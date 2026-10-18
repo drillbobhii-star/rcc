@@ -9,7 +9,6 @@
 <title>RCC — Scripts Lua</title>
 <style>
   :root{
-    /* Paleta Blanco y Negro (Monocromático) */
     --bg: #050505;
     --bg-glass: rgba(15, 15, 15, 0.6);
     --card-glass: rgba(25, 25, 25, 0.4);
@@ -20,7 +19,6 @@
     --accent: #ffffff;
     --sidebar-w: 260px;
   }
-  
   *{box-sizing:border-box;margin:0;padding:0; transition: background-color 0.3s, color 0.3s, border-color 0.3s, backdrop-filter 0.3s; }
   body{
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -28,9 +26,6 @@
     overflow-x:hidden;min-height:100vh;
   }
   
-  /* ==========================================
-     FONDO ANIMADO ESTILO CRISTAL
-     ========================================== */
   .bg-text {
     position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -52,12 +47,8 @@
   @keyframes float1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(60px, 80px) scale(1.05); } }
   @keyframes float2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-70px, -60px) scale(1.1); } }
 
-  /* ==========================================
-     LAYOUT GLASSMORPHISM
-     ========================================== */
   .app{display:flex;min-height:100vh;position:relative;z-index:1}
   
-  /* SIDEBAR */
   .sidebar{
     width:var(--sidebar-w); background:var(--bg-glass);
     border-right:1px solid var(--border-glass);
@@ -76,7 +67,6 @@
   }
   .brand small{color:var(--muted);font-size:.65rem;letter-spacing:5px;display:block;margin-top:4px; font-weight: 600}
 
-  /* TOGGLE DISPOSITIVO */
   .device-toggle{
     display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;
     margin:20px 16px;padding:5px;background:rgba(0,0,0,0.4);
@@ -95,7 +85,6 @@
   }
   .dev-btn .ico{font-size:1.1rem; margin-bottom: 2px;}
 
-  /* SIDEBAR SECTIONS */
   .sidebar-section{padding:10px 16px}
   .sidebar-title{
     font-size:.7rem;color:var(--muted);text-transform:uppercase;
@@ -127,7 +116,6 @@
   }
   .group-header::after{content:"";flex:1;height:1px;background:var(--border-glass);}
 
-  /* MAIN CONTENT */
   .main{flex:1;margin-left:var(--sidebar-w);min-width:0;transition:margin-left .4s ease}
   header{
     position:sticky;top:0;z-index:50;
@@ -166,7 +154,6 @@
   }
   .btn-free:hover{ background:rgba(255,255,255,0.2); transform:translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
 
-  /* HERO */
   .hero{max-width:1300px;margin:auto;padding:40px 24px 10px;position:relative;z-index:1}
   .hero h2{
     font-size:clamp(2rem,4vw,2.8rem); font-weight:800; color: #fff; letter-spacing: -1px;
@@ -187,7 +174,6 @@
   .chip button{background:none;border:none;color:inherit;cursor:pointer;font-size:1.1rem;line-height:1;padding:0;}
   .chip button:hover { color: #ff5c7c; }
 
-  /* CARDS */
   .grid{
     max-width:1300px;margin:auto;padding:28px 24px;
     display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
@@ -219,6 +205,7 @@
   .badge.pc{background:rgba(255, 255, 255,.05); color:#ddd; border: 1px solid rgba(255,255,255,.1);}
   .badge.mobile{background:rgba(255, 255, 255,.05); color:#ddd; border: 1px solid rgba(255,255,255,.1);}
   .badge.both{background:rgba(255, 255, 255,.05); color:#ddd; border: 1px solid rgba(255,255,255,.1);}
+  .badge.loadstring{background:rgba(255, 255, 255, 0.15); color:#fff; border: 1px solid rgba(255,255,255,0.3); font-weight: 900;}
 
   .card h3{font-size:1.15rem;margin-bottom:8px;line-height:1.3; font-weight: 700; color: #fff;}
   .card .desc{color:var(--muted);font-size:.88rem;line-height:1.6;min-height:44px}
@@ -245,7 +232,6 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
   }
 
-  /* ANUNCIOS */
   .ad-banner{max-width:1300px;margin:20px auto 0;padding:0 24px;position:relative;z-index:1}
   .ad-box{
     background:var(--card-glass); border:1px dashed rgba(255,255,255,0.2);
@@ -258,7 +244,6 @@
     font-size:.6rem;letter-spacing:2px;color:rgba(255,255,255,0.3); font-weight: 800;
   }
 
-  /* MODAL */
   .modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);}
   .modal.open{display:flex; animation: fadeIn 0.3s ease;}
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -292,7 +277,6 @@
   .btn-ghost{background:rgba(255,255,255,0.1);color:var(--text);border:1px solid var(--border-glass)}
   .btn-ghost:hover{background: rgba(255,255,255,0.2);}
 
-  /* TOAST */
   .toast{
     position:fixed;bottom:30px;left:50%;transform:translate(-50%,100px);
     background:#fff; color:#000; padding:14px 28px; border-radius:14px; font-weight:700;
@@ -305,7 +289,6 @@
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none; backdrop-filter: blur(4px); transition: opacity 0.3s;}
   .overlay.show{display:block}
 
-  /* RESPONSIVE */
   @media(max-width:900px){
     .sidebar{transform:translateX(-100%)}
     .sidebar.open{transform:translateX(0)}
@@ -328,7 +311,6 @@
 </head>
 <body>
 
-<!-- FONDO ANIMADO -->
 <div class="bg-text">RCC</div>
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
@@ -347,11 +329,15 @@
   </div>
   
   <div class="sidebar-section">
-    <!-- NUEVO BOTON DE RECIENTES -->
     <div id="recentBtn" class="nav-item">
       <span class="ico">⏱️</span>Recientes
       <span class="count" id="recentCount">0</span>
     </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-title">Tipos de Script</div>
+    <div id="typeList"></div>
   </div>
 
   <div class="sidebar-section">
@@ -415,11 +401,11 @@ let scripts = [];
 let filterDevice = 'all';
 let filterPlatform = 'all';
 let filterExecutor = 'all';
-let showRecent = false; // Variable para saber si estamos en la vista de recientes
+let filterType = 'all'; // 'all', 'source', 'loadstring'
+let showRecent = false;
 
-// Sistema de Recientes
 let recentIds = JSON.parse(localStorage.getItem('rcc_recent')) || [];
-let currentCopiedId = null; // Para guardar el ID cuando se abre un script
+let currentCopiedId = null;
 
 const PLATFORMS = [
   { id:'roblox',      name:'Roblox',       icon:'🎮' },
@@ -444,6 +430,7 @@ const modalTitle = document.getElementById('modalTitle');
 const modalBody = document.getElementById('modalBody');
 const platformList = document.getElementById('platformList');
 const executorList = document.getElementById('executorList');
+const typeList = document.getElementById('typeList');
 const activeFilters = document.getElementById('activeFilters');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
@@ -467,12 +454,12 @@ function updateRecentCount() {
     document.getElementById('recentCount').textContent = recentIds.length;
 }
 
-// Lógica de Recientes
 document.getElementById('recentBtn').onclick = () => {
     showRecent = true;
     filterDevice = 'all';
     filterPlatform = 'all';
     filterExecutor = 'all';
+    filterType = 'all';
     searchInput.value = '';
     
     document.getElementById('heroTitle').textContent = "Tus Scripts Recientes";
@@ -485,6 +472,52 @@ document.getElementById('recentBtn').onclick = () => {
 };
 
 function buildSidebar(){
+  // Type filter
+  typeList.innerHTML = '';
+  const allTypes = document.createElement('div');
+  allTypes.className = 'nav-item' + (filterType==='all' && !showRecent ?' active':'');
+  allTypes.innerHTML = `<span class="ico">📄</span>Todos<span class="count">${scripts.length}</span>`;
+  allTypes.onclick = ()=>{ 
+      showRecent = false; 
+      document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
+      document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
+      document.getElementById('recentBtn').classList.remove('active');
+      filterType='all'; buildSidebar(); render(); 
+  };
+  typeList.appendChild(allTypes);
+
+  const loadstringCount = scripts.filter(s => s.type === 'loadstring').length;
+  const sourceCount = scripts.filter(s => s.type === 'source').length;
+
+  if (loadstringCount > 0) {
+    const loadstringItem = document.createElement('div');
+    loadstringItem.className = 'nav-item' + (filterType==='loadstring' && !showRecent ?' active':'');
+    loadstringItem.innerHTML = `<span class="ico">🔗</span>Loadstrings<span class="count">${loadstringCount}</span>`;
+    loadstringItem.onclick = ()=>{ 
+        showRecent = false; 
+        document.getElementById('heroTitle').textContent = "Scripts Loadstring";
+        document.getElementById('heroSubtitle').textContent = "Scripts para ejecutar directamente con loadstring().";
+        document.getElementById('recentBtn').classList.remove('active');
+        filterType='loadstring'; buildSidebar(); render(); closeSidebar();
+    };
+    typeList.appendChild(loadstringItem);
+  }
+
+  if (sourceCount > 0) {
+    const sourceItem = document.createElement('div');
+    sourceItem.className = 'nav-item' + (filterType==='source' && !showRecent ?' active':'');
+    sourceItem.innerHTML = `<span class="ico">📝</span>Fuente (Source)<span class="count">${sourceCount}</span>`;
+    sourceItem.onclick = ()=>{ 
+        showRecent = false; 
+        document.getElementById('heroTitle').textContent = "Scripts de Código Fuente";
+        document.getElementById('heroSubtitle').textContent = "Scripts con código completo para copiar y pegar.";
+        document.getElementById('recentBtn').classList.remove('active');
+        filterType='source'; buildSidebar(); render(); closeSidebar();
+    };
+    typeList.appendChild(sourceItem);
+  }
+
+  // Platform filter
   platformList.innerHTML = '';
   const allP = document.createElement('div');
   allP.className = 'nav-item' + (filterPlatform==='all' && !showRecent ?' active':'');
@@ -500,6 +533,7 @@ function buildSidebar(){
 
   PLATFORMS.forEach(p=>{
     const count = scripts.filter(s=>s.platform===p.id).length;
+    if (count === 0) return;
     const item = document.createElement('div');
     item.className = 'nav-item' + (filterPlatform===p.id && !showRecent ?' active':'');
     item.innerHTML = `<span class="ico">${p.icon}</span>${p.name}<span class="count">${count}</span>`;
@@ -513,6 +547,7 @@ function buildSidebar(){
     platformList.appendChild(item);
   });
 
+  // Executor filter
   executorList.innerHTML = '';
   const allE = document.createElement('div');
   allE.className = 'nav-item' + (filterExecutor==='all' && !showRecent ?' active':'');
@@ -591,6 +626,10 @@ function renderActiveFilters(){
   if(filterExecutor!=='all'){
     add('⚡ '+filterExecutor, ()=>{ filterExecutor='all'; buildSidebar(); render(); });
   }
+  if(filterType!=='all'){
+    const typeLabel = filterType === 'loadstring' ? '🔗 Loadstring' : '📝 Fuente';
+    add(typeLabel, ()=>{ filterType='all'; buildSidebar(); render(); });
+  }
 }
 
 function render(){
@@ -605,12 +644,13 @@ function render(){
     const okDev = filterDevice==='all' || s.device===filterDevice || s.device==='both';
     const okPlat = filterPlatform==='all' || s.platform===filterPlatform;
     const okExec = filterExecutor==='all' || (s.executors||[]).includes(filterExecutor);
+    const okType = filterType==='all' || s.type === filterType;
     const okTxt = !q ||
       s.name.toLowerCase().includes(q) ||
       (s.description||'').toLowerCase().includes(q) ||
       (s.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
       (s.executors||[]).some(e=>e.toLowerCase().includes(q));
-    return okDev && okPlat && okExec && okTxt;
+    return okDev && okPlat && okExec && okType && okTxt;
   });
 
   document.getElementById('statTotal').textContent = scripts.length;
@@ -633,11 +673,15 @@ function render(){
     const plat = PLATFORMS.find(p=>p.id===s.platform);
     const card = document.createElement('div');
     card.className = 'card';
+    
+    const isLoadstring = s.type === 'loadstring';
+
     card.innerHTML = `
       <div class="card-top">
         <div class="badges">
           <span class="badge free">🟢 FREE</span>
           <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
+          ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
       </div>
       <h3>${plat ? plat.icon+' ' : ''}${s.name}</h3>
@@ -651,7 +695,7 @@ function render(){
         <span>📅 ${(s.created_at||'').slice(0,7)}</span>
         <span class="ver">v${s.version}</span>
       </div>
-      <button class="card-action">📋 Ver y copiar</button>
+      <button class="card-action">${isLoadstring ? '⚡ Ejecutar / Copiar Loadstring' : '📋 Ver y copiar'}</button>
     `;
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
     grid.appendChild(card);
@@ -660,13 +704,16 @@ function render(){
 }
 
 function openScript(s){
-  currentCopiedId = s.id; // Guardamos el ID del script actual
+  currentCopiedId = s.id;
   const plat = PLATFORMS.find(p=>p.id===s.platform);
-  modalTitle.innerHTML = `🟢 ${s.name} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${s.version}</span>`;
+  const isLoadstring = s.type === 'loadstring';
+  
+  modalTitle.innerHTML = `${isLoadstring ? '🔗' : '📝'} ${s.name} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${s.version}</span>`;
   modalBody.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
       <span class="badge free">🟢 FREE</span>
+      ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
       ${plat?`<span class="badge" style="background:rgba(255,255,255,.1);color:#fff; border:1px solid rgba(255,255,255,.2)">${plat.icon} ${plat.name}</span>`:''}
     </div>
     <p style="color:var(--muted);margin-bottom:20px;font-size:.92rem; line-height: 1.6;">${s.description||''}</p>
@@ -690,15 +737,12 @@ function copyCode(){
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
       showToast('📋 ¡Copiado!');
       
-      // GUARDAR EN RECIENTES
       if(currentCopiedId && !recentIds.includes(currentCopiedId)) {
           recentIds.unshift(currentCopiedId);
-          // Limitar a 10 recientes para no saturar
           if(recentIds.length > 10) recentIds.pop();
           localStorage.setItem('rcc_recent', JSON.stringify(recentIds));
           updateRecentCount();
           
-          // Si estamos en la vista de recientes, recargar para que aparezca
           if(showRecent) render();
       }
   });
