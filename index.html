@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RCC — Scripts Lua</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0a0a12; --bg2:#12121f; --card:#16162a; --border:#26264a;
@@ -214,11 +215,7 @@ const SUPABASE_URL = 'https://ribhsjlfksmsjyrtqfg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpYmhzanNsZmtzbXNqeXJ0cWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NTY2NjksImV4cCI6MjEwNzQzMjY2OX0.ts6kuw1GfQCQEsxBtrdfauUFMNVlZ0vYblWFDNUBBjM';
 const ADMIN_EMAIL = 'drillbobhii@gmail.com';
 
-// Usamos fetch directo para evitar bloqueos de librerías en móviles
-const headers = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_KEY
-};
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let scripts = [];
 let currentUser = null;
@@ -254,14 +251,19 @@ const activeFilters = document.getElementById('activeFilters');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 
-// LOGIN SIMULADO (Para que funcione sin la librería de Supabase por ahora)
-function initAuth(){
-  const savedUser = localStorage.getItem('rcc_user');
-  if(savedUser) {
-    currentUser = JSON.parse(savedUser);
+async function initAuth(){
+  const { data:{ session } } = await supabaseClient.auth.getSession();
+  if(session){
+    currentUser = session.user;
     isAdmin = currentUser.email === ADMIN_EMAIL;
   }
   renderUserBox();
+  supabaseClient.auth.onAuthStateChange((_e, session)=>{
+    currentUser = session?.user || null;
+    isAdmin = currentUser?.email === ADMIN_EMAIL;
+    renderUserBox();
+    render();
+  });
 }
 
 function renderUserBox(){
@@ -292,7 +294,6 @@ function openLoginModal(){
         <button class="btn btn-primary" onclick="doLogin()">🔓 Entrar</button>
         <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
       </div>
-      <p style="color:var(--muted);font-size:.75rem;margin-top:12px;text-align:center">Ingresa tu correo de administrador para publicar scripts.</p>
     </div>
   `;
   modal.classList.add('open');
@@ -303,61 +304,32 @@ async function doLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
   if(!email || !pass){ showToast('⚠️ Llena todos los campos'); return; }
-  
   showToast('⏳ Iniciando...');
-  try {
-    // Hacemos la petición manual de login a Supabase
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password: pass })
-    });
-    
-    const data = await res.json();
-    
-    if(!res.ok) {
-      throw new Error(data.error_description || data.msg || 'Credenciales incorrectas');
-    }
-
-    currentUser = data.user;
-    isAdmin = currentUser.email === ADMIN_EMAIL;
-    localStorage.setItem('rcc_user', JSON.stringify(currentUser));
-    
-    renderUserBox();
-    closeModal();
-    showToast('✅ Bienvenido');
-  } catch (error) {
-    showToast('❌ ' + error.message);
-  }
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  if(error){ showToast('❌ ' + error.message); return; }
+  closeModal();
+  showToast('✅ Bienvenido');
 }
 
-function logout(){
-  currentUser = null;
-  isAdmin = false;
-  localStorage.removeItem('rcc_user');
-  renderUserBox();
+async function logout(){
+  await supabaseClient.auth.signOut();
   showToast('👋 Sesión cerrada');
 }
 
 async function loadScripts(){
-  try {
-    // Petición manual con fetch (que ya sabemos que funciona en tu cel)
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/scripts?select=*&order=created_at.desc`, {
-      headers: headers
-    });
-    
-    if(!res.ok) throw new Error('Error de conexión');
-    
-    scripts = await res.json();
-    buildSidebar();
-    render();
-  } catch (err) {
-    console.error(err);
-    grid.innerHTML = '<div class="empty">❌ Error al cargar: ' + err.message + '</div>';
+  const { data, error } = await supabaseClient
+    .from('scripts')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if(error){
+    console.error(error);
+    grid.innerHTML = '<div class="empty">❌ Error: ' + error.message + '</div>';
+    return;
   }
+  scripts = data || [];
+  buildSidebar();
+  render();
 }
 
 function buildSidebar(){
@@ -494,16 +466,10 @@ function render(){
       del.onclick = async (ev)=>{
         ev.stopPropagation();
         if(confirm('¿Eliminar "'+s.name+'"?')){
-          try {
-            await fetch(`${SUPABASE_URL}/rest/v1/scripts?id=eq.${s.id}`, {
-              method: 'DELETE',
-              headers: headers
-            });
-            showToast('🗑️ Eliminado');
-            loadScripts();
-          } catch (error) {
-            showToast('❌ Error al eliminar');
-          }
+          const { error } = await supabaseClient.from('scripts').delete().eq('id', s.id);
+          if(error){ showToast('❌ ' + error.message); return; }
+          showToast('🗑️ Eliminado');
+          loadScripts();
         }
       };
       card.appendChild(del);
@@ -532,32 +498,28 @@ async function openScript(s){
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/script_codes?script_id=eq.${s.id}&select=code`, {
-      headers: headers
-    });
-    const data = await res.json();
+  const { data, error } = await supabaseClient
+    .from('script_codes')
+    .select('code')
+    .eq('script_id', s.id)
+    .maybeSingle();
 
-    if(!data || data.length === 0) {
-      throw new Error('No hay código');
-    }
-
-    modalBody.innerHTML = modalBody.innerHTML.replace('<div class="loading">⏳ Cargando código...</div>', `
-      <pre><code id="modalCode"></code></pre>
-      <div class="actions">
-        <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
-        <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
-      </div>
-    `);
-    document.getElementById('modalCode').textContent = data[0].code;
-
-  } catch (error) {
+  if(error || !data){
     modalBody.innerHTML = modalBody.innerHTML.replace('<div class="loading">⏳ Cargando código...</div>',
       `<div style="text-align:center;padding:30px;color:var(--muted)">
         😕 <b>No se pudo cargar el código</b><br>
         <small>Intenta de nuevo más tarde</small>
       </div>`);
+    return;
   }
+  modalBody.innerHTML = modalBody.innerHTML.replace('<div class="loading">⏳ Cargando código...</div>', `
+    <pre><code id="modalCode"></code></pre>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+    </div>
+  `);
+  document.getElementById('modalCode').textContent = data.code;
 }
 
 function openAddModal(){
@@ -620,37 +582,22 @@ async function addScript(){
   if(!name || !code){ showToast('⚠️ Nombre y código obligatorios'); return; }
 
   showToast('⏳ Publicando...');
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/scripts`, {
-      method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify({ name, description, level:'free', device, platform, executors, tags, version, price:0, has_code:true })
-    });
+  const { data, error } = await supabaseClient
+    .from('scripts')
+    .insert([{ name, description, level:'free', device, platform, executors, tags, version, price:0, has_code:true }])
+    .select().single();
 
-    if(!res.ok) throw new Error('Error al guardar script');
-    const newScript = await res.json();
+  if(error){ showToast('❌ ' + error.message); return; }
 
-    const resCode = await fetch(`${SUPABASE_URL}/rest/v1/script_codes`, {
-      method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ script_id: newScript[0].id, code })
-    });
+  const { error: e2 } = await supabaseClient
+    .from('script_codes')
+    .insert([{ script_id: data.id, code }]);
 
-    if(!resCode.ok) throw new Error('Error al guardar código');
+  if(e2){ showToast('❌ Error código: ' + e2.message); return; }
 
-    closeModal();
-    showToast('✅ Script publicado');
-    loadScripts();
-  } catch (error) {
-    showToast('❌ ' + error.message);
-  }
+  closeModal();
+  showToast('✅ Script publicado');
+  loadScripts();
 }
 
 function copyCode(){
@@ -676,10 +623,10 @@ document.getElementById('adminFab').onclick = openAddModal;
 searchInput.addEventListener('input', render);
 
 (async ()=>{
-  initAuth();
+  await initAuth();
   await loadScripts();
 })();
 </script>
 
 </body>
-</html>
+  </html>
