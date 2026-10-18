@@ -3,107 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RCC - Generador de Scripts</title>
+<title>RCC - Panel de Control e IA</title>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: #0a0a12; color: #e8e8f5; padding: 20px; }
-  .container { max-width: 800px; margin: auto; background: #12121f; padding: 20px; border-radius: 12px; border: 1px solid #26264a; }
-  h1 { color: #7c5cff; text-align: center; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a12; color: #e8e8f5; padding: 15px; margin: 0; }
+  .container { max-width: 800px; margin: auto; }
+  
+  /* SECCIÓN DE LA IA */
+  .ai-section { background: #12121f; border: 1px solid #7c5cff; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(124,92,255,0.2); }
+  .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #26264a; padding-bottom: 10px; }
+  .ai-header h2 { margin: 0; font-size: 1.2rem; color: #00e5ff; }
+  .chat-box { height: 250px; overflow-y: auto; background: #0d0d18; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+  .msg { padding: 10px; border-radius: 8px; max-width: 85%; font-size: 0.9rem; line-height: 1.4; }
+  .msg.user { background: #7c5cff; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+  .msg.ai { background: #26264a; color: #e8e8f5; align-self: flex-start; border-bottom-left-radius: 0; }
+  .msg.ai pre { background: #16162a; padding: 8px; border-radius: 5px; overflow-x: auto; color: #00e5ff; font-family: monospace; font-size: 0.8rem; margin: 5px 0; }
+  .btn-use-code { background: #22c55e; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-top: 5px; font-weight: bold; }
+  .chat-input-wrap { display: flex; gap: 10px; }
+  .chat-input-wrap input { flex: 1; padding: 12px; background: #16162a; border: 1px solid #26264a; color: #fff; border-radius: 8px; outline: none; }
+  .chat-input-wrap button { background: #7c5cff; color: #fff; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+  /* SECCIÓN DEL FORMULARIO */
+  .form-section { background: #12121f; padding: 20px; border-radius: 12px; border: 1px solid #26264a; }
+  h1 { color: #7c5cff; text-align: center; font-size: 1.5rem; margin-top: 0;}
   label { display: block; margin-top: 15px; font-size: 0.9rem; color: #8b8ba8; }
-  input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; background: #16162a; border: 1px solid #26264a; color: #fff; border-radius: 8px; outline: none; font-family: inherit; }
+  input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; background: #16162a; border: 1px solid #26264a; color: #fff; border-radius: 8px; outline: none; font-family: inherit; box-sizing: border-box; }
   input:focus, select:focus, textarea:focus { border-color: #7c5cff; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  button { width: 100%; padding: 15px; margin-top: 20px; background: linear-gradient(90deg, #16a34a, #22c55e); color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; }
-  button:hover { filter: brightness(1.1); }
-  #resultado { width: 100%; height: 200px; margin-top: 20px; display: none; background: #0d0d18; color: #00e5ff; font-family: monospace; }
-  .btn-copy { background: linear-gradient(90deg, #7c5cff, #00e5ff); margin-top: 10px; display: none; }
+  button.btn-generate { width: 100%; padding: 15px; margin-top: 20px; background: linear-gradient(90deg, #16a34a, #22c55e); color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+  button.btn-generate:hover { filter: brightness(1.1); }
+  #resultado { width: 100%; height: 150px; margin-top: 15px; display: none; background: #0d0d18; color: #00e5ff; font-family: monospace; box-sizing: border-box; padding: 10px;}
+  .btn-copy { background: linear-gradient(90deg, #7c5cff, #00e5ff); margin-top: 10px; display: none; width: 100%; padding: 15px; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>🛠️ Panel de Administrador RCC</h1>
-  <p style="text-align:center; color:#8b8ba8; font-size:0.9rem;">Llena los datos, genera el código y pégalo en tu archivo <b>scripts.json</b>.</p>
-
-  <label>Nombre del Script</label>
-  <input type="text" id="fName" placeholder="Ej: AutoFarm Pro">
-
-  <label>Descripción corta</label>
-  <textarea id="fDesc" rows="2" placeholder="¿Qué hace este script?"></textarea>
-
-  <div class="row">
-    <div>
-      <label>Plataforma</label>
-      <select id="fPlatform">
-        <option value="roblox">Roblox</option>
-        <option value="fivem">FiveM</option>
-        <option value="gameguardian">GameGuardian</option>
-        <option value="autotouch">AutoTouch</option>
-        <option value="universal">Universal</option>
-      </select>
+  
+  <!-- SECCIÓN DE LA IA (DeepSeek) -->
+  <div class="ai-section">
+    <div class="ai-header">
+      <h2>🤖 Copiloto IA (DeepSeek)</h2>
     </div>
-    <div>
-      <label>Dispositivo</label>
-      <select id="fDevice">
-        <option value="pc">PC</option>
-        <option value="mobile">Móvil</option>
-        <option value="both">Ambos</option>
-      </select>
+    <div class="chat-box" id="chatBox">
+      <div class="msg ai">¡Hola papu! Soy tu asistente. Pídeme un script (ej: "Hazme un script de Roblox para saltar infinito") y yo lo crearé por ti.</div>
+    </div>
+    <div class="chat-input-wrap">
+      <input type="text" id="chatInput" placeholder="Pídele un script a la IA..." onkeypress="if(event.key === 'Enter') enviarMensaje()">
+      <button onclick="enviarMensaje()">Enviar</button>
     </div>
   </div>
 
-  <div class="row">
-    <div>
-      <label>Ejecutores (separados por coma)</label>
-      <input type="text" id="fExec" placeholder="Solara, Wave, Delta">
+  <!-- SECCIÓN DEL FORMULARIO -->
+  <div class="form-section">
+    <h1>🛠️ Generador JSON</h1>
+    <p style="text-align:center; color:#8b8ba8; font-size:0.9rem;">Revisa los datos generados y copia el JSON.</p>
+
+    <label>Nombre del Script</label>
+    <input type="text" id="fName" placeholder="Ej: AutoFarm Pro">
+
+    <label>Descripción corta</label>
+    <textarea id="fDesc" rows="2" placeholder="¿Qué hace este script?"></textarea>
+
+    <div class="row">
+      <div>
+        <label>Plataforma</label>
+        <select id="fPlatform">
+          <option value="roblox">Roblox</option>
+          <option value="fivem">FiveM</option>
+          <option value="gameguardian">GameGuardian</option>
+          <option value="autotouch">AutoTouch</option>
+          <option value="universal">Universal</option>
+        </select>
+      </div>
+      <div>
+        <label>Dispositivo</label>
+        <select id="fDevice">
+          <option value="pc">PC</option>
+          <option value="mobile">Móvil</option>
+          <option value="both">Ambos</option>
+        </select>
+      </div>
     </div>
-    <div>
-      <label>Tags (separados por coma)</label>
-      <input type="text" id="fTags" placeholder="Farm, Auto, OP">
+
+    <div class="row">
+      <div>
+        <label>Ejecutores (separados por coma)</label>
+        <input type="text" id="fExec" placeholder="Solara, Wave">
+      </div>
+      <div>
+        <label>Tags (separados por coma)</label>
+        <input type="text" id="fTags" placeholder="Farm, Auto">
+      </div>
     </div>
+
+    <div class="row">
+      <div>
+        <label>Versión</label>
+        <input type="text" id="fVersion" value="1.0">
+      </div>
+      <div>
+        <label>ID</label>
+        <input type="text" id="fId" readonly style="color:#8b8ba8;">
+      </div>
+    </div>
+
+    <label>Código Lua</label>
+    <textarea id="fCode" rows="6" placeholder="-- El código aparecerá aquí"></textarea>
+
+    <button class="btn-generate" onclick="generarJSON()">Generar Código JSON</button>
+    <textarea id="resultado" readonly></textarea>
+    <button class="btn-copy" id="btnCopy" onclick="copiarJSON()">📋 Copiar JSON para GitHub</button>
   </div>
-
-  <div class="row">
-    <div>
-      <label>Versión</label>
-      <input type="text" id="fVersion" value="1.0">
-    </div>
-    <div>
-      <label>ID (Se genera solo)</label>
-      <input type="text" id="fId" readonly style="color:#8b8ba8;">
-    </div>
-  </div>
-
-  <label>Código Lua</label>
-  <textarea id="fCode" rows="6" placeholder="-- Pega tu código Lua aquí"></textarea>
-
-  <button onclick="generarJSON()">Generar Código JSON</button>
-  <button class="btn-copy" id="btnCopy" onclick="copiarJSON()">📋 Copiar JSON</button>
-
-  <textarea id="resultado" readonly></textarea>
 </div>
 
 <script>
-  // Generar un ID aleatorio al cargar
+  // Generar ID
   document.getElementById('fId').value = Math.random().toString(36).substring(2, 9);
 
+  // --- LÓGICA DE LA IA (Simulada por ahora) ---
+  function enviarMensaje() {
+    const input = document.getElementById('chatInput');
+    const texto = input.value.trim();
+    if(!texto) return;
+
+    const chatBox = document.getElementById('chatBox');
+    
+    // Agregar mensaje del usuario
+    chatBox.innerHTML += `<div class="msg user">${texto}</div>`;
+    input.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Simular que la IA está escribiendo...
+    setTimeout(() => {
+      // Aquí simulamos la respuesta de DeepSeek
+      const respuestaIA = `¡Claro! Aquí tienes un script de ejemplo para tu petición:<br><br>
+      <pre><code>-- Script generado por DeepSeek\nprint("¡Hola desde el script generado!")\n-- Función de prueba\nwhile true do wait(1) end</code></pre>
+      <button class="btn-use-code" onclick="usarCodigoIA()">⬇️ Usar este código</button>`;
+      
+      chatBox.innerHTML += `<div class="msg ai">${respuestaIA}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 1000);
+  }
+
+  function usarCodigoIA() {
+    // Autocompletar el formulario con datos de prueba
+    document.getElementById('fName').value = "Script Generado por IA";
+    document.getElementById('fDesc').value = "Este script fue creado usando el copiloto de DeepSeek.";
+    document.getElementById('fCode').value = `-- Script generado por DeepSeek\nprint("¡Hola desde el script generado!")\n-- Función de prueba\nwhile true do wait(1) end`;
+    document.getElementById('fExec').value = "Solara, Wave";
+    document.getElementById('fTags').value = "IA, Auto";
+    alert("✅ ¡Código insertado en el formulario! Revisa abajo.");
+  }
+
+  // --- LÓGICA DEL GENERADOR JSON ---
   function generarJSON() {
     const name = document.getElementById('fName').value.trim();
     const desc = document.getElementById('fDesc').value.trim();
     const code = document.getElementById('fCode').value.trim();
     
-    if(!name || !code) {
-      alert("⚠️ El nombre y el código son obligatorios.");
-      return;
-    }
+    if(!name || !code) { alert("⚠️ El nombre y el código son obligatorios."); return; }
 
-    // Formatear arrays
     const execString = document.getElementById('fExec').value;
     const execArray = execString ? execString.split(',').map(s => s.trim()) : [];
-    
     const tagsString = document.getElementById('fTags').value;
     const tagsArray = tagsString ? tagsString.split(',').map(s => s.trim()) : [];
 
-    // Crear el objeto
     const scriptObj = {
       id: document.getElementById('fId').value,
       name: name,
@@ -114,14 +178,13 @@
       executors: execArray,
       tags: tagsArray,
       version: document.getElementById('fVersion').value || "1.0",
-      created_at: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+      created_at: new Date().toISOString().slice(0, 10),
       code: code
     };
 
-    // Convertir a JSON bonito
     const jsonString = JSON.stringify(scriptObj, null, 2);
-    
     const resBox = document.getElementById('resultado');
+    
     resBox.value = jsonString;
     resBox.style.display = 'block';
     document.getElementById('btnCopy').style.display = 'block';
@@ -131,7 +194,7 @@
     const resBox = document.getElementById('resultado');
     resBox.select();
     document.execCommand('copy');
-    alert("✅ ¡Copiado! Ahora ve a tu scripts.json en GitHub, pon una coma al final del último script y pega esto.");
+    alert("✅ ¡Copiado! Ahora ve a tu scripts.json en GitHub y pégalo.");
   }
 </script>
 
