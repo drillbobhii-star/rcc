@@ -1,0 +1,67 @@
+[
+  {
+    "id": "1",
+    "name": "AutoFarm Roblox",
+    "description": "Farmea automáticamente con velocidad ajustable.",
+    "level": "free",
+    "device": "pc",
+    "platform": "roblox",
+    "executors": ["Solara", "Wave"],
+    "tags": ["Farm", "Auto"],
+    "version": "1.0",
+    "created_at": "2026-01-15",
+    "code": "-- RCC | AutoFarm (PC)\nlocal player = game.Players.LocalPlayer\n\nwhile true do\n    print(\"Farmeando:\", player.Name)\n    task.wait(1)\nend"
+  },
+  {
+    "id": "2",
+    "name": "AutoFarm Mobile",
+    "description": "Versión móvil del AutoFarm, optimizada para Delta y Fluxus.",
+    "level": "free",
+    "device": "mobile",
+    "platform": "roblox",
+    "executors": ["Delta", "Fluxus", "Arceus X"],
+    "tags": ["Farm", "Mobile"],
+    "version": "1.0",
+    "created_at": "2026-02-10",
+    "code": "-- RCC | AutoFarm (Móvil)\n-- Compatible con Delta, Fluxus, Arceus X\nlocal player = game.Players.LocalPlayer\n\nwhile task.wait(1) do\n    print(\"Mobile farm:\", player.Name)\nend"
+  },
+  {
+    "id": "3",
+    "name": "Teleport FiveM",
+    "description": "Teletransporte a coordenadas en servidores FiveM.",
+    "level": "free",
+    "device": "pc",
+    "platform": "fivem",
+    "executors": ["Nativo"],
+    "tags": ["Teleport", "Utilidad"],
+    "version": "1.0",
+    "created_at": "2026-03-05",
+    "code": "-- RCC | Teleport FiveM\nlocal coords = vector3(0.0, 0.0, 70.0)\nSetEntityCoords(PlayerPedId(), coords.x, coords.y, coords.z, false, false, false, true)"
+  },
+  {
+    "id": "4",
+    "name": "ESP Pro Universal",
+    "description": "ESP avanzado con nombres, distancia y salud. Código optimizado.",
+    "level": "free",
+    "device": "both",
+    "platform": "roblox",
+    "executors": ["Solara", "Wave", "Delta", "Fluxus"],
+    "tags": ["Visual", "ESP"],
+    "version": "2.0",
+    "created_at": "2026-04-20",
+    "code": "-- RCC | ESP Pro\n-- Contenido PRO desbloqueado\nprint(\"ESP Pro cargado\")"
+  },
+  {
+    "id": "5",
+    "name": "DataStore Premium",
+    "description": "Sistema de guardado profesional con caché y respaldo automático.",
+    "level": "free",
+    "device": "pc",
+    "platform": "roblox",
+    "executors": ["Solara", "Wave", "Xeno"],
+    "tags": ["DataStore", "Server"],
+    "version": "3.0",
+    "created_at": "2026-05-12",
+    "code": "-- RCC | DataStore Premium\n-- Sistema de guardado PRO\nprint(\"DataStore cargado\")"
+  }
+]
