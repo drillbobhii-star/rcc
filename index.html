@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RCC — Scripts Lua</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0a0a12; --bg2:#12121f; --card:#16162a; --border:#26264a;
@@ -23,12 +22,6 @@
   .brand{padding:0 20px 20px;border-bottom:1px solid var(--border)}
   .brand h1{font-size:1.5rem;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
   .brand small{color:var(--muted);font-size:.65rem;letter-spacing:3px;display:block;margin-top:2px}
-  .user-box{padding:12px 14px;border-bottom:1px solid var(--border);font-size:.8rem}
-  .user-box .email{color:var(--accent2);word-break:break-all;font-size:.72rem}
-  .user-box .actions{margin-top:8px;display:flex;gap:6px}
-  .user-box button{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.72rem;font-weight:600;transition:.2s}
-  .user-box button:hover{border-color:var(--accent)}
-  .user-box .admin-tag{display:inline-block;background:linear-gradient(90deg,#f5b800,#ff9500);color:#1a1a1a;padding:2px 8px;border-radius:6px;font-size:.65rem;font-weight:800;margin-bottom:4px}
   .device-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin:16px 14px;padding:4px;background:var(--bg);border-radius:12px;border:1px solid var(--border)}
   .dev-btn{padding:9px 0;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:.78rem;font-weight:600;border-radius:8px;transition:.25s;display:flex;flex-direction:column;align-items:center;gap:2px}
   .dev-btn:hover{color:var(--text)}
@@ -103,17 +96,10 @@
   .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;flex:1}
   .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
   .btn:hover{transform:translateY(-2px)}
-  .admin-fab{position:fixed;bottom:24px;right:24px;z-index:990;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.4rem;box-shadow:0 8px 25px rgba(124,92,255,.5);transition:.3s;display:none}
-  .admin-fab:hover{transform:scale(1.1) rotate(15deg)}
   .toast{position:fixed;bottom:30px;left:50%;transform:translate(-50%,100px);background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;padding:13px 24px;border-radius:12px;font-weight:700;z-index:2100;transition:.4s;box-shadow:0 10px 30px rgba(124,92,255,.5);max-width:90%}
   .toast.show{transform:translate(-50%,0)}
   .empty{text-align:center;color:var(--muted);padding:60px 20px;grid-column:1/-1}
   .loading{text-align:center;color:var(--muted);padding:60px 20px;grid-column:1/-1}
-  .form label{display:block;font-size:.78rem;color:var(--muted);margin:14px 0 6px;font-weight:600}
-  .form input,.form textarea,.form select{width:100%;padding:11px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.88rem;outline:none;font-family:inherit}
-  .form input:focus,.form textarea:focus,.form select:focus{border-color:var(--accent)}
-  .form textarea{resize:vertical;font-family:Consolas,monospace}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none}
   .overlay.show{display:block}
   @media(max-width:900px){
@@ -130,7 +116,6 @@
   }
   @media(max-width:480px){
     .grid{grid-template-columns:1fr}
-    .form-row{grid-template-columns:1fr}
     .stats{gap:16px}
   }
 </style>
@@ -143,9 +128,6 @@
   <div class="brand">
     <h1>RCC</h1>
     <small>LUA SCRIPTS</small>
-  </div>
-  <div class="user-box" id="userBox">
-    <button onclick="openLoginModal()" style="width:100%">🔑 Iniciar sesión</button>
   </div>
   <div class="device-toggle">
     <button class="dev-btn active" data-dev="all"><span class="ico">🌐</span>Todos</button>
@@ -188,15 +170,13 @@
       <div class="ad-box">📢 Espacio publicitario</div>
     </div>
     <div class="grid" id="scripts">
-      <div class="loading">⏳ Cargando scripts...</div>
+      <div class="loading">⏳ Cargando scripts desde GitHub...</div>
     </div>
     <div class="ad-banner" style="margin-bottom:40px">
       <div class="ad-box">📢 Espacio publicitario</div>
     </div>
   </div>
 </div>
-
-<button class="admin-fab" id="adminFab" title="Publicar script">➕</button>
 
 <div class="modal" id="modal">
   <div class="modal-box">
@@ -211,15 +191,7 @@
 <div class="toast" id="toast">¡Copiado!</div>
 
 <script>
-const SUPABASE_URL = 'https://ribhsjlfksmsjyrtqfg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpYmhzanNsZmtzbXNqeXJ0cWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NTY2NjksImV4cCI6MjEwNzQzMjY2OX0.ts6kuw1GfQCQEsxBtrdfauUFMNVlZ0vYblWFDNUBBjM';
-const ADMIN_EMAIL = 'drillbobhii@gmail.com';
-
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 let scripts = [];
-let currentUser = null;
-let isAdmin = false;
 let filterDevice = 'all';
 let filterPlatform = 'all';
 let filterExecutor = 'all';
@@ -251,85 +223,20 @@ const activeFilters = document.getElementById('activeFilters');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 
-async function initAuth(){
-  const { data:{ session } } = await supabaseClient.auth.getSession();
-  if(session){
-    currentUser = session.user;
-    isAdmin = currentUser.email === ADMIN_EMAIL;
-  }
-  renderUserBox();
-  supabaseClient.auth.onAuthStateChange((_e, session)=>{
-    currentUser = session?.user || null;
-    isAdmin = currentUser?.email === ADMIN_EMAIL;
-    renderUserBox();
-    render();
-  });
-}
-
-function renderUserBox(){
-  const box = document.getElementById('userBox');
-  const adminFab = document.getElementById('adminFab');
-  if(currentUser){
-    box.innerHTML = `
-      ${isAdmin ? '<div class="admin-tag">👑 ADMIN</div>' : ''}
-      <div class="email">${currentUser.email}</div>
-      <div class="actions"><button onclick="logout()">Cerrar sesión</button></div>
-    `;
-    adminFab.style.display = isAdmin ? 'flex' : 'none';
-  } else {
-    box.innerHTML = `<button onclick="openLoginModal()" style="width:100%">🔑 Iniciar sesión</button>`;
-    adminFab.style.display = 'none';
-  }
-}
-
-function openLoginModal(){
-  modalTitle.innerHTML = '🔐 Iniciar sesión';
-  modalBody.innerHTML = `
-    <div class="form">
-      <label>Email</label>
-      <input id="loginEmail" type="email" placeholder="tu@email.com">
-      <label>Contraseña</label>
-      <input id="loginPass" type="password" placeholder="••••••••">
-      <div class="actions">
-        <button class="btn btn-primary" onclick="doLogin()">🔓 Entrar</button>
-        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      </div>
-    </div>
-  `;
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-async function doLogin(){
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  if(!email || !pass){ showToast('⚠️ Llena todos los campos'); return; }
-  showToast('⏳ Iniciando...');
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-  if(error){ showToast('❌ ' + error.message); return; }
-  closeModal();
-  showToast('✅ Bienvenido');
-}
-
-async function logout(){
-  await supabaseClient.auth.signOut();
-  showToast('👋 Sesión cerrada');
-}
-
+// Cargar los scripts desde el archivo JSON de GitHub
 async function loadScripts(){
-  const { data, error } = await supabaseClient
-    .from('scripts')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if(error){
-    console.error(error);
-    grid.innerHTML = '<div class="empty">❌ Error: ' + error.message + '</div>';
-    return;
+  try {
+    // Busca el archivo en la misma carpeta de GitHub
+    const res = await fetch('scripts.json');
+    if(!res.ok) throw new Error('No se encontró el archivo scripts.json');
+    
+    scripts = await res.json();
+    buildSidebar();
+    render();
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = '<div class="empty">❌ Error al cargar: ' + err.message + '<br><small>Asegúrate de haber creado el archivo scripts.json</small></div>';
   }
-  scripts = data || [];
-  buildSidebar();
-  render();
 }
 
 function buildSidebar(){
@@ -459,27 +366,12 @@ function render(){
       <button class="card-action">📋 Ver y copiar</button>
     `;
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
-    if(isAdmin){
-      const del = document.createElement('button');
-      del.textContent = '🗑️';
-      del.style.cssText = 'position:absolute;top:12px;right:12px;background:rgba(255,92,124,.2);border:1px solid rgba(255,92,124,.4);color:#ff5c7c;border-radius:6px;padding:3px 8px;font-size:.7rem;cursor:pointer;z-index:2';
-      del.onclick = async (ev)=>{
-        ev.stopPropagation();
-        if(confirm('¿Eliminar "'+s.name+'"?')){
-          const { error } = await supabaseClient.from('scripts').delete().eq('id', s.id);
-          if(error){ showToast('❌ ' + error.message); return; }
-          showToast('🗑️ Eliminado');
-          loadScripts();
-        }
-      };
-      card.appendChild(del);
-    }
     grid.appendChild(card);
     setTimeout(()=>card.classList.add('show'), i*60);
   });
 }
 
-async function openScript(s){
+function openScript(s){
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   modalTitle.innerHTML = `🟢 ${s.name} <span style="color:var(--muted);font-size:.8rem">v${s.version}</span>`;
   modalBody.innerHTML = `
@@ -493,111 +385,17 @@ async function openScript(s){
       <div style="font-size:.72rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Ejecutores compatibles</div>
       <div class="tags">${(s.executors||[]).map(e=>`<span class="tag exec">⚡ ${e}</span>`).join('')}</div>
     </div>
-    <div class="loading">⏳ Cargando código...</div>
-  `;
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  const { data, error } = await supabaseClient
-    .from('script_codes')
-    .select('code')
-    .eq('script_id', s.id)
-    .maybeSingle();
-
-  if(error || !data){
-    modalBody.innerHTML = modalBody.innerHTML.replace('<div class="loading">⏳ Cargando código...</div>',
-      `<div style="text-align:center;padding:30px;color:var(--muted)">
-        😕 <b>No se pudo cargar el código</b><br>
-        <small>Intenta de nuevo más tarde</small>
-      </div>`);
-    return;
-  }
-  modalBody.innerHTML = modalBody.innerHTML.replace('<div class="loading">⏳ Cargando código...</div>', `
     <pre><code id="modalCode"></code></pre>
     <div class="actions">
       <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
     </div>
-  `);
-  document.getElementById('modalCode').textContent = data.code;
-}
-
-function openAddModal(){
-  if(!isAdmin){ showToast('⚠️ Solo admin'); return; }
-  modalTitle.innerHTML = '➕ Nuevo script';
-  modalBody.innerHTML = `
-    <div class="form">
-      <label>Nombre</label>
-      <input id="fName" placeholder="Nombre del script">
-      <label>Descripción</label>
-      <textarea id="fDesc" rows="2" placeholder="¿Qué hace?"></textarea>
-      <div class="form-row">
-        <div>
-          <label>Dispositivo</label>
-          <select id="fDevice">
-            <option value="pc">🖥️ PC</option>
-            <option value="mobile">📱 Móvil</option>
-            <option value="both">🌐 Ambos</option>
-          </select>
-        </div>
-        <div>
-          <label>Plataforma</label>
-          <select id="fPlatform">
-            ${PLATFORMS.map(p=>`<option value="${p.id}">${p.icon} ${p.name}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-      <label>Ejecutores (separados por coma)</label>
-      <input id="fExec" placeholder="Solara, Wave">
-      <small style="color:var(--muted);font-size:.72rem;display:block;margin-top:4px">
-        🖥️ PC: ${EXECUTORS.pc.join(', ')}<br>
-        📱 Móvil: ${EXECUTORS.mobile.join(', ')}
-      </small>
-      <label>Tags (separadas por coma)</label>
-      <input id="fTags" placeholder="Farm, Auto">
-      <label>Versión</label>
-      <input id="fVer" value="1.0">
-      <label>Código Lua</label>
-      <textarea id="fCode" rows="8" placeholder="-- tu script aquí"></textarea>
-      <div class="actions">
-        <button class="btn btn-primary" onclick="addScript()">💾 Publicar</button>
-        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      </div>
-    </div>
   `;
+  // Aquí ya lee el código directamente del JSON
+  document.getElementById('modalCode').textContent = s.code;
+  
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-}
-
-async function addScript(){
-  const name = document.getElementById('fName').value.trim();
-  const description = document.getElementById('fDesc').value.trim();
-  const device = document.getElementById('fDevice').value;
-  const platform = document.getElementById('fPlatform').value;
-  const executors = document.getElementById('fExec').value.split(',').map(e=>e.trim()).filter(Boolean);
-  const tags = document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const version = document.getElementById('fVer').value.trim() || '1.0';
-  const code = document.getElementById('fCode').value;
-
-  if(!name || !code){ showToast('⚠️ Nombre y código obligatorios'); return; }
-
-  showToast('⏳ Publicando...');
-  const { data, error } = await supabaseClient
-    .from('scripts')
-    .insert([{ name, description, level:'free', device, platform, executors, tags, version, price:0, has_code:true }])
-    .select().single();
-
-  if(error){ showToast('❌ ' + error.message); return; }
-
-  const { error: e2 } = await supabaseClient
-    .from('script_codes')
-    .insert([{ script_id: data.id, code }]);
-
-  if(e2){ showToast('❌ Error código: ' + e2.message); return; }
-
-  closeModal();
-  showToast('✅ Script publicado');
-  loadScripts();
 }
 
 function copyCode(){
@@ -619,14 +417,11 @@ function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.rem
 document.getElementById('hamburger').onclick = openSidebar;
 overlay.onclick = closeSidebar;
 
-document.getElementById('adminFab').onclick = openAddModal;
 searchInput.addEventListener('input', render);
 
-(async ()=>{
-  await initAuth();
-  await loadScripts();
-})();
+// Iniciar
+loadScripts();
 </script>
 
 </body>
-  </html>
+    </html>
