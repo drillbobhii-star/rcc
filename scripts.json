@@ -2,7 +2,7 @@
   {
     "id": "rbx_inf_jump",
     "name": "Infinite Jump (Salto Infinito)",
-    "description": "Permite saltar sin límites en el aire. Funciona en la mayoría de juegos sin anti-cheat agresivo.",
+    "description": "Permite saltar sin límites en el aire. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -15,7 +15,7 @@
   {
     "id": "rbx_speed",
     "name": "WalkSpeed Rápido",
-    "description": "Aumenta la velocidad base del personaje a 100. Úsalo con precaución en juegos con anti-cheat.",
+    "description": "Aumenta la velocidad base del personaje a 100. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -28,7 +28,7 @@
   {
     "id": "rbx_jump_power",
     "name": "JumpPower Elevado",
-    "description": "Aumenta la fuerza de salto a 200. Ideal para explorar mapas o llegar a lugares altos.",
+    "description": "Aumenta la fuerza de salto a 200. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -41,7 +41,7 @@
   {
     "id": "rbx_teleport",
     "name": "Teleport a Coordenadas",
-    "description": "Te teletransporta a una posición fija (0, 50, 0) para caer desde el cielo. Útil para escapar.",
+    "description": "Te teletransporta a (0, 50, 0). Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "pc",
     "platform": "roblox",
@@ -54,7 +54,7 @@
   {
     "id": "rbx_fly",
     "name": "Fly (Volar) [PC]",
-    "description": "Permite volar usando CFrame. Mantén la barra espaciadora para subir y Ctrl para bajar. (Requiere teclado).",
+    "description": "Permite volar. PRESIONA LA TECLA 'F' PARA ACTIVAR/DESACTIVAR. Usa W/A/S/D para moverte y Espacio/Ctrl para subir/bajar.",
     "level": "pro",
     "device": "pc",
     "platform": "roblox",
@@ -67,7 +67,7 @@
   {
     "id": "rbx_noclip",
     "name": "Noclip (Atravesar paredes)",
-    "description": "Te permite atravesar objetos y paredes. Se activa al presionar la tecla N.",
+    "description": "Te permite atravesar objetos. PRESIONA LA TECLA 'N' PARA ACTIVAR/DESACTIVAR.",
     "level": "pro",
     "device": "pc",
     "platform": "roblox",
@@ -80,7 +80,7 @@
   {
     "id": "rbx_fullbright",
     "name": "Fullbright (Ver en la oscuridad)",
-    "description": "Elimina las sombras y aumenta el brillo para ver todo el mapa. No requiere anti-cheat.",
+    "description": "Elimina las sombras y aumenta el brillo. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -93,7 +93,7 @@
   {
     "id": "rbx_esp_basic",
     "name": "Player List (ESP Básico)",
-    "description": "Muestra en la consola (F9) la lista de jugadores con su nombre y salud. Ideal para probar ESP sin dibujar cajas.",
+    "description": "Muestra la lista de jugadores en la consola (F9). Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -106,7 +106,7 @@
   {
     "id": "rbx_antiafk",
     "name": "Anti-AFK (Anti-Kick)",
-    "description": "Evita que el juego te expulse por inactividad. Perfecto para dejar el juego abierto.",
+    "description": "Evita que el juego te expulse por inactividad. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -119,7 +119,7 @@
   {
     "id": "rbx_fps_boost",
     "name": "FPS Booster (Eliminar Texturas)",
-    "description": "Elimina texturas y detalles para aumentar los FPS en computadoras o celulares de bajos recursos.",
+    "description": "Elimina texturas para mejorar el rendimiento. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -132,7 +132,7 @@
   {
     "id": "rbx_rejoin",
     "name": "Rejoin Server",
-    "description": "Te vuelve a conectar al mismo servidor en el que estás. Útil si te quedas atascado.",
+    "description": "Te reconecta al mismo servidor. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "both",
     "platform": "roblox",
@@ -145,7 +145,7 @@
   {
     "id": "rbx_server_hop",
     "name": "Server Hop (Saltar de Servidor)",
-    "description": "Te cambia a un servidor diferente del mismo juego. Ideal para buscar servidores con menos gente.",
+    "description": "Te cambia a otro servidor del mismo juego. Se activa automáticamente al ejecutar.",
     "level": "pro",
     "device": "both",
     "platform": "roblox",
@@ -158,7 +158,7 @@
   {
     "id": "rbx_hitbox",
     "name": "Hitbox Expander (Básico)",
-    "description": "Aumenta el tamaño de la cabeza de los jugadores para facilitar los golpes. (Requiere juego con PvP).",
+    "description": "Aumenta el tamaño de la cabeza de los jugadores. Se activa automáticamente al ejecutar.",
     "level": "pro",
     "device": "both",
     "platform": "roblox",
@@ -171,7 +171,7 @@
   {
     "id": "rbx_godmode",
     "name": "Godmode (Cliente)",
-    "description": "Evita que recibas daño en la mayoría de juegos (solo lado cliente, no protege de todo).",
+    "description": "Evita que recibas daño (solo lado cliente). Se activa automáticamente al ejecutar.",
     "level": "pro",
     "device": "both",
     "platform": "roblox",
@@ -180,6 +180,19 @@
     "version": "1.0",
     "created_at": "2026-10-18",
     "code": "-- RCC | Godmode Cliente\nlocal player = game.Players.LocalPlayer\n\nplayer.CharacterAdded:Connect(function(char)\n    local humanoid = char:WaitForChild(\"Humanoid\")\n    humanoid.MaxHealth = math.huge\n    humanoid.Health = math.huge\nend)\n\nif player.Character then\n    local humanoid = player.Character:FindFirstChild(\"Humanoid\")\n    if humanoid then\n        humanoid.MaxHealth = math.huge\n        humanoid.Health = math.huge\n    end\nend\nprint(\"Godmode Cliente Activado\")"
+  },
+  {
+    "id": "rbx_floating_panel",
+    "name": "Panel Flotante Arrastrable (Móvil/PC)",
+    "description": "Crea un panel flotante arrastrable para confirmar que el script está activo. Ideal para celulares.",
+    "level": "free",
+    "device": "both",
+    "platform": "roblox",
+    "executors": ["Solara", "Wave", "Delta", "Fluxus", "Xeno"],
+    "tags": ["UI", "Interfaz"],
+    "version": "1.0",
+    "created_at": "2026-10-18",
+    "code": "-- RCC | Panel Flotante Arrastrable\nlocal ScreenGui = Instance.new(\"ScreenGui\")\nScreenGui.Parent = game.CoreGui\nScreenGui.Name = \"RCC_Panel\"\n\nlocal Frame = Instance.new(\"Frame\")\nFrame.Parent = ScreenGui\nFrame.Size = UDim2.new(0, 200, 0, 60)\nFrame.Position = UDim2.new(0.5, -100, 0.1, 0)\nFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)\nFrame.BorderSizePixel = 0\nFrame.Draggable = true\n\nlocal Corner = Instance.new(\"UICorner\")\nCorner.CornerRadius = UDim.new(0, 10)\nCorner.Parent = Frame\n\nlocal Title = Instance.new(\"TextLabel\")\nTitle.Parent = Frame\nTitle.Size = UDim2.new(1, 0, 0.5, 0)\nTitle.Position = UDim2.new(0, 0, 0, 5)\nTitle.BackgroundTransparency = 1\nTitle.Text = \"RCC Scripts ✅\"\nTitle.TextColor3 = Color3.fromRGB(0, 229, 255)\nTitle.Font = Enum.Font.GothamBold\nTitle.TextSize = 16\n\nlocal Status = Instance.new(\"TextLabel\")\nStatus.Parent = Frame\nStatus.Size = UDim2.new(1, 0, 0.5, 0)\nStatus.Position = UDim2.new(0, 0, 0.5, 0)\nStatus.BackgroundTransparency = 1\nStatus.Text = \"Script Activado\"\nStatus.TextColor3 = Color3.fromRGB(34, 197, 94)\nStatus.Font = Enum.Font.Gotham\nStatus.TextSize = 14\n\nlocal Button = Instance.new(\"TextButton\")\nButton.Parent = Frame\nButton.Size = UDim2.new(0, 30, 0, 30)\nButton.Position = UDim2.new(1, -35, 0, 15)\nButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)\nButton.Text = \"X\"\nButton.TextColor3 = Color3.fromRGB(255, 255, 255)\nButton.Font = Enum.Font.GothamBold\nButton.TextSize = 18\nButton.BorderSizePixel = 0\n\nlocal BtnCorner = Instance.new(\"UICorner\")\nBtnCorner.CornerRadius = UDim.new(0, 5)\nBtnCorner.Parent = Button\n\nButton.MouseButton1Click:Connect(function()\n    ScreenGui:Destroy()\nend)\n\nprint(\"Panel Flotante Creado\")"
   },
   {
     "id": "fivem_car",
@@ -197,7 +210,7 @@
   {
     "id": "fivem_tp",
     "name": "Teleport a Coordenadas (FiveM)",
-    "description": "Teletranspórtate a las coordenadas X, Y, Z especificadas (por defecto 0, 0, 70).",
+    "description": "Teletranspórtate a coordenadas (0, 0, 70). Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "pc",
     "platform": "fivem",
@@ -210,7 +223,7 @@
   {
     "id": "fivem_heal",
     "name": "Heal Player",
-    "description": "Restaura toda la salud de tu personaje y limpia la sangre.",
+    "description": "Restaura la salud de tu personaje. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "pc",
     "platform": "fivem",
@@ -223,7 +236,7 @@
   {
     "id": "fivem_armor",
     "name": "Dar Armadura",
-    "description": "Otorga 100 de armadura a tu personaje.",
+    "description": "Otorga 100 de armadura. Se activa automáticamente al ejecutar.",
     "level": "free",
     "device": "pc",
     "platform": "fivem",
@@ -236,7 +249,7 @@
   {
     "id": "fivem_superjump",
     "name": "Super Jump (FiveM)",
-    "description": "Aumenta la fuerza de salto para llegar a lugares altos.",
+    "description": "Aumenta la fuerza de salto. Se activa automáticamente al ejecutar.",
     "level": "pro",
     "device": "pc",
     "platform": "fivem",
@@ -245,5 +258,44 @@
     "version": "1.0",
     "created_at": "2026-10-18",
     "code": "-- RCC | FiveM Super Jump\nlocal playerPed = PlayerPedId()\nSetSuperJumpThisFrame(playerPed)\nprint(\"Super Jump activado por un frame\")"
+  },
+  {
+    "id": "gg_multi_choice",
+    "name": "GameGuardian Multi-Choice Template",
+    "description": "Plantilla de menú de opciones para GameGuardian. Ideal para organizar tus búsquedas de memoria.",
+    "level": "free",
+    "device": "mobile",
+    "platform": "gameguardian",
+    "executors": ["GameGuardian"],
+    "tags": ["Template", "Menú"],
+    "version": "1.0",
+    "created_at": "2026-10-18",
+    "code": "-- RCC | GameGuardian Multi-Choice\nfunction choice()\n    local t = gg.multichoice({\n        'Opción 1: Buscar Vida',\n        'Opción 2: Buscar Monedas',\n        'Opción 3: Buscar Munición',\n        'Salir'\n    }, nil, 'RCC Scripts')\n    if t == nil then gg.sleep(1) else\n        if t[1] then searchHealth() end\n        if t[2] then searchCoins() end\n        if t[3] then searchAmmo() end\n        if t[4] then return end\n    end\nend\n\nfunction searchHealth()\n    gg.searchNumber('100', gg.TYPE_DWORD)\n    gg.alert('Buscando vida...')\nend\n\nfunction searchCoins()\n    gg.searchNumber('9999', gg.TYPE_DWORD)\n    gg.alert('Buscando monedas...')\nend\n\nfunction searchAmmo()\n    gg.searchNumber('30', gg.TYPE_DWORD)\n    gg.alert('Buscando munición...')\nend\n\nwhile true do\n    if gg.isVisible() then\n        gg.setVisible(false)\n        choice()\n    end\n    gg.sleep(100)\nend"
+  },
+  {
+    "id": "autotouch_open_app",
+    "name": "AutoTouch: Abrir App y Tocar",
+    "description": "Abre Safari y simula un toque en pantalla. Ideal para empezar con automatización en iOS.",
+    "level": "free",
+    "device": "mobile",
+    "platform": "autotouch",
+    "executors": ["AutoTouch"],
+    "tags": ["Automatización", "Básico"],
+    "version": "1.0",
+    "created_at": "2026-10-18",
+    "code": "-- RCC | AutoTouch Abrir App y Tocar\n-- Abre Safari (ajusta el bundle ID si es necesario)\nappRun(\"com.apple.mobilesafari\")\nusleep(1000000) -- Espera 1 segundo\n-- Simula un toque en las coordenadas (320, 640)\ntap(320, 640)\nprint(\"App abierta y toque simulado\")"
+  },
+  {
+    "id": "univ_wait_print",
+    "name": "Universal: Esperar y Mostrar Mensaje",
+    "description": "Script universal de ejemplo que espera y muestra un mensaje. Útil para pruebas en cualquier entorno.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "executors": ["Nativo"],
+    "tags": ["Prueba", "Universal"],
+    "version": "1.0",
+    "created_at": "2026-10-18",
+    "code": "-- RCC | Universal Wait & Print\nprint(\"Iniciando script universal...\")\nwait(2) -- Espera 2 segundos\nprint(\"¡Script universal cargado con éxito!\")\n-- Aquí puedes añadir tu lógica personalizada\nfor i = 1, 5 do\n    print(\"Ejecutando paso \" .. i)\n    wait(1)\nend\nprint(\"Script finalizado\")"
   }
 ]
