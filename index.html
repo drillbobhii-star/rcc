@@ -377,6 +377,12 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
 .device-toggle{grid-template-columns:repeat(2,1fr)}
 @media(max-width:600px){.discord-panel{align-items:start;flex-direction:column}.discord-panel a{width:100%;text-align:center}.game-tools label,.game-tools select{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.visitor-badge{position:absolute;right:18px;top:3px;display:grid;gap:3px;padding:7px 10px;border:1px solid var(--border-glass);border-radius:10px;background:var(--card-glass);text-align:right}
+.visitor-badge strong{font-size:.95rem;font-variant-numeric:tabular-nums;color:var(--text)}
+.visitor-badge span{font-size:.58rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.mobile-visitors{display:none}
+@media(max-width:900px){.mobile-visitors{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted);white-space:nowrap}.mobile-visitors strong{color:var(--text);font-variant-numeric:tabular-nums}.topbar{flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -393,6 +399,7 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
 <aside class="sidebar" id="sidebar">
   <div class="brand">
     <h1>RCC</h1>
+    <div class="visitor-badge" title="Navegadores que han visitado RCC desde la activación del contador. Borrar las cookies o cambiar de dispositivo puede contar otra visita."><strong data-visitor-total aria-live="polite">…</strong><span>Visitantes</span></div>
     <small>LUA SCRIPTS</small>
   </div>
   <div class="device-toggle">
@@ -434,6 +441,7 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
           <input type="text" id="search" placeholder="Buscar script, ejecutor o etiqueta...">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
+        <div class="mobile-visitors" title="Total acumulado de visitantes de RCC"><strong data-visitor-total>…</strong> visitantes</div>
         <button class="btn-free">🎁 Gratis</button>
       </div>
     </header>
@@ -443,15 +451,15 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
       </nav>
       <h2 id="heroTitle" tabindex="-1">Scripts Lua por RCC</h2>
-      <p id="heroSubtitle">Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.</p>
+      <p id="heroSubtitle">1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.</p>
       <aside class="discord-panel">
         <div><small>COMUNIDAD RCC</small><h3>Los scripts también se comparten.</h3><p>Únete a nuestro servidor de Discord y comparte con la comunidad.</p></div>
         <a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme a Discord ↗</a>
       </aside>
       <div class="game-tools" id="gameTools" hidden>
         <label>Juego<select id="gameFilter"><option value="all">Todos los juegos</option></select></label>
-        <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="community">Loaders de la comunidad</option></select></label>
-        <p>Fuentes consultadas el 19/10/2026. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
+        <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
+        <p>Incluye 100 recetas configurables para crear tus propios juegos en Roblox Studio, en diez géneros. Fuentes de la comunidad consultadas el 19/10/2026. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
       </div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
@@ -638,7 +646,7 @@ function buildSidebar(){
   allTypes.onclick = ()=>{ 
       showRecent = false; 
       document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
+      document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
       document.getElementById('recentBtn').classList.remove('active');
       filterType='all'; buildSidebar(); render(); 
   };
@@ -682,7 +690,7 @@ function buildSidebar(){
   allP.onclick = ()=>{ 
       showRecent = false; 
       document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
+      document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
       document.getElementById('recentBtn').classList.remove('active');
       filterPlatform='all'; buildSidebar(); render(); 
   };
@@ -697,7 +705,7 @@ function buildSidebar(){
     item.onclick = ()=>{ 
         showRecent = false;
         document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-        document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
+        document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
         document.getElementById('recentBtn').classList.remove('active');
         filterPlatform=p.id; buildSidebar(); render(); closeSidebar(); 
     };
@@ -711,7 +719,7 @@ function buildSidebar(){
   allE.onclick = ()=>{ 
       showRecent = false; 
       document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
+      document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
       document.getElementById('recentBtn').classList.remove('active');
       filterExecutor='all'; buildSidebar(); render(); 
   };
@@ -735,7 +743,7 @@ document.querySelectorAll('.dev-btn').forEach(btn=>{
   btn.onclick = ()=>{
     showRecent = false;
     document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-    document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
+    document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
     document.getElementById('recentBtn').classList.remove('active');
     document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -988,7 +996,7 @@ document.getElementById('resetFilters').onclick = ()=>{
   searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
   document.getElementById('recentBtn').classList.remove('active');
   document.getElementById('heroTitle').textContent='Scripts Lua por RCC';
-  document.getElementById('heroSubtitle').textContent='Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.';
+  document.getElementById('heroSubtitle').textContent='1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.';
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev==='all'));
   buildSidebar(); render();
 };
@@ -1018,6 +1026,33 @@ document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;
 document.getElementById('originFilter').onchange=render;
 loadScripts();
+// El total procede del servidor; actualizarlo no registra otra visita.
+let visitorRegistered = false;
+let visitorBusy = false;
+async function refreshVisitors() {
+  if (visitorBusy || document.hidden) return;
+  visitorBusy = true;
+  try {
+    const response = await fetch('/api/visitors', {
+      method: visitorRegistered ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store'
+    });
+    if (!response.ok) throw new Error('counter');
+    const data = await response.json();
+    if (!Number.isSafeInteger(data.total) || data.total < 0) throw new Error('counter');
+    visitorRegistered = true;
+    document.querySelectorAll('[data-visitor-total]').forEach(el => {
+      el.textContent = new Intl.NumberFormat('es').format(data.total);
+      el.title = 'Visitantes acumulados desde la activación del contador';
+    });
+  } catch {
+    document.querySelectorAll('[data-visitor-total]').forEach(el => {
+      el.textContent = '—'; el.title = 'Contador temporalmente no disponible';
+    });
+  } finally { visitorBusy = false; }
+}
+refreshVisitors();
+setInterval(refreshVisitors, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshVisitors(); });
 </script>
 
 </body>

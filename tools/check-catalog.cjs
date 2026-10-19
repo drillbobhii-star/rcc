@@ -24,7 +24,7 @@ for (const s of scripts) {
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
   }
-  if (s.catalog_section === 'games') {
+  if (s.catalog_section === 'games' && !s.id.startsWith('rcc_recipe_')) {
     assert.equal(s.platform, 'roblox');
     assert.equal(s.type, 'loadstring');
     assert.equal(s.device, 'unknown');
@@ -34,7 +34,7 @@ for (const s of scripts) {
     for (const source of s.compatibility.sources) assert.equal(new URL(source).protocol, 'https:');
     continue;
   }
-  const added = s.id.startsWith('lua_') || s.id.startsWith('learn_rbx_');
+  const added = s.id.startsWith('lua_') || s.id.startsWith('learn_rbx_') || s.id.startsWith('rcc_recipe_');
   if (!added) { counts.legacy++; continue; }
   assert(!newCode.has(s.code), `Duplicate new code: ${s.id}`);
   newCode.add(s.code);
@@ -61,7 +61,7 @@ for (const s of scripts) {
     assert.equal(c.executor_status, 'not-applicable');
   }
 }
-assert.deepEqual(counts, { lua: 129, client: 45, server: 26, legacy: 33 });
+assert.deepEqual(counts, { lua: 229, client: 45, server: 126, legacy: 33 });
 for (const file of ['index.html', 'admin.html']) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
   for (const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
