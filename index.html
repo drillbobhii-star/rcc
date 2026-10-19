@@ -26,6 +26,9 @@
     overflow-x:hidden;min-height:100vh;
   }
   
+  /* ==========================================
+     FONDOS ANIMADOS
+     ========================================== */
   .bg-text {
     position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -38,6 +41,23 @@
   @keyframes softPulse {
     0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
     100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  }
+
+  /* NUEVO TEXTO: ROCIO */
+  .bg-text-rocio {
+    position: fixed; top: 50%; left: 50%;
+    font-size: 25vw; font-weight: 900;
+    color: rgba(255, 255, 255, 0.07); /* Un poco más visible que el RCC */
+    filter: blur(6px); /* Desenfocado pero legible */
+    z-index: 0; pointer-events: none; white-space: nowrap;
+    animation: driftRocio 25s infinite linear;
+  }
+  @keyframes driftRocio {
+    0% { transform: translate(-50%, -50%) translate(-40vw, -20vh) rotate(-10deg); }
+    25% { transform: translate(-50%, -50%) translate(10vw, 30vh) rotate(5deg); }
+    50% { transform: translate(-50%, -50%) translate(40vw, -10vh) rotate(15deg); }
+    75% { transform: translate(-50%, -50%) translate(-10vw, -30vh) rotate(-5deg); }
+    100% { transform: translate(-50%, -50%) translate(-40vw, -20vh) rotate(-10deg); }
   }
   
   .blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.15; z-index: 0; pointer-events: none; }
@@ -301,6 +321,7 @@
     .active-filters{padding:16px 16px 0}
     .ad-banner{padding:0 16px}
     .bg-text{font-size: 80vw;}
+    .bg-text-rocio{font-size: 40vw;}
   }
   @media(max-width:480px){
     .grid{grid-template-columns:1fr}
@@ -311,7 +332,10 @@
 </head>
 <body>
 
+<!-- FONDOS ANIMADOS -->
 <div class="bg-text">RCC</div>
+<div class="bg-text-rocio">Rocio</div>
+
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
 
@@ -401,7 +425,7 @@ let scripts = [];
 let filterDevice = 'all';
 let filterPlatform = 'all';
 let filterExecutor = 'all';
-let filterType = 'all'; // 'all', 'source', 'loadstring'
+let filterType = 'all';
 let showRecent = false;
 
 let recentIds = JSON.parse(localStorage.getItem('rcc_recent')) || [];
@@ -472,7 +496,6 @@ document.getElementById('recentBtn').onclick = () => {
 };
 
 function buildSidebar(){
-  // Type filter
   typeList.innerHTML = '';
   const allTypes = document.createElement('div');
   allTypes.className = 'nav-item' + (filterType==='all' && !showRecent ?' active':'');
@@ -517,7 +540,6 @@ function buildSidebar(){
     typeList.appendChild(sourceItem);
   }
 
-  // Platform filter
   platformList.innerHTML = '';
   const allP = document.createElement('div');
   allP.className = 'nav-item' + (filterPlatform==='all' && !showRecent ?' active':'');
@@ -547,7 +569,6 @@ function buildSidebar(){
     platformList.appendChild(item);
   });
 
-  // Executor filter
   executorList.innerHTML = '';
   const allE = document.createElement('div');
   allE.className = 'nav-item' + (filterExecutor==='all' && !showRecent ?' active':'');
