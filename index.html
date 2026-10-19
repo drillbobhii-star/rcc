@@ -425,6 +425,16 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
     <h1>RCC</h1>
     <div class="visitor-badge" title="Navegadores que han visitado RCC desde la activación del contador. Borrar las cookies o cambiar de dispositivo puede contar otra visita."><strong data-visitor-total aria-live="polite">…</strong><span>Visitantes</span></div>
     <small>LUA SCRIPTS</small>
+    <div class="language-picker notranslate" translate="no">
+      <button id="languageTrigger" class="language-trigger" type="button" aria-expanded="false" aria-controls="languagePanel" aria-label="Seleccionar idioma">🇪🇸 Español</button>
+      <section id="languagePanel" class="language-panel" aria-labelledby="languageHeading" hidden>
+        <h2 id="languageHeading">Idioma / Language</h2>
+        <p>Selecciona una bandera. Traducción automática con Google Translate; el código conserva su idioma original.</p>
+        <div id="languageList" class="language-list" role="group" aria-label="Idiomas disponibles"></div>
+        <p id="languageStatus" role="status" aria-live="polite"></p>
+        <div id="translationProvider"></div>
+      </section>
+    </div>
   </div>
   <button class="appearance-toggle" id="appearanceToggle" type="button" aria-pressed="true">
     <span>Glass iOS</span><span class="appearance-switch" aria-hidden="true"></span>
@@ -1101,15 +1111,6 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) refr
 </script>
 
 <script>(function(s){s.dataset.zone='12067792',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-<div class="language-picker notranslate" translate="no">
-  <button id="languageTrigger" class="language-trigger" type="button" aria-expanded="false" aria-controls="languagePanel" aria-label="Seleccionar idioma">🇪🇸 Español</button>
-  <section id="languagePanel" class="language-panel" aria-labelledby="languageHeading" hidden>
-    <h2 id="languageHeading">Idioma / Language</h2>
-    <p>Selecciona una bandera. Traducción automática con Google Translate; el código conserva su idioma original.</p>
-    <div id="languageList" class="language-list" role="group" aria-label="Idiomas disponibles"></div>
-    <p id="languageStatus" role="status" aria-live="polite"></p>
-    <div id="translationProvider"></div>
-  </section>
-</div>
+
 </body>
 </html>

@@ -1,8 +1,8 @@
-/* Floating language launcher. The provider retains its own attribution. */
-.language-picker{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:1100;color:#f1f6f7;font-family:inherit}
+/* Language selector beneath the RCC logo. The provider retains its own attribution. */
+.language-picker{position:relative;margin-top:16px;color:#f1f6f7;font-family:inherit}
 .language-trigger,.language-panel{border:1px solid rgba(235,251,255,.35);background:rgba(30,46,55,.94);box-shadow:inset 0 1px 0 #ffffff40,0 12px 36px #08151e55;border-radius:24px}
-.language-trigger{min-height:48px;padding:12px 20px;color:inherit;font:inherit;cursor:pointer}
-.language-panel{position:absolute;bottom:60px;right:0;width:min(340px,calc(100vw - 32px));padding:20px;max-height:65vh;overflow-y:auto}
+.language-trigger{width:100%;min-height:48px;padding:12px 20px;color:inherit;font:inherit;cursor:pointer}
+.language-panel{position:relative;margin-top:10px;width:100%;padding:12px;max-height:50vh;overflow-y:auto}
 .language-panel[hidden]{display:none}
 .language-panel h2{font-size:1.05rem;margin-bottom:6px}
 .language-panel p{font-size:.78rem;line-height:1.6;color:#c5d5db;margin:6px 0 12px}
@@ -17,6 +17,5 @@ body.ios-glass :is(.btn-free,.card-action,.load-more,.dev-btn,.games-nav,.btn-gh
 @media(hover:hover){body.ios-glass button:hover:not(:disabled){transform:translateY(-2px);box-shadow:inset 0 1px 0 #ffffff55,0 8px 18px #07121b30}.language-list button:hover:not(:disabled){border-color:#c0dcd2}}
 body.ios-glass button:active:not(:disabled){transform:scale(.96)}
 .language-picker :focus-visible{outline:2px solid #d1eee6;outline-offset:3px}
-body{padding-bottom:88px}
-@media(max-width:600px){.language-picker{right:12px;bottom:calc(12px + env(safe-area-inset-bottom))}.language-panel{border-radius:22px}}
+@media(max-width:600px){.language-panel{border-radius:22px}}
 @media(prefers-reduced-motion:reduce){body.ios-glass button,body.ios-glass .card-action,body.ios-glass .discord-panel a{transition:none}body.ios-glass button:hover,body.ios-glass button:active{transform:none}}
