@@ -332,6 +332,27 @@
     .stats{gap:20px}
     .hero h2 { font-size: 2rem; }
   }
+
+.catalog-tools { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:20px 0; }
+.catalog-tools label { color:var(--muted); font-size:.85rem; }
+.catalog-tools select,.catalog-tools button { padding:10px; border:1px solid var(--muted); border-radius:8px; background:var(--bg); color:var(--text,#eee); }
+#resultCount { margin-right:auto; color:var(--muted); }
+button:focus-visible,select:focus-visible,a:focus-visible { outline:2px solid #aaa; outline-offset:4px; }
+.actions { flex-wrap:wrap; }
+pre { tab-size:2; }
+
+.executor-option { width:100%;font:inherit;text-align:left;background:transparent;border:0; }
+.executor-option.active { border:1px solid rgba(255,255,255,.15); }
+.compat-note { border-left:3px solid #9bae9e; padding:12px 16px; margin:16px 0; color:var(--muted); font-size:.86rem; line-height:1.6; background:rgba(140,170,150,.06); }
+.compat-note a { color:inherit; text-underline-offset:3px; }
+.compat-status { font-size:.76rem; color:#c4d3c9; margin:8px 0; }
+.compat-detail { padding:16px; margin:16px 0; border:1px solid rgba(170,185,175,.3); border-radius:10px; }
+.compat-detail h4 { margin:0 0 10px; }
+.compat-detail p { font-size:.85rem; line-height:1.6; color:var(--muted); margin:8px 0; }
+.compat-detail a { color:inherit; }
+.load-more { display:block; margin:24px auto; padding:14px 28px; background:var(--bg); color:var(--text,#eee); border:1px solid #9bae9e; border-radius:10px; cursor:pointer; }
+.load-more[hidden] { display:none; }
+@media(prefers-reduced-motion:reduce) { .card { transition:none; } }
 </style>
 </head>
 <body>
@@ -373,7 +394,7 @@
     <div id="platformList"></div>
   </div>
   <div class="sidebar-section">
-    <div class="sidebar-title">Ejecutores</div>
+    <div class="sidebar-title">Entornos y ejecutores</div>
     <div id="executorList"></div>
   </div>
 </aside>
@@ -392,31 +413,41 @@
     </header>
     <section class="hero">
       <h2 id="heroTitle">Scripts Lua por RCC</h2>
-      <p id="heroSubtitle">Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.</p>
+      <p id="heroSubtitle">Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.</p>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
         <div class="stat"><b id="statPC">0</b><small>🖥️ PC</small></div>
         <div class="stat"><b id="statMobile">0</b><small>📱 Móvil</small></div>
       </div>
     </section>
-    <div class="active-filters" id="activeFilters"></div>
+    <div class="catalog-tools">
+<span id="resultCount" role="status" aria-live="polite"></span>
+<label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
+<label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="legacy">Catálogo anterior</option></select></label>
+<label>Prueba <select id="verificationFilter"><option value="all">Todas</option><option value="lua-tested">Lua ejecutado en emulador</option><option value="syntax-only">Solo sintaxis</option><option value="unverified">Sin verificar</option></select></label>
+<label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
+<button id="resetFilters">Limpiar filtros</button>
+</div>
+<div class="active-filters" id="activeFilters"></div>
+    <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos y fuentes de compatibilidad</a>.</div>
     <div class="ad-banner">
       <div class="ad-box">📢 Espacio publicitario</div>
     </div>
     <div class="grid" id="scripts">
       <div class="loading">⏳ Cargando scripts...</div>
     </div>
+    <button id="loadMore" class="load-more" hidden>Mostrar más scripts</button>
     <div class="ad-banner" style="margin-bottom:40px">
       <div class="ad-box">📢 Espacio publicitario</div>
     </div>
   </div>
 </div>
 
-<div class="modal" id="modal">
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-box">
     <div class="modal-head">
       <h3 id="modalTitle">Script</h3>
-      <button class="close" onclick="closeModal()">×</button>
+      <button class="close" aria-label="Cerrar script" onclick="closeModal()">×</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
   </div>
@@ -431,6 +462,7 @@ let filterPlatform = 'all';
 let filterExecutor = 'all';
 let filterType = 'all';
 let showRecent = false;
+let visibleLimit = 36;
 
 let recentIds = JSON.parse(localStorage.getItem('rcc_recent')) || [];
 let currentCopiedId = null;
@@ -479,6 +511,9 @@ document.body.addEventListener('click', (e) => {
         e.target.closest('.modal') || 
         e.target.closest('button') || 
         e.target.closest('input') ||
+        e.target.closest('select') ||
+        e.target.closest('a') ||
+        e.target.closest('.catalog-tools') ||
         e.target.closest('.ad-box')
     ) {
         return;
@@ -496,10 +531,6 @@ const PLATFORMS = [
   { id:'universal',   name:'Universal',    icon:'⚙️' },
 ];
 
-const EXECUTORS = {
-  pc:     ['Solara','Wave','Xeno','Hydrogen','Nihon'],
-  mobile: ['Delta','Fluxus','Arceus X','Codex','Vega X']
-};
 
 const DEVICE_ICON = { pc:'🖥️', mobile:'📱', both:'🌐' };
 const DEVICE_LABEL= { pc:'PC', mobile:'Móvil', both:'Ambos' };
@@ -522,9 +553,12 @@ async function loadScripts(){
     if(!res.ok) throw new Error('No se encontró el archivo scripts.json');
     
     scripts = await res.json();
+    const tagSelect = document.getElementById('tagFilter');
+    [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
     updateRecentCount();
     buildSidebar();
     render();
+    openSharedScript();
   } catch (err) {
     console.error(err);
     grid.innerHTML = '<div class="error">❌ Error al cargar: ' + err.message + '</div>';
@@ -560,7 +594,7 @@ function buildSidebar(){
   allTypes.onclick = ()=>{ 
       showRecent = false; 
       document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
+      document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
       document.getElementById('recentBtn').classList.remove('active');
       filterType='all'; buildSidebar(); render(); 
   };
@@ -604,7 +638,7 @@ function buildSidebar(){
   allP.onclick = ()=>{ 
       showRecent = false; 
       document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
+      document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
       document.getElementById('recentBtn').classList.remove('active');
       filterPlatform='all'; buildSidebar(); render(); 
   };
@@ -619,7 +653,7 @@ function buildSidebar(){
     item.onclick = ()=>{ 
         showRecent = false;
         document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-        document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
+        document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
         document.getElementById('recentBtn').classList.remove('active');
         filterPlatform=p.id; buildSidebar(); render(); closeSidebar(); 
     };
@@ -633,45 +667,31 @@ function buildSidebar(){
   allE.onclick = ()=>{ 
       showRecent = false; 
       document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
+      document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
       document.getElementById('recentBtn').classList.remove('active');
       filterExecutor='all'; buildSidebar(); render(); 
   };
   executorList.appendChild(allE);
 
-  function renderGroup(devKey, label){
-    const execs = EXECUTORS[devKey] || [];
-    const visible = execs.filter(e => scripts.some(s => (s.executors||[]).includes(e)));
-    if(visible.length === 0) return;
-    const h = document.createElement('div');
-    h.className = 'group-header';
-    h.textContent = label;
-    executorList.appendChild(h);
-    visible.forEach(e=>{
-      const count = scripts.filter(s=>(s.executors||[]).includes(e)).length;
-      const item = document.createElement('div');
-      item.className = 'nav-item' + (filterExecutor===e && !showRecent ?' active':'');
-      item.innerHTML = `<span class="ico">⚡</span>${e}<span class="count">${count}</span>`;
-      item.onclick = ()=>{ 
-          showRecent = false; 
-          document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-          document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
-          document.getElementById('recentBtn').classList.remove('active');
-          filterExecutor=e; buildSidebar(); render(); closeSidebar(); 
-      };
-      executorList.appendChild(item);
-    });
-  }
-  if(filterDevice === 'all'){ renderGroup('pc','🖥️ PC'); renderGroup('mobile','📱 Móvil'); }
-  else if(filterDevice === 'pc'){ renderGroup('pc','🖥️ PC'); }
-  else if(filterDevice === 'mobile'){ renderGroup('mobile','📱 Móvil'); }
+  const candidates = scripts.filter(s=>filterDevice==='all' || s.device===filterDevice || s.device==='both');
+  const names=[...new Set(candidates.flatMap(s=>s.executors||[]))].sort((a,b)=>a.localeCompare(b,'es'));
+  names.forEach(name=>{
+    const item=document.createElement('button');
+    item.type='button'; item.className='nav-item'+(filterExecutor===name?' active':'');
+    item.classList.add('executor-option');
+    item.textContent=name;
+    const count=document.createElement('span');count.className='count';
+    count.textContent=candidates.filter(s=>(s.executors||[]).includes(name)).length;item.appendChild(count);
+    item.onclick=()=>{ filterExecutor=name;showRecent=false;document.getElementById('recentBtn').classList.remove('active');buildSidebar();render();closeSidebar(); };
+    executorList.appendChild(item);
+  });
 }
 
 document.querySelectorAll('.dev-btn').forEach(btn=>{
   btn.onclick = ()=>{
     showRecent = false;
     document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-    document.getElementById('heroSubtitle').textContent = "Scripts gratuitos listos para pegar en tus proyectos. Todos gratis.";
+    document.getElementById('heroSubtitle').textContent = "Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.";
     document.getElementById('recentBtn').classList.remove('active');
     document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -686,7 +706,7 @@ function renderActiveFilters(){
   const add = (label, clear) => {
     const chip = document.createElement('div');
     chip.className = 'chip';
-    chip.innerHTML = `${label}<button>×</button>`;
+    chip.innerHTML = `${escapeHTML(label)}<button aria-label="Quitar filtro">×</button>`;
     chip.querySelector('button').onclick = clear;
     activeFilters.appendChild(chip);
   };
@@ -710,8 +730,9 @@ function renderActiveFilters(){
   }
 }
 
-function render(){
-  const q = searchInput.value.toLowerCase().trim();
+function render(reset = true){
+  if(reset !== false) visibleLimit = 36;
+  const q = normalize(searchInput.value.trim());
   
   let list = scripts;
   if (showRecent) {
@@ -723,14 +744,20 @@ function render(){
     const okPlat = filterPlatform==='all' || s.platform===filterPlatform;
     const okExec = filterExecutor==='all' || (s.executors||[]).includes(filterExecutor);
     const okType = filterType==='all' || s.type === filterType;
-    const okTxt = !q ||
-      s.name.toLowerCase().includes(q) ||
-      (s.description||'').toLowerCase().includes(q) ||
-      (s.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
-      (s.executors||[]).some(e=>e.toLowerCase().includes(q));
-    return okDev && okPlat && okExec && okType && okTxt;
+    const haystack = normalize([s.name,s.description,s.platform,s.compatibility?.runtime,s.compatibility?.context,...(s.tags||[]),...(s.executors||[])].join(' '));
+    const okTxt = q.split(/\s+/).every(word=>haystack.includes(word));
+    const tag = document.getElementById('tagFilter').value;
+    const environment=document.getElementById('environmentFilter').value;
+    const verification=document.getElementById('verificationFilter').value;
+    return okDev && okPlat && okExec && okType && okTxt && (!tag || (s.tags||[]).includes(tag)) &&
+      (environment==='all' || (s.compatibility?.environment || 'legacy')===environment) &&
+      (verification==='all' || (s.compatibility?.verification || 'unverified')===verification);
   });
 
+  const order = document.getElementById('sortOrder').value;
+  if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+  if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
+  document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
   document.getElementById('statTotal').textContent = scripts.length;
   document.getElementById('statPC').textContent = scripts.filter(s=>s.device==='pc'||s.device==='both').length;
   document.getElementById('statMobile').textContent = scripts.filter(s=>s.device==='mobile'||s.device==='both').length;
@@ -738,6 +765,7 @@ function render(){
   renderActiveFilters();
   grid.innerHTML = '';
   
+  document.getElementById('loadMore').hidden=true;
   if(!list.length){
     if (showRecent && scripts.length > 0) {
         grid.innerHTML = '<div class="empty">⏱️ No has copiado ningún script aún.</div>';
@@ -747,10 +775,14 @@ function render(){
     return;
   }
   
-  list.forEach((s,i)=>{
+  const more=document.getElementById('loadMore');more.hidden=list.length<=visibleLimit;
+  more.textContent=`Mostrar ${Math.min(36,Math.max(0,list.length-visibleLimit))} más (${Math.max(0,list.length-visibleLimit)} pendientes)`;
+  list.slice(0,visibleLimit).forEach((s,i)=>{
     const plat = PLATFORMS.find(p=>p.id===s.platform);
     const card = document.createElement('div');
     card.className = 'card';
+    card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label','Ver '+s.name);
+    card.onkeydown = e=>{ if(e.key==='Enter' || e.key===' '){e.preventDefault(); openScript(s);} };
     
     const isLoadstring = s.type === 'loadstring';
 
@@ -762,31 +794,33 @@ function render(){
           ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
       </div>
-      <h3>${plat ? plat.icon+' ' : ''}${s.name}</h3>
-      <p class="desc">${s.description || ''}</p>
+      <h3>${plat ? plat.icon+' ' : ''}${escapeHTML(s.name)}</h3>
+      <p class="desc">${escapeHTML(s.description || '')}</p>
+      <p class="compat-status">${escapeHTML(verificationLabel(s))}</p>
       <div class="tags">
-        ${(s.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}
-        ${(s.executors||[]).slice(0,3).map(e=>`<span class="tag exec">⚡${e}</span>`).join('')}
+        ${(s.tags||[]).map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join('')}
+        ${(s.executors||[]).slice(0,3).map(e=>`<span class="tag exec">⚡${escapeHTML(e)}</span>`).join('')}
         ${(s.executors||[]).length>3 ? `<span class="tag exec">+${s.executors.length-3}</span>` : ''}
       </div>
       <div class="meta">
         <span>📅 ${(s.created_at||'').slice(0,7)}</span>
-        <span class="ver">v${s.version}</span>
+        <span class="ver">v${escapeHTML(s.version)}</span>
       </div>
-      <button class="card-action">${isLoadstring ? '⚡ Ejecutar / Copiar Loadstring' : '📋 Ver y copiar'}</button>
+      <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : '📋 Ver y copiar'}</button>
     `;
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
     grid.appendChild(card);
-    setTimeout(()=>card.classList.add('show'), i*60);
+    setTimeout(()=>card.classList.add('show'), Math.min(i,8)*35);
   });
 }
 
 function openScript(s){
+  modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   const isLoadstring = s.type === 'loadstring';
   
-  modalTitle.innerHTML = `${isLoadstring ? '🔗' : '📝'} ${s.name} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${s.version}</span>`;
+  modalTitle.innerHTML = `${isLoadstring ? '🔗' : '📝'} ${escapeHTML(s.name)} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${escapeHTML(s.version)}</span>`;
   modalBody.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
@@ -794,21 +828,26 @@ function openScript(s){
       ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
       ${plat?`<span class="badge" style="background:rgba(255,255,255,.1);color:#fff; border:1px solid rgba(255,255,255,.2)">${plat.icon} ${plat.name}</span>`:''}
     </div>
-    <p style="color:var(--muted);margin-bottom:20px;font-size:.92rem; line-height: 1.6;">${s.description||''}</p>
+    <p style="color:var(--muted);margin-bottom:20px;font-size:.92rem; line-height: 1.6;">${escapeHTML(s.description||'')}</p>
     <div style="margin-bottom:16px">
-      <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px; font-weight: 700;">Ejecutores compatibles</div>
-      <div class="tags">${(s.executors||[]).map(e=>`<span class="tag exec">⚡ ${e}</span>`).join('')}</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px; font-weight: 700;">Entornos declarados · ejecutores externos sin verificar</div>
+      <div class="tags">${(s.executors||[]).map(e=>`<span class="tag exec">⚡ ${escapeHTML(e)}</span>`).join('')}</div>
     </div>
+    <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
     <pre><code id="modalCode"></code></pre>
     <div class="actions">
       <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
+      <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .lua</button>
+      <button class="btn btn-ghost" onclick="shareCurrent()">Copiar enlace</button>
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
     </div>
   `;
   document.getElementById('modalCode').textContent = s.code;
+  renderCompatibility(s);
   
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  modal.querySelector('.close').focus();
 }
 
 function copyCode(){
@@ -823,10 +862,10 @@ function copyCode(){
           
           if(showRecent) render();
       }
-  });
+  }).catch(()=>showToast('No se pudo copiar. Selecciona el código y cópialo manualmente.'));
 }
 
-function closeModal(){ modal.classList.remove('open'); document.body.style.overflow=''; }
+function closeModal(){ modal.classList.remove('open'); document.body.style.overflow=''; modalReturnFocus?.focus(); }
 modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 
@@ -844,7 +883,67 @@ overlay.onclick = closeSidebar;
 
 searchInput.addEventListener('input', render);
 
-// Iniciar
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function verificationLabel(s){
+  return ({'lua-tested':'Ejecutado en Lua 5.3 emulado · ejecutores sin probar','syntax-only':'Sintaxis revisada · ejecución Roblox sin probar'})[s.compatibility?.verification] || 'Compatibilidad sin verificar';
+}
+function renderCompatibility(s){
+  const panel=document.getElementById('compatDetail');
+  const c=s.compatibility || {};
+  const title=document.createElement('h4');title.textContent=verificationLabel(s);panel.appendChild(title);
+  for(const [name,value] of [
+    ['Entorno',c.runtime || 'Según el listado anterior'],
+    ['Dónde ejecutar',c.context || 'No documentado'],
+    ['Requisitos',c.requirements || 'Revisar las API y permisos del código antes de usarlo.'],
+    ['Prueba realizada',c.test_details || 'No hay una prueba registrada.'],
+    ['Celular',c.mobile_status || 'Sin pruebas registradas en Android o iOS.'],
+    ['Ejecutores',c.executor_status==='not-applicable'?'Este código requiere un servidor, no un ejecutor cliente.':'Sin pruebas en Solara, Wave, Xeno, Hydrogen, Nihon, Delta, Fluxus, Arceus X, Codex o Vega X.']
+  ]){const p=document.createElement('p');p.textContent=name+': '+value;panel.appendChild(p);}
+  if(s.type==='loadstring'){const p=document.createElement('p');p.textContent='Este código descarga contenido remoto que puede cambiar. Su disponibilidad y contenido no se han validado.';panel.appendChild(p);}
+  for(const source of c.sources || []){
+    if(typeof source!=='string' || !/^https:\/\//.test(source)) continue;
+    const p=document.createElement('p'),a=document.createElement('a');let url;try{url=new URL(source);}catch{continue;}a.href=url.href;a.textContent='Referencia: '+url.hostname;a.target='_blank';a.rel='noopener noreferrer';p.appendChild(a);panel.appendChild(p);
+  }
+}
+const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+let modalReturnFocus = null;
+function downloadCurrent(){
+  const s = scripts.find(s=>s.id===currentCopiedId);
+  if(!s) return;
+  const url = URL.createObjectURL(new Blob([s.code], {type:'text/plain;charset=utf-8'}));
+  const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.lua'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function shareCurrent(){
+  const url = new URL(location.href); url.hash = new URLSearchParams({script:currentCopiedId}).toString();
+  try { await navigator.clipboard.writeText(url.href); showToast('Enlace copiado'); }
+  catch { showToast('No se pudo copiar el enlace.'); }
+}
+function openSharedScript(){
+  const id = new URLSearchParams(location.hash.slice(1)).get('script');
+  const s = scripts.find(s=>s.id===id); if(s) openScript(s);
+}
+window.addEventListener('hashchange',openSharedScript);
+document.getElementById('tagFilter').onchange = render;
+document.getElementById('sortOrder').onchange = render;
+document.getElementById('environmentFilter').onchange = render;
+document.getElementById('verificationFilter').onchange = render;
+document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render(false);};
+document.getElementById('resetFilters').onclick = ()=>{
+  filterDevice=filterPlatform=filterExecutor=filterType='all'; showRecent=false;
+  searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
+  document.getElementById('recentBtn').classList.remove('active');
+  document.getElementById('heroTitle').textContent='Scripts Lua por RCC';
+  document.getElementById('heroSubtitle').textContent='Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.';
+  document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev==='all'));
+  buildSidebar(); render();
+};
+modal.addEventListener('keydown',e=>{
+  if(e.key!=='Tab') return;
+  const buttons=[...modal.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]')]; const first=buttons[0], last=buttons.at(-1);
+  if(e.shiftKey && document.activeElement===first){e.preventDefault(); last.focus();}
+  else if(!e.shiftKey && document.activeElement===last){e.preventDefault(); first.focus();}
+});
 loadScripts();
 </script>
 

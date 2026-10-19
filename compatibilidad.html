@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RCC — Compatibilidad y requisitos</title>
+<style>
+:root { color-scheme:dark; font-family:'Trebuchet MS',sans-serif; background:#10131a; color:#e6e8ed; }
+body { margin:0; padding:32px 20px 60px; }
+main { max-width:920px; margin:auto; }
+a { color:#b7d3c1; text-underline-offset:4px; }
+h1 { font-family:Georgia,serif; font-weight:400; font-size:clamp(2.2rem,6vw,4rem); line-height:1.08; margin:22px 0; }
+h2 { font-weight:500; margin-top:36px; }
+p,li { line-height:1.7; color:#bec5d0; }
+.eyebrow { text-transform:uppercase; font-size:.75rem; letter-spacing:.16em; color:#a9bdae; margin-top:40px; }
+.note { border-left:3px solid #9bb8a6; padding:12px 20px; background:#19221f; }
+.table-wrap { overflow-x:auto; border:1px solid #354039; border-radius:10px; }
+table { width:100%; border-collapse:collapse; text-align:left; font-size:.9rem; }
+th,td { padding:14px 18px; border-bottom:1px solid #30383c; }
+th { background:#1c2523; font-weight:500; } tr:last-child td { border:0; }
+code { color:#d5e7dc; overflow-wrap:anywhere; }
+a:focus-visible { outline:2px solid #c8dfce; outline-offset:4px; }
+</style>
+</head>
+<body><main>
+<a href="index.html">← Volver al catálogo</a>
+<p class="eyebrow">RCC / Guía de ejecución / 19 octubre 2026</p>
+<h1>El entorno decide<br>qué código funciona.</h1>
+<p>El catálogo reúne 233 scripts: los 33 anteriores y 200 ejemplos originales nuevos, sin dependencias de descargas remotas en los nuevos ejemplos. Los filtros separan Lua estándar, Roblox cliente y Roblox servidor.</p>
+<p class="note">No hay pruebas de estos scripts en ejecutores externos, Android o iPhone. Un nombre en la lista sirve para explorar candidatos; no confirma que el ejecutor esté disponible, sea compatible con tu sistema o funcione con la versión actual de Roblox.</p>
+<h2>Qué se comprobó</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Grupo nuevo</th><th>Cantidad</th><th>Prueba realizada</th></tr></thead>
+<tbody><tr><td>Lua básico</td><td>129</td><td>Análisis de sintaxis Lua 5.1 y ejecución de cada ejemplo en Fengari, un intérprete de Lua 5.3 emulado. Sin prueba en Luau.</td></tr>
+<tr><td>Roblox cliente</td><td>45</td><td>Análisis de sintaxis. Sin ejecución en Roblox Studio o dispositivos.</td></tr>
+<tr><td>Roblox servidor</td><td>26</td><td>Análisis de sintaxis. Sin ejecución en Roblox Studio.</td></tr></tbody>
+</table></div>
+<h2>Dónde ejecutar cada grupo</h2>
+<p><strong>Lua estándar:</strong> necesita un intérprete que exponga las bibliotecas base, <code>math</code>, <code>string</code> y <code>table</code>; algunos ejemplos también usan metatables o corrutinas. Los ejemplos no necesitan archivos, conexiones de red ni API privadas. Los ejemplos de texto que lo indican trabajan con ASCII o bytes.</p>
+<p><strong>Roblox cliente:</strong> coloca el código en un <code>LocalScript</code> dentro de <code>StarterPlayer &gt; StarterPlayerScripts</code> de tu propia experiencia. Usa el modo de prueba de Studio. Los paneles usan tamaños relativos y los botones usan <code>Activated</code> para admitir clic, toque y mando. Esto no sustituye las pruebas reales en cada pantalla.</p>
+<p><strong>Roblox servidor:</strong> coloca el código en un <code>Script</code> dentro de <code>ServerScriptService</code>. Necesita acceso de edición a la experiencia. Un ejecutor cliente no proporciona autoridad del servidor. Las piezas creadas por estos ejemplos aparecen para los jugadores de esa sesión.</p>
+<h2>Ejecutores y celulares</h2>
+<p>Se incluyen todos los nombres de ejecutores del catálogo previo para facilitar la búsqueda. Las fuentes oficiales consultadas documentan Lua, Luau y Roblox; no certifican estos ejecutores ni ofrecen una matriz de compatibilidad para ellos.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Ejecutor listado</th><th>PC</th><th>Android</th><th>iPhone / iOS</th></tr></thead>
+<tbody>
+<tr><td>Solara</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Wave</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Xeno</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Hydrogen</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Nihon</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Delta</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Fluxus</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Arceus X</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Codex</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+<tr><td>Vega X</td><td>Sin verificar</td><td>Sin verificar</td><td>Sin verificar</td></tr>
+</tbody></table></div>
+<p>Las etiquetas PC y móvil del catálogo describen el destino del ejemplo, no el sistema en que se haya instalado un ejecutor. Roblox Studio se distribuye para Windows y Mac; puedes preparar allí la experiencia y probar el resultado en los clientes móviles. <code>TouchEnabled</code> detecta entrada táctil y no identifica Android o iOS.</p>
+<h2>Cómo comprobar un ejemplo</h2>
+<ol><li>Consulta la ubicación y los requisitos en la ficha del script.</li><li>Ejecuta un ejemplo cada vez en una experiencia de prueba propia. Los de Lua se pueden probar en un intérprete aislado.</li><li>Comprueba la salida y los errores. En Roblox prueba aparición del personaje, clic, toque y orientación de pantalla cuando corresponda.</li><li>Registra modelo de celular, versión del sistema, versión de Roblox, ejecutor y resultado antes de afirmar compatibilidad.</li></ol>
+<p>Los loadstrings del catálogo anterior se mantienen sin verificar: descargan código que puede cambiar y no se ha comprobado su disponibilidad ni su contenido remoto. Los 200 ejemplos nuevos contienen su código completo.</p>
+<h2>Fuentes consultadas</h2>
+<ul>
+<li><a href="https://www.lua.org/manual/5.1/manual.html">Manual de referencia Lua 5.1</a>: sintaxis, bibliotecas y diferencias de entorno.</li>
+<li><a href="https://luau.org/library">Biblioteca estándar de Luau</a>: funciones disponibles en el lenguaje; el anfitrión puede limitar el entorno.</li>
+<li><a href="https://create.roblox.com/docs/scripting/locations">Roblox: tipos y ubicación de scripts</a>: cliente y servidor.</li>
+<li><a href="https://create.roblox.com/docs/projects/cross-platform">Roblox: desarrollo multiplataforma</a>: interfaz y tipos de entrada.</li>
+<li><a href="https://create.roblox.com/docs/reference/engine/classes/GuiButton">Roblox: GuiButton y Activated</a>: interacción con botones.</li>
+<li><a href="https://create.roblox.com/docs/studio/setup">Roblox Studio: instalación y requisitos</a>: disponibilidad para Windows y Mac.</li>
+</ul>
+</main></body></html>
