@@ -406,6 +406,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){body.ios-glass{--bg-glass:#1a252b;--card-glass:#334249}}
 @media(max-width:600px){body.ios-glass .grid{grid-template-columns:minmax(0,1fr)}body.ios-glass .card{border-radius:22px}}
 </style>
+<link rel="stylesheet" href="assets/glass-controls.css">
+<script src="assets/languages.js" defer></script>
 </head>
 <body class="ios-glass">
 
@@ -938,7 +940,7 @@ function openScript(s){
       <div class="tags">${(s.executors||[]).map(e=>`<span class="tag exec">⚡ ${escapeHTML(e)}</span>`).join('')}</div>
     </div>
     <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
-    <pre><code id="modalCode"></code></pre>
+    <pre class="notranslate" translate="no"><code id="modalCode"></code></pre>
     <div class="actions">
       <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
       <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .lua</button>
@@ -1099,5 +1101,15 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) refr
 </script>
 
 <script>(function(s){s.dataset.zone='12067792',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<div class="language-picker notranslate" translate="no">
+  <button id="languageTrigger" class="language-trigger" type="button" aria-expanded="false" aria-controls="languagePanel" aria-label="Seleccionar idioma">🇪🇸 Español</button>
+  <section id="languagePanel" class="language-panel" aria-labelledby="languageHeading" hidden>
+    <h2 id="languageHeading">Idioma / Language</h2>
+    <p>Selecciona una bandera. Traducción automática con Google Translate; el código conserva su idioma original.</p>
+    <div id="languageList" class="language-list" role="group" aria-label="Idiomas disponibles"></div>
+    <p id="languageStatus" role="status" aria-live="polite"></p>
+    <div id="translationProvider"></div>
+  </section>
+</div>
 </body>
 </html>

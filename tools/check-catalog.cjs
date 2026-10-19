@@ -61,7 +61,7 @@ for (const s of scripts) {
     assert.equal(c.executor_status, 'not-applicable');
   }
 }
-assert.deepEqual(counts, { lua: 229, client: 45, server: 126, legacy: 33 });
+assert.deepEqual(counts, { lua: 235, client: 45, server: 126, legacy: 33 });
 for (const file of ['index.html', 'admin.html']) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
   for (const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
