@@ -384,9 +384,32 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
 .visitor-badge span{font-size:.58rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
 .mobile-visitors{display:none}
 @media(max-width:900px){.mobile-visitors{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted);white-space:nowrap}.mobile-visitors strong{color:var(--text);font-variant-numeric:tabular-nums}.topbar{flex-wrap:wrap}}
+
+/* Glass iOS: capas de cristal con contraste legible. */
+.appearance-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 16px 0;padding:12px 14px;min-height:48px;border:1px solid var(--border-glass);border-radius:16px;background:var(--card-glass);color:var(--text);font:inherit;font-size:.85rem;cursor:pointer}
+.appearance-switch{width:36px;height:22px;padding:3px;border-radius:99px;background:#626875;flex-shrink:0}
+.appearance-switch::after{content:"";display:block;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 4px #18232a66;transition:transform .2s ease}
+.appearance-toggle[aria-pressed="true"] .appearance-switch{background:#729d91}
+.appearance-toggle[aria-pressed="true"] .appearance-switch::after{transform:translateX(14px)}
+body.ios-glass{--bg-glass:rgba(26,37,43,.78);--card-glass:rgba(51,66,73,.64);--border-glass:rgba(225,244,246,.25);--border-hover:rgba(238,253,255,.55);--muted:#b9c8ce;background-image:radial-gradient(ellipse at 15% 10%,rgba(120,175,182,.24),transparent 55%),radial-gradient(ellipse at 90% 75%,rgba(178,160,132,.18),transparent 60%);background-attachment:fixed}
+body.ios-glass .sidebar,body.ios-glass header,body.ios-glass .card,body.ios-glass .modal-box,body.ios-glass .ad-box{background:var(--card-glass);-webkit-backdrop-filter:blur(24px) saturate(140%);backdrop-filter:blur(24px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 12px 32px rgba(6,17,23,.18)}
+body.ios-glass .sidebar,body.ios-glass header,body.ios-glass .modal-box{background:var(--bg-glass)}
+body.ios-glass .card{border-radius:28px}
+body.ios-glass .card:hover{background:rgba(75,94,102,.78);border-color:var(--border-hover)}
+body.ios-glass .search-top input,body.ios-glass .device-toggle,body.ios-glass .section-tabs,body.ios-glass .appearance-toggle{box-shadow:inset 0 1px 0 rgba(255,255,255,.14);border-radius:20px}
+body.ios-glass .section-tabs{width:fit-content;padding:6px;background:rgba(210,234,241,.07);border:1px solid var(--border-glass)}
+body.ios-glass .section-tabs button{border-radius:15px}
+body.ios-glass .ad-box{border-style:solid;border-radius:22px;line-height:1.6;padding:28px 20px 20px;color:#e0e9ed}
+body.ios-glass .ad-box::before{color:#b9c8ce}
+body.ios-glass .modal-box{border-radius:30px}
+body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6ed;outline-offset:4px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){body.ios-glass{--bg-glass:#1a252b;--card-glass:#334249}}
+@media(max-width:600px){body.ios-glass .grid{grid-template-columns:minmax(0,1fr)}body.ios-glass .card{border-radius:22px}}
 </style>
+<link rel="stylesheet" href="assets/glass-controls.css">
+<script src="assets/languages.js" defer></script>
 </head>
-<body>
+<body class="ios-glass">
 
 <!-- FONDOS ANIMADOS -->
 <div class="bg-text" id="bgRccText">RCC</div>
@@ -403,6 +426,9 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
     <div class="visitor-badge" title="Navegadores que han visitado RCC desde la activación del contador. Borrar las cookies o cambiar de dispositivo puede contar otra visita."><strong data-visitor-total aria-live="polite">…</strong><span>Visitantes</span></div>
     <small>LUA SCRIPTS</small>
   </div>
+  <button class="appearance-toggle" id="appearanceToggle" type="button" aria-pressed="true">
+    <span>Glass iOS</span><span class="appearance-switch" aria-hidden="true"></span>
+  </button>
   <div class="device-toggle">
     <button class="dev-btn active" data-dev="all"><span class="ico">🌐</span>Todos</button>
     <button class="dev-btn" data-dev="pc"><span class="ico">🖥️</span>PC</button>
@@ -479,14 +505,26 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos y fuentes de compatibilidad</a>.</div>
     <div class="ad-banner">
-      <div class="ad-box">📢 Espacio publicitario</div>
+      <div class="ad-box">Esta página contiene anuncios. No entrar a cualquier enlace.</div>
+    </div>
+    <div style="display: flex; justify-content: center; margin: 20px 0;">
+<script type="text/javascript">
+	atOptions = {
+		'key' : '6133676',
+		'format' : 'iframe',
+		'height' : 250,
+		'width' : 300,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/6133676/invoke.js"></script>
     </div>
     <div class="grid" id="scripts">
       <div class="loading">⏳ Cargando scripts...</div>
     </div>
     <button id="loadMore" class="load-more" hidden>Mostrar más scripts</button>
     <div class="ad-banner" style="margin-bottom:40px">
-      <div class="ad-box">📢 Espacio publicitario</div>
+      <div class="ad-box">Esta página contiene anuncios. No entrar a cualquier enlace.</div>
     </div>
   </div>
 </div>
@@ -519,6 +557,12 @@ let currentCopiedId = null;
 // ==========================================
 // SISTEMA DE TEMAS MÁGICOS (Clic en el fondo)
 // ==========================================
+const appearanceToggle = document.getElementById('appearanceToggle');
+appearanceToggle.addEventListener('click', () => {
+    const enabled = document.body.classList.toggle('ios-glass');
+    appearanceToggle.setAttribute('aria-pressed', String(enabled));
+});
+
 const themes = [
     { bg: '#050505', rocio: 'Rocio 😂', color: 'rgba(255, 255, 255, 0.07)', blob1: '#ffffff', blob2: '#666666' },
     { bg: '#0a0514', rocio: 'Rocio ❤️', color: 'rgba(192, 132, 252, 0.1)', blob1: '#c084fc', blob2: '#7c3aed' },
@@ -896,7 +940,7 @@ function openScript(s){
       <div class="tags">${(s.executors||[]).map(e=>`<span class="tag exec">⚡ ${escapeHTML(e)}</span>`).join('')}</div>
     </div>
     <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
-    <pre><code id="modalCode"></code></pre>
+    <pre class="notranslate" translate="no"><code id="modalCode"></code></pre>
     <div class="actions">
       <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
       <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .lua</button>
@@ -1056,5 +1100,16 @@ setInterval(refreshVisitors, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshVisitors(); });
 </script>
 
+<script>(function(s){s.dataset.zone='12067792',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<div class="language-picker notranslate" translate="no">
+  <button id="languageTrigger" class="language-trigger" type="button" aria-expanded="false" aria-controls="languagePanel" aria-label="Seleccionar idioma">🇪🇸 Español</button>
+  <section id="languagePanel" class="language-panel" aria-labelledby="languageHeading" hidden>
+    <h2 id="languageHeading">Idioma / Language</h2>
+    <p>Selecciona una bandera. Traducción automática con Google Translate; el código conserva su idioma original.</p>
+    <div id="languageList" class="language-list" role="group" aria-label="Idiomas disponibles"></div>
+    <p id="languageStatus" role="status" aria-live="polite"></p>
+    <div id="translationProvider"></div>
+  </section>
+</div>
 </body>
 </html>

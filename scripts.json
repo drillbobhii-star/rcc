@@ -42023,5 +42023,275 @@
         "https://create.roblox.com/docs/reference/engine/classes"
       ]
     }
+  },
+  {
+    "id": "lua_new_binary_search",
+    "name": "Búsqueda binaria",
+    "description": "Busca un valor en una lista ordenada y devuelve su posición. Ejemplo independiente de Lua; ejecuta el bloque completo.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "type": "source",
+    "executors": [
+      "Lua 5.1+",
+      "Solara",
+      "Wave",
+      "Xeno",
+      "Hydrogen",
+      "Nihon",
+      "Delta",
+      "Fluxus",
+      "Arceus X",
+      "Codex",
+      "Vega X"
+    ],
+    "tags": [
+      "Original RCC",
+      "Lua",
+      "Algoritmos"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-19",
+    "code": "-- RCC | Búsqueda binaria\nlocal function buscar(lista, objetivo)\n  local izquierda, derecha = 1, #lista\n  while izquierda <= derecha do\n    local medio = math.floor((izquierda + derecha) / 2)\n    if lista[medio] == objetivo then return medio end\n    if lista[medio] < objetivo then izquierda = medio + 1 else derecha = medio - 1 end\n  end\n  return nil\nend\nassert(buscar({2, 5, 9, 14, 20}, 14) == 4)\nassert(buscar({2, 5, 9}, 8) == nil)\nprint(\"Búsqueda completada\")\n",
+    "compatibility": {
+      "runtime": "Lua 5.1+ / subconjunto común con Luau",
+      "context": "Intérprete Lua o consola con bibliotecas estándar",
+      "requirements": "Bibliotecas base, math, string y table. Sin archivos, red ni API de ejecutor.",
+      "verification": "lua-tested",
+      "executor_status": "unverified",
+      "mobile_status": "Requiere un intérprete o ejecutor que exponga estas bibliotecas. Android e iOS no probados.",
+      "sources": [
+        "https://www.lua.org/manual/5.1/manual.html",
+        "https://luau.org/library"
+      ],
+      "environment": "lua",
+      "test_details": "Sintaxis Lua 5.1 analizada con luaparse; ejemplo ejecutado sin errores en Fengari (Lua 5.3 emulado). No ejecutado en Luau ni en un ejecutor externo.",
+      "tested_on": "2026-10-19"
+    }
+  },
+  {
+    "id": "lua_new_queue_fifo",
+    "name": "Cola FIFO",
+    "description": "Procesa tareas en el orden en que llegaron sin desplazar toda la tabla. Ejemplo independiente de Lua; ejecuta el bloque completo.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "type": "source",
+    "executors": [
+      "Lua 5.1+",
+      "Solara",
+      "Wave",
+      "Xeno",
+      "Hydrogen",
+      "Nihon",
+      "Delta",
+      "Fluxus",
+      "Arceus X",
+      "Codex",
+      "Vega X"
+    ],
+    "tags": [
+      "Original RCC",
+      "Lua",
+      "Algoritmos"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-19",
+    "code": "-- RCC | Cola FIFO\nlocal cola, primero, ultimo = {}, 1, 0\nlocal function agregar(valor)\n  assert(valor ~= nil)\n  ultimo = ultimo + 1\n  cola[ultimo] = valor\nend\nlocal function sacar()\n  if primero > ultimo then return nil end\n  local valor = cola[primero]\n  cola[primero] = nil\n  primero = primero + 1\n  if primero > ultimo then primero, ultimo = 1, 0 end\n  return valor\nend\nagregar(\"Inicio\"); agregar(\"Meta\")\nassert(sacar() == \"Inicio\")\nassert(sacar() == \"Meta\")\nassert(sacar() == nil)\nprint(\"Cola completada\")\n",
+    "compatibility": {
+      "runtime": "Lua 5.1+ / subconjunto común con Luau",
+      "context": "Intérprete Lua o consola con bibliotecas estándar",
+      "requirements": "Bibliotecas base, math, string y table. Sin archivos, red ni API de ejecutor.",
+      "verification": "lua-tested",
+      "executor_status": "unverified",
+      "mobile_status": "Requiere un intérprete o ejecutor que exponga estas bibliotecas. Android e iOS no probados.",
+      "sources": [
+        "https://www.lua.org/manual/5.1/manual.html",
+        "https://luau.org/library"
+      ],
+      "environment": "lua",
+      "test_details": "Sintaxis Lua 5.1 analizada con luaparse; ejemplo ejecutado sin errores en Fengari (Lua 5.3 emulado). No ejecutado en Luau ni en un ejecutor externo.",
+      "tested_on": "2026-10-19"
+    }
+  },
+  {
+    "id": "lua_new_run_length",
+    "name": "Compresión por repeticiones",
+    "description": "Agrupa caracteres consecutivos; devuelve pares de carácter y cantidad. Ejemplo independiente de Lua; ejecuta el bloque completo.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "type": "source",
+    "executors": [
+      "Lua 5.1+",
+      "Solara",
+      "Wave",
+      "Xeno",
+      "Hydrogen",
+      "Nihon",
+      "Delta",
+      "Fluxus",
+      "Arceus X",
+      "Codex",
+      "Vega X"
+    ],
+    "tags": [
+      "Original RCC",
+      "Lua",
+      "Algoritmos"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-19",
+    "code": "-- RCC | Compresión por repeticiones\nlocal function agrupar(texto)\n  local grupos = {}\n  for i = 1, #texto do\n    local c = texto:sub(i, i)\n    local ultimo = grupos[#grupos]\n    if ultimo and ultimo.caracter == c then ultimo.cantidad = ultimo.cantidad + 1\n    else grupos[#grupos + 1] = {caracter=c, cantidad=1} end\n  end\n  return grupos\nend\nlocal grupos = agrupar(\"aaabbc\")\nassert(#grupos == 3 and grupos[1].cantidad == 3)\nassert(#agrupar(\"\") == 0)\nfor _, grupo in ipairs(grupos) do print(grupo.caracter, grupo.cantidad) end\n",
+    "compatibility": {
+      "runtime": "Lua 5.1+ / subconjunto común con Luau",
+      "context": "Intérprete Lua o consola con bibliotecas estándar",
+      "requirements": "Bibliotecas base, math, string y table. Sin archivos, red ni API de ejecutor.",
+      "verification": "lua-tested",
+      "executor_status": "unverified",
+      "mobile_status": "Requiere un intérprete o ejecutor que exponga estas bibliotecas. Android e iOS no probados.",
+      "sources": [
+        "https://www.lua.org/manual/5.1/manual.html",
+        "https://luau.org/library"
+      ],
+      "environment": "lua",
+      "test_details": "Sintaxis Lua 5.1 analizada con luaparse; ejemplo ejecutado sin errores en Fengari (Lua 5.3 emulado). No ejecutado en Luau ni en un ejecutor externo.",
+      "tested_on": "2026-10-19"
+    }
+  },
+  {
+    "id": "lua_new_moving_average",
+    "name": "Media móvil",
+    "description": "Calcula el promedio de las últimas muestras con una ventana limitada. Ejemplo independiente de Lua; ejecuta el bloque completo.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "type": "source",
+    "executors": [
+      "Lua 5.1+",
+      "Solara",
+      "Wave",
+      "Xeno",
+      "Hydrogen",
+      "Nihon",
+      "Delta",
+      "Fluxus",
+      "Arceus X",
+      "Codex",
+      "Vega X"
+    ],
+    "tags": [
+      "Original RCC",
+      "Lua",
+      "Algoritmos"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-19",
+    "code": "-- RCC | Media móvil\nlocal function mediaMovil(capacidad)\n  assert(capacidad > 0 and capacidad == math.floor(capacidad))\n  local datos, posicion, cantidad, suma = {}, 1, 0, 0\n  return function(valor)\n    suma = suma - (datos[posicion] or 0) + valor\n    datos[posicion] = valor\n    posicion = posicion % capacidad + 1\n    cantidad = math.min(capacidad, cantidad + 1)\n    return suma / cantidad\n  end\nend\nlocal media = mediaMovil(3)\nassert(media(3) == 3)\nassert(media(6) == 4.5)\nassert(media(9) == 6)\nassert(media(12) == 9)\nprint(\"Media móvil verificada\")\n",
+    "compatibility": {
+      "runtime": "Lua 5.1+ / subconjunto común con Luau",
+      "context": "Intérprete Lua o consola con bibliotecas estándar",
+      "requirements": "Bibliotecas base, math, string y table. Sin archivos, red ni API de ejecutor.",
+      "verification": "lua-tested",
+      "executor_status": "unverified",
+      "mobile_status": "Requiere un intérprete o ejecutor que exponga estas bibliotecas. Android e iOS no probados.",
+      "sources": [
+        "https://www.lua.org/manual/5.1/manual.html",
+        "https://luau.org/library"
+      ],
+      "environment": "lua",
+      "test_details": "Sintaxis Lua 5.1 analizada con luaparse; ejemplo ejecutado sin errores en Fengari (Lua 5.3 emulado). No ejecutado en Luau ni en un ejecutor externo.",
+      "tested_on": "2026-10-19"
+    }
+  },
+  {
+    "id": "lua_new_balanced_brackets",
+    "name": "Validar paréntesis",
+    "description": "Comprueba el anidado de paréntesis, corchetes y llaves con una pila. Ejemplo independiente de Lua; ejecuta el bloque completo.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "type": "source",
+    "executors": [
+      "Lua 5.1+",
+      "Solara",
+      "Wave",
+      "Xeno",
+      "Hydrogen",
+      "Nihon",
+      "Delta",
+      "Fluxus",
+      "Arceus X",
+      "Codex",
+      "Vega X"
+    ],
+    "tags": [
+      "Original RCC",
+      "Lua",
+      "Algoritmos"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-19",
+    "code": "-- RCC | Validar paréntesis\nlocal function validar(texto)\n  local pila, pares = {}, {[\")\"]=\"(\", [\"]\"]=\"[\", [\"}\"]=\"{\"}\n  for i = 1, #texto do\n    local c = texto:sub(i, i)\n    if c == \"(\" or c == \"[\" or c == \"{\" then pila[#pila + 1] = c\n    elseif pares[c] then\n      if pila[#pila] ~= pares[c] then return false end\n      pila[#pila] = nil\n    end\n  end\n  return #pila == 0\nend\nassert(validar(\"{[()]}\") and not validar(\"([)]\"))\nassert(not validar(\"((\"))\nprint(\"Validación completada\")\n",
+    "compatibility": {
+      "runtime": "Lua 5.1+ / subconjunto común con Luau",
+      "context": "Intérprete Lua o consola con bibliotecas estándar",
+      "requirements": "Bibliotecas base, math, string y table. Sin archivos, red ni API de ejecutor.",
+      "verification": "lua-tested",
+      "executor_status": "unverified",
+      "mobile_status": "Requiere un intérprete o ejecutor que exponga estas bibliotecas. Android e iOS no probados.",
+      "sources": [
+        "https://www.lua.org/manual/5.1/manual.html",
+        "https://luau.org/library"
+      ],
+      "environment": "lua",
+      "test_details": "Sintaxis Lua 5.1 analizada con luaparse; ejemplo ejecutado sin errores en Fengari (Lua 5.3 emulado). No ejecutado en Luau ni en un ejecutor externo.",
+      "tested_on": "2026-10-19"
+    }
+  },
+  {
+    "id": "lua_new_merge_sorted",
+    "name": "Fusionar listas ordenadas",
+    "description": "Combina dos listas ascendentes sin ordenar de nuevo todos sus elementos. Ejemplo independiente de Lua; ejecuta el bloque completo.",
+    "level": "free",
+    "device": "both",
+    "platform": "universal",
+    "type": "source",
+    "executors": [
+      "Lua 5.1+",
+      "Solara",
+      "Wave",
+      "Xeno",
+      "Hydrogen",
+      "Nihon",
+      "Delta",
+      "Fluxus",
+      "Arceus X",
+      "Codex",
+      "Vega X"
+    ],
+    "tags": [
+      "Original RCC",
+      "Lua",
+      "Algoritmos"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-19",
+    "code": "-- RCC | Fusionar listas ordenadas\nlocal function fusionar(a, b)\n  local salida, i, j = {}, 1, 1\n  while i <= #a and j <= #b do\n    if a[i] <= b[j] then salida[#salida+1] = a[i]; i = i + 1\n    else salida[#salida+1] = b[j]; j = j + 1 end\n  end\n  while i <= #a do salida[#salida+1] = a[i]; i = i + 1 end\n  while j <= #b do salida[#salida+1] = b[j]; j = j + 1 end\n  return salida\nend\nlocal lista = fusionar({1, 4, 8}, {2, 4, 9})\nassert(table.concat(lista, \",\") == \"1,2,4,4,8,9\")\nassert(#fusionar({}, {}) == 0)\nprint(table.concat(lista, \", \"))\n",
+    "compatibility": {
+      "runtime": "Lua 5.1+ / subconjunto común con Luau",
+      "context": "Intérprete Lua o consola con bibliotecas estándar",
+      "requirements": "Bibliotecas base, math, string y table. Sin archivos, red ni API de ejecutor.",
+      "verification": "lua-tested",
+      "executor_status": "unverified",
+      "mobile_status": "Requiere un intérprete o ejecutor que exponga estas bibliotecas. Android e iOS no probados.",
+      "sources": [
+        "https://www.lua.org/manual/5.1/manual.html",
+        "https://luau.org/library"
+      ],
+      "environment": "lua",
+      "test_details": "Sintaxis Lua 5.1 analizada con luaparse; ejemplo ejecutado sin errores en Fengari (Lua 5.3 emulado). No ejecutado en Luau ni en un ejecutor externo.",
+      "tested_on": "2026-10-19"
+    }
   }
 ]
