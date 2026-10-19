@@ -353,6 +353,30 @@ pre { tab-size:2; }
 .load-more { display:block; margin:24px auto; padding:14px 28px; background:var(--bg); color:var(--text,#eee); border:1px solid #9bae9e; border-radius:10px; cursor:pointer; }
 .load-more[hidden] { display:none; }
 @media(prefers-reduced-motion:reduce) { .card { transition:none; } }
+
+/* Game library: a distinct color atmosphere while preserving the RCC shell. */
+.section-tabs{display:flex;gap:8px;margin-bottom:26px;flex-wrap:wrap}
+.section-tabs button,.games-nav{font:inherit;color:var(--text);cursor:pointer;border:1px solid var(--border-glass);background:var(--card-glass);border-radius:12px;padding:12px 20px}
+.section-tabs button[aria-pressed="true"]{background:#a9cfb6;color:#12271b;border-color:#a9cfb6}
+.games-nav{margin:0 16px;text-align:left}
+body.games-mode{--card-glass:rgba(23,49,39,.6);--border-glass:rgba(169,207,182,.23)}
+body.games-mode .main{background:linear-gradient(135deg,rgba(25,68,51,.35),transparent 65%)}
+.section-enter{animation:sectionEnter .5s ease both}
+@keyframes sectionEnter{from{opacity:.3;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.discord-panel{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:28px;padding:22px 24px;border:1px solid #626ca1;border-radius:16px;background:rgba(65,74,120,.2)}
+.discord-panel small{color:#b9c0e2;letter-spacing:2px;font-size:.7rem}
+.discord-panel h3{margin-top:7px;font-size:1.25rem}
+.discord-panel p{font-size:.9rem;line-height:1.6;margin-top:5px}
+.discord-panel a{flex-shrink:0;color:#161b32;background:#c0c9f2;padding:13px 18px;border-radius:10px;text-decoration:none;font-weight:700}
+.game-tools{margin-top:24px;display:flex;gap:16px;flex-wrap:wrap;align-items:end}
+.game-tools[hidden]{display:none}
+.game-tools label{display:grid;gap:8px;color:#bbcebf;font-size:.85rem;max-width:100%}
+.game-tools select{max-width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--border-glass);background:#14261e;color:#e0eee4;border-radius:10px;font:inherit}
+.game-tools p{flex-basis:100%;font-size:.85rem;line-height:1.6}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d9c0;outline-offset:4px}
+.device-toggle{grid-template-columns:repeat(2,1fr)}
+@media(max-width:600px){.discord-panel{align-items:start;flex-direction:column}.discord-panel a{width:100%;text-align:center}.game-tools label,.game-tools select{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -375,8 +399,10 @@ pre { tab-size:2; }
     <button class="dev-btn active" data-dev="all"><span class="ico">🌐</span>Todos</button>
     <button class="dev-btn" data-dev="pc"><span class="ico">🖥️</span>PC</button>
     <button class="dev-btn" data-dev="mobile"><span class="ico">📱</span>Móvil</button>
+    <button class="dev-btn" data-dev="unknown">Sin verificar</button>
   </div>
   
+  <button class="games-nav" id="gamesNav" type="button">Juegos Roblox <span aria-hidden="true">↗</span></button>
   <div class="sidebar-section">
     <div id="recentBtn" class="nav-item">
       <span class="ico">⏱️</span>Recientes
@@ -412,8 +438,21 @@ pre { tab-size:2; }
       </div>
     </header>
     <section class="hero">
-      <h2 id="heroTitle">Scripts Lua por RCC</h2>
+      <nav class="section-tabs" aria-label="Secciones del catálogo">
+        <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
+        <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
+      </nav>
+      <h2 id="heroTitle" tabindex="-1">Scripts Lua por RCC</h2>
       <p id="heroSubtitle">Ejemplos Lua y Roblox con requisitos de ejecución. Todos gratis.</p>
+      <aside class="discord-panel">
+        <div><small>COMUNIDAD RCC</small><h3>Los scripts también se comparten.</h3><p>Únete a nuestro servidor de Discord y comparte con la comunidad.</p></div>
+        <a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme a Discord ↗</a>
+      </aside>
+      <div class="game-tools" id="gameTools" hidden>
+        <label>Juego<select id="gameFilter"><option value="all">Todos los juegos</option></select></label>
+        <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="community">Loaders de la comunidad</option></select></label>
+        <p>Fuentes consultadas el 19/10/2026. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
+      </div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
         <div class="stat"><b id="statPC">0</b><small>🖥️ PC</small></div>
@@ -457,6 +496,7 @@ pre { tab-size:2; }
 
 <script>
 let scripts = [];
+let catalogSection = 'all';
 let filterDevice = 'all';
 let filterPlatform = 'all';
 let filterExecutor = 'all';
@@ -532,8 +572,8 @@ const PLATFORMS = [
 ];
 
 
-const DEVICE_ICON = { pc:'🖥️', mobile:'📱', both:'🌐' };
-const DEVICE_LABEL= { pc:'PC', mobile:'Móvil', both:'Ambos' };
+const DEVICE_ICON = { pc:'🖥️', mobile:'📱', both:'🌐', unknown:'?' };
+const DEVICE_LABEL= { pc:'PC', mobile:'Móvil', both:'Ambos', unknown:'Dispositivo sin verificar' };
 
 const grid = document.getElementById('scripts');
 const searchInput = document.getElementById('search');
@@ -555,6 +595,10 @@ async function loadScripts(){
     scripts = await res.json();
     const tagSelect = document.getElementById('tagFilter');
     [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
+    const games=scripts.filter(s=>s.catalog_section==='games');
+    document.getElementById('gamesCount').textContent='· '+games.length;
+    const gameNames=[...new Set(games.map(s=>s.game))].sort((a,b)=>a.localeCompare(b,'es'));
+    gameNames.forEach(name=>document.getElementById('gameFilter').add(new Option(name+' ('+games.filter(s=>s.game===name).length+')',name)));
     updateRecentCount();
     buildSidebar();
     render();
@@ -734,7 +778,15 @@ function render(reset = true){
   if(reset !== false) visibleLimit = 36;
   const q = normalize(searchInput.value.trim());
   
-  let list = scripts;
+  let list = [...scripts];
+  if(catalogSection==='games'){
+    list=list.filter(s=>s.catalog_section==='games');
+    const gameName=document.getElementById('gameFilter').value;
+    const origin=document.getElementById('originFilter').value;
+    list=list.filter(s=>(gameName==='all'||s.game===gameName)&&(origin==='all'||(origin==='original'?s.tags.includes('Original RCC'):!s.tags.includes('Original RCC'))));
+    document.getElementById('heroTitle').textContent='Scripts para tus juegos';
+    document.getElementById('heroSubtitle').textContent='Explora por juego, revisa la fuente y copia el código desde su ficha.';
+  }
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
   }
@@ -744,7 +796,7 @@ function render(reset = true){
     const okPlat = filterPlatform==='all' || s.platform===filterPlatform;
     const okExec = filterExecutor==='all' || (s.executors||[]).includes(filterExecutor);
     const okType = filterType==='all' || s.type === filterType;
-    const haystack = normalize([s.name,s.description,s.platform,s.compatibility?.runtime,s.compatibility?.context,...(s.tags||[]),...(s.executors||[])].join(' '));
+    const haystack = normalize([s.name,s.description,s.game || '',s.platform,s.compatibility?.runtime,s.compatibility?.context,...(s.tags||[]),...(s.executors||[])].join(' '));
     const okTxt = q.split(/\s+/).every(word=>haystack.includes(word));
     const tag = document.getElementById('tagFilter').value;
     const environment=document.getElementById('environmentFilter').value;
@@ -758,9 +810,10 @@ function render(reset = true){
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
-  document.getElementById('statTotal').textContent = scripts.length;
-  document.getElementById('statPC').textContent = scripts.filter(s=>s.device==='pc'||s.device==='both').length;
-  document.getElementById('statMobile').textContent = scripts.filter(s=>s.device==='mobile'||s.device==='both').length;
+  const sectionScripts=catalogSection==='games'?scripts.filter(s=>s.catalog_section==='games'):scripts;
+  document.getElementById('statTotal').textContent = sectionScripts.length;
+  document.getElementById('statPC').textContent = sectionScripts.filter(s=>s.device==='pc'||s.device==='both').length;
+  document.getElementById('statMobile').textContent = sectionScripts.filter(s=>s.device==='mobile'||s.device==='both').length;
   
   renderActiveFilters();
   grid.innerHTML = '';
@@ -931,6 +984,7 @@ document.getElementById('verificationFilter').onchange = render;
 document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render(false);};
 document.getElementById('resetFilters').onclick = ()=>{
   filterDevice=filterPlatform=filterExecutor=filterType='all'; showRecent=false;
+  document.getElementById('gameFilter').value='all';document.getElementById('originFilter').value='all';
   searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
   document.getElementById('recentBtn').classList.remove('active');
   document.getElementById('heroTitle').textContent='Scripts Lua por RCC';
@@ -944,6 +998,25 @@ modal.addEventListener('keydown',e=>{
   if(e.shiftKey && document.activeElement===first){e.preventDefault(); last.focus();}
   else if(!e.shiftKey && document.activeElement===last){e.preventDefault(); first.focus();}
 });
+function selectSection(section){
+  catalogSection=section;
+  document.getElementById('resetFilters').click();
+  document.getElementById('gameFilter').value='all';
+  document.getElementById('originFilter').value='all';
+  document.body.classList.toggle('games-mode',section==='games');
+  document.getElementById('gameTools').hidden=section!=='games';
+  document.getElementById('libraryTab').setAttribute('aria-pressed',String(section==='all'));
+  document.getElementById('gamesTab').setAttribute('aria-pressed',String(section==='games'));
+  changeTheme();
+  const main=document.querySelector('.main');
+  main.classList.remove('section-enter'); void main.offsetWidth; main.classList.add('section-enter');
+  render();closeSidebar();document.getElementById('heroTitle').focus({preventScroll:true});
+}
+document.getElementById('libraryTab').onclick=()=>selectSection('all');
+document.getElementById('gamesTab').onclick=()=>selectSection('games');
+document.getElementById('gamesNav').onclick=()=>selectSection('games');
+document.getElementById('gameFilter').onchange=render;
+document.getElementById('originFilter').onchange=render;
 loadScripts();
 </script>
 

@@ -16,13 +16,23 @@ for (const s of scripts) {
   }
   assert(!ids.has(s.id), `Duplicate ID: ${s.id}`);
   ids.add(s.id);
-  assert(['pc', 'mobile', 'both'].includes(s.device), s.id);
+  assert(['pc', 'mobile', 'both', 'unknown'].includes(s.device), s.id);
   assert(['source', 'loadstring'].includes(s.type), s.id);
   assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch'].includes(s.platform), s.id);
   for (const key of ['tags', 'executors']) {
     assert(Array.isArray(s[key]), `${s.id}: ${key}`);
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
+  }
+  if (s.catalog_section === 'games') {
+    assert.equal(s.platform, 'roblox');
+    assert.equal(s.type, 'loadstring');
+    assert.equal(s.device, 'unknown');
+    assert.equal(s.compatibility.verification, 'unverified');
+    assert(s.game && s.compatibility.sources.length, `${s.id}: missing game or source`);
+    assert(s.code.includes('loadstring') && s.code.includes('https://'), s.id);
+    for (const source of s.compatibility.sources) assert.equal(new URL(source).protocol, 'https:');
+    continue;
   }
   const added = s.id.startsWith('lua_') || s.id.startsWith('learn_rbx_');
   if (!added) { counts.legacy++; continue; }
