@@ -15,7 +15,7 @@ const dependencyRoot = path.resolve(dependencies);
 const parser = require(path.join(dependencyRoot, 'luaparse'));
 const interpreter = path.join(dependencyRoot, '.bin', 'fengari');
 const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'scripts.json'), 'utf8'));
-const examples = catalog.filter(s => s.id.startsWith('lua_') || s.id.startsWith('learn_rbx_'));
+const examples = catalog.filter(s => s.id.startsWith('lua_') || s.id.startsWith('learn_rbx_') || s.id.startsWith('rcc_recipe_'));
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'rcc-lua-'));
 const failures = [];
 let parsed = 0, executed = 0;
@@ -24,7 +24,7 @@ try {
     try {
       parser.parse(example.code, { luaVersion: '5.1' });
       parsed++;
-      if (!example.id.startsWith('lua_')) continue;
+      if (example.compatibility.environment !== 'lua') continue;
       const file = path.join(temporary, 'example.lua');
       fs.writeFileSync(file, example.code);
       const result = cp.spawnSync(interpreter, [file], { encoding: 'utf8', timeout: 3000 });
