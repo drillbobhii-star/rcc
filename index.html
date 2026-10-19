@@ -18,12 +18,14 @@
     --muted: #888888;
     --accent: #ffffff;
     --sidebar-w: 260px;
+    --theme-color: rgba(255, 255, 255, 0.07);
   }
-  *{box-sizing:border-box;margin:0;padding:0; transition: background-color 0.3s, color 0.3s, border-color 0.3s, backdrop-filter 0.3s; }
+  *{box-sizing:border-box;margin:0;padding:0; transition: background-color 0.5s ease, color 0.5s ease, border-color 0.3s, backdrop-filter 0.3s; }
   body{
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background:var(--bg); color:var(--text);
     overflow-x:hidden;min-height:100vh;
+    cursor: default;
   }
   
   /* ==========================================
@@ -37,20 +39,21 @@
     filter: blur(25px);
     z-index: 0; pointer-events: none; white-space: nowrap;
     animation: softPulse 10s infinite alternate ease-in-out;
+    transition: color 0.5s ease;
   }
   @keyframes softPulse {
     0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
     100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
   }
 
-  /* NUEVO TEXTO: ROCIO */
   .bg-text-rocio {
     position: fixed; top: 50%; left: 50%;
     font-size: 25vw; font-weight: 900;
-    color: rgba(255, 255, 255, 0.07); /* Un poco más visible que el RCC */
-    filter: blur(6px); /* Desenfocado pero legible */
+    color: var(--theme-color);
+    filter: blur(6px);
     z-index: 0; pointer-events: none; white-space: nowrap;
     animation: driftRocio 25s infinite linear;
+    transition: color 0.5s ease;
   }
   @keyframes driftRocio {
     0% { transform: translate(-50%, -50%) translate(-40vw, -20vh) rotate(-10deg); }
@@ -60,15 +63,16 @@
     100% { transform: translate(-50%, -50%) translate(-40vw, -20vh) rotate(-10deg); }
   }
   
-  .blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.15; z-index: 0; pointer-events: none; }
-  .blob1 { width: 600px; height: 600px; background: #ffffff; top: -200px; left: -150px; animation: float1 25s infinite ease-in-out; }
-  .blob2 { width: 500px; height: 500px; background: #666666; bottom: -150px; right: -100px; animation: float2 30s infinite ease-in-out; }
+  .blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.15; z-index: 0; pointer-events: none; transition: background 0.5s ease; }
+  .blob1 { width: 600px; height: 600px; background: var(--text); top: -200px; left: -150px; animation: float1 25s infinite ease-in-out; }
+  .blob2 { width: 500px; height: 500px; background: var(--muted); bottom: -150px; right: -100px; animation: float2 30s infinite ease-in-out; }
   
   @keyframes float1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(60px, 80px) scale(1.05); } }
   @keyframes float2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-70px, -60px) scale(1.1); } }
 
   .app{display:flex;min-height:100vh;position:relative;z-index:1}
   
+  /* (El resto de tu CSS para sidebar, tarjetas, etc. se mantiene igual) */
   .sidebar{
     width:var(--sidebar-w); background:var(--bg-glass);
     border-right:1px solid var(--border-glass);
@@ -333,11 +337,11 @@
 <body>
 
 <!-- FONDOS ANIMADOS -->
-<div class="bg-text">RCC</div>
-<div class="bg-text-rocio">Rocio</div>
+<div class="bg-text" id="bgRccText">RCC</div>
+<div class="bg-text-rocio" id="bgRocioText">Rocio</div>
 
-<div class="blob blob1"></div>
-<div class="blob blob2"></div>
+<div class="blob blob1" id="blob1"></div>
+<div class="blob blob2" id="blob2"></div>
 
 <div class="overlay" id="overlay"></div>
 
@@ -430,6 +434,59 @@ let showRecent = false;
 
 let recentIds = JSON.parse(localStorage.getItem('rcc_recent')) || [];
 let currentCopiedId = null;
+
+// ==========================================
+// SISTEMA DE TEMAS MÁGICOS (Clic en el fondo)
+// ==========================================
+const themes = [
+    { bg: '#050505', rocio: 'Rocio 😂', color: 'rgba(255, 255, 255, 0.07)', blob1: '#ffffff', blob2: '#666666' },
+    { bg: '#0a0514', rocio: 'Rocio ❤️', color: 'rgba(192, 132, 252, 0.1)', blob1: '#c084fc', blob2: '#7c3aed' },
+    { bg: '#05140a', rocio: 'Rocio 🌿', color: 'rgba(52, 211, 153, 0.1)', blob1: '#34d399', blob2: '#059669' },
+    { bg: '#140505', rocio: 'Rocio 🔥', color: 'rgba(248, 113, 113, 0.1)', blob1: '#f87171', blob2: '#dc2626' },
+    { bg: '#050a14', rocio: 'Rocio 💧', color: 'rgba(96, 165, 250, 0.1)', blob1: '#60a5fa', blob2: '#2563eb' },
+    { bg: '#141005', rocio: 'Rocio ✨', color: 'rgba(251, 191, 36, 0.1)', blob1: '#fbbf24', blob2: '#d97706' }
+];
+let currentTheme = 0;
+
+function changeTheme() {
+    currentTheme = (currentTheme + 1) % themes.length;
+    const t = themes[currentTheme];
+    
+    // Cambiar fondo principal
+    document.documentElement.style.setProperty('--bg', t.bg);
+    document.body.style.backgroundColor = t.bg;
+    
+    // Cambiar texto de Rocio y su color
+    const rocioEl = document.getElementById('bgRocioText');
+    rocioEl.textContent = t.rocio;
+    rocioEl.style.color = t.color;
+    
+    // Cambiar colores de los blobs (las manchas de fondo)
+    document.getElementById('blob1').style.background = t.blob1;
+    document.getElementById('blob2').style.background = t.blob2;
+    
+    // Actualizar color del texto RCC
+    document.getElementById('bgRccText').style.color = t.color.replace('0.1', '0.03');
+}
+
+// Detectar clic en cualquier parte del fondo
+document.body.addEventListener('click', (e) => {
+    // Ignorar si el clic fue en un botón, tarjeta, menú o modal
+    if (
+        e.target.closest('.card') || 
+        e.target.closest('.sidebar') || 
+        e.target.closest('header') || 
+        e.target.closest('.modal') || 
+        e.target.closest('button') || 
+        e.target.closest('input') ||
+        e.target.closest('.ad-box')
+    ) {
+        return;
+    }
+    changeTheme();
+});
+
+// ==========================================
 
 const PLATFORMS = [
   { id:'roblox',      name:'Roblox',       icon:'🎮' },
