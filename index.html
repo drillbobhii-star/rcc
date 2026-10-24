@@ -412,13 +412,15 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <style>
 .help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
 </style>
+<link rel="stylesheet" href="assets/personalization.css">
+<script src="assets/personalization.js" defer></script>
 </head>
-<body class="ios-glass">
+<body class="ios-glass" data-ui="ios">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
 
 <!-- FONDOS ANIMADOS -->
-<div class="bg-text" id="bgRccText">RCC</div>
-<div class="bg-text-rocio" id="bgRocioText">Rocio</div>
+<div class="bg-text" id="bgRccText" aria-hidden="true">RCC</div>
+<div class="bg-text-rocio" id="bgRocioText" aria-hidden="true">RCC</div>
 
 <div class="blob blob1" id="blob1"></div>
 <div class="blob blob2" id="blob2"></div>
@@ -441,8 +443,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
       </section>
     </div>
   </div>
-  <button class="appearance-toggle" id="appearanceToggle" type="button" aria-pressed="true">
-    <span>Glass iOS</span><span class="appearance-switch" aria-hidden="true"></span>
+  <button class="appearance-toggle" id="appearanceToggle" type="button" aria-controls="personalization" aria-expanded="false">
+    <span>Personalizar interfaz</span><span class="appearance-switch" aria-hidden="true"></span>
   </button>
   <div class="device-toggle">
     <button class="dev-btn active" data-dev="all"><span class="ico">🌐</span>Todos</button>
@@ -511,9 +513,10 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         <a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme a Discord ↗</a>
       </aside>
       <div class="game-tools" id="gameTools" hidden>
+        <p class="game-support-warning"><strong>Advertencia:</strong> Algunos scripts pueden no funcionar porque sus desarrolladores ya no les dan soporte.</p>
         <label>Juego<select id="gameFilter"><option value="all">Todos los juegos</option></select></label>
         <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
-        <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros y publicaciones externas de juegos. Cada ficha indica la fecha de consulta de su fuente. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
+        <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros, 4 sistemas interactivos originales y publicaciones externas de juegos. Cada ficha indica la fecha de consulta de su fuente. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
       </div>
       <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. 12 componentes con 12 temas visuales; las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
       <div class="stats">
@@ -522,6 +525,26 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         <div class="stat"><b id="statMobile">0</b><small>Para móvil</small></div>
       </div>
     </section>
+    <details id="personalization" class="personalization">
+      <summary><span><small>ESTUDIO VISUAL</small>Tu RCC, a tu estilo</span><span aria-hidden="true">＋</span></summary>
+      <div class="personalization-body">
+        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Estilos inspirados en iOS, Android, HyperOS y Nothing. Ajusta cada detalle. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
+        <div class="theme-options" role="group" aria-label="Estilo de interfaz">
+          <button type="button" data-theme="ios" aria-pressed="true"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
+          <button type="button" data-theme="android" aria-pressed="false"><span class="theme-art art-android" aria-hidden="true">RCC</span><strong>Android</strong><small>Formas y color material</small></button>
+          <button type="button" data-theme="hyper" aria-pressed="false"><span class="theme-art art-hyper" aria-hidden="true">RCC</span><strong>HyperOS</strong><small>Capas suaves y aire</small></button>
+          <button type="button" data-theme="nothing" aria-pressed="false"><span class="theme-art art-nothing" aria-hidden="true">RCC</span><strong>Nothing</strong><small>Contraste y precisión</small></button>
+        </div>
+        <div class="appearance-controls">
+          <label>Color de acento<input id="accentColor" type="color" value="#9ec9f5"></label>
+          <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
+          <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
+          <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Animar logo RCC</label>
+          <button id="resetAppearance" type="button">Restablecer estilo</button>
+        </div>
+        <p id="appearanceStatus" role="status" aria-live="polite">Estilo iOS activo.</p>
+      </div>
+    </details>
     <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
     <div class="catalog-tools">
 <span id="resultCount" role="status" aria-live="polite"></span>
@@ -581,70 +604,9 @@ let filterType = 'all';
 let showRecent = false;
 let visibleLimit = 36;
 
-let recentIds = JSON.parse(localStorage.getItem('rcc_recent')) || [];
+let recentIds = [];
+try { const saved = JSON.parse(localStorage.getItem('rcc_recent')); if (Array.isArray(saved)) recentIds = saved.filter(id => typeof id === 'string').slice(0,10); } catch {}
 let currentCopiedId = null;
-
-// ==========================================
-// SISTEMA DE TEMAS MÁGICOS (Clic en el fondo)
-// ==========================================
-const appearanceToggle = document.getElementById('appearanceToggle');
-appearanceToggle.addEventListener('click', () => {
-    const enabled = document.body.classList.toggle('ios-glass');
-    appearanceToggle.setAttribute('aria-pressed', String(enabled));
-});
-
-const themes = [
-    { bg: '#050505', rocio: 'Rocio 😂', color: 'rgba(255, 255, 255, 0.07)', blob1: '#ffffff', blob2: '#666666' },
-    { bg: '#0a0514', rocio: 'Rocio ❤️', color: 'rgba(192, 132, 252, 0.1)', blob1: '#c084fc', blob2: '#7c3aed' },
-    { bg: '#05140a', rocio: 'Rocio 🌿', color: 'rgba(52, 211, 153, 0.1)', blob1: '#34d399', blob2: '#059669' },
-    { bg: '#140505', rocio: 'Rocio 🔥', color: 'rgba(248, 113, 113, 0.1)', blob1: '#f87171', blob2: '#dc2626' },
-    { bg: '#050a14', rocio: 'Rocio 💧', color: 'rgba(96, 165, 250, 0.1)', blob1: '#60a5fa', blob2: '#2563eb' },
-    { bg: '#141005', rocio: 'Rocio ✨', color: 'rgba(251, 191, 36, 0.1)', blob1: '#fbbf24', blob2: '#d97706' }
-];
-let currentTheme = 0;
-
-function changeTheme() {
-    currentTheme = (currentTheme + 1) % themes.length;
-    const t = themes[currentTheme];
-    
-    // Cambiar fondo principal
-    document.documentElement.style.setProperty('--bg', t.bg);
-    document.body.style.backgroundColor = t.bg;
-    
-    // Cambiar texto de Rocio y su color
-    const rocioEl = document.getElementById('bgRocioText');
-    rocioEl.textContent = t.rocio;
-    rocioEl.style.color = t.color;
-    
-    // Cambiar colores de los blobs (las manchas de fondo)
-    document.getElementById('blob1').style.background = t.blob1;
-    document.getElementById('blob2').style.background = t.blob2;
-    
-    // Actualizar color del texto RCC
-    document.getElementById('bgRccText').style.color = t.color.replace('0.1', '0.03');
-}
-
-// Detectar clic en cualquier parte del fondo
-document.body.addEventListener('click', (e) => {
-    // Ignorar si el clic fue en un botón, tarjeta, menú o modal
-    if (
-        e.target.closest('.card') || 
-        e.target.closest('.sidebar') || 
-        e.target.closest('header') || 
-        e.target.closest('.modal') || 
-        e.target.closest('button') || 
-        e.target.closest('input') ||
-        e.target.closest('select') ||
-        e.target.closest('a') ||
-        e.target.closest('.catalog-tools') ||
-        e.target.closest('.ad-box')
-    ) {
-        return;
-    }
-    changeTheme();
-});
-
-// ==========================================
 
 const PLATFORMS = [
   { id:'roblox',      name:'Roblox',       icon:'🎮' },
@@ -1002,7 +964,7 @@ function copyCode(){
       if(currentCopiedId && !recentIds.includes(currentCopiedId)) {
           recentIds.unshift(currentCopiedId);
           if(recentIds.length > 10) recentIds.pop();
-          localStorage.setItem('rcc_recent', JSON.stringify(recentIds));
+          try { localStorage.setItem('rcc_recent', JSON.stringify(recentIds)); } catch {}
           updateRecentCount();
           
           if(showRecent) render();
@@ -1102,7 +1064,6 @@ function selectSection(section){
   document.body.classList.toggle('web-mode',section==='web');
   document.getElementById('libraryTab').setAttribute('aria-pressed',String(section==='all'));
   document.getElementById('gamesTab').setAttribute('aria-pressed',String(section==='games'));
-  changeTheme();
   const main=document.querySelector('.main');
   main.classList.remove('section-enter'); void main.offsetWidth; main.classList.add('section-enter');
   render();closeSidebar();document.getElementById('heroTitle').focus({preventScroll:true});

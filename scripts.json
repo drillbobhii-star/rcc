@@ -144109,5 +144109,2369 @@
         "https://developer.mozilla.org/es/docs/Web/HTML"
       ]
     }
+  },
+  {
+    "id": "games_sb_6aa43586220099e98bd33be2",
+    "name": "APOCALYPSE FREE V3",
+    "description": "[🎃] RIVALS. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/RIVALS-SCRIPT-RAGEBOT-SILENT-AND-MORE-227671\"))()",
+    "game": "[🎃] RIVALS",
+    "game_id": "17625359962",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/RIVALS-SCRIPT-RAGEBOT-SILENT-AND-MORE-227671"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa42c41988eb489b9a0f1e0",
+    "name": "Nyeh GUI F3X",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Nyeh-GUI-F3X-227662\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Nyeh-GUI-F3X-227662"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa4263daa1800337a1db8cd",
+    "name": "[ALWAYS UPDATED] BEST FREE OP SCRIPT AUTOFARM",
+    "description": "[FREE]  Hotel Tycoon 2. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/FREE-Hotel-Tycoon-2-BEST-FREE-OP-SCRIPT-AUTOFARM-227656\"))()",
+    "game": "[FREE]  Hotel Tycoon 2",
+    "game_id": "114639020543523",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/FREE-Hotel-Tycoon-2-BEST-FREE-OP-SCRIPT-AUTOFARM-227656"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa42ea7466c0100699d75ed",
+    "name": "UTG mobile",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-UTG-mobile-227665\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-UTG-mobile-227665"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa42be0df4f910178facf7f",
+    "name": "ZHX hub",
+    "description": "Catalog Avatar Creator. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Catalog-Avatar-Creator-ZHX-hub-227661\"))()",
+    "game": "Catalog Avatar Creator",
+    "game_id": "7041939546",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Catalog-Avatar-Creator-ZHX-hub-227661"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa426ec6685d20e17b4c6f1",
+    "name": "mobile trigger",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-trigger-mobile-227657\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-trigger-mobile-227657"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa42b22fd35f0c5bd643d81",
+    "name": "Ban hammer v3",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Ban-hammer-v3-227660\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Ban-hammer-v3-227660"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa41a549f5555a131240a97",
+    "name": "AUTO THROW ESP",
+    "description": "KNIFE DUELS. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/2077-KNIFE-DUELS-AUTO-THROW-ESP-227644\"))()",
+    "game": "KNIFE DUELS",
+    "game_id": "112731528776884",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/2077-KNIFE-DUELS-AUTO-THROW-ESP-227644"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_69d56150a8e700e5f2829f5f",
+    "name": "dzindras menu (fixed)",
+    "description": "Ohio.. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Ohio.-CODE-EASTER-dzindras-menu-193762\"))()",
+    "game": "Ohio.",
+    "game_id": "7239319209",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Ohio.-CODE-EASTER-dzindras-menu-193762"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa41266363afe35bb3c855e",
+    "name": "tarekscripter anti slap(full update! & all slap towers)",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-tarekscripter-anti-slap(Beta-and-all-slap-towers)-227639\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-tarekscripter-anti-slap(Beta-and-all-slap-towers)-227639"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_696d5102b75108960af637a6",
+    "name": "Best | Auto Buy Gold, Auto Trophy, Unlock Establishments",
+    "description": "Taxi Boss 🚖. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Taxi-Boss-NEW-SCRIPT-OP-INFINITE-MONEY-87519\"))()",
+    "game": "Taxi Boss 🚖",
+    "game_id": "7305309231",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Taxi-Boss-NEW-SCRIPT-OP-INFINITE-MONEY-87519"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa405be4cb74bf36dd59479",
+    "name": "Ro chat",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Ro-chat-227635\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Ro-chat-227635"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa4134a119137b2f827eb39",
+    "name": "mega menu 100+ features best auto block",
+    "description": "Forsaken. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/WEEK-2-Forsaken-MegaSaken-with-removed-loggers-227640\"))()",
+    "game": "Forsaken",
+    "game_id": "18687417158",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/WEEK-2-Forsaken-MegaSaken-with-removed-loggers-227640"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa40a46dc598465f6f8ef7b",
+    "name": "[NEW] JJS | Auto BlackFlash Chain, Camlock, Auto Kill & More",
+    "description": "[HIRED KILLER] Jujutsu Shenanigans. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/SKY-ASSASSIN-Jujutsu-Shenanigans-NEW-JJS-or-Auto-BlackFlash-Chain-Camlock-Auto-Kill-and-More-227634\"))()",
+    "game": "[HIRED KILLER] Jujutsu Shenanigans",
+    "game_id": "9391468976",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/SKY-ASSASSIN-Jujutsu-Shenanigans-NEW-JJS-or-Auto-BlackFlash-Chain-Camlock-Auto-Kill-and-More-227634"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa405a7c4abd03a9ce3dd76",
+    "name": "New Update Working Auto Divine Auto Eternal 2x Train",
+    "description": "Steal an Anime Egg!. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Steal-An-Anime-Egg-Auto-Divine-Auto-Eternal-Auto-Steal-2x-Train-227634\"))()",
+    "game": "Steal an Anime Egg!",
+    "game_id": "76377501906469",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Steal-An-Anime-Egg-Auto-Divine-Auto-Eternal-Auto-Steal-2x-Train-227634"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa40c910d9f28eee2ac24d3",
+    "name": "Aimbot [open source]",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Aimbot-open-source-227635\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Aimbot-open-source-227635"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa40d6c5ad2f0267d4efc6a",
+    "name": "[Best]Universal Fly Hub V5",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-BestUniversal-Fly-Hub-V5-227636\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-BestUniversal-Fly-Hub-V5-227636"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa40c4ad45f68a19b970f45",
+    "name": "Gun Silent Aim Knife Silent Aim Triggerbot Insta Kill OP",
+    "description": "[🎃] Murder Duels. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/NEW-Murder-Duels-Gun-Silent-Aim-Knife-Silent-Aim-Triggerbot-Insta-Kill-OP-227633\"))()",
+    "game": "[🎃] Murder Duels",
+    "game_id": "120851538706364",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/NEW-Murder-Duels-Gun-Silent-Aim-Knife-Silent-Aim-Triggerbot-Insta-Kill-OP-227633"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa4099b1569597e22ae6027",
+    "name": "Keyless op",
+    "description": "Dronefront [BALLISTIC]. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Dronefront-BALLISTIC-Keyless-op-227634\"))()",
+    "game": "Dronefront [BALLISTIC]",
+    "game_id": "130782443587508",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Dronefront-BALLISTIC-Keyless-op-227634"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6a1094805acd394d472420ff",
+    "name": "Driving Empire OP Script",
+    "description": "Driving Empire [RP SERVERS✨]. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/LEGO-BATMAN-Driving-Empire-Car-Racing-Driving-Empire-OP-Script-220693\"))()",
+    "game": "Driving Empire [RP SERVERS✨]",
+    "game_id": "3351674303",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/LEGO-BATMAN-Driving-Empire-Car-Racing-Driving-Empire-OP-Script-220693"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3fe1b51a4d8013c5ec65a",
+    "name": "Magic Carpet Open Source",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Open-Source-227632\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Open-Source-227632"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa404cf3b3daf29899388f3",
+    "name": "Fly gui v3",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Fly-gui-v3-made-by-Ginuxu-227633\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Fly-gui-v3-made-by-Ginuxu-227633"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa403b337c48fe6fcb78548",
+    "name": "OP KEYLESS",
+    "description": "Zooo. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Zooo-OP-KEYLESS-227631\"))()",
+    "game": "Zooo",
+    "game_id": "13416197699",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Zooo-OP-KEYLESS-227631"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3f311e728b07af827f251",
+    "name": "yubc386",
+    "description": "💣 حرب القنابل الاصلي (تحديث الميمز⌛). Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/hrb-alqnabl-alasly-(thdyth-almymz)-yubc386-227627\"))()",
+    "game": "💣 حرب القنابل الاصلي (تحديث الميمز⌛)",
+    "game_id": "116635984204928",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/hrb-alqnabl-alasly-(thdyth-almymz)-yubc386-227627"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3fc6a58088a56dd7b5787",
+    "name": "Divapan",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Divapan-227630\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Divapan-227630"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3f39b598be6655123f414",
+    "name": "Deltarune Connected Noclip (Undected)",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Deltarune-Connected-Noclip-(Undected)-227628\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Deltarune-Connected-Noclip-(Undected)-227628"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3eb93422440f58c4e3a2e",
+    "name": "Punch npcs",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Punch-npcs-227620\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Punch-npcs-227620"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3dfff51a4d8013c5ec616",
+    "name": "Aimbot hub keyless universal",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Aimbot-hub-keyless-universal-227613\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Aimbot-hub-keyless-universal-227613"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6a8b39358d21cb2dc2d63ec1",
+    "name": "Strategies-X-Reborn[OPEN SOURCE]",
+    "description": "[🌙 NIGHT 2] Tower Defense Simulator. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/GLADIATOR-Tower-Defense-Simulator-Strategies-X-Reborn-225191\"))()",
+    "game": "[🌙 NIGHT 2] Tower Defense Simulator",
+    "game_id": "3260590327",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/GLADIATOR-Tower-Defense-Simulator-Strategies-X-Reborn-225191"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3de0dd6b46ae945abb82b",
+    "name": "Cyber Core Hub |",
+    "description": "[2x + 🎃] Criminality. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Criminality-Cyber-Core-Hub-or-227610\"))()",
+    "game": "[2x + 🎃] Criminality",
+    "game_id": "4588604953",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Criminality-Cyber-Core-Hub-or-227610"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3cb8fd6b46ae945abb7e4",
+    "name": "Leak Verity v.5.9.8 by dyton skid",
+    "description": "Brookhaven 🏡RP. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Brookhaven-RP-Repor-227601\"))()",
+    "game": "Brookhaven 🏡RP",
+    "game_id": "4924922222",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Brookhaven-RP-Repor-227601"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3dc985963f13687c1b83c",
+    "name": "Denko music",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Denko-music-227607\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Denko-music-227607"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6a2d9b25d7d7c359b87027e0",
+    "name": "edaves op script auto revive change speed and undetected",
+    "description": "[1.5x 🎃HLWN] Evade . Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Evade-3D-NEXTBOTS-edaves-op-script-auto-revive-change-speed-and-undetected-236211\"))()",
+    "game": "[1.5x 🎃HLWN] Evade ",
+    "game_id": "9872472334",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Evade-3D-NEXTBOTS-edaves-op-script-auto-revive-change-speed-and-undetected-236211"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6a2d27f21f9fcf33c19f959c",
+    "name": "edaves op script auto revive change speed and undetected",
+    "description": "[1.5x 🎃HLWN] Evade . Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Evade-3D-NEXTBOTS-edaves-op-script-auto-revive-change-speed-and-undetected-236055\"))()",
+    "game": "[1.5x 🎃HLWN] Evade ",
+    "game_id": "9872472334",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Evade-3D-NEXTBOTS-edaves-op-script-auto-revive-change-speed-and-undetected-236055"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3c3165963f13687c1b80d",
+    "name": "unlock strongest of history and strongest of today",
+    "description": "[SALE] Jujutsu Showdown. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/SALE-Jujutsu-Showdown-unlock-strongest-of-history-and-strongest-of-today-227597\"))()",
+    "game": "[SALE] Jujutsu Showdown",
+    "game_id": "12523561556",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/SALE-Jujutsu-Showdown-unlock-strongest-of-history-and-strongest-of-today-227597"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3cfafd6b46ae945abb7ee",
+    "name": "show off pose",
+    "description": "[HIRED KILLER] Jujutsu Shenanigans. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/SKY-ASSASSIN-Jujutsu-Shenanigans-show-off-pose-227603\"))()",
+    "game": "[HIRED KILLER] Jujutsu Shenanigans",
+    "game_id": "9391468976",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/SKY-ASSASSIN-Jujutsu-Shenanigans-show-off-pose-227603"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa34ce7c6b8005919d376f6",
+    "name": "OP auto fish Use it whilst you can (lvl and gold farm)",
+    "description": "Grand Blue [Early Access]. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Grand-Blue-Early-Access-OP-auto-fish-Use-it-whilst-you-can-227541\"))()",
+    "game": "Grand Blue [Early Access]",
+    "game_id": "18335956021",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Grand-Blue-Early-Access-OP-auto-fish-Use-it-whilst-you-can-227541"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3c8ad57954676dc8e8702",
+    "name": "SFLY FARM",
+    "description": "Roblox_Egor Game. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Roblox_Egor-Game-SFLY-FARM-227600\"))()",
+    "game": "Roblox_Egor Game",
+    "game_id": "137539987204810",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Roblox_Egor-Game-SFLY-FARM-227600"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3c747d11a9f02ffe991da",
+    "name": "Auto Farm, ESP, Auto Pick, NoClip",
+    "description": "Animal Hospital (Anomaly) 🧪. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Animal-Hospital-(Anomaly)-Auto-Farm-ESP-Auto-Pick-NoClip-227598\"))()",
+    "game": "Animal Hospital (Anomaly) 🧪",
+    "game_id": "78515283254292",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Animal-Hospital-(Anomaly)-Auto-Farm-ESP-Auto-Pick-NoClip-227598"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3bb777e962ab8c24f8433",
+    "name": "Chat Encoder",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Chat-Encoder-227592\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Chat-Encoder-227592"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3b618e728b07af827f1a4",
+    "name": "Backroom still life script and is client side",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Backroom-still-life-script-and-is-client-side-227589\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Backroom-still-life-script-and-is-client-side-227589"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3b4d981bcb7e1d7a576e4",
+    "name": "FTAP Xocu Script",
+    "description": "Fling Things and People. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Fling-Things-and-People-FTAP-Xocu-Script-227588\"))()",
+    "game": "Fling Things and People",
+    "game_id": "6961824067",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Fling-Things-and-People-FTAP-Xocu-Script-227588"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3a5f10f7b41d0d23d5012",
+    "name": "Morph hub",
+    "description": "Script hub. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Morph-hub-227581\"))()",
+    "game": "Script hub",
+    "game_id": "-1",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Morph-hub-227581"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa39737e076a791cffeb969",
+    "name": "Dex Honey Original",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Dex-Honey-Original-227581\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Dex-Honey-Original-227581"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3930bbd5b83c7518621bb",
+    "name": "MOBHUB Keyless",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-MOBHUB-Keyless-227577\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-MOBHUB-Keyless-227577"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6a9ebedf8f528a98e8ed1311",
+    "name": "WixHub",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-WixHub-227100\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-WixHub-227100"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa38e0aad4b77c2dd534e83",
+    "name": "Best VD Script",
+    "description": "[CURE] Violence District. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/CURE-Violence-District-Best-VD-Script-227573\"))()",
+    "game": "[CURE] Violence District",
+    "game_id": "93978595733734",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/CURE-Violence-District-Best-VD-Script-227573"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa38914e076a791cffeb8fd",
+    "name": "Free Ve Flux.exe",
+    "description": "Fluxo PVP [MATCHMAKING]. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Fluxo-PVP-MATCHMAKING-Free-Ve-Flux.exe-227571\"))()",
+    "game": "Fluxo PVP [MATCHMAKING]",
+    "game_id": "99001115434148",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Fluxo-PVP-MATCHMAKING-Free-Ve-Flux.exe-227571"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3663dd8075c8e3356ce60",
+    "name": "Best  lagger",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Bro-mazika-on-top-227556\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Bro-mazika-on-top-227556"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa36e2fd8075c8e3356ce6d",
+    "name": "keyless",
+    "description": "[HIRED KILLER] Jujutsu Shenanigans. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/SKY-ASSASSIN-Jujutsu-Shenanigans-keyless-227560\"))()",
+    "game": "[HIRED KILLER] Jujutsu Shenanigans",
+    "game_id": "9391468976",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/SKY-ASSASSIN-Jujutsu-Shenanigans-keyless-227560"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa374bf045f2fee75652314",
+    "name": "Luigi hub",
+    "description": "[🔱] Search For The Needle. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Search-For-The-Needle-Luigi-hub-227563\"))()",
+    "game": "[🔱] Search For The Needle",
+    "game_id": "77108422251420",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Search-For-The-Needle-Luigi-hub-227563"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa36fa1a80a476602900e32",
+    "name": "DMX SPAMMER SCRIPT BY ALPHA",
+    "description": "Brookhaven 🏡RP. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Brookhaven-RP-DMX-SPAMMER-SCRIPT-BY-ALPHA-227562\"))()",
+    "game": "Brookhaven 🏡RP",
+    "game_id": "4924922222",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Brookhaven-RP-DMX-SPAMMER-SCRIPT-BY-ALPHA-227562"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa351ba2513c31c6b0d0c03",
+    "name": "Fast Auto Farm Level",
+    "description": "Kanom Tokyo. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Kanom-Tokyo-Fast-Auto-Farm-Level-227543\"))()",
+    "game": "Kanom Tokyo",
+    "game_id": "71793674075007",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Kanom-Tokyo-Fast-Auto-Farm-Level-227543"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3442c94b624b6255d8a20",
+    "name": "Silent aim etc dkhub",
+    "description": "Hood Rivals. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Hood-Rivals-Silent-aim-etc-dkhub-227540\"))()",
+    "game": "Hood Rivals",
+    "game_id": "77463332823746",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Hood-Rivals-Silent-aim-etc-dkhub-227540"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa338ec2513c31c6b0d0bb3",
+    "name": "Sledge hammer f3x",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Sledge-hammer-f3x-227536\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Sledge-hammer-f3x-227536"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa36bf700a69b9544150663",
+    "name": "Axonic | Auto Hack Computers & More!",
+    "description": "Flee the Facility. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Flee-the-Facility-Axonic-Xeno-Not-Supported-227559\"))()",
+    "game": "Flee the Facility",
+    "game_id": "893973440",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Flee-the-Facility-Axonic-Xeno-Not-Supported-227559"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa330a6f7303cdfdf0d205d",
+    "name": "God Mode | Zombie Kill Aura | Auto Loot | Auto Craft",
+    "description": "Last Stop [Beta]. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Last-Stop-Beta-God-Mode-or-Zombie-Kill-Aura-or-Auto-Loot-227532\"))()",
+    "game": "Last Stop [Beta]",
+    "game_id": "85967844112283",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Last-Stop-Beta-God-Mode-or-Zombie-Kill-Aura-or-Auto-Loot-227532"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa3428abbd59cafc56cb5e7",
+    "name": "Fly v4, the best fly",
+    "description": "Universal Script 📌. Publicación de la comunidad en ScriptBlox. Sin clave indicada según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Sin clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Universal-Script-Fly-v4-the-best-fly-227539\"))()",
+    "game": "Universal Script 📌",
+    "game_id": "0",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Universal-Script-Fly-v4-the-best-fly-227539"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6aa341ca33a971bbbb20f18f",
+    "name": "BRUTON HUB",
+    "description": "Brookhaven 🏡RP. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/Brookhaven-RP-BRUTON-HUB-227538\"))()",
+    "game": "Brookhaven 🏡RP",
+    "game_id": "4924922222",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/Brookhaven-RP-BRUTON-HUB-227538"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "games_sb_6a84f27b23eea3725461e246",
+    "name": "Rak Hub  Script",
+    "description": "FIFA Super Soccer. Publicación de la comunidad en ScriptBlox. Requiere clave según la fuente. Contenido remoto y funcionamiento sin verificar.",
+    "level": "free",
+    "device": "unknown",
+    "platform": "roblox",
+    "type": "loadstring",
+    "executors": [
+      "Ejecutor externo (sin verificar)"
+    ],
+    "tags": [
+      "Juegos",
+      "Comunidad",
+      "Con clave"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "loadstring(game:HttpGet(\"https://scriptblox.com/raw/FIFA-Super-Soccer-Rak-Hub-Script-224454\"))()",
+    "game": "FIFA Super Soccer",
+    "game_id": "12177325772",
+    "catalog_section": "games",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Roblox · ejecutor externo",
+      "context": "Cliente de Roblox; publicación externa de la comunidad.",
+      "requirements": "API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.",
+      "verification": "unverified",
+      "test_details": "Ficha encontrada en el listado público el 2026-10-24. No se descargó, auditó ni ejecutó el código remoto.",
+      "mobile_status": "PC, Android e iOS sin comprobar.",
+      "executor_status": "unverified",
+      "sources": [
+        "https://scriptblox.com/script/FIFA-Super-Soccer-Rak-Hub-Script-224454"
+      ],
+      "checked_at": "2026-10-24"
+    }
+  },
+  {
+    "id": "rcc_recipe_system_explosion",
+    "name": "Efectos: explosión visual sin daño",
+    "description": "Explosión visual al interactuar con un botón; sin presión física ni destrucción de uniones. Ejemplo original para Roblox Studio; no modifica juegos ajenos.",
+    "level": "free",
+    "device": "both",
+    "platform": "roblox",
+    "type": "source",
+    "executors": [
+      "Roblox Studio (servidor)"
+    ],
+    "tags": [
+      "Original RCC",
+      "Roblox Studio",
+      "Sistemas de juego"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "-- RCC | Efectos: explosión visual sin daño\n-- Script en ServerScriptService de tu propia experiencia.\nlocal part = Instance.new(\"Part\")\npart.Name = \"RCCVisualExplosion\"\npart.Anchored = true\npart.Position = Vector3.new(0, 3, 0)\npart.Parent = workspace\nlocal prompt = Instance.new(\"ProximityPrompt\")\nprompt.ActionText = \"Ver efecto\"\nprompt.Parent = part\nlocal ready = true\nprompt.Triggered:Connect(function()\n  if not ready then return end\n  ready = false\n  local effect = Instance.new(\"Explosion\")\n  effect.BlastRadius = 8\n  effect.BlastPressure = 0\n  effect.DestroyJointRadiusPercent = 0\n  effect.Position = part.Position + Vector3.new(0, 6, 0)\n  effect.Parent = workspace\n  task.delay(2, function() ready = true end)\nend)\n",
+    "catalog_section": "games",
+    "game": "Crear juegos: Sistemas interactivos",
+    "compatibility": {
+      "environment": "server",
+      "runtime": "Luau / Roblox Studio",
+      "context": "Script en ServerScriptService de tu propia experiencia.",
+      "requirements": "Ejecutar cada ejemplo por separado en tu propia experiencia de Roblox Studio.",
+      "verification": "syntax-only",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseñado con controles adaptables; sin prueba en Android o iOS.",
+      "test_details": "Sintaxis Lua analizada con luaparse; no ejecutado en Roblox Studio.",
+      "sources": [
+        "https://create.roblox.com/docs/scripting/locations",
+        "https://create.roblox.com/docs/reference/engine/classes/Explosion"
+      ]
+    }
+  },
+  {
+    "id": "rcc_recipe_system_daycycle",
+    "name": "Mundo: ciclo de día y noche",
+    "description": "Ciclo suave de iluminación de diez minutos. Desconecta el evento al destruir el script. Ejemplo original para Roblox Studio; no modifica juegos ajenos.",
+    "level": "free",
+    "device": "both",
+    "platform": "roblox",
+    "type": "source",
+    "executors": [
+      "Roblox Studio (servidor)"
+    ],
+    "tags": [
+      "Original RCC",
+      "Roblox Studio",
+      "Sistemas de juego"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "-- RCC | Mundo: ciclo de día y noche\n-- Script en ServerScriptService de tu propia experiencia.\nlocal Lighting = game:GetService(\"Lighting\")\nlocal RunService = game:GetService(\"RunService\")\nlocal secondsPerDay = 600\nlocal connection = RunService.Heartbeat:Connect(function(dt)\n  Lighting.ClockTime = (Lighting.ClockTime + dt * 24 / secondsPerDay) % 24\nend)\nscript.Destroying:Connect(function()\n  connection:Disconnect()\nend)\n",
+    "catalog_section": "games",
+    "game": "Crear juegos: Sistemas interactivos",
+    "compatibility": {
+      "environment": "server",
+      "runtime": "Luau / Roblox Studio",
+      "context": "Script en ServerScriptService de tu propia experiencia.",
+      "requirements": "Ejecutar cada ejemplo por separado en tu propia experiencia de Roblox Studio.",
+      "verification": "syntax-only",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseñado con controles adaptables; sin prueba en Android o iOS.",
+      "test_details": "Sintaxis Lua analizada con luaparse; no ejecutado en Roblox Studio.",
+      "sources": [
+        "https://create.roblox.com/docs/scripting/locations",
+        "https://create.roblox.com/docs/reference/engine/classes/Lighting"
+      ]
+    }
+  },
+  {
+    "id": "rcc_recipe_system_sprint",
+    "name": "Controles: correr con teclado, mando y botón táctil",
+    "description": "Alterna la carrera con Shift, L3 o un botón táctil. Conserva la velocidad inicial y se restablece al reaparecer. Ejemplo original para Roblox Studio; no modifica juegos ajenos.",
+    "level": "free",
+    "device": "both",
+    "platform": "roblox",
+    "type": "source",
+    "executors": [
+      "Roblox Studio (cliente)"
+    ],
+    "tags": [
+      "Original RCC",
+      "Roblox Studio",
+      "Sistemas de juego"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "-- RCC | Controles: correr con teclado, mando y botón táctil\n-- LocalScript en StarterPlayer > StarterPlayerScripts de tu propia experiencia.\nlocal Players = game:GetService(\"Players\")\nlocal CAS = game:GetService(\"ContextActionService\")\nlocal player = Players.LocalPlayer\nlocal running = false\nlocal humanoid\nlocal normalSpeed = 16\nlocal function bindCharacter(character)\n  humanoid = character:WaitForChild(\"Humanoid\")\n  normalSpeed = humanoid.WalkSpeed\n  running = false\nend\nlocal added = player.CharacterAdded:Connect(bindCharacter)\nif player.Character then bindCharacter(player.Character) end\nCAS:BindAction(\"RCCSprint\", function(_, state)\n  if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end\n  if humanoid and humanoid.Health > 0 then\n    running = not running\n    humanoid.WalkSpeed = running and normalSpeed * 1.5 or normalSpeed\n  end\n  return Enum.ContextActionResult.Sink\nend, true, Enum.KeyCode.LeftShift, Enum.KeyCode.ButtonL3)\nCAS:SetTitle(\"RCCSprint\", \"Correr\")\nCAS:SetPosition(\"RCCSprint\", UDim2.fromScale(0.7, 0.65))\nscript.Destroying:Connect(function()\n  added:Disconnect()\n  CAS:UnbindAction(\"RCCSprint\")\n  if humanoid then humanoid.WalkSpeed = normalSpeed end\nend)\n",
+    "catalog_section": "games",
+    "game": "Crear juegos: Sistemas interactivos",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Luau / Roblox Studio",
+      "context": "LocalScript en StarterPlayer > StarterPlayerScripts de tu propia experiencia.",
+      "requirements": "Ejecutar cada ejemplo por separado en tu propia experiencia de Roblox Studio.",
+      "verification": "syntax-only",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseñado con controles adaptables; sin prueba en Android o iOS.",
+      "test_details": "Sintaxis Lua analizada con luaparse; no ejecutado en Roblox Studio.",
+      "sources": [
+        "https://create.roblox.com/docs/scripting/locations",
+        "https://create.roblox.com/docs/reference/engine/classes/ContextActionService"
+      ]
+    }
+  },
+  {
+    "id": "rcc_recipe_system_healthhud",
+    "name": "Interfaz: barra de salud adaptable",
+    "description": "HUD que se adapta al ancho de pantalla y vuelve a conectar la salud al reaparecer. Ejemplo original para Roblox Studio; no modifica juegos ajenos.",
+    "level": "free",
+    "device": "both",
+    "platform": "roblox",
+    "type": "source",
+    "executors": [
+      "Roblox Studio (cliente)"
+    ],
+    "tags": [
+      "Original RCC",
+      "Roblox Studio",
+      "Sistemas de juego"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-24",
+    "code": "-- RCC | Interfaz: barra de salud adaptable\n-- LocalScript en StarterPlayer > StarterPlayerScripts de tu propia experiencia.\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\nlocal gui = Instance.new(\"ScreenGui\")\ngui.Name = \"RCCHealth\"\ngui.ResetOnSpawn = false\ngui.Parent = player:WaitForChild(\"PlayerGui\")\nlocal frame = Instance.new(\"Frame\")\nframe.Size = UDim2.new(0.35, 0, 0, 24)\nframe.Position = UDim2.fromScale(0.04, 0.05)\nframe.BackgroundColor3 = Color3.fromRGB(35, 42, 49)\nframe.ClipsDescendants = true\nframe.Parent = gui\nlocal fill = Instance.new(\"Frame\")\nfill.BorderSizePixel = 0\nfill.BackgroundColor3 = Color3.fromRGB(145, 205, 173)\nfill.Parent = frame\nlocal text = Instance.new(\"TextLabel\")\ntext.Size = UDim2.fromScale(1, 1)\ntext.BackgroundTransparency = 1\ntext.TextColor3 = Color3.fromRGB(245, 248, 250)\ntext.Parent = frame\nlocal healthConnection, maxConnection\nlocal function bind(character)\n  if healthConnection then healthConnection:Disconnect() end\n  if maxConnection then maxConnection:Disconnect() end\n  local humanoid = character:WaitForChild(\"Humanoid\")\n  local function update()\n    local ratio = math.clamp(humanoid.Health / math.max(1, humanoid.MaxHealth), 0, 1)\n    fill.Size = UDim2.fromScale(ratio, 1)\n    text.Text = string.format(\"Salud: %d / %d\", humanoid.Health, humanoid.MaxHealth)\n  end\n  healthConnection = humanoid.HealthChanged:Connect(update)\n  maxConnection = humanoid:GetPropertyChangedSignal(\"MaxHealth\"):Connect(update)\n  update()\nend\nlocal added = player.CharacterAdded:Connect(bind)\nif player.Character then bind(player.Character) end\nscript.Destroying:Connect(function()\n  added:Disconnect()\n  if healthConnection then healthConnection:Disconnect() end\n  if maxConnection then maxConnection:Disconnect() end\n  gui:Destroy()\nend)\n",
+    "catalog_section": "games",
+    "game": "Crear juegos: Sistemas interactivos",
+    "compatibility": {
+      "environment": "client",
+      "runtime": "Luau / Roblox Studio",
+      "context": "LocalScript en StarterPlayer > StarterPlayerScripts de tu propia experiencia.",
+      "requirements": "Ejecutar cada ejemplo por separado en tu propia experiencia de Roblox Studio.",
+      "verification": "syntax-only",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseñado con controles adaptables; sin prueba en Android o iOS.",
+      "test_details": "Sintaxis Lua analizada con luaparse; no ejecutado en Roblox Studio.",
+      "sources": [
+        "https://create.roblox.com/docs/scripting/locations",
+        "https://create.roblox.com/docs/reference/engine/classes/Humanoid"
+      ]
+    }
   }
 ]
