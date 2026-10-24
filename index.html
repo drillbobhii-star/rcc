@@ -6,7 +6,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RCC — Scripts Lua</title>
+<title>RCC — Lua, juegos y JavaScript</title>
 <meta name="monetag" content="44f35da9366291d38d9f74444af9bf00">
 <style>
   :root{
@@ -409,6 +409,9 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/glass-controls.css">
 <link rel="stylesheet" href="assets/catalog-ui.css">
 <script src="assets/languages.js" defer></script>
+<style>
+.help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
+</style>
 </head>
 <body class="ios-glass">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -449,6 +452,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
   </div>
   
   <button class="games-nav" id="gamesNav" type="button">Juegos Roblox <span aria-hidden="true">↗</span></button>
+  <button class="games-nav" id="webNav" type="button">JavaScript · Web ↗</button>
+  <a class="games-nav help-link" href="soporte.html">Ayuda y reportar errores ↗</a>
   <div class="sidebar-section">
     <div id="recentBtn" class="nav-item">
       <span class="ico">⏱️</span>Recientes
@@ -488,10 +493,12 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
       <nav class="section-tabs" aria-label="Secciones del catálogo">
         <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
+        <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
+        <a class="help-link" href="soporte.html">Centro de ayuda ↗</a>
       </nav>
       <div class="hero-intro"><div class="hero-copy"><span class="eyebrow">BIBLIOTECA DE CÓDIGO · RCC</span>
-      <h2 id="heroTitle" tabindex="-1">Scripts Lua por RCC</h2>
-      <p id="heroSubtitle">1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.</p>
+      <h2 id="heroTitle" tabindex="-1">Código para crear por RCC</h2>
+      <p id="heroSubtitle">Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.</p>
       </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
 <span class="code-keyword">local</span> proyecto = {
   lenguaje = <span class="code-string">"Lua"</span>,
@@ -500,14 +507,15 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 
 <span class="code-keyword">return</span> proyecto</pre><div class="code-preview-foot"><span>Lua</span><span>Hecho para explorar ↗</span></div></div></div>
       <aside class="discord-panel">
-        <div><small>COMUNIDAD RCC</small><h3>Los scripts también se comparten.</h3><p>Únete a nuestro servidor de Discord y comparte con la comunidad.</p></div>
+        <div><small>COMUNIDAD RCC</small><h3>Los scripts también se comparten.</h3><p>Únete al Discord y notifica el error. Comparte el enlace del código y qué ha fallado.</p></div>
         <a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme a Discord ↗</a>
       </aside>
       <div class="game-tools" id="gameTools" hidden>
         <label>Juego<select id="gameFilter"><option value="all">Todos los juegos</option></select></label>
         <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
-        <p>Incluye 100 recetas configurables para crear tus propios juegos en Roblox Studio, en diez géneros. Fuentes de la comunidad consultadas el 19/10/2026. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
+        <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros y publicaciones externas de juegos. Cada ficha indica la fecha de consulta de su fuente. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
       </div>
+      <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. 12 componentes con 12 temas visuales; las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
         <div class="stat"><b id="statPC">0</b><small>Para PC</small></div>
@@ -518,8 +526,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
     <div class="catalog-tools">
 <span id="resultCount" role="status" aria-live="polite"></span>
 <label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
-<label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="legacy">Catálogo anterior</option></select></label>
-<label>Prueba <select id="verificationFilter"><option value="all">Todas</option><option value="lua-tested">Lua ejecutado en emulador</option><option value="syntax-only">Solo sintaxis</option><option value="unverified">Sin verificar</option></select></label>
+<label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="browser">Navegador web</option><option value="legacy">Catálogo anterior</option></select></label>
+<label>Prueba <select id="verificationFilter"><option value="all">Todas</option><option value="lua-tested">Lua ejecutado en emulador</option><option value="syntax-only">Solo sintaxis</option><option value="js-syntax">Sintaxis JavaScript revisada</option><option value="unverified">Sin verificar</option></select></label>
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
@@ -643,6 +651,7 @@ const PLATFORMS = [
   { id:'fivem',       name:'FiveM',        icon:'🚗' },
   { id:'gameguardian',name:'GameGuardian', icon:'🕹️' },
   { id:'autotouch',   name:'AutoTouch',    icon:'📱' },
+  { id:'web', name:'JavaScript / Web', icon:'⌘' },
   { id:'universal',   name:'Universal',    icon:'⚙️' },
 ];
 
@@ -670,6 +679,7 @@ async function loadScripts(){
     scripts = await res.json();
     const tagSelect = document.getElementById('tagFilter');
     [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
+    document.getElementById('webCount').textContent='· '+scripts.filter(s=>s.catalog_section==='web').length;
     const games=scripts.filter(s=>s.catalog_section==='games');
     document.getElementById('gamesCount').textContent='· '+games.length;
     const gameNames=[...new Set(games.map(s=>s.game))].sort((a,b)=>a.localeCompare(b,'es'));
@@ -712,8 +722,8 @@ function buildSidebar(){
   allTypes.innerHTML = `<span class="ico">📄</span>Todos<span class="count">${scripts.length}</span>`;
   allTypes.onclick = ()=>{ 
       showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
+      document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+      document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
       filterType='all'; buildSidebar(); render(); 
   };
@@ -756,8 +766,8 @@ function buildSidebar(){
   allP.innerHTML = `<span class="ico">📁</span>Todas<span class="count">${scripts.length}</span>`;
   allP.onclick = ()=>{ 
       showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
+      document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+      document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
       filterPlatform='all'; buildSidebar(); render(); 
   };
@@ -771,8 +781,8 @@ function buildSidebar(){
     item.innerHTML = `<span class="ico">${p.icon}</span>${p.name}<span class="count">${count}</span>`;
     item.onclick = ()=>{ 
         showRecent = false;
-        document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-        document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
+        document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+        document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
         document.getElementById('recentBtn').classList.remove('active');
         filterPlatform=p.id; buildSidebar(); render(); closeSidebar(); 
     };
@@ -785,8 +795,8 @@ function buildSidebar(){
   allE.innerHTML = `<span class="ico">⚡</span>Todos`;
   allE.onclick = ()=>{ 
       showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-      document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
+      document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+      document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
       filterExecutor='all'; buildSidebar(); render(); 
   };
@@ -809,8 +819,8 @@ function buildSidebar(){
 document.querySelectorAll('.dev-btn').forEach(btn=>{
   btn.onclick = ()=>{
     showRecent = false;
-    document.getElementById('heroTitle').textContent = "Scripts Lua por RCC";
-    document.getElementById('heroSubtitle').textContent = "1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.";
+    document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+    document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
     document.getElementById('recentBtn').classList.remove('active');
     document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -862,6 +872,12 @@ function render(reset = true){
     document.getElementById('heroTitle').textContent='Scripts para tus juegos';
     document.getElementById('heroSubtitle').textContent='Explora por juego, revisa la fuente y copia el código desde su ficha.';
   }
+  if(catalogSection==='web'){
+    list=list.filter(s=>s.catalog_section==='web');
+    document.getElementById('heroTitle').textContent='JavaScript para la web';
+    document.getElementById('heroSubtitle').textContent='HTML, CSS y JavaScript en un archivo. Copia, descarga y empieza a crear tu página.';
+  }
+  if(catalogSection==='all' && !showRecent) document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
   }
@@ -885,7 +901,7 @@ function render(reset = true){
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
-  const sectionScripts=catalogSection==='games'?scripts.filter(s=>s.catalog_section==='games'):scripts;
+  const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
   document.getElementById('statTotal').textContent = sectionScripts.length;
   document.getElementById('statPC').textContent = sectionScripts.filter(s=>s.device==='pc'||s.device==='both').length;
   document.getElementById('statMobile').textContent = sectionScripts.filter(s=>s.device==='mobile'||s.device==='both').length;
@@ -965,8 +981,9 @@ function openScript(s){
     <pre class="notranslate" translate="no"><code id="modalCode"></code></pre>
     <div class="actions">
       <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
-      <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .lua</button>
+      <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>
       <button class="btn btn-ghost" onclick="shareCurrent()">Copiar enlace</button>
+      <a class="btn btn-ghost" href="soporte.html?script=${encodeURIComponent(s.id)}#reportar">Notificar error</a>
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
     </div>
   `;
@@ -1013,7 +1030,7 @@ searchInput.addEventListener('input', render);
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function verificationLabel(s){
-  return ({'lua-tested':'Ejecutado en Lua 5.3 emulado · ejecutores sin probar','syntax-only':'Sintaxis revisada · ejecución Roblox sin probar'})[s.compatibility?.verification] || 'Compatibilidad sin verificar';
+  return ({'lua-tested':'Ejecutado en Lua 5.3 emulado · ejecutores sin probar','syntax-only':'Sintaxis revisada · ejecución Roblox sin probar','js-syntax':'Sintaxis JavaScript revisada · ejemplo web'})[s.compatibility?.verification] || 'Compatibilidad sin verificar';
 }
 function renderCompatibility(s){
   const panel=document.getElementById('compatDetail');
@@ -1025,7 +1042,7 @@ function renderCompatibility(s){
     ['Requisitos',c.requirements || 'Revisar las API y permisos del código antes de usarlo.'],
     ['Prueba realizada',c.test_details || 'No hay una prueba registrada.'],
     ['Celular',c.mobile_status || 'Sin pruebas registradas en Android o iOS.'],
-    ['Ejecutores',c.executor_status==='not-applicable'?'Este código requiere un servidor, no un ejecutor cliente.':'Sin pruebas en Solara, Wave, Xeno, Hydrogen, Nihon, Delta, Fluxus, Arceus X, Codex o Vega X.']
+    ['Ejecutores',c.executor_status==='not-applicable'?'Usa el entorno indicado en esta ficha; no requiere ejecutor externo.':'Sin pruebas en Solara, Wave, Xeno, Hydrogen, Nihon, Delta, Fluxus, Arceus X, Codex o Vega X.']
   ]){const p=document.createElement('p');p.textContent=name+': '+value;panel.appendChild(p);}
   if(s.type==='loadstring'){const p=document.createElement('p');p.textContent='Este código descarga contenido remoto que puede cambiar. Su disponibilidad y contenido no se han validado.';panel.appendChild(p);}
   for(const source of c.sources || []){
@@ -1039,7 +1056,7 @@ function downloadCurrent(){
   const s = scripts.find(s=>s.id===currentCopiedId);
   if(!s) return;
   const url = URL.createObjectURL(new Blob([s.code], {type:'text/plain;charset=utf-8'}));
-  const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.lua'; a.click();
+  const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.'+(s.file_extension || 'lua'); a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function shareCurrent(){
@@ -1062,8 +1079,8 @@ document.getElementById('resetFilters').onclick = ()=>{
   document.getElementById('gameFilter').value='all';document.getElementById('originFilter').value='all';
   searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
   document.getElementById('recentBtn').classList.remove('active');
-  document.getElementById('heroTitle').textContent='Scripts Lua por RCC';
-  document.getElementById('heroSubtitle').textContent='1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.';
+  document.getElementById('heroTitle').textContent='Código para crear por RCC';
+  document.getElementById('heroSubtitle').textContent='Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.';
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev==='all'));
   buildSidebar(); render();
 };
@@ -1080,6 +1097,9 @@ function selectSection(section){
   document.getElementById('originFilter').value='all';
   document.body.classList.toggle('games-mode',section==='games');
   document.getElementById('gameTools').hidden=section!=='games';
+  document.getElementById('webTools').hidden=section!=='web';
+  document.getElementById('webTab').setAttribute('aria-pressed',String(section==='web'));
+  document.body.classList.toggle('web-mode',section==='web');
   document.getElementById('libraryTab').setAttribute('aria-pressed',String(section==='all'));
   document.getElementById('gamesTab').setAttribute('aria-pressed',String(section==='games'));
   changeTheme();
@@ -1088,6 +1108,8 @@ function selectSection(section){
   render();closeSidebar();document.getElementById('heroTitle').focus({preventScroll:true});
 }
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
+document.getElementById('webTab').onclick=()=>selectSection('web');
+document.getElementById('webNav').onclick=()=>selectSection('web');
 document.getElementById('gamesTab').onclick=()=>selectSection('games');
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;

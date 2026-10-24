@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Centro de ayuda — RCC</title><meta name="description" content="Ayuda para códigos Lua, scripts de juegos y JavaScript. Notifica errores a RCC o únete a Discord."><link rel="stylesheet" href="assets/support.css"><script src="assets/support.js" defer></script></head>
+<body>
+<header><strong>RCC / AYUDA</strong><nav aria-label="Navegación"><a href="/">Volver al catálogo</a> · <a href="compatibilidad.html">Compatibilidad</a></nav></header>
+<main>
+<span class="eyebrow">Estamos para ayudarte</span><h1>Menos dudas.<br>Más tiempo creando.</h1><p class="intro">Encuentra cómo usar el código, revisa los requisitos o cuéntanos qué ha fallado. Incluye la ficha del script para que podamos localizarlo.</p>
+<div class="support-layout"><section aria-labelledby="helpHeading">
+<aside class="community"><h2>Únete al Discord y notifica el error</h2><p>Comparte el enlace del código, el juego y el mensaje de error con la comunidad. No compartas contraseñas ni claves.</p><a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme al Discord de RCC ↗</a></aside>
+<h2 id="helpHeading">Respuestas para empezar</h2>
+<details><summary>¿Cómo copio o descargo un código?</summary><p>Abre la ficha en el catálogo. Usa «Copiar código» o «Descargar». «Copiar enlace» guarda un enlace directo a esa ficha para compartirla en el formulario o en Discord.</p></details>
+<details><summary>¿Dónde ejecuto los ejemplos de Lua?</summary><p>Los ejemplos de Lua estándar usan un intérprete Lua 5.1 o superior. Los ejemplos de Roblox Studio indican si necesitan un Script de servidor o un LocalScript. Revisa «Dónde ejecutar» en la ficha: no son entornos intercambiables.</p></details>
+<details><summary>¿Cómo creo una página con JavaScript?</summary><p>Entra en «JavaScript · Web». Descarga el ejemplo como index.html y ábrelo en tu navegador. Incluye HTML, CSS y JavaScript en un solo archivo que puedes editar. JavaScript es el lenguaje de interacción de la web; es distinto de Java.</p></details>
+<details><summary>Un script de juego no funciona. ¿Qué hago?</summary><p>Consulta la fuente original, los requisitos y si necesita clave. Las publicaciones de la comunidad pueden cambiar o dejar de funcionar. No se garantiza compatibilidad con ejecutores, PC o móvil. Copia el enlace de la ficha y notifica el error con el juego, dispositivo y mensaje exacto.</p></details>
+<details><summary>¿Qué significa «sin verificar»?</summary><p>Que no se ha probado su ejecución. Encontrar una publicación no equivale a auditar el código que descarga. «Solo sintaxis» tampoco confirma funcionamiento en Roblox. La ficha explica qué se ha comprobado.</p></details>
+<details><summary>¿Por qué hay variantes de una misma receta?</summary><p>Las recetas de Lua y Studio adaptan sistemas a distintos géneros. Los ejemplos web ofrecen componentes en varios temas visuales. Se etiquetan como variantes configurables o visuales para que puedas elegir sin confundirlos con funcionalidades nuevas.</p></details>
+<details><summary>¿Puedo pedir un juego o un ejemplo nuevo?</summary><p>Sí. Selecciona «Solicitar código» en el formulario e indica el juego, el lenguaje y qué quieres conseguir. También puedes proponerlo en Discord. No hay un plazo de respuesta garantizado.</p></details>
+</section>
+<section class="report" id="reportar" aria-labelledby="reportHeading"><span class="eyebrow">Cuéntanos qué ocurre</span><h2 id="reportHeading">Notificar un error</h2><p>El formulario envía tu consulta al equipo de RCC. Para conversar con la comunidad, usa Discord.</p>
+<form name="rcc-support" method="POST" action="/soporte-enviado" data-netlify="true" netlify-honeypot="bot-field" id="supportForm">
+<input type="hidden" name="form-name" value="rcc-support"><p hidden><label>No rellenar <input name="bot-field" autocomplete="off" tabindex="-1"></label></p>
+<label>Asunto <input name="subject" required maxlength="160" placeholder="El código no se carga"></label>
+<label>Tu correo de contacto <input type="email" name="email" autocomplete="email" required maxlength="254"></label>
+<label>Tipo de consulta <select name="category" required><option value="error">Error en un código</option><option value="web">Ayuda con JavaScript / Web</option><option value="lua">Ayuda con Lua / Studio</option><option value="request">Solicitar código</option><option value="site">Problema en la página</option></select></label>
+<label>Enlace o identificador del código (opcional) <input name="script" id="scriptReference" maxlength="1000" placeholder="Pega el enlace de la ficha"></label>
+<label>Juego y dispositivo (opcional) <input name="environment" maxlength="200" placeholder="Nombre del juego · PC, Android o iOS"></label>
+<label>Describe el problema <textarea name="message" rows="7" required minlength="20" maxlength="5000" placeholder="Qué intentabas hacer, pasos para repetirlo y mensaje de error exacto."></textarea></label>
+<p class="privacy">Usamos tu correo y el contenido de la consulta para gestionar tu solicitud. No incluyas contraseñas, claves de acceso ni datos privados de otras personas.</p>
+<button type="submit" id="sendSupport">Enviar consulta</button><p id="formStatus" role="status" aria-live="polite"></p>
+</form></section></div>
+<footer>RCC · Ayuda para Lua, Roblox Studio y JavaScript. <a href="/">Explorar el catálogo</a></footer>
+</main></body></html>
