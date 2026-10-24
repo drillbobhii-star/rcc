@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const scripts = JSON.parse(fs.readFileSync(path.join(root, 'scripts.json'), 'utf8'));
 const ids = new Set();
 const newCode = new Set();
-const counts = { lua: 0, client: 0, server: 0, legacy: 0 };
+const counts = { lua: 0, client: 0, server: 0, legacy: 0, browser: 0 };
 for (const s of scripts) {
   for (const key of ['id', 'name', 'code', 'platform', 'device', 'type']) {
     assert.equal(typeof s[key], 'string', `${s.id}: ${key}`);
@@ -18,11 +18,25 @@ for (const s of scripts) {
   ids.add(s.id);
   assert(['pc', 'mobile', 'both', 'unknown'].includes(s.device), s.id);
   assert(['source', 'loadstring'].includes(s.type), s.id);
-  assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch'].includes(s.platform), s.id);
+  assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch', 'web'].includes(s.platform), s.id);
   for (const key of ['tags', 'executors']) {
     assert(Array.isArray(s[key]), `${s.id}: ${key}`);
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
+  }
+  if (s.catalog_section === 'web') {
+    assert.equal(s.platform, 'web');
+    assert.equal(s.file_extension, 'html');
+    assert.equal(s.compatibility.environment, 'browser');
+    assert.equal(s.compatibility.verification, 'js-syntax');
+    assert(s.code.startsWith('<!doctype html>'));
+    assert(s.code.includes('<html lang="es">'));
+    assert(s.code.includes('name="viewport"'));
+    for (const match of s.code.matchAll(/<script>([\s\S]*?)<\/script>/g)) new vm.Script(match[1], {filename:s.id});
+    assert(!newCode.has(s.code), `Duplicate web starter: ${s.id}`);
+    newCode.add(s.code);
+    counts.browser++;
+    continue;
   }
   if (s.catalog_section === 'games' && !s.id.startsWith('rcc_recipe_')) {
     assert.equal(s.platform, 'roblox');
@@ -61,12 +75,17 @@ for (const s of scripts) {
     assert.equal(c.executor_status, 'not-applicable');
   }
 }
-assert.deepEqual(counts, { lua: 235, client: 45, server: 126, legacy: 33 });
-for (const file of ['index.html', 'admin.html']) {
+assert(counts.lua >= 435 && counts.server >= 326 && counts.client >= 45 && counts.browser >= 144, 'Expected expanded learning libraries');
+assert(scripts.filter(s=>s.catalog_section==='games' && s.type==='loadstring').length >= 2800, 'Expected expanded community library');
+for (const file of ['index.html', 'admin.html', 'soporte.html', 'soporte-enviado.html']) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
   for (const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
     new vm.Script(match[1], { filename: file });
   }
 }
+new vm.Script(fs.readFileSync(path.join(root,'assets/support.js'),'utf8'));
+const support=fs.readFileSync(path.join(root,'soporte.html'),'utf8');
+assert(support.includes('data-netlify="true"') && support.includes('netlify-honeypot="bot-field"'));
+for (const field of ['form-name','subject','email','category','script','environment','message','bot-field']) assert(support.includes(`name="${field}"`), `Missing support field: ${field}`);
 assert(fs.existsSync(path.join(root, 'compatibilidad.html')));
 console.log(`Catalog OK: ${scripts.length} scripts; ${JSON.stringify(counts)}. Page JavaScript syntax OK.`);

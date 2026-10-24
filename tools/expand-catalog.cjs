@@ -1,4 +1,4 @@
-// Reproducible recipes: ten game profiles, ten Lua systems and ten Studio mechanics.
+// Reproducible configurable variants: 30 game profiles, 10 Lua systems and 10 Studio mechanics.
 const fs = require('node:fs');
 const catalog = JSON.parse(fs.readFileSync('scripts.json', 'utf8')).filter(s => !s.id.startsWith('rcc_recipe_'));
 const profiles = [
@@ -7,6 +7,16 @@ const profiles = [
   ['rpg','Aventura RPG','Experiencia',15,150], ['farming','Granja','Semillas',8,100],
   ['fishing','Pesca','Perlas',12,80], ['puzzle','Puzles','Pistas',2,45],
   ['arena','Arena','Puntos',20,75], ['exploration','Exploración','Cristales',7,200],
+  ['space','Espacio','Meteoritos',11,160], ['pirates','Piratas','Doblones',18,210],
+  ['dungeon','Mazmorras','Runas',14,240], ['zombies','Zombis','Antidotos',6,130],
+  ['city','Ciudad','Creditos',22,300], ['island','Islas','Conchas',9,170],
+  ['winter','Invierno','Copos',4,110], ['desert','Desierto','Gemas',16,220],
+  ['ocean','Océano','Corales',13,190], ['jungle','Jungla','Frutas',17,140],
+  ['dragons','Dragones','Escamas',19,250], ['robots','Robots','Circuitos',21,260],
+  ['ninja','Ninjas','Pergaminos',23,70], ['magic','Magia','Esencias',24,230],
+  ['sports','Deportes','Medallas',26,95], ['delivery','Repartos','Paquetes',27,155],
+  ['mining','Minería','Minerales',28,280], ['pets','Mascotas','Galletas',29,185],
+  ['music','Música','Notas',30,105], ['castle','Castillos','Sellos',31,270],
 ];
 const lua = [
   ['shop','Compra con saldo', (c,n)=>`local saldo, precio, cantidad = ${n*20}, ${n}, 3\nlocal coste = precio * cantidad\nif cantidad > 0 and cantidad == math.floor(cantidad) and saldo >= coste then\n  saldo = saldo - coste\n  print("Compra aceptada", cantidad, saldo)\nelse\n  print("Saldo insuficiente o cantidad inválida")\nend`],
@@ -42,7 +52,7 @@ for (const [profile,genre,currency,amount,duration] of profiles) {
         name:`${genre}: ${title}`, description:`Receta configurable de ${genre.toLowerCase()}: ${title.toLowerCase()}. Usa ${currency.toLowerCase()} como recurso y valores de muestra editables. ${isLua?'Simulación independiente con salida en consola.':'Para crear tu propio juego en Studio; no modifica juegos ajenos.'} Estado de sesión: no conserva el progreso al reiniciar.`,
         level:'free', device:'both', platform:isLua?'universal':'roblox', type:'source',
         executors:[isLua?'Lua 5.1+':'Roblox Studio (servidor)'], tags:['Original RCC','Recetas configurables',genre,isLua?'Lógica de juegos':'Roblox Studio',title],
-        version:'1.0', created_at:'2026-10-19',
+        version:'1.1', created_at:'2026-10-24',
         code:`-- RCC | ${genre}: ${title}\n-- ${context}\n-- Perfil configurable: ${currency}, cantidad ${amount}, ronda ${duration}s.\n${make(currency,amount,duration)}\n`,
         ...(isLua?{}:{catalog_section:'games',game:`Crear juegos: ${genre}`}),
         compatibility:{environment,runtime:isLua?'Lua 5.1+':'Luau / Roblox Studio',context,
@@ -57,4 +67,4 @@ for (const [profile,genre,currency,amount,duration] of profiles) {
   }
 }
 fs.writeFileSync('scripts.json', JSON.stringify(catalog,null,2)+'\n');
-console.log('Added 200 configurable recipes. Total:',catalog.length);
+console.log(`Generated ${profiles.length * (lua.length + studio.length)} configurable recipes. Total: ${catalog.length}`);
