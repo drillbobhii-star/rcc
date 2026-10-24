@@ -407,9 +407,11 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 @media(max-width:600px){body.ios-glass .grid{grid-template-columns:minmax(0,1fr)}body.ios-glass .card{border-radius:22px}}
 </style>
 <link rel="stylesheet" href="assets/glass-controls.css">
+<link rel="stylesheet" href="assets/catalog-ui.css">
 <script src="assets/languages.js" defer></script>
 </head>
 <body class="ios-glass">
+<a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
 
 <!-- FONDOS ANIMADOS -->
 <div class="bg-text" id="bgRccText">RCC</div>
@@ -422,7 +424,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1>RCC</h1>
+    <h1><span class="brand-symbol" aria-hidden="true">&lt;/&gt;</span> RCC<span class="brand-dot">.</span></h1>
     <div class="visitor-badge" title="Navegadores que han visitado RCC desde la activación del contador. Borrar las cookies o cambiar de dispositivo puede contar otra visita."><strong data-visitor-total aria-live="polite">…</strong><span>Visitantes</span></div>
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
@@ -473,13 +475,13 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
   <div class="main">
     <header>
       <div class="topbar">
-        <button class="hamburger" id="hamburger">☰</button>
+        <button class="hamburger" id="hamburger" aria-label="Abrir menú de filtros" aria-controls="sidebar">☰</button>
         <div class="search-top">
-          <input type="text" id="search" placeholder="Buscar script, ejecutor o etiqueta...">
+          <input type="text" id="search" aria-label="Buscar en el catálogo" placeholder="Buscar script, ejecutor o etiqueta...">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
         <div class="mobile-visitors" title="Total acumulado de visitantes de RCC"><strong data-visitor-total>…</strong> visitantes</div>
-        <button class="btn-free">🎁 Gratis</button>
+        <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
     <section class="hero">
@@ -487,8 +489,16 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
       </nav>
+      <div class="hero-intro"><div class="hero-copy"><span class="eyebrow">BIBLIOTECA DE CÓDIGO · RCC</span>
       <h2 id="heroTitle" tabindex="-1">Scripts Lua por RCC</h2>
       <p id="heroSubtitle">1.111 códigos: incluye 200 recetas configurables de lógica Lua y creación de juegos. Todos gratis.</p>
+      </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
+<span class="code-keyword">local</span> proyecto = {
+  lenguaje = <span class="code-string">"Lua"</span>,
+  posibilidades = <span class="code-string">"infinitas"</span>
+}
+
+<span class="code-keyword">return</span> proyecto</pre><div class="code-preview-foot"><span>Lua</span><span>Hecho para explorar ↗</span></div></div></div>
       <aside class="discord-panel">
         <div><small>COMUNIDAD RCC</small><h3>Los scripts también se comparten.</h3><p>Únete a nuestro servidor de Discord y comparte con la comunidad.</p></div>
         <a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme a Discord ↗</a>
@@ -500,10 +510,11 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
       </div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
-        <div class="stat"><b id="statPC">0</b><small>🖥️ PC</small></div>
-        <div class="stat"><b id="statMobile">0</b><small>📱 Móvil</small></div>
+        <div class="stat"><b id="statPC">0</b><small>Para PC</small></div>
+        <div class="stat"><b id="statMobile">0</b><small>Para móvil</small></div>
       </div>
     </section>
+    <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
     <div class="catalog-tools">
 <span id="resultCount" role="status" aria-live="polite"></span>
 <label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
@@ -514,6 +525,10 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 </div>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos y fuentes de compatibilidad</a>.</div>
+    <div class="grid" id="scripts">
+      <div class="loading">⏳ Cargando scripts...</div>
+    </div>
+    <button id="loadMore" class="load-more" hidden>Mostrar más scripts</button>
     <div class="ad-banner">
       <div class="ad-box">Esta página contiene anuncios. No entrar a cualquier enlace.</div>
     </div>
@@ -529,10 +544,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 </script>
 <script type="text/javascript" src="//www.highperformanceformat.com/6133676/invoke.js"></script>
     </div>
-    <div class="grid" id="scripts">
-      <div class="loading">⏳ Cargando scripts...</div>
-    </div>
-    <button id="loadMore" class="load-more" hidden>Mostrar más scripts</button>
+
     <div class="ad-banner" style="margin-bottom:40px">
       <div class="ad-box">Esta página contiene anuncios. No entrar a cualquier enlace.</div>
     </div>
@@ -905,12 +917,12 @@ function render(reset = true){
     card.innerHTML = `
       <div class="card-top">
         <div class="badges">
-          <span class="badge free">🟢 FREE</span>
+          <span class="badge free">GRATIS</span>
           <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
           ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
       </div>
-      <h3>${plat ? plat.icon+' ' : ''}${escapeHTML(s.name)}</h3>
+      <h3>${escapeHTML(s.name)}</h3>
       <p class="desc">${escapeHTML(s.description || '')}</p>
       <p class="compat-status">${escapeHTML(verificationLabel(s))}</p>
       <div class="tags">
@@ -919,10 +931,10 @@ function render(reset = true){
         ${(s.executors||[]).length>3 ? `<span class="tag exec">+${s.executors.length-3}</span>` : ''}
       </div>
       <div class="meta">
-        <span>📅 ${(s.created_at||'').slice(0,7)}</span>
+        <span>${plat ? plat.name : 'Lua'} · ${(s.created_at||'').slice(0,7)}</span>
         <span class="ver">v${escapeHTML(s.version)}</span>
       </div>
-      <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : '📋 Ver y copiar'}</button>
+      <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗'}</button>
     `;
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
     grid.appendChild(card);
@@ -940,7 +952,7 @@ function openScript(s){
   modalBody.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
-      <span class="badge free">🟢 FREE</span>
+      <span class="badge free">GRATIS</span>
       ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
       ${plat?`<span class="badge" style="background:rgba(255,255,255,.1);color:#fff; border:1px solid rgba(255,255,255,.2)">${plat.icon} ${plat.name}</span>`:''}
     </div>
