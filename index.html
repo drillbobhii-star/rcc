@@ -413,6 +413,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 .help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
 </style>
 <link rel="stylesheet" href="assets/personalization.css">
+<link rel="stylesheet" href="assets/liquid-glass.css">
+<script src="assets/welcome.js" defer></script>
 <script src="assets/personalization.js" defer></script>
 </head>
 <body class="ios-glass" data-ui="ios">
@@ -488,6 +490,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
         <div class="mobile-visitors" title="Total acumulado de visitantes de RCC"><strong data-visitor-total>…</strong> visitantes</div>
+        <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -518,7 +521,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
         <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros, 4 sistemas interactivos originales y publicaciones externas de juegos. Cada ficha indica la fecha de consulta de su fuente. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
       </div>
-      <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. 12 componentes con 12 temas visuales; las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
+      <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. Incluye componentes de interfaz y 2,048 recetas de procesamiento de datos: filtros, transformaciones y resúmenes combinables. Las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
         <div class="stat"><b id="statPC">0</b><small>Para PC</small></div>
@@ -582,6 +585,27 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
   </div>
 </div>
 
+<dialog id="welcomeDialog" class="welcome-dialog" aria-labelledby="welcomeTitle">
+  <div class="welcome-content">
+    <span class="welcome-kicker" aria-hidden="true">RCC / GUÍA DE INICIO</span>
+    <h2 id="welcomeTitle">⚠️ ¡Atención! Esta es una biblioteca de código, no una IA.</h2>
+    <p>RCC es un repositorio con más de 1,100 scripts. Aquí no se generan códigos mágicos escribiendo lo que quieres, sino que encuentras los códigos ya hechos para copiar y usar.</p>
+    <section class="welcome-uses" aria-labelledby="welcomeUses">
+      <h3 id="welcomeUses">💡 ¿Para qué puedes usar estos códigos?</h3>
+      <p>🎮 Roblox Studio: Para crear tus propios juegos y sistemas.</p>
+      <p>⚡ Exploits: Para ejecutar en herramientas como Solara, Delta, Fluxus, etc.</p>
+      <p>🌐 Desarrollo Web: Para proyectos de páginas web (JavaScript/HTML).</p>
+    </section>
+    <p class="welcome-important">⚠️ Importante: Se requieren conocimientos básicos de programación o de ejecutores para que funcionen.</p>
+    <h3>Cómo usar la página:</h3>
+    <ol class="welcome-steps">
+      <li>Busca el nombre de tu juego o código (Ej: Blox Fruits).</li>
+      <li>Haz clic en 'Ver y copiar' en el script que te guste.</li>
+      <li>Pega el código en tu ejecutor o proyecto y listo.</li>
+    </ol>
+    <form method="dialog"><button class="welcome-confirm" value="understood">Entendido, ir a buscar scripts</button></form>
+  </div>
+</dialog>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-box">
     <div class="modal-head">
