@@ -418,6 +418,12 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <script src="assets/personalization.js" defer></script>
 <link rel="stylesheet" href="assets/interactive-glass.css">
 <script src="assets/interactive-glass.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+.auth-controls [hidden]{display:none!important}.auth-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.auth-email{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem;color:var(--muted)}
+#authModal{z-index:2100}#authModal .modal-box{width:min(100%,440px)}#authForm{display:grid;gap:14px}#authForm label{display:grid;gap:8px}#authForm input{width:100%;padding:13px;border:1px solid var(--border-glass);border-radius:14px;background:rgba(255,255,255,.06);color:var(--text);font:inherit}#authStatus{min-height:2.5em;color:var(--muted)}.favorite-button{margin-left:auto}.favorite-button[aria-pressed="true"]{color:#ffa9bd}button:disabled{opacity:.6;cursor:wait}
+@media(max-width:700px){.topbar{flex-wrap:wrap}.auth-controls{width:100%;justify-content:flex-end}.auth-email{max-width:60vw}}
+</style>
 </head>
 <body class="ios-glass" data-ui="ios">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -462,6 +468,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
     <button class="dev-btn" data-dev="unknown">Sin verificar</button>
   </div>
   
+  <button class="games-nav" id="favoritesBtn" type="button" aria-pressed="false">❤️ Favoritos <span id="favoritesCount">0</span></button>
   <button class="games-nav" id="gamesNav" type="button">Juegos Roblox <span aria-hidden="true">↗</span></button>
   <button class="games-nav" id="webNav" type="button">JavaScript · Web ↗</button>
   <a class="games-nav help-link" href="soporte.html">Ayuda y reportar errores ↗</a>
@@ -498,6 +505,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         </div>
         <div class="mobile-visitors" title="Total acumulado de visitantes de RCC"><strong data-visitor-total>…</strong> visitantes</div>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
+        <div class="auth-controls"><span id="authEmail" class="auth-email" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button">Iniciar Sesión</button><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -626,9 +634,23 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
   </div>
 </div>
 
-<div class="toast" id="toast">¡Copiado!</div>
+<div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-box"><div class="modal-head"><h3 id="authTitle">Iniciar Sesión</h3><button class="close" id="closeAuth" type="button" aria-label="Cerrar acceso">×</button></div>
+    <div class="modal-body"><form id="authForm"><label>Email<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="6"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button></div><p id="authStatus" role="status" aria-live="polite"></p></form></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
 
 <script>
+// Añade aquí la clave pública anon del proyecto; nunca uses una clave service_role.
+const SUPABASE_CONFIG = Object.freeze({ url: 'https://ribhsjlfksmsjyrtqfg.supabase.co', anonKey: '' });
+const cloud = SUPABASE_CONFIG.anonKey && window.supabase ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}) : null;
+let currentUser = null;
+let favoriteIds = new Set();
+let showFavorites = false;
+let favoritesStatus = 'idle';
+let sessionRevision = 0;
+const favoritePending = new Set();
 let scripts = [];
 let catalogSection = 'all';
 let filterDevice = 'all';
@@ -695,7 +717,7 @@ function updateRecentCount() {
 }
 
 document.getElementById('recentBtn').onclick = () => {
-    showRecent = true;
+    showRecent = true; showFavorites=false;document.getElementById('favoritesBtn').setAttribute('aria-pressed','false');
     filterDevice = 'all';
     filterPlatform = 'all';
     filterExecutor = 'all';
@@ -873,7 +895,8 @@ function render(reset = true){
     document.getElementById('heroTitle').textContent='JavaScript para la web';
     document.getElementById('heroSubtitle').textContent='HTML, CSS y JavaScript en un archivo. Copia, descarga y empieza a crear tu página.';
   }
-  if(catalogSection==='all' && !showRecent) document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';
+  if(catalogSection==='all' && !showRecent && !showFavorites) document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';
+  if (showFavorites) list = list.filter(s => favoriteIds.has(s.id));
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
   }
@@ -906,8 +929,13 @@ function render(reset = true){
   grid.innerHTML = '';
   
   document.getElementById('loadMore').hidden=true;
+  if(showFavorites && (!currentUser || favoritesStatus !== 'ready')){
+    grid.innerHTML = '<div class="empty">'+(!currentUser ? 'Inicia sesión para ver tus favoritos en la nube.' : favoritesStatus === 'loading' ? 'Cargando favoritos…' : 'No se pudieron cargar tus favoritos. Vuelve a pulsar Favoritos para reintentar.')+'</div>';
+    document.getElementById('loadMore').hidden=true;return;
+  }
   if(!list.length){
-    if (showRecent && scripts.length > 0) {
+    if(showFavorites){grid.innerHTML='<div class="empty">Todavía no tienes favoritos con estos filtros. Pulsa el corazón de una tarjeta para guardarla.</div>';
+    } else if (showRecent && scripts.length > 0) {
         grid.innerHTML = '<div class="empty">⏱️ No has copiado ningún script aún.</div>';
     } else {
         grid.innerHTML = '<div class="empty">🔍 No se encontraron scripts</div>';
@@ -922,7 +950,7 @@ function render(reset = true){
     const card = document.createElement('div');
     card.className = 'card';
     card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label','Ver '+s.name);
-    card.onkeydown = e=>{ if(e.key==='Enter' || e.key===' '){e.preventDefault(); openScript(s);} };
+    card.onkeydown = e=>{ if(e.target!==card) return; if(e.key==='Enter' || e.key===' '){e.preventDefault(); openScript(s);} };
     
     const isLoadstring = s.type === 'loadstring';
 
@@ -934,6 +962,7 @@ function render(reset = true){
           ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
       </div>
+      <button type="button" class="btn btn-ghost favorite-button" aria-label="Guardar favorito" aria-pressed="${favoriteIds.has(s.id)}" ${favoritePending.has(s.id)?'disabled':''}>${favoriteIds.has(s.id)?'❤️':'♡'}</button>
       <h3>${escapeHTML(s.name)}</h3>
       <p class="desc">${escapeHTML(s.description || '')}</p>
       <p class="compat-status">${escapeHTML(verificationLabel(s))}</p>
@@ -948,6 +977,8 @@ function render(reset = true){
       </div>
       <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗'}</button>
     `;
+    const heart = card.querySelector('.favorite-button');
+    heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
     grid.appendChild(card);
     setTimeout(()=>card.classList.add('show'), Math.min(i,8)*35);
@@ -979,12 +1010,14 @@ function openScript(s){
       <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
       <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>
       <button class="btn btn-ghost" onclick="shareCurrent()">Copiar enlace</button>
+      <button class="btn btn-ghost" id="voteBtn" type="button">👍 Me gusta</button>
       <a class="btn btn-ghost" href="soporte.html?script=${encodeURIComponent(s.id)}#reportar">Notificar error</a>
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
     </div>
   `;
   document.getElementById('modalCode').textContent = s.code;
   renderCompatibility(s);
+  document.getElementById('voteBtn').onclick = e=>voteForScript(s.id,e.currentTarget);
   
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1009,7 +1042,7 @@ function copyCode(){
 
 function closeModal(){ modal.classList.remove('open'); document.body.style.overflow=''; modalReturnFocus?.focus(); }
 modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !authModal.classList.contains('open')) closeModal(); });
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -1072,7 +1105,7 @@ document.getElementById('environmentFilter').onchange = render;
 document.getElementById('verificationFilter').onchange = render;
 document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render(false);};
 document.getElementById('resetFilters').onclick = ()=>{
-  filterDevice=filterPlatform=filterExecutor=filterType='all'; showRecent=false;
+  filterDevice=filterPlatform=filterExecutor=filterType='all'; showRecent=false; showFavorites=false;document.getElementById('favoritesBtn').setAttribute('aria-pressed','false');
   document.getElementById('gameFilter').value='all';document.getElementById('originFilter').value='all';
   searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
   document.getElementById('recentBtn').classList.remove('active');
@@ -1110,6 +1143,143 @@ document.getElementById('gamesTab').onclick=()=>selectSection('games');
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;
 document.getElementById('originFilter').onchange=render;
+const authModal = document.getElementById('authModal');
+const authForm = document.getElementById('authForm');
+const authStatus = document.getElementById('authStatus');
+let authReturnFocus = null;
+function openAuth(){
+  authReturnFocus=document.activeElement;
+  authStatus.textContent=cloud?'':'El acceso necesita la clave pública de Supabase en la configuración del sitio.';
+  authModal.classList.add('open');document.body.style.overflow='hidden';
+  document.getElementById('authEmailInput').focus();
+}
+function closeAuth(){
+  authModal.classList.remove('open');document.getElementById('authPassword').value='';
+  document.body.style.overflow=modal.classList.contains('open')?'hidden':'';
+  authReturnFocus?.focus();
+}
+document.getElementById('loginBtn').onclick=openAuth;
+document.getElementById('closeAuth').onclick=closeAuth;
+authModal.onclick=e=>{if(e.target===authModal) closeAuth();};
+authModal.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.stopPropagation();closeAuth();}
+  if(e.key==='Tab'){
+    const items=[...authModal.querySelectorAll('button,input')].filter(el=>!el.disabled);
+    const first=items[0],last=items.at(-1);
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+});
+function cloudError(error){
+  if(error?.code==='42P01'||error?.code==='PGRST205') return 'Falta configurar la tabla en Supabase. Ejecuta el SQL de instalación.';
+  if(error?.code==='42501') return 'Supabase ha rechazado el permiso. Revisa las políticas de acceso.';
+  return 'No se pudo completar la operación. Comprueba la conexión y vuelve a intentarlo.';
+}
+async function submitAuth(register){
+  if(!authForm.reportValidity()) return;
+  if(!cloud){authStatus.textContent='Añade la clave pública de Supabase para habilitar el acceso.';return;}
+  const buttons=[...authForm.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
+  authStatus.textContent=register?'Creando cuenta…':'Entrando…';
+  try{
+    const credentials={email:document.getElementById('authEmailInput').value.trim(),password:document.getElementById('authPassword').value};
+    const {data,error}=register?await cloud.auth.signUp(credentials):await cloud.auth.signInWithPassword(credentials);
+    if(error){
+      authStatus.textContent=({invalid_credentials:'Email o contraseña incorrectos.',email_not_confirmed:'Confirma tu correo antes de entrar.',user_already_exists:'Ya existe una cuenta con este correo.',weak_password:'Elige una contraseña más segura.',over_email_send_rate_limit:'Espera un momento antes de solicitar otro correo.'})[error.code]||'No se pudo acceder. Revisa los datos e inténtalo de nuevo.';return;
+    }
+    document.getElementById('authPassword').value='';
+    if(data.session){closeAuth();showToast('Sesión iniciada');}
+    else authStatus.textContent='Revisa tu correo para confirmar el registro y después entra con tu contraseña.';
+  }catch{authStatus.textContent='No se pudo conectar con Supabase. Inténtalo de nuevo.';}
+  finally{buttons.forEach(b=>b.disabled=false);}
+}
+authForm.onsubmit=e=>{e.preventDefault();submitAuth(false);};
+document.getElementById('signupBtn').onclick=()=>submitAuth(true);
+async function applySession(session){
+  const previousId=currentUser?.id;
+  currentUser=session?.user||null;
+  document.getElementById('authEmail').textContent=currentUser?.email||'';
+  document.getElementById('authEmail').hidden=!currentUser;
+  document.getElementById('loginBtn').hidden=!!currentUser;
+  document.getElementById('logoutBtn').hidden=!currentUser;
+  if(previousId===currentUser?.id) return;
+  sessionRevision++;
+  favoriteIds=new Set();favoritesStatus='idle';updateFavoriteCount();render();
+  if(currentUser) await loadFavorites();
+}
+function updateFavoriteCount(){document.getElementById('favoritesCount').textContent=favoriteIds.size;}
+async function loadFavorites(){
+  if(!cloud||!currentUser) return;
+  const revision=sessionRevision,userId=currentUser.id;
+  favoritesStatus='loading';if(showFavorites)render();
+  try{
+    const loaded=[];let offset=0;
+    // Pagina para no truncar las colecciones que superan el límite de Supabase.
+    while(true){
+      const {data,error}=await cloud.from('favorites').select('script_id').eq('user_id',userId).order('script_id').range(offset,offset+499);
+      if(error)throw error;
+      loaded.push(...data.map(row=>row.script_id));
+      if(data.length<500)break;offset+=500;
+    }
+    if(revision!==sessionRevision)return;
+    favoriteIds=new Set(loaded);favoritesStatus='ready';
+  }catch(error){if(revision!==sessionRevision)return;favoritesStatus='error';showToast(cloudError(error));}
+  updateFavoriteCount();render();
+}
+async function initializeAuth(){
+  if(!cloud)return;
+  cloud.auth.onAuthStateChange((_event,session)=>{
+    // Evita consultas dentro del bloqueo interno de autenticación.
+    setTimeout(()=>applySession(session),0);
+  });
+  const revision=sessionRevision;
+  try{
+    const {data,error}=await cloud.auth.getSession();
+    if(error)throw error;
+    if(revision===sessionRevision)await applySession(data.session);
+  }catch{showToast('No se pudo recuperar la sesión. Intenta iniciar sesión de nuevo.');}
+}
+document.getElementById('logoutBtn').onclick=async e=>{
+  const button=e.currentTarget;button.disabled=true;
+  try{const {error}=await cloud.auth.signOut();if(error)throw error;await applySession(null);showToast('Sesión cerrada');}
+  catch{showToast('No se pudo cerrar la sesión. Inténtalo de nuevo.');}
+  finally{button.disabled=false;}
+};
+async function toggleFavorite(scriptId,button){
+  if(!currentUser){showToast('Inicia sesión para guardar tus scripts favoritos en la nube');return;}
+  if(favoritesStatus!=='ready'){await loadFavorites();if(favoritesStatus!=='ready')return;}
+  if(favoritePending.has(scriptId)||!currentUser)return;
+  const userId=currentUser.id,revision=sessionRevision,removing=favoriteIds.has(scriptId);
+  favoritePending.add(scriptId);button.disabled=true;
+  try{
+    const {error}=removing?await cloud.from('favorites').delete().eq('user_id',userId).eq('script_id',scriptId):await cloud.from('favorites').insert({user_id:userId,script_id:scriptId});
+    if(error&&!(error.code==='23505'&&!removing))throw error;
+    if(revision!==sessionRevision)return;
+    if(removing)favoriteIds.delete(scriptId);else favoriteIds.add(scriptId);
+    showToast(removing?'Favorito eliminado':'Favorito guardado en la nube');
+  }catch(error){if(revision===sessionRevision)showToast(cloudError(error));}
+  finally{favoritePending.delete(scriptId);updateFavoriteCount();render();}
+}
+document.getElementById('favoritesBtn').onclick=async()=>{
+  selectSection('all');showRecent=false;showFavorites=true;
+  document.getElementById('recentBtn').classList.remove('active');
+  document.getElementById('favoritesBtn').setAttribute('aria-pressed','true');
+  document.getElementById('heroTitle').textContent='❤️ Favoritos';
+  document.getElementById('heroSubtitle').textContent='Tus scripts guardados en la nube.';
+  render();closeSidebar();await loadFavorites();
+};
+async function voteForScript(scriptId,button){
+  if(!currentUser){showToast('Inicia sesión para votar por tus scripts favoritos');return;}
+  const revision=sessionRevision;button.disabled=true;
+  try{
+    const {error}=await cloud.from('votes').insert({user_id:currentUser.id,script_id:scriptId});
+    if(error&&error.code!=='23505')throw error;
+    if(revision!==sessionRevision)return;
+    button.textContent='👍 Te gusta';showToast(error?'Ya has votado este script':'¡Gracias por tu voto!');
+  }catch(error){showToast(cloudError(error));}
+  finally{button.disabled=false;}
+}
+
+initializeAuth();
 loadScripts();
 // El total procede del servidor; actualizarlo no registra otra visita.
 let visitorRegistered = false;

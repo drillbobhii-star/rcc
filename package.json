@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "node tools/check-catalog.cjs && node tools/check-code-engine.mjs"
+    "test": "node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs"
   },
   "keywords": [],
   "author": "",
