@@ -416,13 +416,20 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <script src="assets/welcome.js" defer></script>
 <script src="assets/personalization.js" defer></script>
+<link rel="stylesheet" href="assets/interactive-glass.css">
+<script src="assets/interactive-glass.js" defer></script>
 </head>
 <body class="ios-glass" data-ui="ios">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
 
 <!-- FONDOS ANIMADOS -->
-<div class="bg-text" id="bgRccText" aria-hidden="true">RCC</div>
-<div class="bg-text-rocio" id="bgRocioText" aria-hidden="true">RCC</div>
+<div class="glass-background" id="glassBackground" aria-hidden="true">
+  <div class="glass-lettering" id="glassLettering">
+    <div class="bg-text" id="bgRccText">RCC</div>
+    <div class="bg-text-rocio" id="bgRocioText">Rocio</div>
+  </div>
+  <div class="glass-ripples" id="glassRipples"></div>
+</div>
 
 <div class="blob blob1" id="blob1"></div>
 <div class="blob blob2" id="blob2"></div>
@@ -544,7 +551,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
           <label>Color de acento<input id="accentColor" type="color" value="#9ec9f5"></label>
           <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
           <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
-          <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Animar logo RCC</label>
+          <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Animar fondo RCC y Rocio</label>
           <button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
         <p id="appearanceStatus" role="status" aria-live="polite">Estilo iOS activo.</p>

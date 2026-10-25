@@ -1,0 +1,16 @@
+/* Decorative glass stays behind the catalog and never intercepts a gesture. */
+.glass-background{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;contain:strict}
+.glass-lettering{position:absolute;inset:0;transform:translate(var(--glass-x,0px),var(--glass-y,0px));transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+body[data-ui] .glass-background :is(.bg-text,.bg-text-rocio){position:absolute;filter:none;opacity:1;color:transparent;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,transparent),#e8f4ff08 38%,color-mix(in srgb,var(--accent) 12%,transparent) 55%,#eff8ff30);background-clip:text;-webkit-background-clip:text;-webkit-text-stroke:1px color-mix(in srgb,var(--accent) 24%,transparent);text-shadow:0 2px 1px #ffffff08;line-height:1.05}
+body[data-ui] .glass-background .bg-text{top:36%;left:57%;font-size:clamp(170px,36vw,620px);letter-spacing:-.08em;animation:glass-rcc-float 22s ease-in-out infinite}
+body[data-ui] .glass-background .bg-text-rocio{top:71%;left:62%;font-size:clamp(100px,20vw,340px);letter-spacing:-.055em;animation:glass-rocio-float 28s ease-in-out infinite}
+.glass-ripples{position:absolute;inset:0}
+.glass-ripple{position:absolute;width:180px;height:180px;margin:-90px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 65%,transparent);background:radial-gradient(circle,transparent 40%,color-mix(in srgb,var(--accent) 15%,transparent) 68%,#ffffff18 70%,transparent 73%);box-shadow:inset 0 0 25px #e0f2ff12;animation:glass-ripple-expand 1.4s ease-out forwards}
+@keyframes glass-rcc-float{0%,100%{transform:translate(-50%,-50%) rotate(-9deg)}50%{transform:translate(-46%,-43%) rotate(-3deg)}}
+@keyframes glass-rocio-float{0%,100%{transform:translate(-50%,-50%) rotate(6deg)}50%{transform:translate(-58%,-62%) rotate(-4deg)}}
+@keyframes glass-ripple-expand{from{transform:scale(.15);opacity:.85}to{transform:scale(4);opacity:0}}
+body.motion-paused .glass-lettering{transform:none;transition:none}
+body[data-ui].motion-paused .glass-background :is(.bg-text,.bg-text-rocio){animation-play-state:paused}
+body.motion-paused .glass-ripple{display:none}
+@media(max-width:600px){body[data-ui] .glass-background .bg-text{left:48%;font-size:56vw}body[data-ui] .glass-background .bg-text-rocio{left:50%;font-size:30vw;top:65%}}
+@media(prefers-reduced-motion:reduce){.glass-lettering{transform:none;transition:none}.glass-ripple{display:none}}
