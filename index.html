@@ -636,14 +636,16 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 
 <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
   <div class="modal-box"><div class="modal-head"><h3 id="authTitle">Iniciar Sesión</h3><button class="close" id="closeAuth" type="button" aria-label="Cerrar acceso">×</button></div>
-    <div class="modal-body"><form id="authForm"><label>Email<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="6"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button></div><p id="authStatus" role="status" aria-live="polite"></p></form></div>
+    <div class="modal-body"><form id="authForm"><label>Email<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="6"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button><button class="btn btn-ghost" id="googleLoginBtn" type="button">Continuar con Google</button></div><p id="authStatus" role="status" aria-live="polite"></p></form></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
 
 <script>
 // Añade aquí la clave pública anon del proyecto; nunca uses una clave service_role.
-const SUPABASE_CONFIG = Object.freeze({ url: 'https://ribhsjlfksmsjyrtqfg.supabase.co', anonKey: '' });
+const SUPABASE_URL = 'https://cbkrpyfkteomcukdisdw.supabase.co';
+const SUPABASE_KEY = '';
+const SUPABASE_CONFIG = Object.freeze({ url: SUPABASE_URL, anonKey: SUPABASE_KEY });
 const cloud = SUPABASE_CONFIG.anonKey && window.supabase ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}) : null;
 let currentUser = null;
 let favoriteIds = new Set();
@@ -1017,7 +1019,8 @@ function openScript(s){
   `;
   document.getElementById('modalCode').textContent = s.code;
   renderCompatibility(s);
-  document.getElementById('voteBtn').onclick = e=>voteForScript(s.id,e.currentTarget);
+  document.getElementById('voteBtn').onclick = e=>voteForScript(String(s.id),e.currentTarget);
+  updateVoteButton(String(s.id),document.getElementById('voteBtn'));
   
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1143,6 +1146,8 @@ document.getElementById('gamesTab').onclick=()=>selectSection('games');
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;
 document.getElementById('originFilter').onchange=render;
+const votedIds = new Set();
+const votePending = new Set();
 const authModal = document.getElementById('authModal');
 const authForm = document.getElementById('authForm');
 const authStatus = document.getElementById('authStatus');
@@ -1194,6 +1199,16 @@ async function submitAuth(register){
 }
 authForm.onsubmit=e=>{e.preventDefault();submitAuth(false);};
 document.getElementById('signupBtn').onclick=()=>submitAuth(true);
+document.getElementById('googleLoginBtn').onclick=async()=>{
+  if(!cloud){authStatus.textContent='Añade la clave pública de Supabase para habilitar el acceso.';return;}
+  const buttons=[...authForm.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
+  authStatus.textContent='Conectando con Google…';
+  try{
+    const {error}=await cloud.auth.signInWithOAuth({ provider: 'google' });
+    if(error)throw error;
+  }catch{authStatus.textContent='No se pudo acceder con Google. Comprueba que el proveedor esté habilitado en Supabase.';}
+  finally{buttons.forEach(b=>b.disabled=false);}
+};
 async function applySession(session){
   const previousId=currentUser?.id;
   currentUser=session?.user||null;
@@ -1203,6 +1218,9 @@ async function applySession(session){
   document.getElementById('logoutBtn').hidden=!currentUser;
   if(previousId===currentUser?.id) return;
   sessionRevision++;
+  votedIds.clear();
+  const voteButton=document.getElementById('voteBtn');
+  if(voteButton?.voteScriptId)updateVoteButton(voteButton.voteScriptId,voteButton);
   favoriteIds=new Set();favoritesStatus='idle';updateFavoriteCount();render();
   if(currentUser) await loadFavorites();
 }
@@ -1245,6 +1263,7 @@ document.getElementById('logoutBtn').onclick=async e=>{
   finally{button.disabled=false;}
 };
 async function toggleFavorite(scriptId,button){
+  scriptId=String(scriptId);
   if(!currentUser){showToast('Inicia sesión para guardar tus scripts favoritos en la nube');return;}
   if(favoritesStatus!=='ready'){await loadFavorites();if(favoritesStatus!=='ready')return;}
   if(favoritePending.has(scriptId)||!currentUser)return;
@@ -1267,16 +1286,45 @@ document.getElementById('favoritesBtn').onclick=async()=>{
   document.getElementById('heroSubtitle').textContent='Tus scripts guardados en la nube.';
   render();closeSidebar();await loadFavorites();
 };
+async function updateVoteButton(scriptId,button){
+  button.voteScriptId=scriptId;
+  button.textContent=votedIds.has(scriptId)?'👍 Te gusta':'👍 Me gusta';
+  button.disabled=votedIds.has(scriptId)||votePending.has(currentUser?.id+':'+scriptId);
+  if(!cloud||!currentUser)return;
+  const revision=sessionRevision,userId=currentUser.id;
+  button.disabled=true;
+  try{
+    const {data,error}=await cloud.from('votes').select('script_id').eq('user_id',userId).eq('script_id',scriptId).maybeSingle();
+    if(error)throw error;
+    if(revision!==sessionRevision)return;
+    if(data)votedIds.add(scriptId);
+  }catch(error){if(revision===sessionRevision)showToast(cloudError(error));}
+  finally{
+    if(revision===sessionRevision){
+      button.textContent=votedIds.has(scriptId)?'👍 Te gusta':'👍 Me gusta';
+      button.disabled=votedIds.has(scriptId)||votePending.has(currentUser?.id+':'+scriptId);
+    }
+  }
+}
 async function voteForScript(scriptId,button){
+  scriptId=String(scriptId);
   if(!currentUser){showToast('Inicia sesión para votar por tus scripts favoritos');return;}
-  const revision=sessionRevision;button.disabled=true;
+  if(votedIds.has(scriptId)||votePending.has(currentUser?.id+':'+scriptId))return;
+  const revision=sessionRevision;
+  const pendingKey=currentUser.id+':'+scriptId;
+  if(votePending.has(pendingKey))return;
+  votePending.add(pendingKey);button.disabled=true;
   try{
     const {error}=await cloud.from('votes').insert({user_id:currentUser.id,script_id:scriptId});
     if(error&&error.code!=='23505')throw error;
     if(revision!==sessionRevision)return;
+    votedIds.add(scriptId);
     button.textContent='👍 Te gusta';showToast(error?'Ya has votado este script':'¡Gracias por tu voto!');
-  }catch(error){showToast(cloudError(error));}
-  finally{button.disabled=false;}
+  }catch(error){if(revision===sessionRevision)showToast(cloudError(error));}
+  finally{
+    votePending.delete(pendingKey);
+    if(revision===sessionRevision)button.disabled=votedIds.has(scriptId);
+  }
 }
 
 initializeAuth();
