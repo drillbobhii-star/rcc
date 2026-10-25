@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs"
+    "test": "node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node --experimental-strip-types tools/check-community-api.mjs"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@netlify/database": "^2.0.1",
     "@netlify/functions": "^6.0.2",
+    "@netlify/identity": "^2.0.0",
     "drizzle-orm": "^1.0.0-beta.22",
     "openai": "^7.43.0"
   },

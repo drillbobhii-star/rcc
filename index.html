@@ -418,7 +418,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <script src="assets/personalization.js" defer></script>
 <link rel="stylesheet" href="assets/interactive-glass.css">
 <script src="assets/interactive-glass.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/identity-client.js"></script>
+<link rel="stylesheet" href="assets/community.css">
 <style>
 .auth-controls [hidden]{display:none!important}.auth-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.auth-email{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem;color:var(--muted)}
 #authModal{z-index:2100}#authModal .modal-box{width:min(100%,440px)}#authForm{display:grid;gap:14px}#authForm label{display:grid;gap:8px}#authForm input{width:100%;padding:13px;border:1px solid var(--border-glass);border-radius:14px;background:rgba(255,255,255,.06);color:var(--text);font:inherit}#authStatus{min-height:2.5em;color:var(--muted)}.favorite-button{margin-left:auto}.favorite-button[aria-pressed="true"]{color:#ffa9bd}button:disabled{opacity:.6;cursor:wait}
@@ -505,7 +506,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         </div>
         <div class="mobile-visitors" title="Total acumulado de visitantes de RCC"><strong data-visitor-total>…</strong> visitantes</div>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
-        <div class="auth-controls"><span id="authEmail" class="auth-email" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button">Iniciar Sesión</button><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
+        <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button">Iniciar Sesión</button><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -635,18 +636,13 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 </div>
 
 <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-  <div class="modal-box"><div class="modal-head"><h3 id="authTitle">Iniciar Sesión</h3><button class="close" id="closeAuth" type="button" aria-label="Cerrar acceso">×</button></div>
-    <div class="modal-body"><form id="authForm"><label>Email<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="6"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button><button class="btn btn-ghost" id="googleLoginBtn" type="button">Continuar con Google</button></div><p id="authStatus" role="status" aria-live="polite"></p></form></div>
+  <div class="modal-box"><div class="modal-head"><h3 id="authTitle">Tu cuenta RCC</h3><button class="close" id="closeAuth" type="button" aria-label="Cerrar acceso">×</button></div>
+    <div class="modal-body"><form id="authForm"><p class="auth-intro">Guarda tus scripts en la nube y participa en la comunidad.</p><label>Correo electrónico<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="8" maxlength="128"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button><button class="btn btn-ghost" id="googleLoginBtn" type="button">Continuar con Google</button></div><button class="btn btn-ghost" id="forgotPasswordBtn" type="button">Olvidé mi contraseña</button><p id="authStatus" role="status" aria-live="polite"></p></form></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
 
 <script>
-// Añade aquí la clave pública anon del proyecto; nunca uses una clave service_role.
-const SUPABASE_URL = 'https://cbkrpyfkteomcukdisdw.supabase.co';
-const SUPABASE_KEY = '';
-const SUPABASE_CONFIG = Object.freeze({ url: SUPABASE_URL, anonKey: SUPABASE_KEY });
-const cloud = SUPABASE_CONFIG.anonKey && window.supabase ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}) : null;
 let currentUser = null;
 let favoriteIds = new Set();
 let showFavorites = false;
@@ -1020,6 +1016,7 @@ function openScript(s){
   document.getElementById('modalCode').textContent = s.code;
   renderCompatibility(s);
   document.getElementById('voteBtn').onclick = e=>voteForScript(String(s.id),e.currentTarget);
+  renderCommunity(String(s.id));
   updateVoteButton(String(s.id),document.getElementById('voteBtn'));
   
   modal.classList.add('open');
@@ -1152,11 +1149,13 @@ const authModal = document.getElementById('authModal');
 const authForm = document.getElementById('authForm');
 const authStatus = document.getElementById('authStatus');
 let authReturnFocus = null;
+let passwordReset = false;
+let threadRevision = 0;
 function openAuth(){
   authReturnFocus=document.activeElement;
-  authStatus.textContent=cloud?'':'El acceso necesita la clave pública de Supabase en la configuración del sitio.';
+  authStatus.textContent='';
   authModal.classList.add('open');document.body.style.overflow='hidden';
-  document.getElementById('authEmailInput').focus();
+  document.getElementById(passwordReset?'authPassword':'authEmailInput').focus();
 }
 function closeAuth(){
   authModal.classList.remove('open');document.getElementById('authPassword').value='';
@@ -1169,109 +1168,136 @@ authModal.onclick=e=>{if(e.target===authModal) closeAuth();};
 authModal.addEventListener('keydown',e=>{
   if(e.key==='Escape'){e.stopPropagation();closeAuth();}
   if(e.key==='Tab'){
-    const items=[...authModal.querySelectorAll('button,input')].filter(el=>!el.disabled);
+    const items=[...authModal.querySelectorAll('button,input')].filter(el=>!el.disabled&&!el.hidden&&el.offsetParent!==null);
     const first=items[0],last=items.at(-1);
     if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   }
 });
-function cloudError(error){
-  if(error?.code==='42P01'||error?.code==='PGRST205') return 'Falta configurar la tabla en Supabase. Ejecuta el SQL de instalación.';
-  if(error?.code==='42501') return 'Supabase ha rechazado el permiso. Revisa las políticas de acceso.';
-  return 'No se pudo completar la operación. Comprueba la conexión y vuelve a intentarlo.';
+function cloudError(error){return error?.message||'No se pudo completar la operación. Vuelve a intentarlo.';}
+function authError(error){
+  const message=String(error?.message||'')+' '+String(error?.cause?.message||'');
+  if(/already|exists|registered|registrad/i.test(message))return 'Ya se usó este correo. Inicia sesión o recupera tu contraseña.';
+  if(/confirm|verif/i.test(message))return 'Confirma tu correo antes de iniciar sesión.';
+  if(/invalid.*(credential|password|grant)|email.*password/i.test(message)||error?.status===401)return 'Correo o contraseña incorrectos.';
+  if(/rate|too many/i.test(message)||error?.status===429)return 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.';
+  return 'No se pudo acceder. Revisa los datos y la conexión e inténtalo de nuevo.';
 }
+async function community(action,scriptId,method='GET',body,extra=''){
+  const response=await fetch('/api/community?action='+encodeURIComponent(action)+(scriptId?'&script='+encodeURIComponent(scriptId):'')+extra,
+    {method,credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});
+  let data;try{data=await response.json();}catch{throw new Error('No se pudo conectar con la comunidad.');}
+  if(!response.ok)throw new Error(data.error||'No se pudo completar la operación.');
+  return data;
+}
+function setAuthBusy(busy){authForm.querySelectorAll('button').forEach(b=>b.disabled=busy);}
 async function submitAuth(register){
-  if(!authForm.reportValidity()) return;
-  if(!cloud){authStatus.textContent='Añade la clave pública de Supabase para habilitar el acceso.';return;}
-  const buttons=[...authForm.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
-  authStatus.textContent=register?'Creando cuenta…':'Entrando…';
+  if(!authForm.reportValidity())return;
+  setAuthBusy(true);authStatus.textContent=register?'Creando cuenta…':passwordReset?'Actualizando contraseña…':'Entrando…';
   try{
-    const credentials={email:document.getElementById('authEmailInput').value.trim(),password:document.getElementById('authPassword').value};
-    const {data,error}=register?await cloud.auth.signUp(credentials):await cloud.auth.signInWithPassword(credentials);
-    if(error){
-      authStatus.textContent=({invalid_credentials:'Email o contraseña incorrectos.',email_not_confirmed:'Confirma tu correo antes de entrar.',user_already_exists:'Ya existe una cuenta con este correo.',weak_password:'Elige una contraseña más segura.',over_email_send_rate_limit:'Espera un momento antes de solicitar otro correo.'})[error.code]||'No se pudo acceder. Revisa los datos e inténtalo de nuevo.';return;
+    const identity=await window.rccIdentityReady;
+    const email=document.getElementById('authEmailInput').value.trim();
+    const password=document.getElementById('authPassword').value;
+    if(passwordReset){
+      await identity.updateUser({password});passwordReset=false;
+      document.getElementById('authEmailInput').disabled=false;
+      document.getElementById('authTitle').textContent='Tu cuenta RCC';
+      authForm.querySelector('[type="submit"]').textContent='Entrar';
+      for(const id of ['signupBtn','googleLoginBtn','forgotPasswordBtn'])document.getElementById(id).hidden=false;
+      await applySession(await identity.getUser());closeAuth();showToast('Contraseña actualizada');return;
     }
+    const user=register?await identity.signup(email,password):await identity.login(email,password);
     document.getElementById('authPassword').value='';
-    if(data.session){closeAuth();showToast('Sesión iniciada');}
-    else authStatus.textContent='Revisa tu correo para confirmar el registro y después entra con tu contraseña.';
-  }catch{authStatus.textContent='No se pudo conectar con Supabase. Inténtalo de nuevo.';}
-  finally{buttons.forEach(b=>b.disabled=false);}
+    if(!register||user.confirmedAt){await applySession(user);closeAuth();showToast(register?'Cuenta creada':'Sesión iniciada');}
+    else authStatus.textContent='Revisa tu correo y confirma tu cuenta. Después podrás comentar y guardar scripts.';
+  }catch(error){authStatus.textContent=authError(error);}
+  finally{setAuthBusy(false);}
 }
 authForm.onsubmit=e=>{e.preventDefault();submitAuth(false);};
 document.getElementById('signupBtn').onclick=()=>submitAuth(true);
-document.getElementById('googleLoginBtn').onclick=async()=>{
-  if(!cloud){authStatus.textContent='Añade la clave pública de Supabase para habilitar el acceso.';return;}
-  const buttons=[...authForm.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
-  authStatus.textContent='Conectando con Google…';
-  try{
-    const {error}=await cloud.auth.signInWithOAuth({ provider: 'google' });
-    if(error)throw error;
-  }catch{authStatus.textContent='No se pudo acceder con Google. Comprueba que el proveedor esté habilitado en Supabase.';}
-  finally{buttons.forEach(b=>b.disabled=false);}
+document.getElementById('forgotPasswordBtn').onclick=async()=>{
+  const email=document.getElementById('authEmailInput');
+  if(!email.reportValidity()||!email.value)return;
+  setAuthBusy(true);
+  try{await (await window.rccIdentityReady).requestPasswordRecovery(email.value.trim());authStatus.textContent='Si existe una cuenta con este correo, recibirás un enlace para recuperar el acceso.';}
+  catch{authStatus.textContent='No se pudo enviar el enlace. Inténtalo de nuevo más tarde.';}
+  finally{setAuthBusy(false);}
 };
-async function applySession(session){
+document.getElementById('googleLoginBtn').onclick=async()=>{
+  setAuthBusy(true);authStatus.textContent='Conectando con Google…';
+  try{
+    const identity=await window.rccIdentityReady;
+    const settings=await identity.getSettings();
+    if(!settings.providers.google){authStatus.textContent='El acceso con Google aún no está habilitado. Puedes registrarte con tu correo.';return;}
+    // OAuth crea la cuenta la primera vez y reutiliza la cuenta al volver a entrar.
+    const authorize=new URL('/.netlify/identity/authorize',location.origin);
+    authorize.searchParams.set('provider','google');
+    authorize.searchParams.set('redirect_to',location.origin+location.pathname);
+    authorize.searchParams.set('prompt','select_account');
+    location.assign(authorize.href);
+  }catch{authStatus.textContent='No se pudo conectar con Google. Prueba de nuevo o usa tu correo.';}
+  finally{setAuthBusy(false);}
+};
+async function applySession(user){
   const previousId=currentUser?.id;
-  currentUser=session?.user||null;
+  currentUser=user||null;
   document.getElementById('authEmail').textContent=currentUser?.email||'';
   document.getElementById('authEmail').hidden=!currentUser;
   document.getElementById('loginBtn').hidden=!!currentUser;
   document.getElementById('logoutBtn').hidden=!currentUser;
-  if(previousId===currentUser?.id) return;
-  sessionRevision++;
-  votedIds.clear();
-  const voteButton=document.getElementById('voteBtn');
-  if(voteButton?.voteScriptId)updateVoteButton(voteButton.voteScriptId,voteButton);
-  favoriteIds=new Set();favoritesStatus='idle';updateFavoriteCount();render();
-  if(currentUser) await loadFavorites();
+  if(previousId===currentUser?.id)return;
+  sessionRevision++;votedIds.clear();favoriteIds=new Set();favoritesStatus='idle';
+  updateFavoriteCount();render();
+  if(currentUser)await loadFavorites();
+  if(modal.classList.contains('open'))loadThread(String(currentCopiedId));
 }
 function updateFavoriteCount(){document.getElementById('favoritesCount').textContent=favoriteIds.size;}
 async function loadFavorites(){
-  if(!cloud||!currentUser) return;
-  const revision=sessionRevision,userId=currentUser.id;
+  if(!currentUser)return;
+  const revision=sessionRevision;
   favoritesStatus='loading';if(showFavorites)render();
-  try{
-    const loaded=[];let offset=0;
-    // Pagina para no truncar las colecciones que superan el límite de Supabase.
-    while(true){
-      const {data,error}=await cloud.from('favorites').select('script_id').eq('user_id',userId).order('script_id').range(offset,offset+499);
-      if(error)throw error;
-      loaded.push(...data.map(row=>row.script_id));
-      if(data.length<500)break;offset+=500;
-    }
-    if(revision!==sessionRevision)return;
-    favoriteIds=new Set(loaded);favoritesStatus='ready';
-  }catch(error){if(revision!==sessionRevision)return;favoritesStatus='error';showToast(cloudError(error));}
+  try{const data=await community('favorites');if(revision!==sessionRevision)return;favoriteIds=new Set(data.ids);favoritesStatus='ready';}
+  catch(error){if(revision!==sessionRevision)return;favoritesStatus='error';showToast(cloudError(error));}
   updateFavoriteCount();render();
 }
 async function initializeAuth(){
-  if(!cloud)return;
-  cloud.auth.onAuthStateChange((_event,session)=>{
-    // Evita consultas dentro del bloqueo interno de autenticación.
-    setTimeout(()=>applySession(session),0);
-  });
-  const revision=sessionRevision;
   try{
-    const {data,error}=await cloud.auth.getSession();
-    if(error)throw error;
-    if(revision===sessionRevision)await applySession(data.session);
-  }catch{showToast('No se pudo recuperar la sesión. Intenta iniciar sesión de nuevo.');}
+    const identity=await window.rccIdentityReady;
+    identity.onAuthChange((_event,user)=>{setTimeout(()=>applySession(user),0);});
+    const callbackParams=new URLSearchParams(location.hash.slice(1));
+    if(callbackParams.has('error')){
+      const description=callbackParams.get('error_description')||callbackParams.get('error');
+      history.replaceState(null,'',location.pathname+location.search);
+      openAuth();authStatus.textContent=authError({message:description});
+      await applySession(await identity.getUser());return;
+    }
+    const result=await identity.handleAuthCallback();
+    await applySession(await identity.getUser());
+    if(result?.type==='recovery'){
+      passwordReset=true;document.getElementById('authTitle').textContent='Nueva contraseña';
+      document.getElementById('authEmailInput').value=currentUser?.email||'';
+      document.getElementById('authEmailInput').disabled=true;
+      authForm.querySelector('[type="submit"]').textContent='Guardar contraseña';
+      for(const id of ['signupBtn','googleLoginBtn','forgotPasswordBtn'])document.getElementById(id).hidden=true;
+      openAuth();authStatus.textContent='Elige tu nueva contraseña.';
+    }else if(result?.type==='oauth'||result?.type==='confirmation')showToast('Sesión iniciada');
+  }catch{showToast('No se pudo recuperar el acceso. Intenta iniciar sesión de nuevo.');}
 }
 document.getElementById('logoutBtn').onclick=async e=>{
   const button=e.currentTarget;button.disabled=true;
-  try{const {error}=await cloud.auth.signOut();if(error)throw error;await applySession(null);showToast('Sesión cerrada');}
-  catch{showToast('No se pudo cerrar la sesión. Inténtalo de nuevo.');}
+  try{await (await window.rccIdentityReady).logout();await applySession(null);showToast('Sesión cerrada');}
+  catch{await applySession(null);showToast('Comprueba tu conexión antes de volver a entrar.');}
   finally{button.disabled=false;}
 };
 async function toggleFavorite(scriptId,button){
   scriptId=String(scriptId);
-  if(!currentUser){showToast('Inicia sesión para guardar tus scripts favoritos en la nube');return;}
+  if(!currentUser){showToast('Inicia sesión para guardar tus scripts favoritos en la nube');openAuth();return;}
   if(favoritesStatus!=='ready'){await loadFavorites();if(favoritesStatus!=='ready')return;}
   if(favoritePending.has(scriptId)||!currentUser)return;
-  const userId=currentUser.id,revision=sessionRevision,removing=favoriteIds.has(scriptId);
+  const revision=sessionRevision,removing=favoriteIds.has(scriptId);
   favoritePending.add(scriptId);button.disabled=true;
   try{
-    const {error}=removing?await cloud.from('favorites').delete().eq('user_id',userId).eq('script_id',scriptId):await cloud.from('favorites').insert({user_id:userId,script_id:scriptId});
-    if(error&&!(error.code==='23505'&&!removing))throw error;
+    await community('favorite',scriptId,removing?'DELETE':'PUT');
     if(revision!==sessionRevision)return;
     if(removing)favoriteIds.delete(scriptId);else favoriteIds.add(scriptId);
     showToast(removing?'Favorito eliminado':'Favorito guardado en la nube');
@@ -1282,49 +1308,67 @@ document.getElementById('favoritesBtn').onclick=async()=>{
   selectSection('all');showRecent=false;showFavorites=true;
   document.getElementById('recentBtn').classList.remove('active');
   document.getElementById('favoritesBtn').setAttribute('aria-pressed','true');
-  document.getElementById('heroTitle').textContent='❤️ Favoritos';
-  document.getElementById('heroSubtitle').textContent='Tus scripts guardados en la nube.';
-  render();closeSidebar();await loadFavorites();
+  document.getElementById('heroTitle').textContent='Tus guardados';
+  document.getElementById('heroSubtitle').textContent='Tus scripts favoritos, disponibles desde cualquier dispositivo al iniciar sesión.';
+  render();closeSidebar();if(!currentUser)openAuth();else await loadFavorites();
 };
-async function updateVoteButton(scriptId,button){
-  button.voteScriptId=scriptId;
-  button.textContent=votedIds.has(scriptId)?'👍 Te gusta':'👍 Me gusta';
-  button.disabled=votedIds.has(scriptId)||votePending.has(currentUser?.id+':'+scriptId);
-  if(!cloud||!currentUser)return;
-  const revision=sessionRevision,userId=currentUser.id;
-  button.disabled=true;
-  try{
-    const {data,error}=await cloud.from('votes').select('script_id').eq('user_id',userId).eq('script_id',scriptId).maybeSingle();
-    if(error)throw error;
-    if(revision!==sessionRevision)return;
-    if(data)votedIds.add(scriptId);
-  }catch(error){if(revision===sessionRevision)showToast(cloudError(error));}
-  finally{
-    if(revision===sessionRevision){
-      button.textContent=votedIds.has(scriptId)?'👍 Te gusta':'👍 Me gusta';
-      button.disabled=votedIds.has(scriptId)||votePending.has(currentUser?.id+':'+scriptId);
-    }
-  }
-}
+async function updateVoteButton(scriptId,button){button.voteScriptId=scriptId;await loadThread(scriptId);}
 async function voteForScript(scriptId,button){
-  scriptId=String(scriptId);
-  if(!currentUser){showToast('Inicia sesión para votar por tus scripts favoritos');return;}
-  if(votedIds.has(scriptId)||votePending.has(currentUser?.id+':'+scriptId))return;
-  const revision=sessionRevision;
-  const pendingKey=currentUser.id+':'+scriptId;
-  if(votePending.has(pendingKey))return;
-  votePending.add(pendingKey);button.disabled=true;
+  if(!currentUser){showToast('Inicia sesión para dar me gusta');openAuth();return;}
+  const key=currentUser.id+':'+scriptId,revision=sessionRevision;
+  if(votePending.has(key))return;
+  votePending.add(key);button.disabled=true;
+  try{await community('like',scriptId,votedIds.has(scriptId)?'DELETE':'PUT');if(revision===sessionRevision)await loadThread(scriptId);}
+  catch(error){showToast(cloudError(error));}
+  finally{votePending.delete(key);if(button.isConnected)button.disabled=false;}
+}
+async function loadThread(scriptId,before=null){
+  const revision=++threadRevision,session=sessionRevision;
+  const panel=document.getElementById('communityPanel');
+  if(!panel)return;
+  const list=panel.querySelector('.comment-list'),status=panel.querySelector('.community-status');
+  const more=panel.querySelector('.comments-more');
+  status.textContent='Cargando comunidad…';more.disabled=true;
+  const form=panel.querySelector('form');
+  form.hidden=!currentUser;panel.querySelector('.comment-login').hidden=!!currentUser;
   try{
-    const {error}=await cloud.from('votes').insert({user_id:currentUser.id,script_id:scriptId});
-    if(error&&error.code!=='23505')throw error;
-    if(revision!==sessionRevision)return;
-    votedIds.add(scriptId);
-    button.textContent='👍 Te gusta';showToast(error?'Ya has votado este script':'¡Gracias por tu voto!');
-  }catch(error){if(revision===sessionRevision)showToast(cloudError(error));}
-  finally{
-    votePending.delete(pendingKey);
-    if(revision===sessionRevision)button.disabled=votedIds.has(scriptId);
-  }
+    const data=await community('thread',scriptId,'GET',null,before?'&before='+encodeURIComponent(before):'');
+    if(revision!==threadRevision||session!==sessionRevision||!panel.isConnected)return;
+    if(data.liked)votedIds.add(scriptId);else votedIds.delete(scriptId);
+    const button=document.getElementById('voteBtn');
+    button.textContent=(data.liked?'Te gusta':'Me gusta')+' · '+data.likes;button.setAttribute('aria-pressed',String(data.liked));button.disabled=false;
+    if(!before)list.replaceChildren();
+    for(const comment of data.comments){
+      const article=document.createElement('article');article.className='community-comment';
+      const header=document.createElement('div'),author=document.createElement('strong'),time=document.createElement('time'),body=document.createElement('p');
+      author.textContent=comment.author;time.dateTime=comment.createdAt;time.textContent=new Date(comment.createdAt).toLocaleString('es',{dateStyle:'medium',timeStyle:'short'});
+      body.textContent=comment.body;header.append(author,time);article.append(header,body);
+      if(comment.mine){
+        const remove=document.createElement('button');remove.type='button';remove.className='btn btn-ghost';remove.textContent='Eliminar mi comentario';
+        remove.onclick=async()=>{remove.disabled=true;try{await community('comment',scriptId,'DELETE',null,'&id='+encodeURIComponent(comment.id));await loadThread(scriptId);}catch(error){status.textContent=cloudError(error);remove.disabled=false;}};
+        article.append(remove);
+      }
+      list.append(article);
+    }
+    status.textContent=list.childElementCount?'':'Todavía no hay comentarios. Comparte tu experiencia con este script.';
+    more.hidden=!data.next;more.onclick=()=>loadThread(scriptId,data.next);
+  }catch(error){if(revision===threadRevision&&panel.isConnected){status.textContent=cloudError(error);more.hidden=false;more.textContent='Reintentar';more.onclick=()=>loadThread(scriptId,before);}}
+  finally{if(revision===threadRevision)more.disabled=false;}
+}
+function renderCommunity(scriptId){
+  const panel=document.createElement('section');panel.id='communityPanel';panel.className='community-panel';panel.setAttribute('aria-label','Comentarios públicos');
+  panel.innerHTML='<div class="community-heading"><div><small>COMUNIDAD RCC</small><h4>La conversación del script</h4></div><button class="btn btn-ghost refresh-comments" type="button">Actualizar</button></div><p class="community-status" role="status" aria-live="polite"></p><button type="button" class="btn btn-ghost comment-login">Inicia sesión para comentar</button><form class="comment-form" hidden><label for="commentBody">Comparte tu experiencia <span>Visible para todos</span></label><textarea id="commentBody" required maxlength="2000" rows="3" placeholder="¿Cómo te funcionó? ¿Qué recomendarías?"></textarea><div><small>Máximo 2000 caracteres. Tu correo completo no se publica.</small><button type="submit" class="btn btn-primary">Publicar comentario</button></div></form><div class="comment-list"></div><button class="btn btn-ghost comments-more" type="button" hidden>Ver comentarios anteriores</button>';
+  modalBody.append(panel);
+  panel.querySelector('.comment-login').onclick=openAuth;
+  panel.querySelector('.refresh-comments').onclick=()=>loadThread(scriptId);
+  panel.querySelector('form').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,button=form.querySelector('button'),input=form.querySelector('textarea'),status=panel.querySelector('.community-status');
+    if(!currentUser){openAuth();return;}if(!input.value.trim()){status.textContent='Escribe un comentario antes de publicar.';return;}
+    const session=sessionRevision;button.disabled=true;status.textContent='Publicando…';
+    try{await community('comment',scriptId,'POST',{body:input.value.trim()});if(session!==sessionRevision)return;input.value='';await loadThread(scriptId);}
+    catch(error){status.textContent=cloudError(error);}
+    finally{button.disabled=false;}
+  };
 }
 
 initializeAuth();
