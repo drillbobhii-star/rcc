@@ -1,3 +1,7 @@
+# Integración anterior (archivo)
+
+Esta guía corresponde a la integración anterior y ya no se aplica al catálogo actual. Consulta [Cuentas y comunidad](accounts-setup.md). No ejecutes el SQL de Supabase para activar la versión actual.
+
 # Configuración de Supabase
 
 La interfaz está integrada en `index.html`. Para activar la conexión:
