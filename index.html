@@ -499,8 +499,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
-        <a class="help-link" href="laboratorio.html#analysis">Sección de prueba ↗</a>
-        <a class="help-link" href="laboratorio.html#obfuscator">Generador de ofuscador ↗</a>
+        <a class="help-link" href="#analysis">Sección de prueba ↗</a>
+        <a class="help-link" href="#obfuscator">Generador de ofuscador ↗</a>
         <a class="help-link" href="soporte.html">Centro de ayuda ↗</a>
       </nav>
       <div class="hero-intro"><div class="hero-copy"><span class="eyebrow">BIBLIOTECA DE CÓDIGO · RCC</span>
@@ -1132,8 +1132,152 @@ setInterval(refreshVisitors, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshVisitors(); });
 </script>
 
-<script>(function(s){s.dataset.zone='12067792',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
-<script src="assets/copy-analysis.js"></script>
+
+<style>body.lab-open > :not(#rccLab):not(script):not(template){display:none!important}#rccLab[hidden]{display:none!important}</style>
+<section id="rccLab" hidden aria-label="Laboratorio de código"></section>
+<template id="rccLabTemplate"><style>:host{color-scheme:dark;--bg:#111a1b;--surface:#1a2627;--line:#344344;--text:#eaf0e9;--muted:#a6b8b5;--accent:#bbd4a6}*{box-sizing:border-box}:host{margin:0;background:var(--bg);color:var(--text);font:15px 'DM Sans',sans-serif}header,main,footer{max-width:1240px;margin:auto;padding:28px 40px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}a{color:var(--text);text-decoration:none}a:hover{color:var(--accent)}.brand{font:800 26px Manrope,sans-serif;letter-spacing:-1px}.brand span{font-size:14px;color:var(--muted);letter-spacing:2px;margin-left:12px}.intro{padding:40px 0 30px;max-width:740px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:700}h1{font:600 clamp(42px,6vw,76px)/1.08 Manrope,sans-serif;letter-spacing:-3px;margin:22px 0}h1 em{font-style:normal;color:var(--accent)}p,small{color:var(--muted);line-height:1.7}button,select{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 17px;cursor:pointer}button:hover{border-color:var(--accent)}button:disabled{opacity:.5;cursor:wait}button:focus-visible,a:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.tabs{display:flex;gap:10px;margin:16px 0 25px;flex-wrap:wrap}.tabs [aria-pressed=true]{background:var(--accent);color:#172519;border-color:var(--accent)}.workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface)}.editor{min-width:0;border-right:1px solid var(--line)}.bar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:18px 22px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:1px;color:var(--muted);flex-wrap:wrap}.bar h2{font:inherit;margin:0}.bar button{font-size:13px;letter-spacing:0;padding:8px 12px}textarea{display:block;resize:vertical;width:100%;min-height:340px;background:#142021;border:0;color:#d3e9cd;padding:23px;font:14px/1.8 ui-monospace,monospace;tab-size:2;border-radius:0}.editor-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;gap:12px;color:var(--accent);font-size:13px}#privacy{font-size:12px;margin:0;padding:5px 22px 22px}.controls{padding:28px}h2{font:600 25px Manrope,sans-serif;letter-spacing:-.7px}.controls label:not(.check){display:block;margin:22px 0 9px;font-size:13px}.controls select{width:100%;margin-bottom:14px}.primary{background:var(--accent);color:#172519;width:100%;font-weight:700;margin:14px 0}small{display:block;font-size:12px}.check{display:flex;gap:10px;align-items:center;font-size:13px;margin:14px 0}.check input{accent-color:var(--accent)}.small{margin-bottom:14px}#mismatch{border-left:3px solid #e5bb78;padding:1px 15px 15px;background:#352f23}#mismatch p{color:#e5d2b4}#status{min-height:26px}.result{border:1px solid var(--line);border-radius:18px;overflow:hidden}.result pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:24px;margin:0;min-height:170px;font:14px/1.8 ui-monospace,monospace;color:#caddd3}.result pre.code{white-space:pre;overflow:auto;max-height:600px}footer{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding-bottom:40px}[hidden]{display:none!important}@media(max-width:760px){header,main,footer{padding:22px}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line)}h1{letter-spacing:-2px}.controls{padding:22px}footer{gap:15px;flex-wrap:wrap}textarea{min-height:270px}}@media(prefers-reduced-motion:no-preference){button{transition:background .18s,border-color .18s}}
+</style><header><a class="brand" href="index.html">RCC <span>/ LAB</span></a><a href="index.html">Volver al catálogo ↗</a></header>
+<main><div class="intro"><span class="eyebrow">LEE · COMPRENDE · TRANSFORMA</span><h1>Tu código,<br><em>bajo la lupa.</em></h1><p>Descubre qué hace un script y prepara una versión menos legible sin ejecutarlo.</p></div>
+<nav class="tabs" aria-label="Herramientas"><button id="analysisTab" aria-pressed="true">Sección de prueba</button><button id="obfuscatorTab" aria-pressed="false">Generador de ofuscador</button></nav>
+<section class="workspace" aria-label="Editor de código"><div class="editor"><div class="bar"><label for="source">01 / CÓDIGO DE ENTRADA</label><span id="counter">0 caracteres</span></div><textarea id="source" class="notranslate" translate="no" spellcheck="false" placeholder="Pega aquí tu código Java, Lua o Luau…" aria-describedby="privacy"></textarea><div class="editor-footer"><span id="detection" role="status">Esperando código</span><button id="clear" type="button">Limpiar</button></div><p id="privacy">El análisis y la ofuscación se realizan en tu navegador. El código no se envía a ningún servicio externo.</p></div>
+<div class="controls"><section id="analysisPanel"><span class="eyebrow">02 / ENTENDER</span><h2>¿Para qué sirve?</h2><p>Identificación orientativa del lenguaje y sus usos mediante reglas locales.</p><button class="primary" id="analyze">Analizar código ↗</button><small>Análisis local por patrones. No ejecuta scripts ni verifica su compatibilidad o contenido remoto.</small></section>
+<section id="obfuscatorPanel" hidden><span class="eyebrow">02 / TRANSFORMAR</span><h2>Generador de ofuscador</h2><div class="tabs small" aria-label="Lenguaje de salida"><button id="luaTab" aria-pressed="true">Lua / Luau</button><button id="javaTab" aria-pressed="false">Java</button></div><div id="mismatch" hidden><p id="mismatchText"></p><button id="switchLanguage">Cambiar de pestaña</button></div><label for="method">Método de ofuscación</label><select id="method"><option value="strings">Codificación de cadenas</option><option value="comments">Retirar comentarios</option><option value="combined">Combinado: cadenas + comentarios</option></select><label class="check"><input type="checkbox" id="reinforce"> Refuerzo: eliminar comentarios también</label><label class="check"><input type="checkbox" id="confirmLanguage"> Confirmo el lenguaje si no se detecta</label><button class="primary" id="generate">Generar ofuscación ↗</button><small>Sin límite de texto impuesto; depende de la memoria del dispositivo. Conserva nombres y APIs. No ofrece cifrado ni protección contra ingeniería inversa. Prueba el resultado en tu entorno. Conserva las licencias necesarias.</small></section></div></section>
+<p id="status" role="status" aria-live="polite"></p>
+<section class="result" aria-labelledby="resultTitle"><div class="bar"><h2 id="resultTitle">03 / RESULTADO</h2><div><button id="copyResult" hidden>Copiar código</button><button id="download" hidden>Descargar</button></div></div><pre id="result" tabindex="0">Tu resultado aparece aquí. Pega un script para comenzar.</pre></section>
+</main><footer>RCC / Laboratorio de código <span>Java ≠ JavaScript · Lua / Luau</span></footer></template>
+<script>
+document.getElementById('rccLab').attachShadow({mode:'open'}).append(document.getElementById('rccLabTemplate').content.cloneNode(true));
+</script>
+<script>
+(async () => {
+const { detect } = await import('./assets/code-engine.js');
+const root = document.getElementById('rccLab').shadowRoot;
+const $ = id => root.getElementById(id);
+let language = 'lua', detected = 'unknown', output = '', outputLanguage = 'lua', worker, timer, revision = 0;
+function invalidate() {
+  revision++; worker?.terminate(); worker = null;
+  $('analyze').disabled = false; $('generate').disabled = false;
+  output = ''; $('copyResult').hidden = $('download').hidden = true;
+  $('result').textContent = 'Tu resultado aparece aquí. Pega un script para comenzar.';
+  $('status').textContent = ''; $('result').classList.remove('code');
+}
+function mode(value) {
+  const obf = value === 'obfuscator';
+  $('analysisPanel').hidden = obf; $('obfuscatorPanel').hidden = !obf;
+  $('analysisTab').setAttribute('aria-pressed', String(!obf)); $('obfuscatorTab').setAttribute('aria-pressed', String(obf));
+  history.replaceState(null, '', '#' + value);
+}
+function inspect() {
+  detected = detect($('source').value);
+  const names = {lua:'Lua / Luau',java:'Java',javascript:'JavaScript (distinto de Java)',unknown:'Lenguaje sin confirmar'};
+  $('detection').textContent = $('source').value.trim() ? 'Detección orientativa: ' + names[detected] : 'Esperando código';
+  const mismatch = detected !== 'unknown' && detected !== language;
+  $('mismatch').hidden = !mismatch;
+  $('switchLanguage').hidden = detected === 'javascript';
+  $('mismatchText').textContent = detected === 'javascript' ? 'Este código parece JavaScript. Las pestañas Java y Lua no son compatibles con JavaScript.' : `El código parece ${names[detected]}. Cambia a la pestaña correspondiente para ofuscarlo.`;
+}
+function selectLanguage(value) {
+  invalidate(); language = value;
+  for (const name of ['java','lua']) $(name+'Tab').setAttribute('aria-pressed', String(name === language));
+  $('confirmLanguage').checked = false; inspect();
+}
+$('analysisTab').onclick = () => mode('analysis'); $('obfuscatorTab').onclick = () => mode('obfuscator');
+$('luaTab').onclick = () => selectLanguage('lua'); $('javaTab').onclick = () => selectLanguage('java');
+$('switchLanguage').onclick = () => selectLanguage(detected);
+$('source').addEventListener('input', () => {invalidate(); $('confirmLanguage').checked = false; $('counter').textContent = $('source').value.length.toLocaleString('es')+' caracteres'; clearTimeout(timer); timer = setTimeout(inspect, 250);});
+for (const id of ['method','reinforce','confirmLanguage']) $(id).addEventListener('change', invalidate);
+$('clear').onclick = () => { $('source').value = ''; $('source').dispatchEvent(new Event('input')); $('source').focus(); };
+function analyzeLocally(code) {
+  if (/gg\.(?:searchNumber|setValues)/i.test(code)) return '🕹️ Lenguaje detectado: GameGuardian (Lua). Uso: Modificación de memoria en Android.';
+  if (/game:GetService|Workspace|Players|Humanoid|WalkSpeed|local\s+player|CFrame/i.test(code)) return '🟢 Lenguaje detectado: Lua (Roblox). Uso recomendado: 1. Exploits (Delta, Solara, Fluxus). 2. Roblox Studio (Desarrollo de juegos). Funciones: Manipulación de personajes o entorno.';
+  if (/public\s+class|System\.out\.println|import\s+java\./i.test(code)) return '🟠 Lenguaje detectado: Java. Uso recomendado: Desarrollo de software (Backend).';
+  if (!/\blocal\b/i.test(code) && /document\.|window\.|addEventListener|function\s*\(\s*\)|=>/i.test(code)) return '🔵 Lenguaje detectado: JavaScript. Uso recomendado: Desarrollo Web (Frontend, páginas web).';
+  return '⚪ Lenguaje no identificado. No se encontraron los patrones conocidos; pega un fragmento más completo.';
+}
+$('analyze').onclick = () => {
+  const code = $('source').value;
+  invalidate();
+  if (!code.trim()) { $('status').textContent = 'Pega un código primero.'; return; }
+  $('result').textContent = analyzeLocally(code);
+  $('status').textContent = 'Análisis local por patrones completado. No se ha ejecutado el código. La detección no garantiza compatibilidad.';
+};
+$('generate').onclick = () => {
+  inspect(); const code = $('source').value;
+  if (!code.trim()) { $('status').textContent = 'Pega un código primero.'; return; }
+  if (detected !== 'unknown' && detected !== language) { $('status').textContent = 'Revisa el lenguaje detectado antes de continuar.'; return; }
+  if (detected === 'unknown' && !$('confirmLanguage').checked) { $('status').textContent = 'No hay señales suficientes. Confirma el lenguaje de tu código.'; return; }
+  invalidate(); $('generate').disabled = true; $('status').textContent = 'Procesando en tu navegador…';
+  try {
+    worker = new Worker('assets/obfuscator-worker.js', {type:'module'});
+    worker.onmessage = ({data}) => {
+      $('generate').disabled = false; worker.terminate(); worker = null;
+      if (data.error) { $('status').textContent = data.error; return; }
+      output = data.result; outputLanguage = language;
+      $('result').textContent = output; $('result').classList.add('code');
+      $('copyResult').hidden = $('download').hidden = false;
+      $('status').textContent = output === code ? 'No se encontraron elementos transformables con este método. El código se conserva.' : 'Ofuscación terminada. Prueba la salida en tu entorno antes de usarla.';
+    };
+    worker.onerror = () => { $('generate').disabled = false; $('status').textContent = 'No se pudo iniciar el procesador local.'; worker?.terminate(); worker = null; };
+    worker.postMessage({code,language,method:$('method').value,reinforce:$('reinforce').checked});
+  } catch { $('generate').disabled = false; $('status').textContent = 'Tu navegador no permite iniciar el procesador local.'; }
+};
+$('copyResult').onclick = async () => { try { await navigator.clipboard.writeText(output); $('status').textContent = 'Código copiado.'; } catch { $('status').textContent = 'No se pudo copiar. Selecciona el resultado manualmente.'; } };
+$('download').onclick = () => { const url = URL.createObjectURL(new Blob([output],{type:'text/plain;charset=utf-8'})); const a = document.createElement('a'); a.href=url; a.download=outputLanguage === 'java' ? 'codigo-ofuscado.java' : 'codigo-ofuscado.lua'; a.click(); setTimeout(() => URL.revokeObjectURL(url),1000); };
+window.openRccLab = (code, value = 'analysis') => {
+  closeModal();
+  document.body.classList.add('lab-open');
+  document.getElementById('rccLab').hidden = false;
+  mode(value);
+  if (typeof code === 'string') {
+    $('source').value = code;
+    $('source').dispatchEvent(new Event('input'));
+    inspect();
+    $('analyze').click();
+  }
+  window.scrollTo(0, 0);
+  $('source').focus();
+};
+function followLabHash() {
+  if (['#analysis', '#obfuscator'].includes(location.hash)) window.openRccLab(undefined, location.hash.slice(1));
+  else { document.body.classList.remove('lab-open'); document.getElementById('rccLab').hidden = true; }
+}
+window.addEventListener('hashchange', followLabHash);
+followLabHash();
+try { const code = sessionStorage.getItem('rcc_lab_code'); if (code) { sessionStorage.removeItem('rcc_lab_code'); window.openRccLab(code); } } catch {}
+
+(() => {
+  let copied = '';
+  const notice = document.createElement('aside');
+  notice.setAttribute('aria-label', 'Analizar código copiado');
+  notice.hidden = true;
+  notice.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:10010;max-width:calc(100vw - 48px);width:360px;padding:22px;border:1px solid #658071;border-radius:18px;background:#1a2927;color:#edf3eb;box-shadow:0 14px 50px #10191880;font:14px/1.6 inherit';
+  notice.innerHTML = '<div role="status" style="font-weight:700;margin-bottom:12px">¿Para qué sirve este código?</div><p style="margin:0 0 16px">Descubre sus funciones y posibles usos. El análisis se realiza en tu navegador, sin enviar el código.</p><button type="button" data-analyze style="padding:10px 14px;border:0;border-radius:8px;background:#bbd4a6;color:#172519;cursor:pointer">🔍 ¿Qué hace este código?</button> <button type="button" data-dismiss style="padding:10px;border:1px solid #658071;border-radius:8px;background:transparent;color:inherit;cursor:pointer">Cerrar</button>';
+  document.body.append(notice);
+  window.offerCodeAnalysis = code => { copied = code; notice.hidden = false; };
+  notice.querySelector('[data-dismiss]').onclick = () => { notice.hidden = true; };
+  notice.querySelector('[data-analyze]').onclick = () => {
+    notice.hidden = true;
+    window.openRccLab(copied);
+  };
+  document.addEventListener('copy', () => {
+    const selection = window.getSelection();
+    if (selection?.toString().trim() && selection.anchorNode?.parentElement?.closest('pre, code')) window.offerCodeAnalysis(selection.toString());
+  });
+})();
+})();
+</script>
+<script>
+// Disuasión local: estos bloqueos no hacen secreto el contenido público.
+document.addEventListener('contextmenu', event => event.preventDefault());
+document.addEventListener('keydown', event => {
+  const key = event.key.toLowerCase();
+  if (key === 'f12' || ((event.ctrlKey || event.metaKey) &&
+      ((event.shiftKey && ['i', 'j', 'c'].includes(key)) || key === 'u'))) {
+    event.preventDefault();
+  }
+}, {capture:true});
+console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intentes robar los scripts. Únete a nuestro Discord si quieres aprender.', 'color:#e53935;font-size:32px;font-weight:900;line-height:1.5;');
+</script>
 </body>
 </html>
