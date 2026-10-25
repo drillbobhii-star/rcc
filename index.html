@@ -499,6 +499,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
         <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
+        <a class="help-link" href="laboratorio.html#analysis">Sección de prueba ↗</a>
+        <a class="help-link" href="laboratorio.html#obfuscator">Generador de ofuscador ↗</a>
         <a class="help-link" href="soporte.html">Centro de ayuda ↗</a>
       </nav>
       <div class="hero-intro"><div class="hero-copy"><span class="eyebrow">BIBLIOTECA DE CÓDIGO · RCC</span>
@@ -984,6 +986,7 @@ function openScript(s){
 function copyCode(){
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
       showToast('📋 ¡Copiado!');
+      offerCodeAnalysis(document.getElementById('modalCode').textContent);
       
       if(currentCopiedId && !recentIds.includes(currentCopiedId)) {
           recentIds.unshift(currentCopiedId);
@@ -1131,5 +1134,6 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) refr
 
 <script>(function(s){s.dataset.zone='12067792',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
+<script src="assets/copy-analysis.js"></script>
 </body>
 </html>
