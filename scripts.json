@@ -228393,5 +228393,309 @@
         "https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/JSON"
       ]
     }
+  },
+  {
+    "id": "rcc_web_motion_reveal",
+    "name": "Entrada escalonada",
+    "description": "Haz aparecer las tarjetas al entrar en pantalla con IntersectionObserver. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Entrada escalonada · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}.tiles{display:grid;gap:16px}article{padding:32px;background:#ffffff0b;border:1px solid #ffffff22;border-radius:18px}.ready article{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}.ready article.visible{opacity:1;transform:none}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Entrada escalonada</h1><p>Haz aparecer las tarjetas al entrar en pantalla con IntersectionObserver.</p><div class=\"tiles\"><article>01 · Imagina</article><article>02 · Construye</article><article>03 · Comparte</article></div></main><script>if('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches){document.body.classList.add('ready');const observer=new IntersectionObserver(items=>items.forEach(item=>{if(item.isIntersecting){item.target.classList.add('visible');observer.unobserve(item.target);}}));document.querySelectorAll('article').forEach((el,i)=>{el.style.transitionDelay=i*140+'ms';observer.observe(el);});}</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_orbit",
+    "name": "Órbita CSS",
+    "description": "Anima una órbita con transformaciones y un control para pausar. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Órbita CSS · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}.orbit{width:180px;height:180px;border:1px solid #ffffff33;border-radius:50%;margin:50px auto;animation:spin 8s linear infinite}.orbit span{display:block;width:24px;height:24px;border-radius:50%;background:var(--accent);margin:12px}.paused .orbit{animation-play-state:paused}@keyframes spin{to{transform:rotate(360deg)}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Órbita CSS</h1><p>Anima una órbita con transformaciones y un control para pausar.</p><div class=\"orbit\" aria-hidden=\"true\"><span></span></div><button id=\"toggle\" aria-pressed=\"false\">Pausar animación</button></main><script>document.querySelector('#toggle').onclick=e=>{const paused=document.body.classList.toggle('paused');e.target.setAttribute('aria-pressed',paused);e.target.textContent=paused?'Reanudar animación':'Pausar animación';};</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_flip",
+    "name": "Tarjeta de dos caras",
+    "description": "Gira una tarjeta con un botón accesible y perspectiva CSS. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Tarjeta de dos caras · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}.flip{perspective:800px;margin:30px 0}.inner{display:grid;transform-style:preserve-3d;transition:transform .7s}.inner p{grid-area:1/1;padding:55px 20px;border:1px solid var(--accent);border-radius:20px;backface-visibility:hidden;background:#1d3030}.back{transform:rotateY(180deg)}.turned .inner{transform:rotateY(180deg)}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Tarjeta de dos caras</h1><p>Gira una tarjeta con un botón accesible y perspectiva CSS.</p><div class=\"flip\"><div class=\"inner\"><p class=\"front\">HTML + CSS</p><p class=\"back\">Una idea, dos perspectivas.</p></div></div><button id=\"flip\" aria-pressed=\"false\">Girar tarjeta</button></main><script>document.querySelector('#flip').onclick=e=>{const turned=document.body.classList.toggle('turned');e.target.setAttribute('aria-pressed',turned);document.querySelector('.front').setAttribute('aria-hidden',turned);document.querySelector('.back').setAttribute('aria-hidden',!turned);};document.querySelector('.back').setAttribute('aria-hidden','true');</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_wave",
+    "name": "Onda tipográfica",
+    "description": "Anima cada letra con retardos CSS y reproduce el efecto a demanda. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Onda tipográfica · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}.wave{display:flex;gap:10px;font-size:clamp(40px,12vw,80px);font-weight:bold}.wave.play span{animation:wave .85s both;animation-delay:calc(var(--i)*100ms)}@keyframes wave{50%{transform:translateY(-22px) rotate(-8deg);opacity:.5}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Onda tipográfica</h1><p>Anima cada letra con retardos CSS y reproduce el efecto a demanda.</p><p class=\"wave\" aria-label=\"CREA\"><span aria-hidden=\"true\">C</span><span aria-hidden=\"true\">R</span><span aria-hidden=\"true\">E</span><span aria-hidden=\"true\">A</span></p><button id=\"play\">Reproducir onda</button></main><script>document.querySelectorAll('.wave span').forEach((el,i)=>el.style.setProperty('--i',i));document.querySelector('#play').onclick=()=>{const wave=document.querySelector('.wave');wave.classList.remove('play');requestAnimationFrame(()=>requestAnimationFrame(()=>wave.classList.add('play')));};</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_spotlight",
+    "name": "Foco interactivo",
+    "description": "Mueve un foco dentro de una tarjeta con el puntero o las flechas del teclado. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Foco interactivo · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}#light{--x:50%;--y:50%;padding:90px 20px;text-align:center;border-radius:24px;border:1px solid #ffffff33;background:radial-gradient(circle at var(--x) var(--y),#a4c9af55,transparent 55%),#172b2a}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Foco interactivo</h1><p>Mueve un foco dentro de una tarjeta con el puntero o las flechas del teclado.</p><div id=\"light\" tabindex=\"0\" role=\"img\" aria-label=\"Foco interactivo. Usa las flechas para moverlo.\">Explora la luz</div></main><script>const light=document.querySelector('#light');let x=50,y=50;function draw(){light.style.setProperty('--x',x+'%');light.style.setProperty('--y',y+'%');}light.onpointermove=e=>{const r=light.getBoundingClientRect();x=(e.clientX-r.left)/r.width*100;y=(e.clientY-r.top)/r.height*100;draw();};light.onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();x=Math.max(0,Math.min(100,x+(e.key==='ArrowRight'?5:e.key==='ArrowLeft'?-5:0)));y=Math.max(0,Math.min(100,y+(e.key==='ArrowDown'?5:e.key==='ArrowUp'?-5:0)));draw();};</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_accordion_motion",
+    "name": "Acordeón con entrada suave",
+    "description": "Combina details nativo y una animación de entrada para las respuestas. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Acordeón con entrada suave · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}details{border-bottom:1px solid #ffffff33;padding:20px 0}summary{cursor:pointer}details[open] p{animation:enter .4s both}@keyframes enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Acordeón con entrada suave</h1><p>Combina details nativo y una animación de entrada para las respuestas.</p><details><summary>¿Necesito instalar algo?</summary><p>No. Guarda este documento como index.html y ábrelo en tu navegador.</p></details><details><summary>¿Cómo cambio los colores?</summary><p>Edita la variable --accent en el CSS.</p></details></main><script></script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_progress_steps",
+    "name": "Pasos animados",
+    "description": "Avanza y retrocede entre tres pasos con un indicador accesible. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Pasos animados · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}ol{display:flex;gap:12px;padding:0;list-style:none}li{flex:1;padding:18px 8px;border-bottom:3px solid #ffffff33;transition:opacity .3s,transform .3s}li.active{border-color:var(--accent);transform:translateY(-5px)}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Pasos animados</h1><p>Avanza y retrocede entre tres pasos con un indicador accesible.</p><ol><li>Idea</li><li>Código</li><li>Proyecto</li></ol><p id=\"status\" role=\"status\"></p><button id=\"prev\">Anterior</button><button id=\"next\">Siguiente</button></main><script>let step=0;const items=[...document.querySelectorAll('li')];function update(){items.forEach((el,i)=>{el.classList.toggle('active',i<=step);if(i===step)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});document.querySelector('#status').textContent='Paso '+(step+1)+' de 3: '+items[step].textContent;document.querySelector('#prev').disabled=step===0;document.querySelector('#next').disabled=step===2;}document.querySelector('#prev').onclick=()=>{step--;update();};document.querySelector('#next').onclick=()=>{step++;update();};update();</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
+  },
+  {
+    "id": "rcc_web_motion_toast_motion",
+    "name": "Aviso con animación",
+    "description": "Muestra una notificación accesible, con cierre manual y temporizador reiniciable. Ejemplo completo, sin dependencias. Descarga el HTML y experimenta.",
+    "level": "free",
+    "device": "both",
+    "platform": "web",
+    "type": "source",
+    "executors": [
+      "Navegador web"
+    ],
+    "tags": [
+      "Original RCC",
+      "JavaScript",
+      "HTML y CSS",
+      "Animación",
+      "Movimiento RCC"
+    ],
+    "version": "1.0",
+    "created_at": "2026-10-27",
+    "catalog_section": "web",
+    "file_extension": "html",
+    "code": "<!doctype html>\n<html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Aviso con animación · RCC</title><style>\n:root{--accent:#bdd5aa;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#142321;color:#edf2e8;font:17px/1.7 'Trebuchet MS',sans-serif}main{max-width:720px;margin:8vh auto;padding:24px}h1{font-size:clamp(30px,7vw,52px);line-height:1.1}button{font:inherit;border:1px solid var(--accent);border-radius:10px;padding:12px 18px;background:var(--accent);color:#142321;cursor:pointer;margin:8px 8px 8px 0}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}#toast{margin-top:24px;padding:22px;border:1px solid var(--accent);border-radius:16px;background:#203a34;animation:toast .35s both}@keyframes toast{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n</style></head><body><main><p>RCC / Estudio de movimiento</p><h1>Aviso con animación</h1><p>Muestra una notificación accesible, con cierre manual y temporizador reiniciable.</p><button id=\"notify\">Mostrar aviso</button><aside id=\"toast\" role=\"status\" hidden><span>Tu vista previa está lista.</span> <button id=\"close\">Cerrar</button></aside></main><script>let timeout;const toast=document.querySelector('#toast');document.querySelector('#notify').onclick=()=>{clearTimeout(timeout);toast.hidden=false;timeout=setTimeout(()=>toast.hidden=true,6000);};document.querySelector('#close').onclick=()=>{clearTimeout(timeout);toast.hidden=true;document.querySelector('#notify').focus();};</script></body></html>\n",
+    "compatibility": {
+      "environment": "browser",
+      "runtime": "HTML5 / CSS / JavaScript",
+      "context": "Guarda el archivo como index.html y ábrelo en un navegador moderno.",
+      "requirements": "No requiere paquetes ni claves. JavaScript habilitado.",
+      "verification": "js-syntax",
+      "executor_status": "not-applicable",
+      "mobile_status": "Diseño adaptable; sin prueba en dispositivos físicos.",
+      "test_details": "Sintaxis JavaScript comprobada con Node.js. Incluye soporte CSS para movimiento reducido; sin prueba en dispositivos físicos.",
+      "sources": [
+        "https://developer.mozilla.org/es/docs/Web/JavaScript",
+        "https://developer.mozilla.org/es/docs/Web/HTML"
+      ]
+    }
   }
 ]

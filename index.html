@@ -439,6 +439,8 @@ window.rccSupabaseReady.catch(() => {});
 #authModal{z-index:2100}#authModal .modal-box{width:min(100%,440px)}#authForm{display:grid;gap:14px}#authForm label{display:grid;gap:8px}#authForm input{width:100%;padding:13px;border:1px solid var(--border-glass);border-radius:14px;background:rgba(255,255,255,.06);color:var(--text);font:inherit}#authStatus{min-height:2.5em;color:var(--muted)}.favorite-button{margin-left:auto}.favorite-button[aria-pressed="true"]{color:#ffa9bd}button:disabled{opacity:.6;cursor:wait}
 @media(max-width:700px){.topbar{flex-wrap:wrap}.auth-controls{width:100%;justify-content:flex-end}.auth-email{max-width:60vw}}
 </style>
+<link rel="stylesheet" href="assets/motion-studio.css">
+<script src="assets/motion-studio.js" defer></script>
 </head>
 <body class="ios-glass" data-ui="ios">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -535,8 +537,9 @@ window.rccSupabaseReady.catch(() => {});
         <a class="help-link" href="rocio-informacion.html">Rocío información ↗</a>
       </nav>
       <div class="hero-intro"><div class="hero-copy"><span class="eyebrow">BIBLIOTECA DE CÓDIGO · RCC</span>
-      <h2 id="heroTitle" tabindex="-1">Código para crear por RCC</h2>
+      <h2 id="heroTitle" tabindex="-1">Tu próxima idea empieza con código.</h2>
       <p id="heroSubtitle">Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.</p>
+      <div class="studio-actions"><a class="studio-primary" href="#catalogHeading">Explorar códigos <span aria-hidden="true">↗</span></a><button type="button" data-motion-library>Probar animaciones <span aria-hidden="true">→</span></button><span class="studio-shortcut"><kbd>Ctrl / ⌘ K</kbd> para buscar</span></div>
       </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
 <span class="code-keyword">local</span> proyecto = {
   lenguaje = <span class="code-string">"Lua"</span>,
@@ -544,6 +547,7 @@ window.rccSupabaseReady.catch(() => {});
 }
 
 <span class="code-keyword">return</span> proyecto</pre><div class="code-preview-foot"><span>Lua</span><span>Hecho para explorar ↗</span></div></div></div>
+      <section class="motion-feature" aria-labelledby="motionHeading"><div><span class="eyebrow">NUEVO / ESTUDIO DE MOVIMIENTO</span><h3 id="motionHeading">Código que cobra vida.</h3><p>8 ejemplos nuevos: órbitas, tarjetas 3D, ondas de texto y más. Abre el código, descárgalo y dale tu estilo.</p></div><div class="motion-sample" aria-hidden="true"></div><button type="button" data-motion-library>Ver los 8 ejemplos <span aria-hidden="true">↗</span></button></section>
       <aside class="discord-panel">
         <div><small>COMUNIDAD RCC</small><h3>Los scripts también se comparten.</h3><p>Únete al Discord y notifica el error. Comparte el enlace del código y qué ha fallado.</p></div>
         <a href="https://discord.gg/kwRE6N4Edp" target="_blank" rel="noopener noreferrer">Unirme a Discord ↗</a>
@@ -575,7 +579,7 @@ window.rccSupabaseReady.catch(() => {});
           <label>Color de acento<input id="accentColor" type="color" value="#9ec9f5"></label>
           <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
           <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
-          <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Animar fondo RCC y Rocio</label>
+          <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
           <button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
         <p id="appearanceStatus" role="status" aria-live="polite">Estilo iOS activo.</p>
@@ -752,7 +756,7 @@ function buildSidebar(){
   allTypes.innerHTML = `<span class="ico">📄</span>Todos<span class="count">${scripts.length}</span>`;
   allTypes.onclick = ()=>{ 
       showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+      document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
       document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
       filterType='all'; buildSidebar(); render(); 
@@ -796,7 +800,7 @@ function buildSidebar(){
   allP.innerHTML = `<span class="ico">📁</span>Todas<span class="count">${scripts.length}</span>`;
   allP.onclick = ()=>{ 
       showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+      document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
       document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
       filterPlatform='all'; buildSidebar(); render(); 
@@ -811,7 +815,7 @@ function buildSidebar(){
     item.innerHTML = `<span class="ico">${p.icon}</span>${p.name}<span class="count">${count}</span>`;
     item.onclick = ()=>{ 
         showRecent = false;
-        document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+        document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
         document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
         document.getElementById('recentBtn').classList.remove('active');
         filterPlatform=p.id; buildSidebar(); render(); closeSidebar(); 
@@ -825,7 +829,7 @@ function buildSidebar(){
   allE.innerHTML = `<span class="ico">⚡</span>Todos`;
   allE.onclick = ()=>{ 
       showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+      document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
       document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
       filterExecutor='all'; buildSidebar(); render(); 
@@ -849,7 +853,7 @@ function buildSidebar(){
 document.querySelectorAll('.dev-btn').forEach(btn=>{
   btn.onclick = ()=>{
     showRecent = false;
-    document.getElementById('heroTitle').textContent = "Código para crear por RCC";
+    document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
     document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
     document.getElementById('recentBtn').classList.remove('active');
     document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
@@ -1122,7 +1126,7 @@ document.getElementById('resetFilters').onclick = ()=>{
   document.getElementById('gameFilter').value='all';document.getElementById('originFilter').value='all';
   searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
   document.getElementById('recentBtn').classList.remove('active');
-  document.getElementById('heroTitle').textContent='Código para crear por RCC';
+  document.getElementById('heroTitle').textContent='Tu próxima idea empieza con código.';
   document.getElementById('heroSubtitle').textContent='Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.';
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev==='all'));
   buildSidebar(); render();

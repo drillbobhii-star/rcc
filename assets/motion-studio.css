@@ -1,0 +1,43 @@
+/* RCC motion studio: composited motion, shared across public pages. */
+:root{--motion-ease:cubic-bezier(.22,1,.36,1)}
+html{scroll-behavior:smooth;scroll-padding-top:110px}
+body[data-ui] .hero-intro{position:relative;padding:34px 0 26px;gap:48px}
+body[data-ui] .hero h2{font-size:clamp(38px,4.5vw,68px);letter-spacing:-2.8px;max-width:620px;line-height:1.06}
+.hero-copy>.eyebrow::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:10px;animation:studio-beacon 3s ease-in-out infinite}
+body[data-ui] .code-preview{transform:rotate(2deg);animation:studio-float 9s ease-in-out infinite;position:relative}
+.code-preview::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,#ffffff09 48%,transparent 65%);pointer-events:none;animation:studio-sheen 10s ease-in-out infinite}
+.studio-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;align-items:center}
+.studio-actions a,.studio-actions button{display:inline-flex;align-items:center;gap:12px;font-family:inherit;font-weight:600;font-size:12px;padding:13px 18px;border:1px solid var(--border-glass);border-radius:12px;background:var(--card-glass);color:var(--text);text-decoration:none;cursor:pointer;min-height:44px}
+.studio-actions .studio-primary{background:var(--accent);color:#18251e;border-color:var(--accent)}
+.studio-actions kbd{font:10px monospace;border:1px solid currentColor;padding:2px 5px;border-radius:4px;opacity:.7}
+.motion-feature{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;gap:26px;margin-top:28px;padding:26px 28px;border:1px solid var(--border-glass);border-radius:20px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),var(--card-glass);overflow:hidden}
+.motion-feature .eyebrow{margin:0 0 8px;font-size:9px}.motion-feature h3{font-size:23px;letter-spacing:-.7px}.motion-feature p{margin:8px 0 0;font-size:12px;max-width:540px}
+.motion-feature button{position:relative;z-index:1;display:flex;align-items:center;gap:14px;border:1px solid var(--border-glass);border-radius:12px;padding:15px 20px;background:var(--surface);color:var(--text);font:600 12px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.motion-sample{position:absolute;right:95px;top:-50px;width:220px;height:220px;border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);border-radius:50%;pointer-events:none;animation:studio-orbit 24s linear infinite;opacity:.6}.motion-sample::before{content:'';position:absolute;width:14px;height:14px;top:24px;left:24px;background:var(--accent);border-radius:50%}
+body[data-ui] .card{transition:transform .45s var(--motion-ease),opacity .5s var(--motion-ease),border-color .25s,box-shadow .25s;position:relative;overflow:hidden}
+body[data-ui] .card.show:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 16px 32px #0b151826}
+body[data-ui] .card-action{transition:transform .25s,background-color .25s}
+body[data-ui] .card:hover .card-action{transform:translateX(3px)}
+body[data-ui] :is(button,.help-link,.nav-item){transition:transform .25s var(--motion-ease),background-color .25s,border-color .25s}
+body[data-ui] button:active{transform:scale(.97)}
+body[data-ui] .search-top input:focus{border-color:var(--accent);outline:2px solid color-mix(in srgb,var(--accent) 22%,transparent);outline-offset:3px}
+body[data-ui] .stat b{font-size:32px}.stat{transition:transform .3s}.stat:hover{transform:translateY(-3px)}
+.studio-scroll{position:fixed;top:0;left:0;height:3px;width:100%;background:var(--accent,#bdd5aa);transform:scaleX(0);transform-origin:left;z-index:2200;pointer-events:none;transition:none}
+.studio-top{position:fixed;bottom:24px;left:calc(50% - 22px);z-index:1002;width:44px;height:44px;background:var(--surface,#21362e);color:var(--text,#edf2e8);border:1px solid var(--border-glass,#78917d);border-radius:50%;cursor:pointer;box-shadow:0 8px 24px #101a2333;font-size:20px}
+.studio-top[hidden]{display:none}
+.studio-observed{opacity:0;transform:translateY(20px);transition:opacity .7s var(--motion-ease),transform .7s var(--motion-ease)}
+.studio-observed.studio-visible{opacity:1;transform:none}
+body[data-ui] .modal.open .modal-box{animation:studio-enter .35s var(--motion-ease)}
+@keyframes studio-enter{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes studio-float{0%,100%{transform:translateY(0) rotate(2deg)}50%{transform:translateY(-9px) rotate(.5deg)}}
+@keyframes studio-sheen{0%,65%,100%{transform:translateX(-110%)}90%{transform:translateX(110%)}}
+@keyframes studio-beacon{50%{opacity:.4;transform:scale(.8)}}
+@keyframes studio-orbit{to{transform:rotate(360deg)}}
+@media(max-width:900px){body[data-ui] .hero-intro{gap:24px}.motion-feature{padding:22px}.motion-feature h3{font-size:20px}}
+@media(max-width:600px){body[data-ui] .hero-intro{padding-top:10px;gap:28px}body[data-ui] .hero h2{font-size:40px;letter-spacing:-1.7px}.motion-feature{grid-template-columns:1fr;gap:18px}.motion-feature button{justify-self:start}.motion-sample{right:-60px;opacity:.3}.studio-actions{gap:8px}.studio-actions a,.studio-actions button{padding:12px}.studio-actions kbd{display:none}.studio-top{left:auto;right:18px;bottom:18px}}
+body.motion-paused *,body.motion-paused *::before,body.motion-paused *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+body.motion-paused .studio-observed{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.studio-observed{opacity:1;transform:none}}
+
+.studio-shortcut{font-size:10px;color:var(--muted)}.studio-shortcut kbd{font:10px monospace;padding:4px 6px;border:1px solid var(--border-glass);border-radius:5px}
+@media(max-width:600px){body[data-ui] .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}body[data-ui] .stats .stat{padding:0 8px 0 0;margin:0;min-width:0}body[data-ui] .stats .stat b{font-size:25px}body[data-ui] .stats .stat small{font-size:8px}}
