@@ -1168,10 +1168,7 @@ const authStatus = document.getElementById('authStatus');
 let authReturnFocus = null;
 let passwordReset = false;
 function openAuth(){
-  authReturnFocus=document.activeElement;
-  authStatus.textContent='';
-  authModal.classList.add('open');document.body.style.overflow='hidden';
-  document.getElementById(passwordReset?'authPassword':'authEmailInput').focus();
+  showToast('Estamos trabajando en el inicio de sesión. Próximamente estará disponible.');
 }
 function closeAuth(){
   authModal.classList.remove('open');document.getElementById('authPassword').value='';
