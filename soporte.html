@@ -18,17 +18,20 @@
 <details><summary>¿Por qué hay variantes de una misma receta?</summary><p>Las recetas de Lua y Studio adaptan sistemas a distintos géneros. Los ejemplos web ofrecen componentes en varios temas visuales. Se etiquetan como variantes configurables o visuales para que puedas elegir sin confundirlos con funcionalidades nuevas.</p></details>
 <details><summary>¿Puedo pedir un juego o un ejemplo nuevo?</summary><p>Sí. Selecciona «Solicitar código» en el formulario e indica el juego, el lenguaje y qué quieres conseguir. También puedes proponerlo en Discord. No hay un plazo de respuesta garantizado.</p></details>
 </section>
-<section class="report" id="reportar" aria-labelledby="reportHeading"><span class="eyebrow">Cuéntanos qué ocurre</span><h2 id="reportHeading">Notificar un error</h2><p>El formulario envía tu consulta al equipo de RCC. Para conversar con la comunidad, usa Discord.</p>
-<form name="rcc-support" method="POST" action="/soporte-enviado" data-netlify="true" netlify-honeypot="bot-field" id="supportForm">
-<input type="hidden" name="form-name" value="rcc-support"><p hidden><label>No rellenar <input name="bot-field" autocomplete="off" tabindex="-1"></label></p>
+<section class="report" id="reportar" aria-labelledby="reportHeading"><span class="eyebrow">Cuéntanos qué ocurre</span><h2 id="reportHeading">Notificar un error</h2><p>El formulario envía tu consulta al equipo de RCC. Elige soporte o reporta un error. Ambas opciones se envían a Discord con una clasificación automática orientativa del texto.</p>
+<div class="mode-picker" role="group" aria-label="Tipo de solicitud"><button type="button" id="supportMode" aria-pressed="false">Soporte</button><button type="button" id="errorMode" aria-pressed="true">Reportar error</button></div>
+<form enctype="multipart/form-data" name="rcc-support" method="POST" action="/api/send-error" id="supportForm">
+<p hidden><label>No rellenar <input name="bot-field" autocomplete="off" tabindex="-1"></label></p>
+<input type="hidden" name="mode" id="reportMode" value="error">
 <label>Asunto <input name="subject" required maxlength="160" placeholder="El código no se carga"></label>
-<label>Tu correo de contacto <input type="email" name="email" autocomplete="email" required maxlength="254"></label>
+<label>Tu correo de contacto (opcional; no se envía a Discord) <input type="email" name="email" id="contactEmail" autocomplete="email" maxlength="254"></label>
 <label>Tipo de consulta <select name="category" required><option value="error">Error en un código</option><option value="web">Ayuda con JavaScript / Web</option><option value="lua">Ayuda con Lua / Studio</option><option value="request">Solicitar código</option><option value="site">Problema en la página</option></select></label>
 <label>Enlace o identificador del código (opcional) <input name="script" id="scriptReference" maxlength="1000" placeholder="Pega el enlace de la ficha"></label>
 <label>Juego y dispositivo (opcional) <input name="environment" maxlength="200" placeholder="Nombre del juego · PC, Android o iOS"></label>
 <label>Describe el problema <textarea name="message" rows="7" required minlength="20" maxlength="5000" placeholder="Qué intentabas hacer, pasos para repetirlo y mensaje de error exacto."></textarea></label>
-<p class="privacy">Usamos tu correo y el contenido de la consulta para gestionar tu solicitud. No incluyas contraseñas, claves de acceso ni datos privados de otras personas.</p>
-<button type="submit" id="sendSupport">Enviar consulta</button><p id="formStatus" role="status" aria-live="polite"></p>
+<label>Captura o imagen (opcional)<input type="file" id="screenshot" name="screenshot" accept="image/png,image/jpeg,image/webp" aria-describedby="imageHelp"></label><p id="imageHelp" class="privacy">PNG, JPG o WebP · máximo 3 MB. Revisa que no aparezcan datos privados.</p><div id="imagePreview" hidden><img id="previewImage" alt="Vista previa de la captura"><button type="button" id="removeImage">Quitar imagen</button></div>
+<p class="privacy" id="destinationNotice">El informe, su análisis y la captura se publicarán en el canal de errores de Discord. Tu correo solo se usa para soporte y no se publica en Discord.</p><p class="privacy">El contenido y la captura se comparten en Discord para gestionar tu solicitud. No incluyas contraseñas, claves de acceso ni datos privados de otras personas.</p>
+<button type="submit" id="sendSupport">Enviar informe</button><p id="formStatus" role="status" aria-live="polite"></p>
 </form></section></div>
 <footer>RCC · Ayuda para Lua, Roblox Studio y JavaScript. <a href="/">Explorar el catálogo</a></footer>
 </main></body></html>
