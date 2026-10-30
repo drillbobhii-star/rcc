@@ -443,8 +443,9 @@ window.rccSupabaseReady.catch(() => {});
 </style>
 <link rel="stylesheet" href="assets/motion-studio.css">
 <script src="assets/motion-studio.js" defer></script>
+<link rel="stylesheet" href="assets/black-studio.css">
 </head>
-<body class="ios-glass" data-ui="ios">
+<body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
 
 <!-- FONDOS ANIMADOS -->
@@ -463,7 +464,7 @@ window.rccSupabaseReady.catch(() => {});
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1><span class="brand-symbol" aria-hidden="true">&lt;/&gt;</span> RCC<span class="brand-dot">.</span></h1>
+    <h1><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span> RCC<span class="brand-dot">.</span></h1>
     <div class="visitor-badge"><strong>Comunidad RCC</strong></div>
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
@@ -542,6 +543,15 @@ window.rccSupabaseReady.catch(() => {});
       <h2 id="heroTitle" tabindex="-1">Tu próxima idea empieza con código.</h2>
       <p id="heroSubtitle">Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.</p>
       <div class="studio-actions"><a class="studio-primary" href="#catalogHeading">Explorar códigos <span aria-hidden="true">↗</span></a><button type="button" data-motion-library>Probar animaciones <span aria-hidden="true">→</span></button><span class="studio-shortcut"><kbd>Ctrl / ⌘ K</kbd> para buscar</span></div>
+      <section class="platform-spotlight" aria-label="Nuevos scripts independientes">
+        <span class="eyebrow">NUEVO · CÓDIGO FUENTE INDEPENDIENTE</span>
+        <p>60 scripts nuevos para FiveM, GameGuardian y AutoTouch. Revisa el entorno y la instalación en cada ficha; ejecución en dispositivos reales pendiente.</p>
+        <div class="platform-shortcuts">
+          <button type="button" data-platform-shortcut="fivem" aria-pressed="false" disabled>FiveM <span>20 nuevos ↗</span></button>
+          <button type="button" data-platform-shortcut="gameguardian" aria-pressed="false" disabled>GameGuardian <span>20 nuevos ↗</span></button>
+          <button type="button" data-platform-shortcut="autotouch" aria-pressed="false" disabled>AutoTouch <span>20 nuevos ↗</span></button>
+        </div>
+      </section>
       </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
 <span class="code-keyword">local</span> proyecto = {
   lenguaje = <span class="code-string">"Lua"</span>,
@@ -571,8 +581,8 @@ window.rccSupabaseReady.catch(() => {});
       <summary><span><small>ESTUDIO VISUAL</small>Tu RCC, a tu estilo</span><span aria-hidden="true">＋</span></summary>
       <div class="personalization-body">
         <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Azul glass y negro glass, además de iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
-        <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="false"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito y logo blanco</small></button>
-          <button type="button" data-theme="ios" aria-pressed="true"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
+        <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="true"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito y logo blanco</small></button>
+          <button type="button" data-theme="ios" aria-pressed="false"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
           <button type="button" data-theme="android" aria-pressed="false"><span class="theme-art art-android" aria-hidden="true">RCC</span><strong>Android</strong><small>Formas y color material</small></button>
           <button type="button" data-theme="hyper" aria-pressed="false"><span class="theme-art art-hyper" aria-hidden="true">RCC</span><strong>HyperOS</strong><small>Capas suaves y aire</small></button>
           <button type="button" data-theme="nothing" aria-pressed="false"><span class="theme-art art-nothing" aria-hidden="true">RCC</span><strong>Nothing</strong><small>Contraste y precisión</small></button>
@@ -591,7 +601,7 @@ window.rccSupabaseReady.catch(() => {});
     <div class="catalog-tools">
 <span id="resultCount" role="status" aria-live="polite"></span>
 <label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
-<label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="browser">Navegador web</option><option value="legacy">Catálogo anterior</option></select></label>
+<label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="browser">Navegador web</option><option value="fivem-client">FiveM cliente</option><option value="fivem-server">FiveM servidor</option><option value="gameguardian">GameGuardian Android</option><option value="autotouch">AutoTouch iOS</option><option value="legacy">Catálogo anterior</option></select></label>
 <label>Prueba <select id="verificationFilter"><option value="all">Todas</option><option value="lua-tested">Lua ejecutado en emulador</option><option value="syntax-only">Solo sintaxis</option><option value="js-syntax">Sintaxis JavaScript revisada</option><option value="unverified">Sin verificar</option></select></label>
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
@@ -720,6 +730,7 @@ async function loadScripts(){
     document.getElementById('gamesCount').textContent='· '+games.length;
     const gameNames=[...new Set(games.map(s=>s.game))].sort((a,b)=>a.localeCompare(b,'es'));
     gameNames.forEach(name=>document.getElementById('gameFilter').add(new Option(name+' ('+games.filter(s=>s.game===name).length+')',name)));
+    document.querySelectorAll('[data-platform-shortcut]').forEach(button => button.disabled = false);
     updateRecentCount();
     buildSidebar();
     render();
@@ -895,7 +906,20 @@ function renderActiveFilters(){
   }
 }
 
+document.querySelectorAll('[data-platform-shortcut]').forEach(button => {
+  button.addEventListener('click', () => {
+    selectSection('all');
+    filterPlatform = button.dataset.platformShortcut;
+    document.getElementById('tagFilter').value = 'Script independiente';
+    document.getElementById('sortOrder').value = 'newest';
+    buildSidebar(); render();
+    document.getElementById('catalogHeading').focus({preventScroll:true});
+    document.getElementById('catalogHeading').scrollIntoView({block:'start',behavior:'instant'});
+  });
+});
+
 function render(reset = true){
+  document.querySelectorAll('[data-platform-shortcut]').forEach(button => button.setAttribute('aria-pressed', String(filterPlatform === button.dataset.platformShortcut)));
   if(reset !== false) visibleLimit = 36;
   const q = normalize(searchInput.value.trim());
   
@@ -1082,7 +1106,7 @@ searchInput.addEventListener('input', render);
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function verificationLabel(s){
-  return ({'lua-tested':'Ejecutado en Lua 5.3 emulado · ejecutores sin probar','syntax-only':'Sintaxis revisada · ejecución Roblox sin probar','js-syntax':'Sintaxis JavaScript revisada · ejemplo web'})[s.compatibility?.verification] || 'Compatibilidad sin verificar';
+  return ({'lua-tested':'Ejecutado en Lua 5.3 emulado · ejecutores sin probar','syntax-only':'Sintaxis revisada · ejecución en el entorno sin probar','js-syntax':'Sintaxis JavaScript revisada · ejemplo web'})[s.compatibility?.verification] || 'Compatibilidad sin verificar';
 }
 function renderCompatibility(s){
   const panel=document.getElementById('compatDetail');
