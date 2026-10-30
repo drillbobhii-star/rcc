@@ -28,8 +28,6 @@
     const links = document.createElement('div'); links.className = 'game-links';
     function link(label, url) { if (!safeUrl(url)) return; const a = document.createElement('a'); a.href = safeUrl(url); a.textContent = label; a.target = '_blank'; a.rel = 'noopener noreferrer'; links.append(a); }
     if (/^[1-9]\d*$/.test(s.game_id)) link('Jugar en Roblox ↗', 'https://www.roblox.com/games/' + s.game_id);
-    const source = s.compatibility?.sources?.[0];
-    if (source && s.type === 'loadstring') link(tags.includes('Con clave') ? 'Consultar llave en la fuente ↗' : 'Ver publicación original ↗', source);
     if (s.key_url) link('Obtener llave ↗', s.key_url);
     text.append(links); panel.append(text); body.prepend(panel);
   };
