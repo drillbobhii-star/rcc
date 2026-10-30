@@ -40,20 +40,20 @@ body[data-ui][data-ui="ios"] .brand-symbol{border-radius:12px;background:linear-
 body[data-ui][data-ui="ios"] .catalog-free,body[data-ui][data-ui="ios"] .catalog-heading a{color:var(--muted)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[role="button"]:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .welcome-open{overflow:hidden!important}
-.welcome-dialog{margin:auto;width:min(700px,calc(100% - 28px));max-height:calc(100dvh - 40px);overflow:auto;border:1px solid #d5e6ff45;border-radius:32px;color:#edf4ff;background:linear-gradient(145deg,#34475beF,#121e2bf5);box-shadow:inset 0 1px 0 #ffffff40,0 35px 100px #030a1899;padding:0;backdrop-filter:blur(35px);-webkit-backdrop-filter:blur(35px)}
-.welcome-dialog::backdrop{background:#050d1bb8;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.welcome-dialog{margin:auto;width:min(700px,calc(100% - 28px));max-height:calc(100dvh - 40px);overflow:auto;border:1px solid var(--border-glass,#ffffff24);border-radius:32px;color:var(--text,#f5f5f5);background:var(--surface,#181818);background:color-mix(in srgb,var(--surface,#181818) 58%,transparent);box-shadow:inset 0 1px 0 #ffffff20,0 35px 100px #0006;padding:0;backdrop-filter:blur(44px);-webkit-backdrop-filter:blur(44px)}
+.welcome-dialog::backdrop{background:#09090945;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .welcome-content{padding:32px 36px}
-.welcome-kicker{font-size:10px;letter-spacing:2px;color:#b5cee9;font-weight:700}
+.welcome-kicker{font-size:10px;letter-spacing:2px;color:var(--muted,#b8b8b8);font-weight:700}
 .welcome-dialog h2{font-size:clamp(23px,4vw,30px);letter-spacing:-.9px;line-height:1.25;margin:16px 0}
-.welcome-dialog p,.welcome-dialog li{font-size:14px;line-height:1.7;color:#d2deec}
+.welcome-dialog p,.welcome-dialog li{font-size:14px;line-height:1.7;color:var(--text,#f5f5f5)}
 .welcome-dialog h3{font-size:15px;margin:20px 0 10px}
-.welcome-uses{border:1px solid #d6eaff20;background:#d1e5ff07;border-radius:20px;padding:0 18px 15px;margin-top:20px}
+.welcome-uses{border:1px solid var(--border-glass,#ffffff24);background:#ffffff05;border-radius:20px;padding:0 18px 15px;margin-top:20px}
 .welcome-uses p{margin:8px 0}
 .welcome-dialog .welcome-important{border-left:2px solid #e8c798;padding:10px 14px;margin:20px 0;background:#edc28c08}
 .welcome-steps{padding-left:24px;display:grid;gap:10px;margin-bottom:24px}
 .welcome-steps li{padding-left:5px}
-.welcome-steps li::marker{color:#a8cff8;font-weight:700}
-.welcome-confirm{width:100%;border:1px solid #ffffff70;border-radius:18px;padding:16px;background:linear-gradient(145deg,#daebff,#a9ccef);color:#122a42;font:700 14px 'DM Sans',sans-serif;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff80,0 8px 20px #06132130}
+.welcome-steps li::marker{color:var(--accent,#fff);font-weight:700}
+.welcome-confirm{width:100%;border:1px solid #ffffff70;border-radius:18px;padding:16px;background:var(--accent,#fff);color:var(--bg,#090909);font:700 14px 'DM Sans',sans-serif;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff80,0 8px 20px #06132130}
 .welcome-confirm:hover{filter:brightness(1.06)}
 @media(min-width:1000px){body[data-ui][data-ui="ios"] .sidebar{scrollbar-width:thin;scrollbar-color:#a2bfdd40 transparent}}
 @media(max-width:1100px){.catalog-free{display:none!important}body[data-ui][data-ui="ios"] .section-tabs{gap:2px}body[data-ui][data-ui="ios"] .section-tabs button{padding:11px 12px}}
