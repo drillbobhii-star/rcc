@@ -1,0 +1,11 @@
+/* Blue-hour glass and graphite share the same adjustable visual system. */
+body[data-ui] :is(.sidebar,header,.card,.catalog-tools,.code-preview,.modal-box,.personalization){backdrop-filter:blur(var(--glass-blur,22px));-webkit-backdrop-filter:blur(var(--glass-blur,22px))}
+body[data-ui] .brand-symbol{color:#f6f9ff;background:linear-gradient(145deg,#ffffff30,#ffffff09);border:1px solid #ffffff65;box-shadow:inset 0 1px 0 #ffffff80;text-shadow:0 1px 8px #ffffff25}
+.art-blue{background:linear-gradient(140deg,#315777,#132c46);color:#f3f8ff}.art-black{background:linear-gradient(140deg,#48505a,#1c2026);color:#fff}
+.theme-options{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.game-reference{display:flex;align-items:center;gap:18px;padding:18px;margin-bottom:18px;border:1px solid var(--border-glass);border-radius:var(--ui-radius,18px);background:linear-gradient(135deg,#b1d4ff12,transparent)}
+.game-reference img{width:112px;height:112px;object-fit:cover;border-radius:18px}.game-reference h4{margin:0 0 8px}.game-reference p{margin:8px 0;color:var(--muted);line-height:1.6}
+.game-cover{height:132px;width:100%;object-fit:cover;border-radius:12px;margin-bottom:16px;background:#1d3045}.game-cover-fallback{display:grid;place-items:center;padding:18px;background:linear-gradient(130deg,#263c51,#182330);font:700 16px Manrope,sans-serif;color:#d0ddeb;text-align:center}
+.key-status{font-size:.85rem;color:var(--muted);padding:9px 0}.game-links{display:flex;gap:10px;flex-wrap:wrap}.game-links a{color:var(--accent)}
+@media(prefers-reduced-motion:no-preference){body:not(.motion-paused) .game-reference{animation:rcc-reference-in .4s ease both}@keyframes rcc-reference-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}}
+@media(max-width:600px){.game-reference{align-items:flex-start;gap:12px}.game-reference img{width:72px;height:72px}.game-reference .btn{padding:8px 12px}}

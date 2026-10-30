@@ -416,6 +416,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <script src="assets/welcome.js" defer></script>
 <script src="assets/personalization.js" defer></script>
+<script src="assets/game-reference.js" defer></script>
+<link rel="stylesheet" href="assets/rcc-update.css">
 <link rel="stylesheet" href="assets/interactive-glass.css">
 <script src="assets/interactive-glass.js" defer></script>
 <!-- Completa content con la clave pública anon al configurar el sitio estático. -->
@@ -568,8 +570,8 @@ window.rccSupabaseReady.catch(() => {});
     <details id="personalization" class="personalization">
       <summary><span><small>ESTUDIO VISUAL</small>Tu RCC, a tu estilo</span><span aria-hidden="true">＋</span></summary>
       <div class="personalization-body">
-        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Estilos inspirados en iOS, Android, HyperOS y Nothing. Ajusta cada detalle. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
-        <div class="theme-options" role="group" aria-label="Estilo de interfaz">
+        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Azul glass y negro glass, además de iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
+        <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="false"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito y logo blanco</small></button>
           <button type="button" data-theme="ios" aria-pressed="true"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
           <button type="button" data-theme="android" aria-pressed="false"><span class="theme-art art-android" aria-hidden="true">RCC</span><strong>Android</strong><small>Formas y color material</small></button>
           <button type="button" data-theme="hyper" aria-pressed="false"><span class="theme-art art-hyper" aria-hidden="true">RCC</span><strong>HyperOS</strong><small>Capas suaves y aire</small></button>
@@ -580,9 +582,9 @@ window.rccSupabaseReady.catch(() => {});
           <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
           <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
           <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
-          <button id="resetAppearance" type="button">Restablecer estilo</button>
+          <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos de paneles</label><label>Volumen<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
-        <p id="appearanceStatus" role="status" aria-live="polite">Estilo iOS activo.</p>
+        <p id="appearanceStatus" role="status" aria-live="polite">Estilo Azul glass activo.</p>
       </div>
     </details>
     <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
@@ -626,7 +628,7 @@ window.rccSupabaseReady.catch(() => {});
   <div class="welcome-content">
     <span class="welcome-kicker" aria-hidden="true">RCC / GUÍA DE INICIO</span>
     <h2 id="welcomeTitle">⚠️ ¡Atención! Esta es una biblioteca de código, no una IA.</h2>
-    <p>RCC es un repositorio con más de 1,100 scripts. Aquí no se generan códigos mágicos escribiendo lo que quieres, sino que encuentras los códigos ya hechos para copiar y usar.</p>
+    <p>RCC es un repositorio con un catálogo ampliado de scripts y variantes configurables. Aquí no se generan códigos mágicos escribiendo lo que quieres, sino que encuentras los códigos ya hechos para copiar y usar.</p>
     <section class="welcome-uses" aria-labelledby="welcomeUses">
       <h3 id="welcomeUses">💡 ¿Para qué puedes usar estos códigos?</h3>
       <p>🎮 Roblox Studio: Para crear tus propios juegos y sistemas.</p>
@@ -638,7 +640,7 @@ window.rccSupabaseReady.catch(() => {});
     <ol class="welcome-steps">
       <li>Busca el nombre de tu juego o código (Ej: Blox Fruits).</li>
       <li>Haz clic en 'Ver y copiar' en el script que te guste.</li>
-      <li>Pega el código en tu ejecutor o proyecto y listo.</li>
+      <li>Lee los requisitos: un Script de servidor va en ServerScriptService; un LocalScript necesita un contexto de cliente en tu propio proyecto de Studio.</li><li>En juegos, consulta el estado de la llave y la fuente original. «Jugar en Roblox» abre la experiencia, no instala ni ejecuta el script.</li><li>Abre «¿Qué hace este código?» para leer la explicación de esa ficha. Los loaders descargan código remoto que el analizador no puede inspeccionar.</li><li>Prueba primero en una copia de tu proyecto. Descarga el código o guárdalo en favoritos para volver después.</li><li>En el laboratorio, ofusca únicamente Lua/Luau. Elige el nivel, genera y comprueba la salida. Guarda siempre el original.</li><li>Personaliza el cristal, el color, las esquinas, el tamaño y el movimiento. Activa los sonidos si quieres una respuesta distinta por panel y tema.</li>
     </ol>
     <form method="dialog"><button class="welcome-confirm" value="understood">Entendido, ir a buscar scripts</button></form>
   </div>
@@ -993,6 +995,7 @@ function render(reset = true){
       </div>
       <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗'}</button>
     `;
+    window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
@@ -1032,6 +1035,8 @@ function openScript(s){
     </div>
   `;
   document.getElementById('modalCode').textContent = s.code;
+  window.enhanceGameDetail?.(s, modalBody);
+  const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => window.openRccLab?.(s.code); modalBody.querySelector('.actions').prepend(explain);
   renderCompatibility(s);
   document.getElementById('voteBtn').onclick = e=>voteForScript(String(s.id),e.currentTarget);
   updateVoteButton(String(s.id),document.getElementById('voteBtn'));
@@ -1337,22 +1342,22 @@ loadScripts();
 
 <style>body.lab-open > :not(#rccLab):not(script):not(template){display:none!important}#rccLab[hidden]{display:none!important}</style>
 <section id="rccLab" hidden aria-label="Laboratorio de código"></section>
-<template id="rccLabTemplate"><style>:host{color-scheme:dark;--bg:#111a1b;--surface:#1a2627;--line:#344344;--text:#eaf0e9;--muted:#a6b8b5;--accent:#bbd4a6}*{box-sizing:border-box}:host{margin:0;background:var(--bg);color:var(--text);font:15px 'DM Sans',sans-serif}header,main,footer{max-width:1240px;margin:auto;padding:28px 40px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}a{color:var(--text);text-decoration:none}a:hover{color:var(--accent)}.brand{font:800 26px Manrope,sans-serif;letter-spacing:-1px}.brand span{font-size:14px;color:var(--muted);letter-spacing:2px;margin-left:12px}.intro{padding:40px 0 30px;max-width:740px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:700}h1{font:600 clamp(42px,6vw,76px)/1.08 Manrope,sans-serif;letter-spacing:-3px;margin:22px 0}h1 em{font-style:normal;color:var(--accent)}p,small{color:var(--muted);line-height:1.7}button,select{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 17px;cursor:pointer}button:hover{border-color:var(--accent)}button:disabled{opacity:.5;cursor:wait}button:focus-visible,a:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.tabs{display:flex;gap:10px;margin:16px 0 25px;flex-wrap:wrap}.tabs [aria-pressed=true]{background:var(--accent);color:#172519;border-color:var(--accent)}.workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface)}.editor{min-width:0;border-right:1px solid var(--line)}.bar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:18px 22px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:1px;color:var(--muted);flex-wrap:wrap}.bar h2{font:inherit;margin:0}.bar button{font-size:13px;letter-spacing:0;padding:8px 12px}textarea{display:block;resize:vertical;width:100%;min-height:340px;background:#142021;border:0;color:#d3e9cd;padding:23px;font:14px/1.8 ui-monospace,monospace;tab-size:2;border-radius:0}.editor-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;gap:12px;color:var(--accent);font-size:13px}#privacy{font-size:12px;margin:0;padding:5px 22px 22px}.controls{padding:28px}h2{font:600 25px Manrope,sans-serif;letter-spacing:-.7px}.controls label:not(.check){display:block;margin:22px 0 9px;font-size:13px}.controls select{width:100%;margin-bottom:14px}.primary{background:var(--accent);color:#172519;width:100%;font-weight:700;margin:14px 0}small{display:block;font-size:12px}.check{display:flex;gap:10px;align-items:center;font-size:13px;margin:14px 0}.check input{accent-color:var(--accent)}.small{margin-bottom:14px}#mismatch{border-left:3px solid #e5bb78;padding:1px 15px 15px;background:#352f23}#mismatch p{color:#e5d2b4}#status{min-height:26px}.result{border:1px solid var(--line);border-radius:18px;overflow:hidden}.result pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:24px;margin:0;min-height:170px;font:14px/1.8 ui-monospace,monospace;color:#caddd3}.result pre.code{white-space:pre;overflow:auto;max-height:600px}footer{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding-bottom:40px}[hidden]{display:none!important}@media(max-width:760px){header,main,footer{padding:22px}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line)}h1{letter-spacing:-2px}.controls{padding:22px}footer{gap:15px;flex-wrap:wrap}textarea{min-height:270px}}@media(prefers-reduced-motion:no-preference){button{transition:background .18s,border-color .18s}}
+<template id="rccLabTemplate"><style>:host{color-scheme:dark;--line:#344b63;--text:#eaf1fa;--muted:#b2c6da;}*{box-sizing:border-box}:host{margin:0;background:var(--bg);color:var(--text);font:15px 'DM Sans',sans-serif}header,main,footer{max-width:1240px;margin:auto;padding:28px 40px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}a{color:var(--text);text-decoration:none}a:hover{color:var(--accent)}.brand{font:800 26px Manrope,sans-serif;letter-spacing:-1px}.brand span{font-size:14px;color:var(--muted);letter-spacing:2px;margin-left:12px}.intro{padding:40px 0 30px;max-width:740px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:700}h1{font:600 clamp(42px,6vw,76px)/1.08 Manrope,sans-serif;letter-spacing:-3px;margin:22px 0}h1 em{font-style:normal;color:var(--accent)}p,small{color:var(--muted);line-height:1.7}button,select{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 17px;cursor:pointer}button:hover{border-color:var(--accent)}button:disabled{opacity:.5;cursor:wait}button:focus-visible,a:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.tabs{display:flex;gap:10px;margin:16px 0 25px;flex-wrap:wrap}.tabs [aria-pressed=true]{background:var(--accent);color:#172519;border-color:var(--accent)}.workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface)}.editor{min-width:0;border-right:1px solid var(--line)}.bar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:18px 22px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:1px;color:var(--muted);flex-wrap:wrap}.bar h2{font:inherit;margin:0}.bar button{font-size:13px;letter-spacing:0;padding:8px 12px}textarea{display:block;resize:vertical;width:100%;min-height:340px;background:#142021;border:0;color:#d3e9cd;padding:23px;font:14px/1.8 ui-monospace,monospace;tab-size:2;border-radius:0}.editor-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;gap:12px;color:var(--accent);font-size:13px}#privacy{font-size:12px;margin:0;padding:5px 22px 22px}.controls{padding:28px}h2{font:600 25px Manrope,sans-serif;letter-spacing:-.7px}.controls label:not(.check){display:block;margin:22px 0 9px;font-size:13px}.controls select{width:100%;margin-bottom:14px}.primary{background:var(--accent);color:#172519;width:100%;font-weight:700;margin:14px 0}small{display:block;font-size:12px}.check{display:flex;gap:10px;align-items:center;font-size:13px;margin:14px 0}.check input{accent-color:var(--accent)}.small{margin-bottom:14px}#mismatch{border-left:3px solid #e5bb78;padding:1px 15px 15px;background:#352f23}#mismatch p{color:#e5d2b4}#status{min-height:26px}.result{border:1px solid var(--line);border-radius:18px;overflow:hidden}.result pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:24px;margin:0;min-height:170px;font:14px/1.8 ui-monospace,monospace;color:#caddd3}.result pre.code{white-space:pre;overflow:auto;max-height:600px}footer{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding-bottom:40px}[hidden]{display:none!important}@media(max-width:760px){header,main,footer{padding:22px}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line)}h1{letter-spacing:-2px}.controls{padding:22px}footer{gap:15px;flex-wrap:wrap}textarea{min-height:270px}}@media(prefers-reduced-motion:no-preference){button{transition:background .18s,border-color .18s}}
 </style><header><a class="brand" href="index.html">RCC <span>/ LAB</span></a><a href="index.html">Volver al catálogo ↗</a></header>
 <main><div class="intro"><span class="eyebrow">LEE · COMPRENDE · TRANSFORMA</span><h1>Tu código,<br><em>bajo la lupa.</em></h1><p>Descubre qué hace un script y prepara una versión menos legible sin ejecutarlo.</p></div>
 <nav class="tabs" aria-label="Herramientas"><button id="analysisTab" aria-pressed="true">Sección de prueba</button><button id="obfuscatorTab" aria-pressed="false">Generador de ofuscador</button></nav>
-<section class="workspace" aria-label="Editor de código"><div class="editor"><div class="bar"><label for="source">01 / CÓDIGO DE ENTRADA</label><span id="counter">0 caracteres</span></div><textarea id="source" class="notranslate" translate="no" spellcheck="false" placeholder="Pega aquí tu código Java, Lua o Luau…" aria-describedby="privacy"></textarea><div class="editor-footer"><span id="detection" role="status">Esperando código</span><button id="clear" type="button">Limpiar</button></div><p id="privacy">El análisis y la ofuscación se realizan en tu navegador. El código no se envía a ningún servicio externo.</p></div>
+<section class="workspace" aria-label="Editor de código"><div class="editor"><div class="bar"><label for="source">01 / CÓDIGO DE ENTRADA</label><span id="counter">0 caracteres</span></div><textarea id="source" class="notranslate" translate="no" spellcheck="false" placeholder="Pega aquí tu código para analizar; ofuscación solo Lua / Luau…" aria-describedby="privacy"></textarea><div class="editor-footer"><span id="detection" role="status">Esperando código</span><button id="clear" type="button">Limpiar</button></div><p id="privacy">El análisis y la ofuscación se realizan en tu navegador. El código no se envía a ningún servicio externo.</p></div>
 <div class="controls"><section id="analysisPanel"><span class="eyebrow">02 / ENTENDER</span><h2>¿Para qué sirve?</h2><p>Identificación orientativa del lenguaje y sus usos mediante reglas locales.</p><button class="primary" id="analyze">Analizar código ↗</button><small>Análisis local por patrones. No ejecuta scripts ni verifica su compatibilidad o contenido remoto.</small></section>
-<section id="obfuscatorPanel" hidden><span class="eyebrow">02 / TRANSFORMAR</span><h2>Generador de ofuscador</h2><div class="tabs small" aria-label="Lenguaje de salida"><button id="luaTab" aria-pressed="true">Lua / Luau</button><button id="javaTab" aria-pressed="false">Java</button></div><div id="mismatch" hidden><p id="mismatchText"></p><button id="switchLanguage">Cambiar de pestaña</button></div><label for="method">Método de ofuscación</label><select id="method"><option value="strings">Codificación de cadenas</option><option value="comments">Retirar comentarios</option><option value="combined">Combinado: cadenas + comentarios</option></select><label class="check"><input type="checkbox" id="reinforce"> Refuerzo: eliminar comentarios también</label><label class="check"><input type="checkbox" id="confirmLanguage"> Confirmo el lenguaje si no se detecta</label><button class="primary" id="generate">Generar ofuscación ↗</button><small>Sin límite de texto impuesto; depende de la memoria del dispositivo. Conserva nombres y APIs. No ofrece cifrado ni protección contra ingeniería inversa. Prueba el resultado en tu entorno. Conserva las licencias necesarias.</small></section></div></section>
+<section id="obfuscatorPanel" hidden><span class="eyebrow">02 / TRANSFORMAR</span><h2>Generador de ofuscador</h2><div class="tabs small" aria-label="Lenguaje de salida"><button id="luaTab" aria-pressed="true">Lua / Luau</button></div><div id="mismatch" hidden><p id="mismatchText"></p><button id="switchLanguage" hidden>Solo Lua / Luau</button></div><label for="securityLevel">Nivel de transformación</label><select id="securityLevel"><option value="light">Ligero · cadenas</option><option value="balanced" selected>Equilibrado · cadenas y comentarios</option><option value="custom">Personalizado</option></select><p>La ofuscación dificulta la lectura; ningún nivel garantiza seguridad ni cifra el código.</p><label for="method">Método de ofuscación</label><select id="method"><option value="strings">Codificación de cadenas</option><option value="comments">Retirar comentarios</option><option value="combined" selected>Combinado: cadenas + comentarios</option></select><label class="check"><input type="checkbox" id="reinforce"> Refuerzo: eliminar comentarios también</label><label class="check"><input type="checkbox" id="confirmLanguage"> Confirmo el lenguaje si no se detecta</label><button class="primary" id="generate">Generar ofuscación ↗</button><small>Sin límite de texto impuesto; depende de la memoria del dispositivo. Conserva nombres y APIs. No ofrece cifrado ni protección contra ingeniería inversa. Prueba el resultado en tu entorno. Conserva las licencias necesarias.</small><details><summary>Motor y créditos</summary><p>RCC Lua · v1.0.0 · Gratis. Transformación léxica local propia. No ejecuta motores externos.</p><p>Referencia solicitada: Equipo RazorXP · v1.0.0 · Gratis. Hercules Obfuscator, por zeusssz; Prometheus, de Elias Oelschner; Luraph Team. Son proyectos independientes; no están integrados ni implican afiliación.</p><p><a href="https://github.com/zeusssz/hercules-obfuscator" target="_blank" rel="noopener noreferrer">Hercules: consultar versión, precio y licencia en GitHub ↗</a></p><p><a href="https://github.com/prometheus-lua/Prometheus" target="_blank" rel="noopener noreferrer">Prometheus: consultar documentación y licencia ↗</a>. Hercules: gratis y de código abierto, licencia Apache License 2.0 verificada en su repositorio. Prometheus publica su propia licencia: consulta sus condiciones. Versiones: consulta la versión actual en GitHub; RCC no incluye ni actualiza estos motores.</p></details></section></div></section>
 <p id="status" role="status" aria-live="polite"></p>
 <section class="result" aria-labelledby="resultTitle"><div class="bar"><h2 id="resultTitle">03 / RESULTADO</h2><div><button id="copyResult" hidden>Copiar código</button><button id="download" hidden>Descargar</button></div></div><pre id="result" tabindex="0">Tu resultado aparece aquí. Pega un script para comenzar.</pre></section>
-</main><footer>RCC / Laboratorio de código <span>Java ≠ JavaScript · Lua / Luau</span></footer></template>
+</main><footer>RCC / Laboratorio de código <span>Análisis local · Ofuscación Lua / Luau</span></footer></template>
 <script>
 document.getElementById('rccLab').attachShadow({mode:'open'}).append(document.getElementById('rccLabTemplate').content.cloneNode(true));
 </script>
 <script>
 (async () => {
-const { detect } = await import('./assets/code-engine.js');
+const { detect, analyzeCode } = await import('./assets/code-engine.js');
 const root = document.getElementById('rccLab').shadowRoot;
 const $ = id => root.getElementById(id);
 let language = 'lua', detected = 'unknown', output = '', outputLanguage = 'lua', worker, timer, revision = 0;
@@ -1375,27 +1380,23 @@ function inspect() {
   $('detection').textContent = $('source').value.trim() ? 'Detección orientativa: ' + names[detected] : 'Esperando código';
   const mismatch = detected !== 'unknown' && detected !== language;
   $('mismatch').hidden = !mismatch;
-  $('switchLanguage').hidden = detected === 'javascript';
-  $('mismatchText').textContent = detected === 'javascript' ? 'Este código parece JavaScript. Las pestañas Java y Lua no son compatibles con JavaScript.' : `El código parece ${names[detected]}. Cambia a la pestaña correspondiente para ofuscarlo.`;
+  $('switchLanguage').hidden = true;
+  $('mismatchText').textContent = detected === 'javascript' ? 'Este código parece JavaScript. El ofuscador solo admite Lua / Luau.' : `El código parece ${names[detected]}. El ofuscador solo admite Lua / Luau.`;
 }
 function selectLanguage(value) {
   invalidate(); language = value;
-  for (const name of ['java','lua']) $(name+'Tab').setAttribute('aria-pressed', String(name === language));
+  for (const name of ['lua']) $(name+'Tab').setAttribute('aria-pressed', String(name === language));
   $('confirmLanguage').checked = false; inspect();
 }
 $('analysisTab').onclick = () => mode('analysis'); $('obfuscatorTab').onclick = () => mode('obfuscator');
-$('luaTab').onclick = () => selectLanguage('lua'); $('javaTab').onclick = () => selectLanguage('java');
+$('luaTab').onclick = () => selectLanguage('lua');
+$('securityLevel').onchange = () => { const level = $('securityLevel').value; if (level !== 'custom') $('method').value = level === 'light' ? 'strings' : 'combined'; invalidate(); };
+$('method').addEventListener('change', () => { $('securityLevel').value = 'custom'; });
 $('switchLanguage').onclick = () => selectLanguage(detected);
 $('source').addEventListener('input', () => {invalidate(); $('confirmLanguage').checked = false; $('counter').textContent = $('source').value.length.toLocaleString('es')+' caracteres'; clearTimeout(timer); timer = setTimeout(inspect, 250);});
 for (const id of ['method','reinforce','confirmLanguage']) $(id).addEventListener('change', invalidate);
 $('clear').onclick = () => { $('source').value = ''; $('source').dispatchEvent(new Event('input')); $('source').focus(); };
-function analyzeLocally(code) {
-  if (/gg\.(?:searchNumber|setValues)/i.test(code)) return '🕹️ Lenguaje detectado: GameGuardian (Lua). Uso: Modificación de memoria en Android.';
-  if (/game:GetService|Workspace|Players|Humanoid|WalkSpeed|local\s+player|CFrame/i.test(code)) return '🟢 Lenguaje detectado: Lua (Roblox). Uso recomendado: 1. Exploits (Delta, Solara, Fluxus). 2. Roblox Studio (Desarrollo de juegos). Funciones: Manipulación de personajes o entorno.';
-  if (/public\s+class|System\.out\.println|import\s+java\./i.test(code)) return '🟠 Lenguaje detectado: Java. Uso recomendado: Desarrollo de software (Backend).';
-  if (!/\blocal\b/i.test(code) && /document\.|window\.|addEventListener|function\s*\(\s*\)|=>/i.test(code)) return '🔵 Lenguaje detectado: JavaScript. Uso recomendado: Desarrollo Web (Frontend, páginas web).';
-  return '⚪ Lenguaje no identificado. No se encontraron los patrones conocidos; pega un fragmento más completo.';
-}
+function analyzeLocally(code) { return analyzeCode(code, scripts); }
 $('analyze').onclick = () => {
   const code = $('source').value;
   invalidate();
