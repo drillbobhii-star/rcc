@@ -1,0 +1,30 @@
+/* Graphite surfaces and a white animated mark; alternate saved themes remain available. */
+:root{--bg:#090909;--surface:#181818;--accent:#fff;--text:#f5f5f5;--muted:#b8b8b8}
+body[data-ui="black"]{--muted:#b8b8b8;--border-glass:#ffffff24;background:#090909;color:#f5f5f5;color-scheme:dark}
+body[data-ui="black"] .main{background:transparent}
+body[data-ui="black"] :is(.sidebar,header,.card,.catalog-tools,.personalization,.modal-box,.discord-panel,.code-preview,.language-panel){background:color-mix(in srgb,#181818 var(--surface-opacity,78%),transparent);border-color:var(--border-glass)}
+body[data-ui="black"] :is(.blob,.glass-ripple){background:#fff;opacity:.025}
+body[data-ui="black"] .glass-background :is(.bg-text,.bg-text-rocio){background:none;color:#ffffff08;-webkit-text-stroke:1px #ffffff13;text-shadow:none}
+body[data-ui="black"] :is(.code-keyword,.code-string,.code-comment,.badge,.tag,.ver,.compat-status,.catalog-heading a,.section-tabs a){color:#d9d9d9}
+body[data-ui="black"] :is(.section-tabs button[aria-pressed="true"],.studio-primary,.discord-panel a,.btn-primary){background:#fff;border-color:#fff;color:#121212}
+body[data-ui="black"] :is(.games-nav,.nav-item.active,.chip,.dev-btn.active,.card-action,.theme-options button){background:#222;color:#f5f5f5;border-color:#ffffff30}
+body[data-ui="black"] .card.show:hover{background:#202020;border-color:#ffffff70;box-shadow:0 18px 40px #0005}
+body[data-ui="black"] .art-black{background:#090909;color:#fff;border:1px solid #ffffff30}
+body[data-ui="black"] .brand h1{color:#fff}
+body[data-ui] .brand-symbol.rcc-white-mark{position:relative;display:inline-grid;place-items:center;width:42px;height:42px;border:1px solid #ffffff45;border-radius:13px;background:#ffffff09;color:#fff;box-shadow:none;flex-shrink:0;animation:rcc-mark-float 6s ease-in-out infinite}
+.rcc-white-mark svg{width:26px;height:26px;overflow:visible}
+.rcc-white-mark path{stroke-dasharray:80;stroke-dashoffset:0;animation:rcc-mark-draw 5s ease-in-out infinite}
+.rcc-white-mark::after{content:'';position:absolute;inset:-5px;border:1px solid transparent;border-top-color:#ffffff90;border-bottom-color:#ffffff28;border-radius:17px;animation:rcc-mark-orbit 12s linear infinite;pointer-events:none}
+.platform-spotlight{margin:24px 0 0;padding:20px 0;border-top:1px solid var(--border-glass);border-bottom:1px solid var(--border-glass)}
+.platform-spotlight p{font-size:12px;margin:0 0 12px;max-width:640px}
+.platform-shortcuts{display:flex;flex-wrap:wrap;gap:10px}
+.platform-shortcuts button{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:44px;padding:12px 16px;border:1px solid var(--border-glass);border-radius:10px;background:var(--surface);color:var(--text);font:600 12px 'DM Sans',sans-serif;cursor:pointer}
+.platform-shortcuts button:hover{border-color:var(--accent)}
+.platform-shortcuts span{font:11px monospace;color:var(--muted)}
+.platform-shortcuts button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+@keyframes rcc-mark-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes rcc-mark-draw{0%,100%{stroke-dashoffset:0;opacity:1}45%{stroke-dashoffset:0;opacity:1}65%{stroke-dashoffset:80;opacity:.45}85%{stroke-dashoffset:0;opacity:1}}
+@keyframes rcc-mark-orbit{to{transform:rotate(360deg)}}
+body.motion-paused .rcc-white-mark,body.motion-paused .rcc-white-mark * ,body.motion-paused .rcc-white-mark::after{animation:none!important}
+@media(prefers-reduced-motion:reduce){.rcc-white-mark,.rcc-white-mark *,.rcc-white-mark::after{animation:none!important}}
+@media(max-width:600px){.platform-shortcuts button{flex:1 1 130px}.platform-spotlight{padding:16px 0}}

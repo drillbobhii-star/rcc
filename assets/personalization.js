@@ -2,13 +2,13 @@
 (() => {
   const presets = {
     blue: {name:'Azul glass', accent:'#a8cefa', bg:'#0c1727', surface:'#142c46', radius:'24px'},
-    black: {name:'Negro glass', accent:'#e0e7ef', bg:'#111419', surface:'#232a33', radius:'24px'},
+    black: {name:'Negro glass', accent:'#ffffff', bg:'#090909', surface:'#181818', radius:'24px'},
     ios: {name:'iOS', accent:'#9ec9f5', bg:'#101a26', surface:'#172635', radius:'24px'},
     android: {name:'Android', accent:'#c1d6a4', bg:'#171d16', surface:'#263024', radius:'30px'},
     hyper: {name:'HyperOS', accent:'#edbda1', bg:'#241b20', surface:'#34282d', radius:'20px'},
     nothing: {name:'Nothing', accent:'#f2a69c', bg:'#1c1c1e', surface:'#28282b', radius:'6px'}
   };
-  const defaults = {theme:'blue', accent:presets.blue.accent, glass:78, density:'comfortable', motion:true, corners:24, scale:100, blur:22, sound:false, volume:25};
+  const defaults = {theme:'black', accent:presets.black.accent, glass:78, density:'comfortable', motion:true, corners:24, scale:100, blur:22, sound:false, volume:25};
   let state = {...defaults};
   try {
     const saved = JSON.parse(localStorage.getItem('rcc_appearance'));

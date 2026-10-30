@@ -42,7 +42,7 @@ const {chromium} = require(path.join(path.resolve(process.argv[2]), 'playwright'
     assert(await page.locator('#personalization summary').isVisible());
     assert(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth));
     await page.locator('#resetAppearance').click();
-    assert.equal(await page.locator('body').getAttribute('data-ui'),'ios');
+    assert.equal(await page.locator('body').getAttribute('data-ui'),'black');
     await page.emulateMedia({reducedMotion:'reduce'});
     assert.equal(await page.locator('#bgRccText').evaluate(el=>getComputedStyle(el).animationName),'none');
     await page.addInitScript(()=>{
