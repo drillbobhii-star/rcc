@@ -1,0 +1,49 @@
+/* Independent movement presets share the appearance controls and reduced-motion policy. */
+.brand-home{display:inline-flex;align-items:center;gap:9px;color:inherit;text-decoration:none;border-radius:12px;min-height:48px}
+.mobile-brand-home{display:none;color:inherit;text-decoration:none;flex-shrink:0;border-radius:10px;min-width:44px;min-height:44px;align-items:center;justify-content:center}
+.brand-home:focus-visible,.mobile-brand-home:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
+body[data-logo-motion="float"]{--logo-animation:rcc-logo-float}body[data-logo-motion="orbit"]{--logo-animation:rcc-logo-orbit}body[data-logo-motion="pulse"]{--logo-animation:rcc-logo-pulse}body[data-logo-motion="tilt"]{--logo-animation:rcc-logo-tilt}body[data-logo-motion="bounce"]{--logo-animation:rcc-logo-bounce}body[data-logo-motion="pendulum"]{--logo-animation:rcc-logo-pendulum}body[data-logo-motion="wave"]{--logo-animation:rcc-logo-wave}body[data-logo-motion="flip"]{--logo-animation:rcc-logo-flip}body[data-logo-motion="spin"]{--logo-animation:rcc-logo-spin}body[data-logo-motion="zoom"]{--logo-animation:rcc-logo-zoom}body[data-logo-motion="swing"]{--logo-animation:rcc-logo-swing}body[data-logo-motion="none"]{--logo-animation:none}
+body[data-ui][data-logo-motion] .rcc-white-mark{animation:var(--logo-animation) var(--logo-cycle,6s) ease-in-out infinite;transform-origin:center;will-change:auto}
+body[data-ui][data-logo-motion] .rcc-white-mark::after{animation-duration:var(--logo-cycle,6s)}
+body[data-ui][data-logo-motion] .rcc-white-mark::before{content:'';position:absolute;inset:-8px;border:1px solid transparent;border-left-color:#ffffff55;border-right-color:#ffffff18;border-radius:20px;pointer-events:none;animation:rcc-mark-orbit calc(var(--logo-cycle,6s)*2) linear infinite reverse}
+body[data-ui][data-logo-motion] .rcc-white-mark path{animation-duration:calc(var(--logo-cycle,6s)*1.2)}
+body[data-logo-motion="none"] .rcc-white-mark::before,body[data-logo-motion="none"] .rcc-white-mark::after,body[data-logo-motion="none"] .rcc-white-mark path{animation:none!important}
+@keyframes rcc-logo-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(calc(-1*var(--motion-distance,8px))) rotate(var(--motion-angle,8deg))}}
+@keyframes rcc-logo-orbit{0%,100%{transform:translate(calc(-.6*var(--motion-distance)),0) rotate(calc(-1*var(--motion-angle)))}25%{transform:translate(0,calc(-1*var(--motion-distance))) rotate(0)}50%{transform:translate(calc(.6*var(--motion-distance)),0) rotate(var(--motion-angle))}75%{transform:translate(0,var(--motion-distance)) rotate(0)}}
+@keyframes rcc-logo-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(var(--motion-scale));opacity:.7}}
+@keyframes rcc-logo-tilt{0%,100%{transform:perspective(240px) rotateY(calc(-2*var(--motion-angle)))}50%{transform:perspective(240px) rotateY(calc(2*var(--motion-angle))) rotateX(var(--motion-angle))}}
+@keyframes rcc-logo-bounce{0%,40%,100%{transform:translateY(0)}15%{transform:translateY(calc(-1.5*var(--motion-distance)))}28%{transform:translateY(calc(-.5*var(--motion-distance)))}}
+@keyframes rcc-logo-pendulum{0%,100%{transform:rotate(calc(-1*var(--motion-angle)))}50%{transform:rotate(var(--motion-angle))}}
+@keyframes rcc-logo-wave{0%,100%{transform:translateX(calc(-1*var(--motion-distance))) rotate(calc(-1*var(--motion-angle)))}50%{transform:translateX(var(--motion-distance)) rotate(var(--motion-angle))}}
+@keyframes rcc-logo-flip{0%,25%{transform:perspective(300px) rotateY(0)}75%,100%{transform:perspective(300px) rotateY(360deg)}}
+@keyframes rcc-logo-spin{to{transform:rotate(360deg)}}
+@keyframes rcc-logo-zoom{0%,100%{transform:scale(1)}35%{transform:scale(var(--motion-scale))}65%{transform:scale(.94)}}
+@keyframes rcc-logo-swing{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(calc(-1*var(--motion-distance))) rotate(calc(-1.5*var(--motion-angle)))}75%{transform:translateY(calc(-1*var(--motion-distance))) rotate(calc(1.5*var(--motion-angle)))}}
+body[data-card-motion="rise"]{--card-entry:rcc-entry-rise}body[data-card-motion="fade"]{--card-entry:rcc-entry-fade}body[data-card-motion="left"]{--card-entry:rcc-entry-left}body[data-card-motion="right"]{--card-entry:rcc-entry-right}body[data-card-motion="zoom"]{--card-entry:rcc-entry-zoom}body[data-card-motion="tilt"]{--card-entry:rcc-entry-tilt}body[data-card-motion="flip"]{--card-entry:rcc-entry-flip}body[data-card-motion="none"]{--card-entry:none}
+body[data-ui][data-card-motion] #scripts .card.show,.motion-preview-playing .motion-preview-card{animation:var(--card-entry,rcc-entry-rise) var(--entry-cycle,.65s) cubic-bezier(.16,1,.3,1) backwards}
+.motion-preview-card:nth-child(2){animation-delay:.09s}.motion-preview-card:nth-child(3){animation-delay:.18s}
+@keyframes rcc-entry-rise{from{opacity:0;transform:translateY(calc(3*var(--motion-distance)))}to{opacity:1;transform:translateY(0)}}
+@keyframes rcc-entry-fade{from{opacity:0}to{opacity:1}}
+@keyframes rcc-entry-left{from{opacity:0;transform:translateX(calc(-3*var(--motion-distance)))}to{opacity:1;transform:translateX(0)}}
+@keyframes rcc-entry-right{from{opacity:0;transform:translateX(calc(3*var(--motion-distance)))}to{opacity:1;transform:translateX(0)}}
+@keyframes rcc-entry-zoom{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+@keyframes rcc-entry-tilt{from{opacity:0;transform:translateY(var(--motion-distance)) rotate(var(--motion-angle))}to{opacity:1;transform:translateY(0) rotate(0)}}
+@keyframes rcc-entry-flip{from{opacity:0;transform:perspective(600px) rotateX(calc(-4*var(--motion-angle)))}to{opacity:1;transform:perspective(600px) rotateX(0)}}
+body[data-ambient-motion="drift"]{--ambient-animation:glass-rcc-float}body[data-ambient-motion="orbit"]{--ambient-animation:rcc-ambient-orbit}body[data-ambient-motion="wave"]{--ambient-animation:rcc-ambient-wave}body[data-ambient-motion="pulse"]{--ambient-animation:rcc-ambient-pulse}body[data-ambient-motion="pan"]{--ambient-animation:rcc-ambient-pan}body[data-ambient-motion="none"]{--ambient-animation:none}
+body[data-ui][data-ambient-motion] .glass-background :is(.bg-text,.bg-text-rocio){animation:var(--ambient-animation) var(--ambient-cycle,24s) ease-in-out infinite;transform:translate(-50%,-50%)}
+body[data-ui][data-ambient-motion] .glass-background .bg-text-rocio{animation-direction:reverse;animation-duration:calc(var(--ambient-cycle,24s)*1.3)}
+@keyframes rcc-ambient-orbit{0%,100%{transform:translate(-50%,-50%) rotate(-8deg)}33%{transform:translate(-46%,-62%) rotate(0)}66%{transform:translate(-58%,-44%) rotate(8deg)}}
+@keyframes rcc-ambient-wave{0%,100%{transform:translate(-55%,-50%) rotate(calc(-1*var(--motion-angle)))}50%{transform:translate(-45%,-50%) rotate(var(--motion-angle))}}
+@keyframes rcc-ambient-pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(var(--motion-scale));opacity:.4}}
+@keyframes rcc-ambient-pan{0%,100%{transform:translate(-58%,-50%)}50%{transform:translate(-42%,-50%)}}
+.motion-settings{margin-top:28px;border-top:1px solid var(--border-glass);padding-top:26px}
+.motion-settings-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}.motion-settings h3{font-size:25px;letter-spacing:-.8px;margin:9px 0}.motion-settings-heading button{flex-shrink:0}
+.motion-settings button,.motion-options select{min-height:44px;padding:10px 14px;border:1px solid var(--border-glass);border-radius:12px;background:var(--surface);color:var(--text);font:inherit;font-size:12px;cursor:pointer}
+.motion-studio-layout{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.2fr);gap:28px}
+.motion-live-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:270px;padding:28px 20px;border:1px solid var(--border-glass);border-radius:20px;background:radial-gradient(ellipse at top,color-mix(in srgb,var(--accent) 9%,transparent),transparent 75%),var(--surface);overflow:hidden}
+.motion-preview-logo{display:flex;align-items:center;gap:18px;margin:20px 0 32px;font:800 34px 'Manrope',sans-serif;letter-spacing:-2px}.motion-preview-logo .brand-dot{margin-left:0}.motion-preview-cards{display:flex;gap:10px;width:100%}.motion-preview-card{flex:1;min-width:0;padding:16px 10px;border:1px solid var(--border-glass);border-radius:10px;background:var(--bg);font-size:11px}.motion-preview-card b{display:block;margin-bottom:15px;font:18px monospace;color:var(--accent)}.motion-live-preview>p{margin-top:18px}
+.motion-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-content:center}.motion-options label{display:grid;gap:9px;font-size:12px;min-width:0}.motion-options label:first-child{grid-column:1/-1}.motion-options select{width:100%}.motion-options input{width:100%;accent-color:var(--accent)}.motion-options output{font:11px monospace;color:var(--muted)}#motionStatus{grid-column:1/-1;min-height:3em}
+body.motion-paused *,body.motion-paused *::before,body.motion-paused *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(max-width:900px){.mobile-brand-home{display:inline-flex}.mobile-brand-home .brand-symbol.rcc-white-mark{width:30px;height:30px;border-radius:9px}.mobile-brand-home .rcc-white-mark svg{width:21px;height:21px}.mobile-brand-home .rcc-white-mark::after{inset:-3px;border-radius:12px}.mobile-brand-home .rcc-white-mark::before{inset:-5px;border-radius:14px}}
+@media(max-width:700px){.motion-studio-layout{grid-template-columns:minmax(0,1fr)}.motion-settings-heading{align-items:start;flex-direction:column}.motion-live-preview{min-height:240px}.motion-settings-heading button{width:100%}}
+@media(prefers-reduced-motion:reduce){body[data-ui] *,body[data-ui] *::before,body[data-ui] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

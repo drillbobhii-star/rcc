@@ -5,6 +5,10 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const catalog = JSON.parse(fs.readFileSync('scripts.json','utf8')).filter(s => !s.id.startsWith('rcc_pipeline_'));
 const datasets = [
+ ['presupuestos','Presupuestos',[12,18,25,35,48,62,75,96,125,180]],
+ ['latencias','Latencias',[8,12,18,25,42,65,95,120,180,250]],
+ ['altitudes','Altitudes',[-20,-8,0,5,18,42,80,125,240,500]],
+ ['duraciones','Duraciones',[0.5,1.5,3,5,8,13,21,34,55,89]],
  ['temperaturas','Temperaturas',[-12,-5,0,7,12,18,24,31,38,42]],
  ['puntuaciones','Puntuaciones',[0,15,25,40,50,65,75,80,95,100]],
  ['variaciones','Variaciones',[-40,-20,-10,-3,0,3,10,20,40,80]],

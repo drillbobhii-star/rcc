@@ -408,6 +408,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 </style>
 <link rel="stylesheet" href="assets/glass-controls.css">
 <link rel="stylesheet" href="assets/catalog-ui.css">
+<link rel="stylesheet" href="assets/trending.css">
+<script src="assets/catalog-filters.js"></script>
 <script src="assets/languages.js" defer></script>
 <style>
 .help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
@@ -444,6 +446,7 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/motion-studio.css">
 <script src="assets/motion-studio.js" defer></script>
 <link rel="stylesheet" href="assets/black-studio.css">
+<link rel="stylesheet" href="assets/motion-preferences.css">
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -464,8 +467,8 @@ window.rccSupabaseReady.catch(() => {});
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span> RCC<span class="brand-dot">.</span></h1>
-    <div class="visitor-badge"><strong>Comunidad RCC</strong></div>
+    <h1><a class="brand-home" href="index.html" aria-label="RCC · Ir a la página principal"><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
+
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
       <button id="languageTrigger" class="language-trigger" type="button" aria-expanded="false" aria-controls="languagePanel" aria-label="Seleccionar idioma">🇪🇸 Español</button>
@@ -519,11 +522,12 @@ window.rccSupabaseReady.catch(() => {});
     <header>
       <div class="topbar">
         <button class="hamburger" id="hamburger" aria-label="Abrir menú de filtros" aria-controls="sidebar">☰</button>
+        <a class="mobile-brand-home" href="index.html" aria-label="RCC · Ir a la página principal"><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span></a>
         <div class="search-top">
           <input type="text" id="search" aria-label="Buscar en el catálogo" placeholder="Buscar script, ejecutor o etiqueta...">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
-        <div class="mobile-visitors"><strong>Comunidad RCC</strong></div>
+
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
         <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button">Iniciar Sesión</button><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
@@ -567,15 +571,19 @@ window.rccSupabaseReady.catch(() => {});
       <div class="game-tools" id="gameTools" hidden>
         <p class="game-support-warning"><strong>Advertencia:</strong> Algunos scripts pueden no funcionar porque sus desarrolladores ya no les dan soporte.</p>
         <label>Juego<select id="gameFilter"><option value="all">Todos los juegos</option></select></label>
-        <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
-        <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros, 4 sistemas interactivos originales y publicaciones externas de juegos. Cada ficha indica la fecha de consulta de su fuente. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
+        <label>Tipo de código<select id="originFilter"><option value="all">Todos los tipos</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
+        <p>Incluye recetas configurables para crear tus propios juegos en Roblox Studio y loaders de juegos. Los loaders descargan código externo; no se han ejecutado. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
       </div>
-      <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. Incluye componentes de interfaz y 2,048 recetas de procesamiento de datos: filtros, transformaciones y resúmenes combinables. Las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
+      <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. Incluye componentes de interfaz y recetas de procesamiento de datos: filtros, transformaciones y resúmenes combinables. Las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
         <div class="stat"><b id="statPC">0</b><small>Para PC</small></div>
         <div class="stat"><b id="statMobile">0</b><small>Para móvil</small></div>
       </div>
+    </section>
+    <section class="trending-section" aria-labelledby="trendingTitle">
+      <div class="trending-heading"><div><span class="eyebrow">🔥 TENDENCIAS</span><h2 id="trendingTitle">Los más copiados de la semana</h2></div><span>Últimos 7 días · Una copia por navegador, código y día</span></div>
+      <div id="trendingList" class="trending-list" aria-live="polite"><p>Cargando tendencias…</p></div>
     </section>
     <details id="personalization" class="personalization">
       <summary><span><small>ESTUDIO VISUAL</small>Tu RCC, a tu estilo</span><span aria-hidden="true">＋</span></summary>
@@ -594,6 +602,8 @@ window.rccSupabaseReady.catch(() => {});
           <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
           <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos de paneles</label><label>Volumen<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
+        <section class="motion-settings" aria-labelledby="motionSettingsTitle"><div class="motion-settings-heading"><div><span class="eyebrow">ESTUDIO DE MOVIMIENTO</span><h3 id="motionSettingsTitle">Dale tu ritmo a RCC.</h3><p>Combina 12 estilos de logo, 8 entradas de tarjetas y 6 fondos. La vista previa cambia al instante.</p></div><button id="replayMotion" type="button">Repetir vista previa ↻</button></div>
+<div class="motion-studio-layout"><div class="motion-live-preview"><div class="motion-preview-logo"><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span><span>RCC<span class="brand-dot">.</span></span></div><div id="motionPreviewCards" class="motion-preview-cards" aria-hidden="true"><span class="motion-preview-card"><b>01</b>Lua</span><span class="motion-preview-card"><b>02</b>Studio</span><span class="motion-preview-card"><b>03</b>Web</span></div><p>Vista previa · Logo y tarjetas</p></div><div class="motion-options"><label>Animación del logo<select id="logoMotion"><option value="float">Levitación</option><option value="orbit">Órbita</option><option value="pulse">Respiración</option><option value="tilt">Giro suave</option><option value="bounce">Rebote</option><option value="pendulum">Péndulo</option><option value="wave">Ola</option><option value="flip">Vuelta 3D</option><option value="spin">Rotación</option><option value="zoom">Acercamiento</option><option value="swing">Balanceo</option><option value="none">Sin animación</option></select></label><label>Entrada de las tarjetas<select id="cardMotion"><option value="rise">Ascenso</option><option value="fade">Desvanecer</option><option value="left">Desde la izquierda</option><option value="right">Desde la derecha</option><option value="zoom">Escala</option><option value="tilt">Inclinación</option><option value="flip">Desplegar en 3D</option><option value="none">Sin animación</option></select></label><label>Movimiento del fondo<select id="ambientMotion"><option value="drift">Flotación</option><option value="orbit">Órbita amplia</option><option value="wave">Oleaje</option><option value="pulse">Respiración</option><option value="pan">Desplazamiento</option><option value="none">Sin animación</option></select></label><label>Velocidad<input id="motionSpeed" type="range" min="50" max="175" step="5" value="100"><output id="motionSpeedValue" for="motionSpeed">100%</output></label><label>Intensidad<input id="motionIntensity" type="range" min="25" max="150" step="5" value="100"><output id="motionIntensityValue" for="motionIntensity">100%</output></label><p id="motionStatus" role="status" aria-live="polite"></p></div></div></section>
         <p id="appearanceStatus" role="status" aria-live="polite">Estilo Azul glass activo.</p>
       </div>
     </details>
@@ -650,7 +660,7 @@ window.rccSupabaseReady.catch(() => {});
     <ol class="welcome-steps">
       <li>Busca el nombre de tu juego o código (Ej: Blox Fruits).</li>
       <li>Haz clic en 'Ver y copiar' en el script que te guste.</li>
-      <li>Lee los requisitos: un Script de servidor va en ServerScriptService; un LocalScript necesita un contexto de cliente en tu propio proyecto de Studio.</li><li>En juegos, consulta el estado de la llave y la fuente original. «Jugar en Roblox» abre la experiencia, no instala ni ejecuta el script.</li><li>Abre «¿Qué hace este código?» para leer la explicación de esa ficha. Los loaders descargan código remoto que el analizador no puede inspeccionar.</li><li>Prueba primero en una copia de tu proyecto. Descarga el código o guárdalo en favoritos para volver después.</li><li>En el laboratorio, ofusca únicamente Lua/Luau. Elige el nivel, genera y comprueba la salida. Guarda siempre el original.</li><li>Personaliza el cristal, el color, las esquinas, el tamaño y el movimiento. Activa los sonidos si quieres una respuesta distinta por panel y tema.</li>
+      <li>Lee los requisitos: un Script de servidor va en ServerScriptService; un LocalScript necesita un contexto de cliente en tu propio proyecto de Studio.</li><li>En juegos, consulta el estado de la llave y los requisitos. «Jugar en Roblox» abre la experiencia, no instala ni ejecuta el script.</li><li>Abre «¿Qué hace este código?» para leer la explicación de esa ficha. Los loaders descargan código remoto que el analizador no puede inspeccionar.</li><li>Prueba primero en una copia de tu proyecto. Descarga el código o guárdalo en favoritos para volver después.</li><li>En el laboratorio, ofusca únicamente Lua/Luau. Elige el nivel, genera y comprueba la salida. Guarda siempre el original.</li><li>Personaliza el cristal, el color, las esquinas, el tamaño y el movimiento. Activa los sonidos si quieres una respuesta distinta por panel y tema.</li>
     </ol>
     <form method="dialog"><button class="welcome-confirm" value="understood">Entendido, ir a buscar scripts</button></form>
   </div>
@@ -735,6 +745,7 @@ async function loadScripts(){
     buildSidebar();
     render();
     openSharedScript();
+    loadTrending();
   } catch (err) {
     console.error(err);
     grid.innerHTML = '<div class="error">❌ Error al cargar: ' + err.message + '</div>';
@@ -746,6 +757,7 @@ function updateRecentCount() {
 }
 
 document.getElementById('recentBtn').onclick = () => {
+    selectSection('all');
     showRecent = true; showFavorites=false;document.getElementById('favoritesBtn').setAttribute('aria-pressed','false');
     filterDevice = 'all';
     filterPlatform = 'all';
@@ -788,7 +800,7 @@ function buildSidebar(){
         document.getElementById('heroTitle').textContent = "Scripts Loadstring";
         document.getElementById('heroSubtitle').textContent = "Scripts para ejecutar directamente con loadstring().";
         document.getElementById('recentBtn').classList.remove('active');
-        filterType='loadstring'; buildSidebar(); render(); closeSidebar();
+        selectSection('all'); filterType='loadstring'; buildSidebar(); render(); closeSidebar();
     };
     typeList.appendChild(loadstringItem);
   }
@@ -802,7 +814,7 @@ function buildSidebar(){
         document.getElementById('heroTitle').textContent = "Scripts de Código Fuente";
         document.getElementById('heroSubtitle').textContent = "Scripts con código completo para copiar y pegar.";
         document.getElementById('recentBtn').classList.remove('active');
-        filterType='source'; buildSidebar(); render(); closeSidebar();
+        selectSection('all'); filterType='source'; buildSidebar(); render(); closeSidebar();
     };
     typeList.appendChild(sourceItem);
   }
@@ -816,7 +828,7 @@ function buildSidebar(){
       document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
       document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
       document.getElementById('recentBtn').classList.remove('active');
-      filterPlatform='all'; buildSidebar(); render(); 
+      selectSection('all');
   };
   platformList.appendChild(allP);
 
@@ -831,7 +843,7 @@ function buildSidebar(){
         document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
         document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
         document.getElementById('recentBtn').classList.remove('active');
-        filterPlatform=p.id; buildSidebar(); render(); closeSidebar(); 
+        selectSection('all'); filterPlatform=p.id; buildSidebar(); render(); closeSidebar();
     };
     platformList.appendChild(item);
   });
@@ -849,7 +861,7 @@ function buildSidebar(){
   };
   executorList.appendChild(allE);
 
-  const candidates = scripts.filter(s=>filterDevice==='all' || s.device===filterDevice || s.device==='both');
+  const candidates = scripts.filter(s=>(filterPlatform==='all'||s.platform===filterPlatform) && (catalogSection==='all'||s.catalog_section===catalogSection)).filter(s=>filterDevice==='all' || s.device===filterDevice || (['pc','mobile','both'].includes(filterDevice) && s.device==='both'));
   const names=[...new Set(candidates.flatMap(s=>s.executors||[]))].sort((a,b)=>a.localeCompare(b,'es'));
   names.forEach(name=>{
     const item=document.createElement('button');
@@ -886,6 +898,12 @@ function renderActiveFilters(){
     chip.querySelector('button').onclick = clear;
     activeFilters.appendChild(chip);
   };
+  for(const [id, label, empty] of [['tagFilter','Etiqueta',''],['environmentFilter','Entorno','all'],['verificationFilter','Prueba','all'],['gameFilter','Juego','all'],['originFilter','Tipo de juego','all']]){
+    const control=document.getElementById(id);
+    if(control.value && control.value!==empty && (catalogSection==='games'||!['gameFilter','originFilter'].includes(id))) add(label+': '+control.selectedOptions[0].textContent,()=>{control.value=empty;render();});
+  }
+  if(searchInput.value.trim()) add('Buscar: '+searchInput.value.trim(),()=>{searchInput.value='';render();});
+  if(catalogSection!=='all') add(catalogSection==='games'?'Juegos':'Web',()=>selectSection('all'));
   if(filterDevice!=='all'){
     add(DEVICE_ICON[filterDevice]+' '+DEVICE_LABEL[filterDevice], ()=>{
       filterDevice='all';
@@ -910,7 +928,7 @@ document.querySelectorAll('[data-platform-shortcut]').forEach(button => {
   button.addEventListener('click', () => {
     selectSection('all');
     filterPlatform = button.dataset.platformShortcut;
-    document.getElementById('tagFilter').value = 'Script independiente';
+
     document.getElementById('sortOrder').value = 'newest';
     buildSidebar(); render();
     document.getElementById('catalogHeading').focus({preventScroll:true});
@@ -943,20 +961,18 @@ function render(reset = true){
       list = list.filter(s => recentIds.includes(s.id));
   }
 
-  list = list.filter(s=>{
-    const okDev = filterDevice==='all' || s.device===filterDevice || s.device==='both';
-    const okPlat = filterPlatform==='all' || s.platform===filterPlatform;
-    const okExec = filterExecutor==='all' || (s.executors||[]).includes(filterExecutor);
-    const okType = filterType==='all' || s.type === filterType;
-    const haystack = normalize([s.name,s.description,s.game || '',s.platform,s.compatibility?.runtime,s.compatibility?.context,...(s.tags||[]),...(s.executors||[])].join(' '));
-    const okTxt = q.split(/\s+/).every(word=>haystack.includes(word));
-    const tag = document.getElementById('tagFilter').value;
-    const environment=document.getElementById('environmentFilter').value;
-    const verification=document.getElementById('verificationFilter').value;
-    return okDev && okPlat && okExec && okType && okTxt && (!tag || (s.tags||[]).includes(tag)) &&
-      (environment==='all' || (s.compatibility?.environment || 'legacy')===environment) &&
-      (verification==='all' || (s.compatibility?.verification || 'unverified')===verification);
-  });
+  const filters = {section:catalogSection,platform:filterPlatform,device:filterDevice,executor:filterExecutor,type:filterType,query:q,
+    tag:document.getElementById('tagFilter').value,environment:document.getElementById('environmentFilter').value,
+    verification:document.getElementById('verificationFilter').value,game:document.getElementById('gameFilter').value,origin:document.getElementById('originFilter').value};
+  list = list.filter(s=>RCCFilters.matches(s,filters));
+  // Disable impossible choices while preserving explicitly selected constraints and their chips.
+  for(const [id,key,empty,getValues] of [
+    ['tagFilter','tag','',s=>s.tags||[]],['environmentFilter','environment','all',s=>[s.compatibility?.environment||'legacy']],
+    ['verificationFilter','verification','all',s=>[s.compatibility?.verification||'unverified']],['gameFilter','game','all',s=>[s.game]]
+  ]){
+    const available=new Set(scripts.filter(s=>RCCFilters.matches(s,{...filters,[key]:empty})).flatMap(getValues));
+    for(const option of document.getElementById(id).options) option.disabled=option.value!==empty && option.value!==filters[key] && !available.has(option.value);
+  }
 
   const order = document.getElementById('sortOrder').value;
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
@@ -978,9 +994,10 @@ function render(reset = true){
   if(!list.length){
     if(showFavorites){grid.innerHTML='<div class="empty">Todavía no tienes favoritos con estos filtros. Pulsa el corazón de una tarjeta para guardarla.</div>';
     } else if (showRecent && scripts.length > 0) {
-        grid.innerHTML = '<div class="empty">⏱️ No has copiado ningún script aún.</div>';
+        grid.innerHTML = '<div class="empty">'+(recentIds.length?'No hay copias recientes con estos filtros.':'Todavía no has copiado ningún script.')+'</div>';
     } else {
-        grid.innerHTML = '<div class="empty">🔍 No se encontraron scripts</div>';
+        grid.innerHTML = '<div class="empty">No hay códigos con esta combinación de filtros. <button type="button" id="emptyReset">Ver todos los códigos</button></div>';
+        document.getElementById('emptyReset').onclick=()=>selectSection('all');
     }
     return;
   }
@@ -1070,9 +1087,40 @@ function openScript(s){
   modal.querySelector('.close').focus();
 }
 
+async function loadTrending(){
+  const container=document.getElementById('trendingList');
+  try {
+    const response=await fetch('/api/trending');
+    if(!response.ok) throw new Error('unavailable');
+    const data=await response.json();
+    const items=data.items.filter(item=>scripts.some(s=>s.id===item.id));
+    container.replaceChildren();
+    if(!items.length){container.innerHTML='<p>La semana empieza con tus ideas. Copia un código para inaugurar las tendencias.</p>';return;}
+    items.forEach((item,index)=>{
+      const script=scripts.find(s=>s.id===item.id),button=document.createElement('button');
+      button.type='button';button.className='trending-card';
+      button.innerHTML='<span class="rank">'+String(index+1).padStart(2,'0')+'</span><span><strong>'+escapeHTML(script.name)+'</strong><small>'+escapeHTML(script.platform)+' · '+Number(item.copies).toLocaleString('es')+' copias registradas</small></span>';
+      button.onclick=()=>openScript(script);container.appendChild(button);
+    });
+  } catch {
+    container.innerHTML='<p>No se pudieron cargar las tendencias.</p><button type="button">Reintentar</button>';
+    container.querySelector('button').onclick=loadTrending;
+  }
+}
+let copyQueue=Promise.resolve();
+function recordCopy(id){
+  // Serialize requests so rapid copies share the same anonymous browser cookie.
+  copyQueue=copyQueue.then(async()=>{
+    const response=await fetch('/api/trending?script='+encodeURIComponent(id),{method:'POST'});
+    if(response.ok) await loadTrending();
+  }).catch(()=>{});
+}
+
 function copyCode(){
+  const copiedId=currentCopiedId;
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
       showToast('📋 ¡Copiado!');
+      if(copiedId) recordCopy(copiedId);
       offerCodeAnalysis(document.getElementById('modalCode').textContent);
       
       if(currentCopiedId && !recentIds.includes(currentCopiedId)) {
@@ -1122,6 +1170,7 @@ function renderCompatibility(s){
   ]){const p=document.createElement('p');p.textContent=name+': '+value;panel.appendChild(p);}
   if(s.type==='loadstring'){const p=document.createElement('p');p.textContent='Este código descarga contenido remoto que puede cambiar. Su disponibilidad y contenido no se han validado.';panel.appendChild(p);}
   for(const source of c.sources || []){
+    if(s.platform==='roblox'){try{const host=new URL(source).hostname;if(host!=='roblox.com'&&!host.endsWith('.roblox.com'))continue;}catch{continue;}}
     if(typeof source!=='string' || !/^https:\/\//.test(source)) continue;
     const p=document.createElement('p'),a=document.createElement('a');let url;try{url=new URL(source);}catch{continue;}a.href=url.href;a.textContent='Referencia: '+url.hostname;a.target='_blank';a.rel='noopener noreferrer';p.appendChild(a);panel.appendChild(p);
   }

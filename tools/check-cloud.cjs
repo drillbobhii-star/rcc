@@ -56,7 +56,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  assert.equal(els.get('authEmail').textContent,'member@example.test');assert.equal(els.get('logoutBtn').hidden,false);
  await vm.runInContext(`applySession(null)`,context);
  assert.equal(vm.runInContext(`favoriteIds.size`,context),0);
- assert(!html.includes("fetch('/api/"),'Static catalog must not request backend routes');
+ assert(html.includes("fetch('/api/trending"),'Copy rankings use the server-side persistence endpoint');
  assert(html.includes("window.supabase.createClient('https://cbkrpyfkteomcukdisdw.supabase.co', anonKey"),'Client must connect directly to Supabase');
  assert(!html.includes('public-proxy'),'Client must not use the old proxy');
  console.log('Cloud UI OK: guest guard, favorite persistence and failures, duplicate signup, Google redirect and votes and session cleanup.');

@@ -23,7 +23,7 @@
     const text = document.createElement('div'), title = document.createElement('h4'); title.textContent = s.game; text.append(title);
     const status = document.createElement('p'); status.className = 'key-status';
     const tags = s.tags || [];
-    status.textContent = tags.includes('Con clave') ? 'Requiere llave según la fuente. Consulta las instrucciones del autor.' : tags.includes('Sin clave') ? 'Sin llave según la fuente; puede cambiar con las actualizaciones.' : s.type === 'source' ? 'Receta RCC: no necesita llave. Se utiliza en tu propio proyecto de Studio.' : 'Estado de llave sin confirmar. Revisa la publicación original.';
+    status.textContent = tags.includes('Con clave') ? 'Requiere llave ; consulta los requisitos del código.' : tags.includes('Sin clave') ? 'Sin llave indicada; puede cambiar con las actualizaciones.' : s.type === 'source' ? 'Receta RCC: no necesita llave. Se utiliza en tu propio proyecto de Studio.' : 'Estado de llave sin confirmar. Consulta los requisitos del código.';
     text.append(status);
     const links = document.createElement('div'); links.className = 'game-links';
     function link(label, url) { if (!safeUrl(url)) return; const a = document.createElement('a'); a.href = safeUrl(url); a.textContent = label; a.target = '_blank'; a.rel = 'noopener noreferrer'; links.append(a); }

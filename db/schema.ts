@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, uuid, timestamp, text, primaryKey, index, check } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, timestamp, text, primaryKey, index, check, date } from 'drizzle-orm/pg-core';
 
 export const visitors = pgTable('visitors', {
   id: uuid().primaryKey(),
@@ -27,3 +27,11 @@ export const comments = pgTable('comments', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, table => [index('comments_script_date_idx').on(table.scriptId, table.createdAt),
   check('comments_body_length', sql`char_length(${table.body}) between 1 and 2000`)]);
+
+export const scriptCopies = pgTable('script_copies', {
+  scriptId: text('script_id').notNull(),
+  visitorId: uuid('visitor_id').notNull(),
+  day: date('day').notNull().default(sql`CURRENT_DATE`),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, table => [primaryKey({ columns: [table.scriptId, table.visitorId, table.day] }),
+  index('script_copies_date_idx').on(table.createdAt)]);
