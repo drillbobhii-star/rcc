@@ -14,7 +14,7 @@ if (!dependencies) {
 const dependencyRoot = path.resolve(dependencies);
 const parser = require(path.join(dependencyRoot, 'luaparse'));
 const interpreter = path.join(dependencyRoot, '.bin', 'fengari');
-const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'scripts.json'), 'utf8'));
+const catalog = require('./catalog-store.cjs').readCatalog();
 const examples = catalog.filter(s => s.id.startsWith('lua_') || s.id.startsWith('learn_rbx_') || s.id.startsWith('rcc_recipe_'));
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'rcc-lua-'));
 const failures = [];

@@ -35,7 +35,7 @@ const assert=require('node:assert/strict');
  await page.getByRole('button',{name:'Entendido, ir a buscar scripts',exact:true}).click();
  }
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/tmp/rcc-mobile.png',fullPage:true});
- const examples=require('../scripts.json').filter(x=>x.id.startsWith('rcc_pipeline_'));
+ const examples=require('./catalog-store.cjs').readCatalog().filter(x=>x.id.startsWith('rcc_pipeline_'));
  await page.setContent(examples[0].code);assert((await page.locator('#output').textContent()).includes('result'));
  await page.locator('#data').fill('[1,2,3]');await page.getByRole('button',{name:'Calcular resultado'}).click();assert.equal(JSON.parse(await page.locator('#output').textContent()).result,12);
  await page.locator('#data').fill('["x"]');await page.getByRole('button',{name:'Calcular resultado'}).click();assert((await page.locator('#output').textContent()).startsWith('Revisa los datos:'));

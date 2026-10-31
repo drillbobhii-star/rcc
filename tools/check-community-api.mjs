@@ -1,3 +1,4 @@
+import {readCatalog} from './catalog-store.cjs';
 import assert from 'node:assert/strict';
 import { registerHooks } from 'node:module';
 import { readFileSync } from 'node:fs';
@@ -20,7 +21,7 @@ registerHooks({resolve(specifier,context,next){
   return source?{url:moduleUrl(source),shortCircuit:true}:next(specifier,context);
 }});
 const {default:handle}=await import('../netlify/functions/community.mts');
-const catalog=JSON.parse(readFileSync(new URL('../scripts.json',import.meta.url)));
+const catalog=readCatalog();
 const ids=JSON.parse(readFileSync(new URL('../netlify/functions/lib/catalog-ids.json',import.meta.url)));
 assert.deepEqual(ids,catalog.map(s=>s.id),'Server catalog IDs must match the catalog');
 const script=encodeURIComponent(ids[0]);

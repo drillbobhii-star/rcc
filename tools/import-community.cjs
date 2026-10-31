@@ -1,7 +1,7 @@
 // Fetches public listing metadata only. Never evaluates scripts or remote loaders.
 const fs = require('node:fs');
 async function main() {
-  const catalog = JSON.parse(fs.readFileSync('scripts.json', 'utf8'));
+  const catalog = require('./catalog-store.cjs').readCatalog();
   const ids = new Set(catalog.map(s => s.id));
   const sources = new Set(catalog.flatMap(s => s.compatibility?.sources || []));
   const date = new Date().toISOString().slice(0,10);
@@ -29,7 +29,7 @@ async function main() {
     if (!result.nextPage || page >= result.totalPages) break;
     await new Promise(resolve=>setTimeout(resolve,120));
   }
-  fs.writeFileSync('scripts.json',JSON.stringify(catalog,null,2)+'\n');
+  require('./catalog-store.cjs').writeCatalog(catalog);
   console.log(`Imported ${added} unique public listings; catalog: ${catalog.length}`);
 }
 main().catch(error=>{console.error(error.message);process.exitCode=1;});

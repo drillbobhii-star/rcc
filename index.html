@@ -444,6 +444,9 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/motion-studio.css">
 <script src="assets/motion-studio.js" defer></script>
 <link rel="stylesheet" href="assets/black-studio.css">
+<link rel="stylesheet" href="assets/release17.css">
+<script src="assets/catalog-filters.js"></script>
+<script src="assets/catalog-loader.js"></script>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -464,8 +467,8 @@ window.rccSupabaseReady.catch(() => {});
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span> RCC<span class="brand-dot">.</span></h1>
-    <div class="visitor-badge"><strong>Comunidad RCC</strong></div>
+    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
+
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
       <button id="languageTrigger" class="language-trigger" type="button" aria-expanded="false" aria-controls="languagePanel" aria-label="Seleccionar idioma">🇪🇸 Español</button>
@@ -523,15 +526,16 @@ window.rccSupabaseReady.catch(() => {});
           <input type="text" id="search" aria-label="Buscar en el catálogo" placeholder="Buscar script, ejecutor o etiqueta...">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
-        <div class="mobile-visitors"><strong>Comunidad RCC</strong></div>
+
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
-        <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button">Iniciar Sesión</button><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
+        <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost login-unavailable" id="loginBtn" type="button" aria-disabled="true" aria-controls="loginNotice" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
     <section class="hero">
       <nav class="section-tabs" aria-label="Secciones del catálogo">
         <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
+        <button id="trendingTab" type="button" aria-pressed="false">Tendencia</button><button id="updatesTab" type="button" aria-pressed="false">Actualizados · 1.7</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
         <a class="help-link" href="#analysis">Sección de prueba ↗</a>
@@ -567,8 +571,8 @@ window.rccSupabaseReady.catch(() => {});
       <div class="game-tools" id="gameTools" hidden>
         <p class="game-support-warning"><strong>Advertencia:</strong> Algunos scripts pueden no funcionar porque sus desarrolladores ya no les dan soporte.</p>
         <label>Juego<select id="gameFilter"><option value="all">Todos los juegos</option></select></label>
-        <label>Procedencia<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
-        <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros, 4 sistemas interactivos originales y publicaciones externas de juegos. Cada ficha indica la fecha de consulta de su fuente. Los loaders descargan código externo; no se han ejecutado. Cada ficha enlaza su publicación. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
+        <label hidden>Tipo<select id="originFilter"><option value="all">Todas las fuentes</option><option value="original">Recetas originales RCC · Roblox Studio</option><option value="community">Loaders de la comunidad</option></select></label>
+        <p>Incluye 300 recetas configurables para Roblox Studio en 30 géneros, 4 sistemas interactivos originales y publicaciones externas de juegos. Los loaders descargan código externo; no se han ejecutado. PC, celular y ejecutores aparecen sin verificar cuando faltan pruebas.</p>
       </div>
       <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. Incluye componentes de interfaz y 2,048 recetas de procesamiento de datos: filtros, transformaciones y resúmenes combinables. Las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
       <div class="stats">
@@ -607,7 +611,7 @@ window.rccSupabaseReady.catch(() => {});
 <button id="resetFilters">Limpiar filtros</button>
 </div>
 <div class="active-filters" id="activeFilters"></div>
-    <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos y fuentes de compatibilidad</a>.</div>
+    <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <div class="grid" id="scripts">
       <div class="loading">⏳ Cargando scripts...</div>
     </div>
@@ -650,7 +654,7 @@ window.rccSupabaseReady.catch(() => {});
     <ol class="welcome-steps">
       <li>Busca el nombre de tu juego o código (Ej: Blox Fruits).</li>
       <li>Haz clic en 'Ver y copiar' en el script que te guste.</li>
-      <li>Lee los requisitos: un Script de servidor va en ServerScriptService; un LocalScript necesita un contexto de cliente en tu propio proyecto de Studio.</li><li>En juegos, consulta el estado de la llave y la fuente original. «Jugar en Roblox» abre la experiencia, no instala ni ejecuta el script.</li><li>Abre «¿Qué hace este código?» para leer la explicación de esa ficha. Los loaders descargan código remoto que el analizador no puede inspeccionar.</li><li>Prueba primero en una copia de tu proyecto. Descarga el código o guárdalo en favoritos para volver después.</li><li>En el laboratorio, ofusca únicamente Lua/Luau. Elige el nivel, genera y comprueba la salida. Guarda siempre el original.</li><li>Personaliza el cristal, el color, las esquinas, el tamaño y el movimiento. Activa los sonidos si quieres una respuesta distinta por panel y tema.</li>
+      <li>Lee los requisitos: un Script de servidor va en ServerScriptService; un LocalScript necesita un contexto de cliente en tu propio proyecto de Studio.</li><li>En juegos, consulta el estado de la llave y los requisitos. «Jugar en Roblox» abre la experiencia, no instala ni ejecuta el script.</li><li>Abre «¿Qué hace este código?» para leer la explicación de esa ficha. Los loaders descargan código remoto que el analizador no puede inspeccionar.</li><li>Prueba primero en una copia de tu proyecto. Descarga el código o guárdalo en favoritos para volver después.</li><li>En el laboratorio, ofusca únicamente Lua/Luau. Elige el nivel, genera y comprueba la salida. Guarda siempre el original.</li><li>Personaliza el cristal, el color, las esquinas, el tamaño y el movimiento. Activa los sonidos si quieres una respuesta distinta por panel y tema.</li>
     </ol>
     <form method="dialog"><button class="welcome-confirm" value="understood">Entendido, ir a buscar scripts</button></form>
   </div>
@@ -680,7 +684,11 @@ let favoritesStatus = 'idle';
 let sessionRevision = 0;
 const favoritePending = new Set();
 let scripts = [];
+let catalogStatus = 'loading';
 let catalogSection = 'all';
+let releaseView = '';
+let trendCounts = {};
+let trendStatus = 'loading';
 let filterDevice = 'all';
 let filterPlatform = 'all';
 let filterExecutor = 'all';
@@ -718,12 +726,14 @@ const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 
 async function loadScripts(){
+  catalogStatus='loading';render();
   try {
-    const res = await fetch('scripts.json');
-    if(!res.ok) throw new Error('No se encontró el archivo scripts.json');
-    
-    scripts = await res.json();
+    const data=await window.RCCCatalogLoader.load({onProgress:({loaded,total})=>{
+      document.getElementById('resultCount').textContent=`Cargando catálogo: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos…`;
+    }});
+    scripts=data;catalogStatus='ready';
     const tagSelect = document.getElementById('tagFilter');
+    tagSelect.options.length=1;document.getElementById('gameFilter').options.length=1;
     [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
     document.getElementById('webCount').textContent='· '+scripts.filter(s=>s.catalog_section==='web').length;
     const games=scripts.filter(s=>s.catalog_section==='games');
@@ -737,7 +747,7 @@ async function loadScripts(){
     openSharedScript();
   } catch (err) {
     console.error(err);
-    grid.innerHTML = '<div class="error">❌ Error al cargar: ' + err.message + '</div>';
+    catalogStatus='error';render();
   }
 }
 
@@ -746,20 +756,7 @@ function updateRecentCount() {
 }
 
 document.getElementById('recentBtn').onclick = () => {
-    showRecent = true; showFavorites=false;document.getElementById('favoritesBtn').setAttribute('aria-pressed','false');
-    filterDevice = 'all';
-    filterPlatform = 'all';
-    filterExecutor = 'all';
-    filterType = 'all';
-    searchInput.value = '';
-    
-    document.getElementById('heroTitle').textContent = "Tus Scripts Recientes";
-    document.getElementById('heroSubtitle').textContent = "Los últimos scripts que has copiado.";
-    document.getElementById('recentBtn').classList.add('active');
-    
-    document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
-    buildSidebar(); 
-    render();
+  selectSection('all', {recent:true});
 };
 
 function buildSidebar(){
@@ -767,13 +764,8 @@ function buildSidebar(){
   const allTypes = document.createElement('div');
   allTypes.className = 'nav-item' + (filterType==='all' && !showRecent ?' active':'');
   allTypes.innerHTML = `<span class="ico">📄</span>Todos<span class="count">${scripts.length}</span>`;
-  allTypes.onclick = ()=>{ 
-      showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
-      document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
-      document.getElementById('recentBtn').classList.remove('active');
-      filterType='all'; buildSidebar(); render(); 
-  };
+  allTypes.onclick = ()=>selectSection('all');
+
   typeList.appendChild(allTypes);
 
   const loadstringCount = scripts.filter(s => s.type === 'loadstring').length;
@@ -783,13 +775,8 @@ function buildSidebar(){
     const loadstringItem = document.createElement('div');
     loadstringItem.className = 'nav-item' + (filterType==='loadstring' && !showRecent ?' active':'');
     loadstringItem.innerHTML = `<span class="ico">🔗</span>Loadstrings<span class="count">${loadstringCount}</span>`;
-    loadstringItem.onclick = ()=>{ 
-        showRecent = false; 
-        document.getElementById('heroTitle').textContent = "Scripts Loadstring";
-        document.getElementById('heroSubtitle').textContent = "Scripts para ejecutar directamente con loadstring().";
-        document.getElementById('recentBtn').classList.remove('active');
-        filterType='loadstring'; buildSidebar(); render(); closeSidebar();
-    };
+    loadstringItem.onclick = ()=>selectSection('all', {type:'loadstring'});
+
     typeList.appendChild(loadstringItem);
   }
 
@@ -797,13 +784,8 @@ function buildSidebar(){
     const sourceItem = document.createElement('div');
     sourceItem.className = 'nav-item' + (filterType==='source' && !showRecent ?' active':'');
     sourceItem.innerHTML = `<span class="ico">📝</span>Fuente (Source)<span class="count">${sourceCount}</span>`;
-    sourceItem.onclick = ()=>{ 
-        showRecent = false; 
-        document.getElementById('heroTitle').textContent = "Scripts de Código Fuente";
-        document.getElementById('heroSubtitle').textContent = "Scripts con código completo para copiar y pegar.";
-        document.getElementById('recentBtn').classList.remove('active');
-        filterType='source'; buildSidebar(); render(); closeSidebar();
-    };
+    sourceItem.onclick = ()=>selectSection('all', {type:'source'});
+
     typeList.appendChild(sourceItem);
   }
 
@@ -811,13 +793,8 @@ function buildSidebar(){
   const allP = document.createElement('div');
   allP.className = 'nav-item' + (filterPlatform==='all' && !showRecent ?' active':'');
   allP.innerHTML = `<span class="ico">📁</span>Todas<span class="count">${scripts.length}</span>`;
-  allP.onclick = ()=>{ 
-      showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
-      document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
-      document.getElementById('recentBtn').classList.remove('active');
-      filterPlatform='all'; buildSidebar(); render(); 
-  };
+  allP.onclick = ()=>selectSection('all');
+
   platformList.appendChild(allP);
 
   PLATFORMS.forEach(p=>{
@@ -826,13 +803,8 @@ function buildSidebar(){
     const item = document.createElement('div');
     item.className = 'nav-item' + (filterPlatform===p.id && !showRecent ?' active':'');
     item.innerHTML = `<span class="ico">${p.icon}</span>${p.name}<span class="count">${count}</span>`;
-    item.onclick = ()=>{ 
-        showRecent = false;
-        document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
-        document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
-        document.getElementById('recentBtn').classList.remove('active');
-        filterPlatform=p.id; buildSidebar(); render(); closeSidebar(); 
-    };
+    item.onclick = ()=>selectSection('all', {platform:p.id});
+
     platformList.appendChild(item);
   });
 
@@ -840,13 +812,8 @@ function buildSidebar(){
   const allE = document.createElement('div');
   allE.className = 'nav-item' + (filterExecutor==='all' && !showRecent ?' active':'');
   allE.innerHTML = `<span class="ico">⚡</span>Todos`;
-  allE.onclick = ()=>{ 
-      showRecent = false; 
-      document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
-      document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
-      document.getElementById('recentBtn').classList.remove('active');
-      filterExecutor='all'; buildSidebar(); render(); 
-  };
+  allE.onclick = ()=>selectSection('all');
+
   executorList.appendChild(allE);
 
   const candidates = scripts.filter(s=>filterDevice==='all' || s.device===filterDevice || s.device==='both');
@@ -858,23 +825,13 @@ function buildSidebar(){
     item.textContent=name;
     const count=document.createElement('span');count.className='count';
     count.textContent=candidates.filter(s=>(s.executors||[]).includes(name)).length;item.appendChild(count);
-    item.onclick=()=>{ filterExecutor=name;showRecent=false;document.getElementById('recentBtn').classList.remove('active');buildSidebar();render();closeSidebar(); };
+    item.onclick=()=>selectSection('all', {executor:name});
     executorList.appendChild(item);
   });
 }
 
 document.querySelectorAll('.dev-btn').forEach(btn=>{
-  btn.onclick = ()=>{
-    showRecent = false;
-    document.getElementById('heroTitle').textContent = "Tu próxima idea empieza con código.";
-    document.getElementById('heroSubtitle').textContent = "Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.";
-    document.getElementById('recentBtn').classList.remove('active');
-    document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    filterDevice = btn.dataset.dev;
-    filterExecutor = 'all';
-    buildSidebar(); render();
-  };
+  btn.onclick = ()=>selectSection('all', {device:btn.dataset.dev});
 });
 
 function renderActiveFilters(){
@@ -895,7 +852,7 @@ function renderActiveFilters(){
   }
   if(filterPlatform!=='all'){
     const p = PLATFORMS.find(x=>x.id===filterPlatform);
-    add(p.icon+' '+p.name, ()=>{ filterPlatform='all'; buildSidebar(); render(); });
+    add(p ? p.icon+' '+p.name : filterPlatform, ()=>{ filterPlatform='all'; buildSidebar(); render(); });
   }
   if(filterExecutor!=='all'){
     add('⚡ '+filterExecutor, ()=>{ filterExecutor='all'; buildSidebar(); render(); });
@@ -904,13 +861,18 @@ function renderActiveFilters(){
     const typeLabel = filterType === 'loadstring' ? '🔗 Loadstring' : '📝 Fuente';
     add(typeLabel, ()=>{ filterType='all'; buildSidebar(); render(); });
   }
+  if(searchInput.value.trim()) add('Búsqueda: '+searchInput.value.trim(),()=>{searchInput.value='';render();});
+  for(const [id,label,empty] of [['tagFilter','Etiqueta',''],['environmentFilter','Entorno','all'],['verificationFilter','Prueba','all'],['gameFilter','Juego','all'],['originFilter','Tipo de juego','all']]){
+    const control=document.getElementById(id);
+    if(control.value && control.value!==empty && (catalogSection==='games'||!['gameFilter','originFilter'].includes(id))) add(label+': '+(control.selectedOptions[0]?.textContent||control.value),()=>{control.value=empty;render();});
+  }
 }
 
 document.querySelectorAll('[data-platform-shortcut]').forEach(button => {
   button.addEventListener('click', () => {
     selectSection('all');
     filterPlatform = button.dataset.platformShortcut;
-    document.getElementById('tagFilter').value = 'Script independiente';
+    // Show every script on the selected platform, including community entries.
     document.getElementById('sortOrder').value = 'newest';
     buildSidebar(); render();
     document.getElementById('catalogHeading').focus({preventScroll:true});
@@ -919,48 +881,54 @@ document.querySelectorAll('[data-platform-shortcut]').forEach(button => {
 });
 
 function render(reset = true){
+  if(catalogStatus!=='ready'){
+    document.getElementById('loadMore').hidden=true;
+    document.getElementById('resultCount').textContent=catalogStatus==='loading'?'Cargando catálogo…':'Catálogo no disponible';
+    grid.innerHTML=catalogStatus==='loading'?'<div class="empty" role="status">Cargando códigos…</div>':'<div class="empty" role="status">No se pudo cargar el catálogo. <button class="btn btn-ghost" id="retryCatalog" type="button">Reintentar</button></div>';
+    document.getElementById('retryCatalog')?.addEventListener('click',loadScripts);
+    if(typeof renderTrendsStatus==='function')renderTrendsStatus();
+    return;
+  }
   document.querySelectorAll('[data-platform-shortcut]').forEach(button => button.setAttribute('aria-pressed', String(filterPlatform === button.dataset.platformShortcut)));
   if(reset !== false) visibleLimit = 36;
   const q = normalize(searchInput.value.trim());
   
   let list = [...scripts];
+  if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7');
+  if(releaseView==='trending') list=list.filter(s=>(trendCounts[s.id]?.total || 0)>0);
   if(catalogSection==='games'){
     list=list.filter(s=>s.catalog_section==='games');
-    const gameName=document.getElementById('gameFilter').value;
-    const origin=document.getElementById('originFilter').value;
-    list=list.filter(s=>(gameName==='all'||s.game===gameName)&&(origin==='all'||(origin==='original'?s.tags.includes('Original RCC'):!s.tags.includes('Original RCC'))));
+    const gameName=document.getElementById('gameFilter').value || 'all';
+    const origin=document.getElementById('originFilter').value || 'all';
+    list=list.filter(s=>(gameName==='all'||s.game===gameName)&&(origin==='all'||(origin==='original'?(s.tags||[]).includes('Original RCC'):!(s.tags||[]).includes('Original RCC'))));
     document.getElementById('heroTitle').textContent='Scripts para tus juegos';
-    document.getElementById('heroSubtitle').textContent='Explora por juego, revisa la fuente y copia el código desde su ficha.';
+    document.getElementById('heroSubtitle').textContent='Explora por juego, revisa los requisitos y copia el código desde su ficha.';
   }
   if(catalogSection==='web'){
     list=list.filter(s=>s.catalog_section==='web');
     document.getElementById('heroTitle').textContent='JavaScript para la web';
     document.getElementById('heroSubtitle').textContent='HTML, CSS y JavaScript en un archivo. Copia, descarga y empieza a crear tu página.';
   }
-  if(catalogSection==='all' && !showRecent && !showFavorites) document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';
+  if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza con código.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';}
   if (showFavorites) list = list.filter(s => favoriteIds.has(s.id));
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
   }
 
-  list = list.filter(s=>{
-    const okDev = filterDevice==='all' || s.device===filterDevice || s.device==='both';
-    const okPlat = filterPlatform==='all' || s.platform===filterPlatform;
-    const okExec = filterExecutor==='all' || (s.executors||[]).includes(filterExecutor);
-    const okType = filterType==='all' || s.type === filterType;
-    const haystack = normalize([s.name,s.description,s.game || '',s.platform,s.compatibility?.runtime,s.compatibility?.context,...(s.tags||[]),...(s.executors||[])].join(' '));
-    const okTxt = q.split(/\s+/).every(word=>haystack.includes(word));
-    const tag = document.getElementById('tagFilter').value;
-    const environment=document.getElementById('environmentFilter').value;
-    const verification=document.getElementById('verificationFilter').value;
-    return okDev && okPlat && okExec && okType && okTxt && (!tag || (s.tags||[]).includes(tag)) &&
-      (environment==='all' || (s.compatibility?.environment || 'legacy')===environment) &&
-      (verification==='all' || (s.compatibility?.verification || 'unverified')===verification);
-  });
+  list = list.filter(s=>window.RCCCatalogFilters.matches(s, {
+    device:filterDevice, platform:filterPlatform, executor:filterExecutor, type:filterType,
+    query:q, tag:document.getElementById('tagFilter').value,
+    environment:document.getElementById('environmentFilter').value,
+    verification:document.getElementById('verificationFilter').value
+  }));
 
   const order = document.getElementById('sortOrder').value;
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
+  if(showRecent) list.sort((a,b)=>recentIds.indexOf(a.id)-recentIds.indexOf(b.id));
+  if(releaseView==='trending') list.sort((a,b)=>trendCounts[b.id].total-trendCounts[a.id].total || a.name.localeCompare(b.name,'es'));
+  if(releaseView==='updates') list.sort((a,b)=>(b.release?.date||'').localeCompare(a.release?.date||''));
+  if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Actualizados · versión 1.7'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Los códigos más copiados y descargados por la comunidad en los últimos 30 días. Una acción por visitante, código y tipo al día.':'Consulta los cambios de cada código al abrir su ficha. La versión del catálogo no certifica los scripts remotos.'; }
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
   const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
   document.getElementById('statTotal').textContent = sectionScripts.length;
@@ -968,6 +936,7 @@ function render(reset = true){
   document.getElementById('statMobile').textContent = sectionScripts.filter(s=>s.device==='mobile'||s.device==='both').length;
   
   renderActiveFilters();
+  if(typeof renderTrendsStatus==='function')renderTrendsStatus();
   grid.innerHTML = '';
   
   document.getElementById('loadMore').hidden=true;
@@ -975,12 +944,13 @@ function render(reset = true){
     grid.innerHTML = '<div class="empty">'+(!currentUser ? 'Inicia sesión para ver tus favoritos en la nube.' : favoritesStatus === 'loading' ? 'Cargando favoritos…' : 'No se pudieron cargar tus favoritos. Vuelve a pulsar Favoritos para reintentar.')+'</div>';
     document.getElementById('loadMore').hidden=true;return;
   }
+  if(!list.length && releaseView==='trending' && (trendStatus!=='ready'||!Object.keys(trendCounts).length)){grid.innerHTML='<div class="empty" role="status">'+(trendStatus==='loading'?'Cargando tendencias…':trendStatus==='error'?'No se pudieron cargar las tendencias. Vuelve a pulsar Tendencia para reintentar.':'Todavía no hay copias ni descargas registradas. Abre una ficha para comenzar.')+'</div>';return;}
   if(!list.length){
     if(showFavorites){grid.innerHTML='<div class="empty">Todavía no tienes favoritos con estos filtros. Pulsa el corazón de una tarjeta para guardarla.</div>';
-    } else if (showRecent && scripts.length > 0) {
-        grid.innerHTML = '<div class="empty">⏱️ No has copiado ningún script aún.</div>';
+    } else if (showRecent && recentIds.length===0) {
+        grid.innerHTML = '<div class="empty">Todavía no has copiado ningún script.</div>';
     } else {
-        grid.innerHTML = '<div class="empty">🔍 No se encontraron scripts</div>';
+        grid.innerHTML = '<div class="empty">No hay resultados con estos filtros. Quita una etiqueta de filtro o pulsa Limpiar filtros.</div>';
     }
     return;
   }
@@ -999,7 +969,7 @@ function render(reset = true){
     card.innerHTML = `
       <div class="card-top">
         <div class="badges">
-          <span class="badge free">GRATIS</span>
+          <span class="badge free">GRATIS</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
           <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
           ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
@@ -1019,6 +989,7 @@ function render(reset = true){
       </div>
       <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗'}</button>
     `;
+    if(releaseView==='trending'){const count=document.createElement('p');count.className='trend-count';count.textContent=`${trendCounts[s.id].copies} copias · ${trendCounts[s.id].downloads} descargas`;card.querySelector('.meta').before(count);}
     window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
@@ -1038,7 +1009,7 @@ function openScript(s){
   modalBody.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
-      <span class="badge free">GRATIS</span>
+      <span class="badge free">GRATIS</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
       ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
       ${plat?`<span class="badge" style="background:rgba(255,255,255,.1);color:#fff; border:1px solid rgba(255,255,255,.2)">${plat.icon} ${plat.name}</span>`:''}
     </div>
@@ -1061,6 +1032,7 @@ function openScript(s){
   document.getElementById('modalCode').textContent = s.code;
   window.enhanceGameDetail?.(s, modalBody);
   const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => window.openRccLab?.(s.code); modalBody.querySelector('.actions').prepend(explain);
+  if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
   renderCompatibility(s);
   document.getElementById('voteBtn').onclick = e=>voteForScript(String(s.id),e.currentTarget);
   updateVoteButton(String(s.id),document.getElementById('voteBtn'));
@@ -1071,12 +1043,15 @@ function openScript(s){
 }
 
 function copyCode(){
+  const copiedId=currentCopiedId;
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
+      recordCatalogAction(copiedId,'copy');
       showToast('📋 ¡Copiado!');
       offerCodeAnalysis(document.getElementById('modalCode').textContent);
       
-      if(currentCopiedId && !recentIds.includes(currentCopiedId)) {
-          recentIds.unshift(currentCopiedId);
+      if(copiedId) {
+          recentIds=recentIds.filter(id=>id!==copiedId);
+          recentIds.unshift(copiedId);
           if(recentIds.length > 10) recentIds.pop();
           try { localStorage.setItem('rcc_recent', JSON.stringify(recentIds)); } catch {}
           updateRecentCount();
@@ -1121,10 +1096,7 @@ function renderCompatibility(s){
     ['Ejecutores',c.executor_status==='not-applicable'?'Usa el entorno indicado en esta ficha; no requiere ejecutor externo.':'Sin pruebas en Solara, Wave, Xeno, Hydrogen, Nihon, Delta, Fluxus, Arceus X, Codex o Vega X.']
   ]){const p=document.createElement('p');p.textContent=name+': '+value;panel.appendChild(p);}
   if(s.type==='loadstring'){const p=document.createElement('p');p.textContent='Este código descarga contenido remoto que puede cambiar. Su disponibilidad y contenido no se han validado.';panel.appendChild(p);}
-  for(const source of c.sources || []){
-    if(typeof source!=='string' || !/^https:\/\//.test(source)) continue;
-    const p=document.createElement('p'),a=document.createElement('a');let url;try{url=new URL(source);}catch{continue;}a.href=url.href;a.textContent='Referencia: '+url.hostname;a.target='_blank';a.rel='noopener noreferrer';p.appendChild(a);panel.appendChild(p);
-  }
+
 }
 const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 let modalReturnFocus = null;
@@ -1133,6 +1105,7 @@ function downloadCurrent(){
   if(!s) return;
   const url = URL.createObjectURL(new Blob([s.code], {type:'text/plain;charset=utf-8'}));
   const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.'+(s.file_extension || 'lua'); a.click();
+  recordCatalogAction(s.id,'download');
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function shareCurrent(){
@@ -1150,15 +1123,16 @@ document.getElementById('sortOrder').onchange = render;
 document.getElementById('environmentFilter').onchange = render;
 document.getElementById('verificationFilter').onchange = render;
 document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render(false);};
-document.getElementById('resetFilters').onclick = ()=>{
-  filterDevice=filterPlatform=filterExecutor=filterType='all'; showRecent=false; showFavorites=false;document.getElementById('favoritesBtn').setAttribute('aria-pressed','false');
-  document.getElementById('gameFilter').value='all';document.getElementById('originFilter').value='all';
-  searchInput.value=''; document.getElementById('environmentFilter').value='all';document.getElementById('verificationFilter').value='all';document.getElementById('tagFilter').value=''; document.getElementById('sortOrder').value='original';
-  document.getElementById('recentBtn').classList.remove('active');
-  document.getElementById('heroTitle').textContent='Tu próxima idea empieza con código.';
-  document.getElementById('heroSubtitle').textContent='Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.';
+function clearCatalogFilters(){
+  filterDevice=filterPlatform=filterExecutor=filterType='all';
+  searchInput.value='';
+  for(const id of ['gameFilter','originFilter','environmentFilter','verificationFilter'])document.getElementById(id).value='all';
+  document.getElementById('tagFilter').value='';
+  document.getElementById('sortOrder').value='newest';
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev==='all'));
-  buildSidebar(); render();
+}
+document.getElementById('resetFilters').onclick = ()=>{
+  clearCatalogFilters();buildSidebar();render();
 };
 modal.addEventListener('keydown',e=>{
   if(e.key!=='Tab') return;
@@ -1166,21 +1140,25 @@ modal.addEventListener('keydown',e=>{
   if(e.shiftKey && document.activeElement===first){e.preventDefault(); last.focus();}
   else if(!e.shiftKey && document.activeElement===last){e.preventDefault(); first.focus();}
 });
-function selectSection(section){
-  catalogSection=section;
-  document.getElementById('resetFilters').click();
-  document.getElementById('gameFilter').value='all';
-  document.getElementById('originFilter').value='all';
-  document.body.classList.toggle('games-mode',section==='games');
-  document.getElementById('gameTools').hidden=section!=='games';
-  document.getElementById('webTools').hidden=section!=='web';
-  document.getElementById('webTab').setAttribute('aria-pressed',String(section==='web'));
-  document.body.classList.toggle('web-mode',section==='web');
-  document.getElementById('libraryTab').setAttribute('aria-pressed',String(section==='all'));
-  document.getElementById('gamesTab').setAttribute('aria-pressed',String(section==='games'));
+function selectSection(section, options={}){
+  clearCatalogFilters();
+  catalogSection=['all','games','web'].includes(section)?section:'all';
+  releaseView=options.view || '';
+  showRecent=options.recent===true;showFavorites=options.favorites===true;
+  filterDevice=options.device || 'all';filterPlatform=options.platform || 'all';
+  filterExecutor=options.executor || 'all';filterType=options.type || 'all';
+  document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev===filterDevice));
+  document.getElementById('recentBtn').classList.toggle('active',showRecent);
+  document.getElementById('favoritesBtn').setAttribute('aria-pressed',String(showFavorites));
+  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
+  document.body.classList.toggle('games-mode',catalogSection==='games');
+  document.body.classList.toggle('web-mode',catalogSection==='web');
+  document.getElementById('gameTools').hidden=catalogSection!=='games';
+  document.getElementById('webTools').hidden=catalogSection!=='web';
+  if(showRecent){document.getElementById('heroTitle').textContent='Tus scripts recientes';document.getElementById('heroSubtitle').textContent='Los últimos scripts que has copiado.';}
   const main=document.querySelector('.main');
-  main.classList.remove('section-enter'); void main.offsetWidth; main.classList.add('section-enter');
-  render();closeSidebar();document.getElementById('heroTitle').focus({preventScroll:true});
+  main.classList.remove('section-enter');void main.offsetWidth;main.classList.add('section-enter');
+  buildSidebar();render();closeSidebar();document.getElementById('heroTitle').focus({preventScroll:true});
 }
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
 document.getElementById('webTab').onclick=()=>selectSection('web');
@@ -1196,9 +1174,22 @@ const authForm = document.getElementById('authForm');
 const authStatus = document.getElementById('authStatus');
 let authReturnFocus = null;
 let passwordReset = false;
-function openAuth(){
-  showToast('Estamos trabajando en el inicio de sesión. Próximamente estará disponible.');
+let loginNoticeTimer;
+function hideLoginNotice(){
+  clearTimeout(loginNoticeTimer);
+  const notice=document.getElementById('loginNotice');
+  notice.hidden=true;notice.textContent='';
+  document.getElementById('loginBtn').setAttribute('aria-expanded','false');
 }
+function openAuth(){
+  clearTimeout(loginNoticeTimer);
+  const notice=document.getElementById('loginNotice');
+  notice.textContent='Estamos trabajando en el inicio de sesión y el acceso a cuentas. Mientras tanto, puedes explorar, copiar y descargar códigos sin iniciar sesión.';
+  notice.hidden=false;
+  document.getElementById('loginBtn').setAttribute('aria-expanded','true');
+  loginNoticeTimer=setTimeout(hideLoginNotice,6500);
+}
+
 function closeAuth(){
   authModal.classList.remove('open');document.getElementById('authPassword').value='';
   document.body.style.overflow=modal.classList.contains('open')?'hidden':'';
@@ -1277,6 +1268,7 @@ async function applySession(user){
   document.getElementById('authEmail').textContent=currentUser?.email||'';
   document.getElementById('authEmail').hidden=!currentUser;
   document.getElementById('loginBtn').hidden=!!currentUser;
+  if(currentUser)hideLoginNotice();
   document.getElementById('logoutBtn').hidden=!currentUser;
   if(previousId===currentUser?.id)return;
   sessionRevision++;votedIds.clear();favoriteIds=new Set();favoritesStatus='idle';
@@ -1336,7 +1328,7 @@ async function toggleFavorite(scriptId,button){
   finally{favoritePending.delete(scriptId);updateFavoriteCount();render();}
 }
 document.getElementById('favoritesBtn').onclick=async()=>{
-  selectSection('all');showRecent=false;showFavorites=true;
+  selectSection('all', {favorites:true});
   document.getElementById('recentBtn').classList.remove('active');
   document.getElementById('favoritesBtn').setAttribute('aria-pressed','true');
   document.getElementById('heroTitle').textContent='Tus guardados';
@@ -1505,5 +1497,7 @@ document.addEventListener('keydown', event => {
 }, {capture:true});
 console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intentes robar los scripts. Únete a nuestro Discord si quieres aprender.', 'color:#e53935;font-size:32px;font-weight:900;line-height:1.5;');
 </script>
+<script src="assets/trends-config.js"></script>
+<script src="assets/release17.js"></script>
 </body>
 </html>

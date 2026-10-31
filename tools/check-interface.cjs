@@ -3,7 +3,7 @@
 const path=require('node:path');
 if(!process.argv[2]) throw new Error('Pass the external validation node_modules directory');
 const {chromium}=require(path.join(path.resolve(process.argv[2]),'playwright'));
-const catalog=require('../scripts.json');
+const catalog=require('./catalog-store.cjs').readCatalog();
 const total=catalog.length;
 const games=catalog.filter(s=>s.catalog_section==='games');
 const web=catalog.filter(s=>s.catalog_section==='web');
