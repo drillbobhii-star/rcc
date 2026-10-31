@@ -1,6 +1,7 @@
 /* Browser appearance preferences are optional; unavailable storage never blocks the catalog. */
 (() => {
   const presets = {
+    monochrome: {name:'Diagonal blanco y negro', accent:'#f5f5f2', bg:'#111113', surface:'#202023', radius:'24px'},
     blue: {name:'Azul glass', accent:'#a8cefa', bg:'#0c1727', surface:'#142c46', radius:'24px'},
     black: {name:'Negro glass', accent:'#ffffff', bg:'#090909', surface:'#181818', radius:'24px'},
     ios: {name:'iOS', accent:'#9ec9f5', bg:'#101a26', surface:'#172635', radius:'24px'},

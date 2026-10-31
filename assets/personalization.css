@@ -33,3 +33,14 @@ body.motion-paused :is(.bg-text,.bg-text-rocio,.blob){animation-play-state:pause
 @media(max-width:900px){.personalization{margin-left:22px;margin-right:22px}}
 @media(max-width:600px){.personalization summary,.personalization-body{padding:18px}.personalization-intro{grid-template-columns:1fr;gap:10px}.theme-options{grid-template-columns:repeat(2,minmax(0,1fr))}.personalization h2{font-size:21px}.appearance-controls{gap:18px}.theme-art{height:68px}}
 @media(prefers-reduced-motion:reduce){body[data-ui] *,body[data-ui] *::before,body[data-ui] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Equal diagonal bands travel toward the upper right, returning at a matching tile. */
+body[data-ui="monochrome"]::before{content:"";position:fixed;inset:-240px;pointer-events:none;z-index:0;background:repeating-linear-gradient(45deg,#111113 0 169.7056px,#f5f5f2 169.7056px 339.4112px);animation:monochrome-corner 18s linear infinite;will-change:transform}
+@keyframes monochrome-corner{from{transform:translate(0,0)}to{transform:translate(240px,-240px)}}
+body[data-ui="monochrome"]{--card-glass:#202023f5;--bg-glass:var(--card-glass);--muted:#c5c5cb}
+body[data-ui="monochrome"] :is(.bg-text,.bg-text-rocio,.blob){display:none}
+body[data-ui="monochrome"] :is(.hero-intro,.catalog-heading,.compat-note,.stats){position:relative;background:#18181bf5;border-radius:var(--ui-radius);padding:20px}
+.art-monochrome{background:repeating-linear-gradient(45deg,#111113 0 28px,#f5f5f2 28px 56px);color:#fff;text-shadow:0 1px 5px #111}
+body.motion-paused[data-ui="monochrome"]::before{animation-play-state:paused}
+.code-compare{margin:20px 36px}.compare-inputs{display:grid;grid-template-columns:1fr 1fr;gap:16px}.compare-inputs label{display:grid;gap:8px}.compare-inputs textarea{resize:vertical;width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--border-glass);border-radius:12px;background:var(--bg);color:var(--text);font:13px/1.6 monospace}.code-compare pre{max-height:420px;overflow:auto;padding:16px;background:var(--bg);font:13px/1.7 monospace;white-space:pre}.compare-added{color:#bce9bc}.compare-removed{color:#f4baba}
+@media(max-width:600px){.compare-inputs{grid-template-columns:1fr}.code-compare{margin:18px 22px}}
+@media(prefers-reduced-motion:reduce){body[data-ui="monochrome"]::before{animation:none}}
