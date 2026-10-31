@@ -1,6 +1,6 @@
 // Reproducible configurable variants: 30 game profiles, 10 Lua systems and 10 Studio mechanics.
 const fs = require('node:fs');
-const catalog = JSON.parse(fs.readFileSync('scripts.json', 'utf8')).filter(s => !s.id.startsWith('rcc_recipe_'));
+const catalog = JSON.parse(fs.readFileSync('scripts.json', 'utf8'));
 const profiles = [
   ['obby','Obby','Estrellas',5,60], ['racing','Carreras','Trofeos',10,90],
   ['survival','Supervivencia','Suministros',3,120], ['tycoon','Tycoon','Monedas',25,180],
@@ -18,6 +18,16 @@ const profiles = [
   ['mining','Minería','Minerales',28,280], ['pets','Mascotas','Galletas',29,185],
   ['music','Música','Notas',30,105], ['castle','Castillos','Sellos',31,270],
 ];
+// Additional profiles reuse the authored mechanics with distinct, editable configurations.
+for (const [zone, label, resource] of [
+  ['volcan','Volcán','Obsidiana'],['cielo','Cielo','Plumas'],['pantano','Pantano','Lirios'],
+  ['laboratorio','Laboratorio','Reactivos'],['ferrocarril','Ferrocarril','Billetes'],['festival','Festival','Entradas'],
+  ['submarino','Submarino','Burbujas'],['cristal','Cavernas de cristal','Prismas'],['rescate','Rescate','Insignias'],
+  ['cocina','Cocina','Ingredientes'],['astronomia','Astronomía','Estelas'],['arqueologia','Arqueología','Vestigios']
+]) for (const [mode, labelMode, multiplier] of [['inicio','Inicio',1],['ruta','Ruta',2],['reto','Reto',3],['experto','Experto',4],['maraton','Maratón',5],['cooperativo','Cooperativo',6],['contrarreloj','Contrarreloj',7],['temporada','Temporada',8],['expedicion','Expedición',9],['torneo','Torneo',10]]) {
+  const index=profiles.length;
+  profiles.push([`${zone}_${mode}`,`${label} · ${labelMode}`,resource,35+index*multiplier,90+index*5]);
+}
 const lua = [
   ['shop','Compra con saldo', (c,n)=>`local saldo, precio, cantidad = ${n*20}, ${n}, 3\nlocal coste = precio * cantidad\nif cantidad > 0 and cantidad == math.floor(cantidad) and saldo >= coste then\n  saldo = saldo - coste\n  print("Compra aceptada", cantidad, saldo)\nelse\n  print("Saldo insuficiente o cantidad inválida")\nend`],
   ['levels','Progresión por niveles',(c,n)=>`local experiencia, nivel = ${n*35}, 1\nlocal function siguiente(n) return 100 * n end\nwhile experiencia >= siguiente(nivel) do\n  experiencia = experiencia - siguiente(nivel)\n  nivel = nivel + 1\nend\nprint("Nivel", nivel, "Progreso", experiencia, siguiente(nivel))`],
@@ -47,12 +57,13 @@ for (const [profile,genre,currency,amount,duration] of profiles) {
     for (const [key,title,make] of recipes) {
       const isLua = environment === 'lua';
       const context = isLua ? 'Intérprete Lua 5.1+; ejecuta el ejemplo completo' : 'Script en ServerScriptService de tu propia experiencia de Roblox Studio';
+      if(catalog.some(s=>s.id===`rcc_recipe_${profile}_${environment}_${key}`)) continue;
       catalog.push({
         id:`rcc_recipe_${profile}_${environment}_${key}`,
         name:`${genre}: ${title}`, description:`Receta configurable de ${genre.toLowerCase()}: ${title.toLowerCase()}. Usa ${currency.toLowerCase()} como recurso y valores de muestra editables. ${isLua?'Simulación independiente con salida en consola.':'Para crear tu propio juego en Studio; no modifica juegos ajenos.'} Estado de sesión: no conserva el progreso al reiniciar.`,
         level:'free', device:'both', platform:isLua?'universal':'roblox', type:'source',
         executors:[isLua?'Lua 5.1+':'Roblox Studio (servidor)'], tags:['Original RCC','Recetas configurables',genre,isLua?'Lógica de juegos':'Roblox Studio',title],
-        version:'1.1', created_at:'2026-10-24',
+        version:'1.1', created_at:'2026-10-30',
         code:`-- RCC | ${genre}: ${title}\n-- ${context}\n-- Perfil configurable: ${currency}, cantidad ${amount}, ronda ${duration}s.\n${make(currency,amount,duration)}\n`,
         ...(isLua?{}:{catalog_section:'games',game:`Crear juegos: ${genre}`}),
         compatibility:{environment,runtime:isLua?'Lua 5.1+':'Luau / Roblox Studio',context,
