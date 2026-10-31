@@ -446,6 +446,7 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/black-studio.css">
 <link rel="stylesheet" href="assets/release17.css">
 <script src="assets/catalog-filters.js"></script>
+<script src="assets/catalog-loader.js"></script>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -727,11 +728,9 @@ const overlay = document.getElementById('overlay');
 async function loadScripts(){
   catalogStatus='loading';render();
   try {
-    const res = await fetch('scripts.json');
-    if(!res.ok) throw new Error('No se encontró el archivo scripts.json');
-    
-    const data=await res.json();
-    if(!Array.isArray(data))throw Error('Catálogo inválido');
+    const data=await window.RCCCatalogLoader.load({onProgress:({loaded,total})=>{
+      document.getElementById('resultCount').textContent=`Cargando catálogo: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos…`;
+    }});
     scripts=data;catalogStatus='ready';
     const tagSelect = document.getElementById('tagFilter');
     tagSelect.options.length=1;document.getElementById('gameFilter').options.length=1;

@@ -1,7 +1,7 @@
 // Reproducible Studio presets: 4 layouts × 8 palettes × 8 transitions × 8 corner sizes.
 // These are 2,048 configurable variants of one UI recipe, not distinct game mechanics.
 const fs = require('node:fs');
-const catalog = JSON.parse(fs.readFileSync('scripts.json','utf8')).filter(s => !s.id.startsWith('rcc_recipe_glass_'));
+const catalog = require('./catalog-store.cjs').readCatalog().filter(s => !s.id.startsWith('rcc_recipe_glass_'));
 const layouts = [['compacto',280,160],['panoramico',420,180],['vertical',260,340],['cuadrado',320,320]];
 const colors = [['azul',24,56,90],['grafito',30,34,42],['oceano',20,65,77],['pizarra',50,62,78],['bosque',25,62,50],['cobre',75,47,34],['vino',63,34,48],['hielo',75,98,116]];
 const transitions = [['suave','Sine',0.25],['rebote','Bounce',0.5],['elastico','Elastic',0.65],['cuadratico','Quad',0.3],['cubico','Cubic',0.4],['circular','Circular',0.35],['exponencial','Exponential',0.45],['retroceso','Back',0.55]];
@@ -71,6 +71,6 @@ end)
   catalog.push({id,name,description:`Variante configurable de la receta de panel RCC: distribución ${layout} de ${width} × ${height}, paleta ${palette} RGB(${r}, ${g}, ${b}), transición ${easing} de ${duration}s y esquinas de ${radius}px. Crea una interfaz adaptable y un botón que alterna la transparencia; no modifica juegos ajenos.`,level:'free',device:'both',platform:'roblox',type:'source',executors:['Roblox Studio (cliente)'],tags:['Original RCC','Variantes configurables','Interfaz glass',palette,motion],version:'1.0.0',created_at:'2026-10-30',code,
     compatibility:{environment:'client',runtime:'Luau / Roblox Studio',context:'LocalScript en StarterPlayer > StarterPlayerScripts de tu propia experiencia.',requirements:'Roblox Studio. Probar con Play para disponer de LocalPlayer. No requiere llave ni dependencias remotas.',verification:'syntax-only',executor_status:'not-applicable',test_details:'Receta generada de forma reproducible; estructura revisada. Sin prueba de ejecución en Roblox Studio.',mobile_status:'Botón Activated para ratón y tacto; escala según la cámara. Sin prueba en dispositivo.',sources:['https://create.roblox.com/docs/reference/engine/classes/TweenService','https://create.roblox.com/docs/reference/engine/classes/ScreenGui']}});
 }
-fs.writeFileSync('scripts.json',JSON.stringify(catalog,null,2)+'\n');
+require('./catalog-store.cjs').writeCatalog(catalog);
 fs.writeFileSync('netlify/functions/lib/catalog-ids.json',JSON.stringify(catalog.map(s=>s.id))+'\n');
 console.log('Added 2048 clearly labeled glass recipe variants; total:',catalog.length);

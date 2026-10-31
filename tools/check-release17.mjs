@@ -1,8 +1,9 @@
+import {readCatalog} from './catalog-store.cjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {registerHooks} from 'node:module';
-const catalog=JSON.parse(readFileSync(new URL('../scripts.json',import.meta.url)));
+const catalog=readCatalog();
 assert.equal(catalog.filter(s=>s.release?.kind==='new').length,200);
 assert(catalog.every(s=>s.release?.version==='1.7' && s.release.changes.length));
 assert.equal(new Set(catalog.map(s=>s.id)).size,catalog.length);

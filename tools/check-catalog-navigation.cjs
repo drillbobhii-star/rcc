@@ -2,14 +2,14 @@
 // Exercises real catalog handlers without external services, ads or script execution.
 const {JSDOM}=require(require('node:path').join(process.argv[2],'jsdom'));
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const catalog=JSON.parse(fs.readFileSync('scripts.json','utf8'));
+const catalog=require('./catalog-store.cjs').readCatalog();
 const html=fs.readFileSync('index.html','utf8');
 const dom=new JSDOM(html,{url:'https://rcc-3m0.pages.dev',runScripts:'outside-only',pretendToBeVisual:true});
 const {window}=dom,context=dom.getInternalVMContext();
 let getFailure=false,postFailure=false,gets=0,posts=[],intervals=[];
 const id=catalog[0].id;
 window.fetch=async(url,options={})=>{
- if(url==='scripts.json')return {ok:true,json:async()=>catalog};
+ if(url==='scripts.json'||/^catalog\/part-/.test(url))return {ok:true,json:async()=>JSON.parse(fs.readFileSync(url,'utf8'))};
  assert.equal(new URL(url).hostname,'cosmic-cucurucho-6280c8.netlify.app');
  assert.equal(options.credentials,'omit');
  if(options.method==='POST'){posts.push(JSON.parse(options.body));return {ok:!postFailure,json:async()=>({ok:true})};}
@@ -20,6 +20,7 @@ window.setInterval=(fn,delay)=>{intervals.push({fn,delay});return intervals.leng
 window.setTimeout=(fn,delay)=>delay<100?setTimeout(fn,0):0;
 window.clearTimeout=()=>{};
 vm.runInContext(fs.readFileSync('assets/catalog-filters.js','utf8'),context);
+vm.runInContext(fs.readFileSync('assets/catalog-loader.js','utf8'),context);
 const main=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).find(s=>s.includes('let currentUser = null;'));
 vm.runInContext(main.replace('initializeAuth();',''),context);
 vm.runInContext(fs.readFileSync('assets/trends-config.js','utf8'),context);

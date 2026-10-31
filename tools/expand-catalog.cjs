@@ -1,6 +1,6 @@
 // Reproducible configurable variants: 30 game profiles, 10 Lua systems and 10 Studio mechanics.
 const fs = require('node:fs');
-const catalog = JSON.parse(fs.readFileSync('scripts.json', 'utf8')).filter(s => !s.id.startsWith('rcc_recipe_'));
+const catalog = require('./catalog-store.cjs').readCatalog().filter(s => !s.id.startsWith('rcc_recipe_'));
 const profiles = [
   ['obby','Obby','Estrellas',5,60], ['racing','Carreras','Trofeos',10,90],
   ['survival','Supervivencia','Suministros',3,120], ['tycoon','Tycoon','Monedas',25,180],
@@ -66,5 +66,5 @@ for (const [profile,genre,currency,amount,duration] of profiles) {
     }
   }
 }
-fs.writeFileSync('scripts.json', JSON.stringify(catalog,null,2)+'\n');
+require('./catalog-store.cjs').writeCatalog(catalog);
 console.log(`Generated ${profiles.length * (lua.length + studio.length)} configurable recipes. Total: ${catalog.length}`);

@@ -3,7 +3,8 @@
   "version": "1.7.0",
   "description": "",
   "scripts": {
-    "test": "node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node --experimental-strip-types tools/check-community-api.mjs"
+    "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node --experimental-strip-types tools/check-community-api.mjs",
+    "test:static": "node tools/check-static-catalog.cjs"
   },
   "keywords": [],
   "author": "",

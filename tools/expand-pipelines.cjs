@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
-const catalog = JSON.parse(fs.readFileSync('scripts.json','utf8')).filter(s => !s.id.startsWith('rcc_pipeline_'));
+const catalog = require('./catalog-store.cjs').readCatalog().filter(s => !s.id.startsWith('rcc_pipeline_'));
 const datasets = [
  ['temperaturas','Temperaturas',[-12,-5,0,7,12,18,24,31,38,42]],
  ['puntuaciones','Puntuaciones',[0,15,25,40,50,65,75,80,95,100]],
@@ -57,5 +57,5 @@ for(const [dataset,label,values] of datasets) for(const [filter,filterLabel,sele
  catalog.push({id,name:title,description:`Receta combinable de JavaScript: ${filterLabel.toLowerCase()}, ${mapLabel.toLowerCase()} y ${reducerLabel.toLowerCase()}. Datos de ejemplo: ${label.toLowerCase()}. Página editable con validación JSON y resultado visible. Combina operaciones compartidas; no es un sistema de juego ni un exploit.`,level:'free',device:'both',platform:'web',type:'source',executors:['Navegador web'],tags:['Original RCC','JavaScript','Recetas de datos',label,filterLabel,mapLabel,reducerLabel],version:'1.0',created_at:'2026-10-25',catalog_section:'web',file_extension:'html',code,compatibility:{environment:'browser',runtime:'HTML5 / JavaScript ES2020',context:'Guardar como index.html y abrir en un navegador moderno.',requirements:'JavaScript habilitado. Array JSON de hasta 10,000 números finitos entre -1e9 y 1e9.',verification:'js-syntax',executor_status:'not-applicable',mobile_status:'Diseño adaptable; sin validación en dispositivos físicos.',test_details:'Sintaxis analizada con Node.js. Lógica ejecutada contra resultados de referencia para el conjunto de muestra, array vacío y un elemento. Interfaz sujeta a pruebas de navegador.',sources:['https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array','https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/JSON']}});
  count++;
 }
-fs.writeFileSync('scripts.json',JSON.stringify(catalog,null,2)+'\n');
+require('./catalog-store.cjs').writeCatalog(catalog);
 console.log(`Added ${count} composable recipes; ${count*3} calculation checks passed. Total: ${catalog.length}.`);
