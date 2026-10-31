@@ -586,6 +586,7 @@ window.rccSupabaseReady.catch(() => {});
       <div class="personalization-body">
         <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Azul glass y negro glass, además de iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
         <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="true"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito y logo blanco</small></button>
+          <button type="button" data-theme="monochrome" aria-pressed="false"><span class="theme-art art-monochrome" aria-hidden="true">RCC</span><strong>Diagonal infinito</strong><small>Mitad blanco, mitad negro · en movimiento</small></button>
           <button type="button" data-theme="ios" aria-pressed="false"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
           <button type="button" data-theme="android" aria-pressed="false"><span class="theme-art art-android" aria-hidden="true">RCC</span><strong>Android</strong><small>Formas y color material</small></button>
           <button type="button" data-theme="hyper" aria-pressed="false"><span class="theme-art art-hyper" aria-hidden="true">RCC</span><strong>HyperOS</strong><small>Capas suaves y aire</small></button>
@@ -602,7 +603,12 @@ window.rccSupabaseReady.catch(() => {});
       </div>
     </details>
     <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
-    <div class="catalog-tools">
+    <details class="code-compare personalization" id="codeCompare">
+<summary>Comparar códigos <small>HERRAMIENTA RCC 1.7</small></summary>
+<div class="personalization-body"><p>Pega dos versiones para localizar líneas añadidas y eliminadas. La comparación se realiza en tu navegador sin ejecutar ni enviar el código. Máximo 400 líneas y 60.000 caracteres por versión.</p>
+<div class="compare-inputs"><label>Versión anterior<textarea id="compareBefore" rows="8" spellcheck="false" maxlength="60000"></textarea></label><label>Versión nueva<textarea id="compareAfter" rows="8" spellcheck="false" maxlength="60000"></textarea></label></div>
+<div class="actions"><button type="button" class="btn btn-primary" id="compareRun">Comparar líneas</button><button type="button" class="btn btn-ghost" id="compareClear">Limpiar</button></div><p id="compareStatus" role="status" aria-live="polite"></p><pre id="compareResult" tabindex="0" aria-label="Diferencias entre versiones" hidden></pre></div></details>
+<div class="catalog-tools">
 <span id="resultCount" role="status" aria-live="polite"></span>
 <label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
 <label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="browser">Navegador web</option><option value="fivem-client">FiveM cliente</option><option value="fivem-server">FiveM servidor</option><option value="gameguardian">GameGuardian Android</option><option value="autotouch">AutoTouch iOS</option><option value="legacy">Catálogo anterior</option></select></label>
@@ -1499,5 +1505,6 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 </script>
 <script src="assets/trends-config.js"></script>
 <script src="assets/release17.js"></script>
+<script src="assets/code-compare.js"></script>
 </body>
 </html>
