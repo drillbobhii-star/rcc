@@ -2,32 +2,8 @@ import type { Config } from '@netlify/functions';
 import ids from './lib/catalog-ids.json' with { type:'json' };
 
 function normalize(value:string) {return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
-export function parseYouTubeResults(html:string) {
-  const marker=/(?:var\s+)?ytInitialData\s*=\s*/g.exec(html);
-  if(!marker)throw new Error('Search data unavailable');
-  const start=marker.index+marker[0].length;
-  let depth=0,inString=false,escaped=false,end=-1;
-  for(let i=start;i<html.length;i++){
-    const char=html[i];
-    if(inString){if(escaped)escaped=false;else if(char==='\\')escaped=true;else if(char==='"')inString=false;continue;}
-    if(char==='"')inString=true;else if(char==='{')depth++;else if(char==='}'&&--depth===0){end=i+1;break;}
-  }
-  if(end<0)throw new Error('Incomplete search data');
-  const root=JSON.parse(html.slice(start,end));
-  const pending:unknown[]=[root],videos:{id:string,title:string,channel:string}[]=[],seen=new Set<string>();
-  let visited=0;
-  const text=(value:any)=>typeof value?.simpleText==='string'?value.simpleText:(value?.runs||[]).map((part:any)=>typeof part.text==='string'?part.text:'').join('');
-  while(pending.length&&visited++<100000){
-    const value:any=pending.pop();if(!value||typeof value!=='object')continue;
-    const video=value.videoRenderer;
-    if(video&&/^[\w-]{11}$/.test(video.videoId||'')&&!seen.has(video.videoId)){
-      const title=text(video.title),channel=text(video.ownerText||video.longBylineText);
-      if(title){videos.push({id:video.videoId,title:title.slice(0,300),channel:channel.slice(0,150)});seen.add(video.videoId);}
-    }
-    pending.push(...Object.values(value));
-  }
-  return videos;
-}
+import { parseYouTubeResults } from './lib/youtube-search.mts';
+export { parseYouTubeResults } from './lib/youtube-search.mts';
 export function matchVideos(videos:ReturnType<typeof parseYouTubeResults>,name:string,game:string) {
   const ignored=new Set('script scripts roblox the a an in of for and with no key keys working new best free auto farm all most features feature open source games game update version gui hub'.split(' '));
   const gameWords=normalize(game).split(' ').filter(word=>word.length>2&&!ignored.has(word));
