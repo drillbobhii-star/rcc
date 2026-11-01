@@ -414,8 +414,12 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 </style>
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
+<link rel="stylesheet" href="assets/welcome.css">
+<script src="assets/studio.js" defer></script>
+<script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
 <script src="assets/personalization.js" defer></script>
+<script src="assets/script-art.js" defer></script>
 <script src="assets/game-reference.js" defer></script>
 <link rel="stylesheet" href="assets/rcc-update.css">
 <link rel="stylesheet" href="assets/interactive-glass.css">
@@ -446,7 +450,11 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/black-studio.css">
 <link rel="stylesheet" href="assets/release17.css">
 <script src="assets/catalog-filters.js"></script>
+<script src="assets/catalog-search.js"></script>
 <script src="assets/catalog-loader.js"></script>
+<link rel="stylesheet" href="assets/studio.css">
+<link rel="stylesheet" href="assets/search-experience.css">
+<link rel="stylesheet" href="assets/script-media.css">
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -527,6 +535,7 @@ window.rccSupabaseReady.catch(() => {});
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
 
+        <a class="roblox-follow" href="https://www.roblox.com/share?code=86b2c3c1d4ef024fafa196db62dac9a6&amp;type=Profile&amp;source=ProfileShare&amp;stamp=1793551063604" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 1 31 8 24 31 1 24Zm5 10-2 8 8 2 2-8Z"/></svg>Seguime en Roblox<span aria-hidden="true">↗</span></a>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
         <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost login-unavailable" id="loginBtn" type="button" aria-disabled="true" aria-controls="loginNotice" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
@@ -646,23 +655,22 @@ window.rccSupabaseReady.catch(() => {});
 
 <dialog id="welcomeDialog" class="welcome-dialog" aria-labelledby="welcomeTitle">
   <div class="welcome-content">
-    <span class="welcome-kicker" aria-hidden="true">RCC / GUÍA DE INICIO</span>
-    <h2 id="welcomeTitle">⚠️ ¡Atención! Esta es una biblioteca de código, no una IA.</h2>
-    <p>RCC es un repositorio con un catálogo ampliado de scripts y variantes configurables. Aquí no se generan códigos mágicos escribiendo lo que quieres, sino que encuentras los códigos ya hechos para copiar y usar.</p>
-    <section class="welcome-uses" aria-labelledby="welcomeUses">
-      <h3 id="welcomeUses">💡 ¿Para qué puedes usar estos códigos?</h3>
-      <p>🎮 Roblox Studio: Para crear tus propios juegos y sistemas.</p>
-      <p>⚡ Exploits: Para ejecutar en herramientas como Solara, Delta, Fluxus, etc.</p>
-      <p>🌐 Desarrollo Web: Para proyectos de páginas web (JavaScript/HTML).</p>
+    <div class="welcome-top"><span class="welcome-kicker">RCC / PRIMERA VISITA</span><button type="button" class="tour-skip" id="tourSkip">Omitir presentación ↗</button></div>
+    <div class="tour-progress" aria-label="Progreso"><span id="tourCounter">01 / 02</span><div><i id="tourProgress"></i></div></div>
+    <div class="welcome-stage" aria-hidden="true"><div class="welcome-orbit"></div><div class="welcome-emblem">RCC<span>EXPLORA. ENTIENDE. CREA.</span></div><span class="welcome-signal">TU ESPACIO DE CÓDIGO</span></div>
+    <h2 id="welcomeTitle" tabindex="-1">Un nuevo espacio para tus ideas.</h2>
+    <section id="tourFirst">
+      <p class="welcome-lead">Todo empieza en el panel superior. Explora la biblioteca, cambia tu estilo y abre las herramientas sin perder tu lugar.</p>
+      <div class="tour-demo-tabs" role="group" aria-label="Demostración de funciones"><button type="button" data-demo="explore" aria-pressed="true">01 Explora</button><button type="button" data-demo="appearance" aria-pressed="false">02 Personaliza</button><button type="button" data-demo="tools" aria-pressed="false">03 Prueba</button></div>
+      <div class="tour-demo" id="tourDemo" data-scene="explore" aria-live="polite" aria-atomic="true"><div class="demo-scene" aria-hidden="true"><div class="demo-search">Buscar: inventario Lua<span>⌕</span></div><div class="demo-result"><i></i><div>Inventario para tu proyecto<small>Lua / Roblox Studio</small></div><b>↗</b></div></div><h3>Del buscador a tu proyecto.</h3><p>Busca por nombre o etiqueta. Usa filtros de plataforma, dispositivo y entorno; abre una ficha para leer los requisitos, copiar o descargar.</p></div>
     </section>
-    <p class="welcome-important">⚠️ Importante: Se requieren conocimientos básicos de programación o de ejecutores para que funcionen.</p>
-    <h3>Cómo usar la página:</h3>
-    <ol class="welcome-steps">
-      <li>Busca el nombre de tu juego o código (Ej: Blox Fruits).</li>
-      <li>Haz clic en 'Ver y copiar' en el script que te guste.</li>
-      <li>Lee los requisitos: un Script de servidor va en ServerScriptService; un LocalScript necesita un contexto de cliente en tu propio proyecto de Studio.</li><li>En juegos, consulta el estado de la llave y los requisitos. «Jugar en Roblox» abre la experiencia, no instala ni ejecuta el script.</li><li>Abre «¿Qué hace este código?» para leer la explicación de esa ficha. Los loaders descargan código remoto que el analizador no puede inspeccionar.</li><li>Prueba primero en una copia de tu proyecto. Descarga el código o guárdalo en favoritos para volver después.</li><li>En el laboratorio, ofusca únicamente Lua/Luau. Elige el nivel, genera y comprueba la salida. Guarda siempre el original.</li><li>Personaliza el cristal, el color, las esquinas, el tamaño y el movimiento. Activa los sonidos si quieres una respuesta distinta por panel y tema.</li>
-    </ol>
-    <form method="dialog"><button class="welcome-confirm" value="understood">Entendido, ir a buscar scripts</button></form>
+    <section id="tourLast" hidden>
+      <p class="welcome-lead">Tienes una biblioteca a tu alcance y un asistente de navegación para encontrar tu próximo ejemplo.</p>
+      <div class="tour-warning"><span>ANTES DE EMPEZAR</span><h3>RCC no es una IA<br>ni un generador de código.</h3><p>Los códigos ya están publicados. El asistente busca en el catálogo y te guía por las funciones; no inventa scripts ni responde como una IA.</p></div>
+      <p class="welcome-important">Lee los requisitos y prueba en una copia de tu proyecto. Los loaders descargan código remoto que el analizador no puede inspeccionar. «Jugar en Roblox» abre el juego, no ejecuta scripts.</p>
+      <p class="tour-memory">Recordamos esta presentación y tu última búsqueda en este navegador mientras conserves las cookies. Puedes volver a verla desde «Cómo usar RCC».</p>
+    </section>
+    <div class="tour-navigation"><button type="button" id="tourBack" hidden>← Anterior</button><button type="button" id="tourNext" class="welcome-confirm">Siguiente <span aria-hidden="true">→</span></button></div>
   </div>
 </dialog>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -936,6 +944,7 @@ function render(reset = true){
   if(releaseView==='updates') list.sort((a,b)=>(b.release?.date||'').localeCompare(a.release?.date||''));
   if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Actualizados · versión 1.7'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Los códigos más copiados y descargados por la comunidad en los últimos 30 días. Una acción por visitante, código y tipo al día.':'Consulta los cambios de cada código al abrir su ficha. La versión del catálogo no certifica los scripts remotos.'; }
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
+  window.dispatchEvent(new CustomEvent('rcc:results', {detail:{count:list.length, query:searchInput.value.trim()}}));
   const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
   document.getElementById('statTotal').textContent = sectionScripts.length;
   document.getElementById('statPC').textContent = sectionScripts.filter(s=>s.device==='pc'||s.device==='both').length;
@@ -1067,7 +1076,7 @@ function copyCode(){
   }).catch(()=>showToast('No se pudo copiar. Selecciona el código y cópialo manualmente.'));
 }
 
-function closeModal(){ modal.classList.remove('open'); document.body.style.overflow=''; modalReturnFocus?.focus(); }
+function closeModal(){ window.RCCStopScriptVideo?.(); modal.classList.remove('open'); document.body.style.overflow=''; modalReturnFocus?.focus(); }
 modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !authModal.classList.contains('open')) closeModal(); });
 
@@ -1166,6 +1175,39 @@ function selectSection(section, options={}){
   main.classList.remove('section-enter');void main.offsetWidth;main.classList.add('section-enter');
   buildSidebar();render();closeSidebar();document.getElementById('heroTitle').focus({preventScroll:true});
 }
+let navigationSearchIndex;
+let navigationSearchSource;
+function getNavigationSearchIndex() {
+  if (navigationSearchSource !== scripts) {
+    navigationSearchSource=scripts;
+    navigationSearchIndex=window.RCCCatalogSearch.createIndex(scripts);
+  }
+  return navigationSearchIndex;
+}
+window.RCCNavigation = {
+  ready: () => catalogStatus === 'ready',
+  status: () => catalogStatus,
+  state: () => ({section:catalogSection, view:releaseView, query:searchInput.value, scroll:scrollY, limit:visibleLimit,
+    device:filterDevice, platform:filterPlatform, executor:filterExecutor, type:filterType,
+    tag:document.getElementById('tagFilter').value, environment:document.getElementById('environmentFilter').value,
+    verification:document.getElementById('verificationFilter').value, sort:document.getElementById('sortOrder').value,
+    game:document.getElementById('gameFilter').value, origin:document.getElementById('originFilter').value}),
+  restore: state => {
+    selectSection(state.section, {view:state.view, device:state.device, platform:state.platform, executor:state.executor, type:state.type});
+    searchInput.value = state.query || '';
+    for (const [id,key] of [['tagFilter','tag'],['environmentFilter','environment'],['verificationFilter','verification'],['sortOrder','sort'],['gameFilter','game'],['originFilter','origin']]) {
+      const control = document.getElementById(id);
+      if ([...control.options].some(option => option.value === state[key])) control.value = state[key];
+    }
+    visibleLimit = state.limit || 36; render(false);
+    requestAnimationFrame(() => window.scrollTo({top:state.scroll || 0,behavior:'instant'}));
+  },
+  search: (query, section='all') => {selectSection(section); searchInput.value=query.slice(0,200);render();},
+  suggestions: (query, limit=10) => getNavigationSearchIndex().suggest(query,limit),
+  executors: () => getNavigationSearchIndex().executors,
+  recommend: (query='') => getNavigationSearchIndex().recommend(query),
+  section: selectSection
+};
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
 document.getElementById('webTab').onclick=()=>selectSection('web');
 document.getElementById('webNav').onclick=()=>selectSection('web');
