@@ -43,7 +43,7 @@
     heading.focus({preventScroll:true});
   }));
   document.addEventListener('keydown', event => {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && document.getElementById('search') && !document.querySelector('.modal.open')) {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && document.getElementById('search') && !document.querySelector('.modal.open,dialog[open]')) {
       event.preventDefault(); document.getElementById('search').focus();
     }
   });

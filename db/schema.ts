@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, uuid, timestamp, text, primaryKey, index, check } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, timestamp, text, primaryKey, index, check, boolean, jsonb } from 'drizzle-orm/pg-core';
 
 export const visitors = pgTable('visitors', {
   id: uuid().primaryKey(),
@@ -37,3 +37,11 @@ export const catalogActions = pgTable('catalog_actions', {
 }, table => [primaryKey({ columns: [table.visitorId, table.scriptId, table.action, table.day] }),
   index('catalog_actions_script_idx').on(table.scriptId),
   check('catalog_actions_type', sql`${table.action} in ('copy', 'download')`)]);
+
+// Anonymous browser journey, separate from account data.
+export const browserJourneys = pgTable('browser_journeys', {
+  id: uuid().primaryKey(),
+  completed: boolean().notNull().default(false),
+  state: jsonb().notNull().default({}),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});

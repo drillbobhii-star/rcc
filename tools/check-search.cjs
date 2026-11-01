@@ -1,0 +1,25 @@
+// Unit coverage for real-catalog matching, typo suggestions, and catalog provenance.
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+const window={};const context=vm.createContext({window});
+for(const file of ['catalog-filters','catalog-search'])vm.runInContext(fs.readFileSync(`assets/${file}.js`,'utf8'),context);
+const catalog=require('./catalog-store.cjs').readCatalog();
+const filters=window.RCCCatalogFilters,index=window.RCCCatalogSearch.createIndex(catalog);
+const fixture={name:'Inventory button',description:'Create a health bar',platform:'roblox',executors:['Delta'],tags:['UI'],device:'mobile'};
+assert(filters.matches(fixture,{query:'busco un código de inventário para Delta'}));
+assert(filters.matches(fixture,{query:'botones vida'}));
+assert(!filters.matches(fixture,{query:'inventario Solara'}));
+assert(!filters.matches(fixture,{query:'不存在的代码'}));
+assert(!filters.matches(fixture,{query:'!!!'}));
+assert(filters.matches(fixture,{query:''}));
+assert(!filters.matches(fixture,{query:'inventario',device:'pc'}));
+assert(index.suggest('Delta').some(item=>item.kind==='Ejecutor'&&item.label==='Delta'));
+assert(index.suggest('Dleta').some(item=>item.label==='Delta'&&item.correction));
+assert.equal(index.suggest('zxyqnonexistentzzzz').length,0);
+assert.equal(index.suggest('!!!').length,0);
+assert(index.suggest('Blox').length>0);
+const known=new Set(catalog.flatMap(item=>[item.name,item.game,item.platform,...(item.tags||[]),...(item.executors||[])].filter(Boolean).map(value=>value.trim())));
+for(const query of ['','Delta','Blox','inventario','button','Dleta','Movimiento RCC'])for(const item of index.suggest(query))assert(known.has(item.label),`Invented suggestion: ${item.label}`);
+for(const item of index.recommend('Delta'))assert(catalog.some(script=>script.name===item.name&&filters.matches(script,{query:'Delta'})));
+assert.equal(index.recommend('zxyqnonexistentzzzz').length,0);
+assert.equal(index.executors.length,new Set(catalog.flatMap(item=>item.executors||[])).size);
+console.log(`Search index OK: ${catalog.length} scripts, ${index.executors.length} executors, natural phrases, aliases, accents, typo suggestions, unknown queries and provenance.`);
