@@ -419,6 +419,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
 <script src="assets/personalization.js" defer></script>
+<script src="assets/background-music.js" defer></script>
 <script src="assets/script-art.js" defer></script>
 <script src="assets/game-reference.js" defer></script>
 <link rel="stylesheet" href="assets/rcc-update.css">
@@ -452,6 +453,7 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/catalog-filters.js"></script>
 <script src="assets/catalog-search.js"></script>
 <script src="assets/catalog-loader.js"></script>
+<script src="assets/trend-analysis.js"></script>
 <link rel="stylesheet" href="assets/studio.css">
 <link rel="stylesheet" href="assets/search-experience.css">
 <link rel="stylesheet" href="assets/script-media.css">
@@ -606,11 +608,40 @@ window.rccSupabaseReady.catch(() => {});
           <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
           <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
           <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
-          <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos de paneles</label><label>Volumen<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
+          <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos de paneles</label><label>Volumen de paneles<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
+        <fieldset class="background-music-controls">
+          <legend>Música de fondo</legend>
+          <div class="appearance-controls">
+            <button id="musicShow" type="button" aria-expanded="false" aria-controls="musicExplorer">Mostrar música</button>
+            <button id="musicToggle" type="button" aria-pressed="true">Pausar música</button>
+            <label for="musicVolume">Volumen de música<input id="musicVolume" type="range" min="0" max="100" value="12" aria-describedby="musicVolumeValue"><output id="musicVolumeValue" for="musicVolume">12 %</output></label>
+          </div>
+          <p>Empieza bajito, al 12 %. El volumen y la pausa se recuerdan en este navegador.</p>
+        </fieldset>
         <p id="appearanceStatus" role="status" aria-live="polite">Estilo Azul glass activo.</p>
       </div>
     </details>
+    <section class="background-music-player" aria-labelledby="musicHeading">
+      <div class="music-video-frame"><div id="backgroundMusicPlayer"></div></div>
+      <div class="music-player-info"><span class="eyebrow">AMBIENTE RCC</span><h2 id="musicHeading">Tu música de fondo</h2><p id="musicNowPlaying">Primera canción · YouTube · en bucle</p>
+        <p id="musicStatus" role="status" aria-live="polite">Cargando música de YouTube…</p>
+        <button id="musicQuickToggle" class="btn btn-ghost" type="button">Pausar música</button>
+        <a id="musicExternalLink" href="https://www.youtube.com/watch?v=kXB2Of4QrNQ" target="_blank" rel="noopener noreferrer">Abrir en YouTube ↗</a>
+        <p>Ajusta el volumen en Personalización. Cada canción se repite hasta que elijas otra.</p>
+      </div>
+      <div id="musicExplorer" class="music-explorer" hidden>
+        <div class="music-explorer-heading"><div><span class="eyebrow">DESCUBRE EN YOUTUBE</span><h3>Elige qué suena</h3></div><button id="musicHide" class="btn btn-ghost" type="button">Ocultar música</button></div>
+        <form id="musicSearchForm" class="music-search-form" role="search" aria-label="Buscar música en YouTube">
+          <label for="musicQuery">Canción, artista o enlace de YouTube</label>
+          <div><input id="musicQuery" type="search" maxlength="160" placeholder="Busca una canción o pega su enlace" required><button class="btn btn-primary" type="submit">Buscar / reproducir</button></div>
+        </form>
+        <div class="music-discovery" role="group" aria-label="Explorar música"><button type="button" data-music-query="lofi para programar">Para programar</button><button type="button" data-music-query="música relajante">Relax</button><button type="button" data-music-query="música electrónica">Electrónica</button><button type="button" data-music-query="éxitos latinos">Latino</button><button id="musicDefault" type="button">Volver a la primera canción</button></div>
+        <p id="musicSearchStatus" role="status" aria-live="polite">Busca música o explora las sugerencias públicas de YouTube.</p>
+        <div id="musicResults" class="music-results" aria-busy="false"></div>
+        <p class="music-service-note">Resultados públicos de YouTube; no se conecta a tu cuenta ni a tus recomendaciones personales de YouTube Music. El reproductor de YouTube permite ajustar el volumen, pero no ofrece ecualizador.</p>
+      </div>
+    </section>
     <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
     <details class="code-compare personalization" id="codeCompare">
 <summary>Comparar códigos <small>HERRAMIENTA RCC 1.7</small></summary>
@@ -909,7 +940,7 @@ function render(reset = true){
   
   let list = [...scripts];
   if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7');
-  if(releaseView==='trending') list=list.filter(s=>(trendCounts[s.id]?.total || 0)>0);
+  if(releaseView==='trending') list=window.RCCTrendAnalysis.rank(list,trendCounts);
   if(catalogSection==='games'){
     list=list.filter(s=>s.catalog_section==='games');
     const gameName=document.getElementById('gameFilter').value || 'all';
@@ -940,9 +971,9 @@ function render(reset = true){
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
   if(showRecent) list.sort((a,b)=>recentIds.indexOf(a.id)-recentIds.indexOf(b.id));
-  if(releaseView==='trending') list.sort((a,b)=>trendCounts[b.id].total-trendCounts[a.id].total || a.name.localeCompare(b.name,'es'));
+  if(releaseView==='trending'){const ranks=new Map(window.RCCTrendAnalysis.rank(scripts,trendCounts).map((s,i)=>[s.id,i]));list.sort((a,b)=>ranks.get(a.id)-ranks.get(b.id));}
   if(releaseView==='updates') list.sort((a,b)=>(b.release?.date||'').localeCompare(a.release?.date||''));
-  if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Actualizados · versión 1.7'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Los códigos más copiados y descargados por la comunidad en los últimos 30 días. Una acción por visitante, código y tipo al día.':'Consulta los cambios de cada código al abrir su ficha. La versión del catálogo no certifica los scripts remotos.'; }
+  if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Actualizados · versión 1.7'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Juegos y scripts destacados, con una selección que combina títulos del catálogo y códigos reutilizables según su utilidad, compatibilidad y código disponible. Las cifras altas son una simulación editorial de popularidad, no actividad registrada. Las acciones reales de los últimos 30 días se muestran por separado.':'Consulta los cambios de cada código al abrir su ficha. La versión del catálogo no certifica los scripts remotos.'; }
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
   window.dispatchEvent(new CustomEvent('rcc:results', {detail:{count:list.length, query:searchInput.value.trim()}}));
   const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
@@ -959,7 +990,7 @@ function render(reset = true){
     grid.innerHTML = '<div class="empty">'+(!currentUser ? 'Inicia sesión para ver tus favoritos en la nube.' : favoritesStatus === 'loading' ? 'Cargando favoritos…' : 'No se pudieron cargar tus favoritos. Vuelve a pulsar Favoritos para reintentar.')+'</div>';
     document.getElementById('loadMore').hidden=true;return;
   }
-  if(!list.length && releaseView==='trending' && (trendStatus!=='ready'||!Object.keys(trendCounts).length)){grid.innerHTML='<div class="empty" role="status">'+(trendStatus==='loading'?'Cargando tendencias…':trendStatus==='error'?'No se pudieron cargar las tendencias. Vuelve a pulsar Tendencia para reintentar.':'Todavía no hay copias ni descargas registradas. Abre una ficha para comenzar.')+'</div>';return;}
+
   if(!list.length){
     if(showFavorites){grid.innerHTML='<div class="empty">Todavía no tienes favoritos con estos filtros. Pulsa el corazón de una tarjeta para guardarla.</div>';
     } else if (showRecent && recentIds.length===0) {
@@ -1004,7 +1035,23 @@ function render(reset = true){
       </div>
       <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗'}</button>
     `;
-    if(releaseView==='trending'){const count=document.createElement('p');count.className='trend-count';count.textContent=`${trendCounts[s.id].copies} copias · ${trendCounts[s.id].downloads} descargas`;card.querySelector('.meta').before(count);}
+    if(releaseView==='trending'){
+      const forecast=window.RCCTrendAnalysis.analyze(s);
+      const count=document.createElement('section');count.className='trend-forecast';
+      const label=document.createElement('strong');label.className='trend-label';label.textContent='Popularidad estimada · simulación';
+      const metrics=document.createElement('p');metrics.className='trend-count';
+      const format=new Intl.NumberFormat('es-ES');
+      metrics.textContent=`${format.format(forecast.copies)} copias estimadas · ${format.format(forecast.downloads)} descargas estimadas`;
+      const reason=document.createElement('p');reason.className='trend-reason';reason.textContent=forecast.reason;
+      const actual=document.createElement('p');actual.className='trend-real';
+      const recorded=trendCounts[s.id];
+      actual.textContent=recorded?`Registradas · 30 días: ${format.format(recorded.copies)} copias · ${format.format(recorded.downloads)} descargas`:trendStatus==='ready'?'Registradas · 30 días: 0 copias · 0 descargas':trendStatus==='loading'?'Consultando acciones reales…':'Acciones reales no disponibles';
+      if(s.catalog_section==='games'){
+        const gameLabel=document.createElement('span');gameLabel.className='badge release-badge';
+        gameLabel.textContent='Juego · '+(s.game||s.name);card.querySelector('.badges').append(gameLabel);
+      }
+      count.append(label,metrics,reason,actual);card.querySelector('.meta').before(count);
+    }
     window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
