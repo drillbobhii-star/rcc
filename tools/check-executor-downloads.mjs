@@ -26,6 +26,17 @@ const document={body:new Element('body'),createElement(tag){const el=new Element
 vm.runInNewContext(source,{document,URL,Date:{now:()=>now},setInterval(fn){const id=++intervalId;intervals.set(id,fn);return id;},clearInterval(id){intervals.delete(id);},window:{location:{assign(url){destinations.push(url);}}}});
 const get=selector=>nodes.get(selector),buttons=get('.executor-options').children;
 assert.equal(buttons.length,8);
+const declaredPlatforms=[['PC · Windows'],['PC · Windows'],[],['PC · Windows'],['Móvil · Android'],['Móvil · Android'],[],['PC · Windows']];
+buttons.forEach((button,index)=>{
+  const badges=button.children[2].children[2].children;
+  assert.equal(badges.length,3);
+  assert.deepEqual(badges.filter(badge=>badge.className.includes('is-declared')).map(badge=>badge.children[0].textContent),declaredPlatforms[index]);
+  for(const badge of badges){
+    assert.match(badge.innerHTML,/aria-hidden="true"/);
+    assert.match(badge.children[1].textContent,/^(Indicado por la fuente|Por confirmar)$/);
+  }
+});
+
 for(const button of buttons){const image=button.children[0];assert(fs.existsSync(image.src));}
 const trigger=new Element('button');trigger.closest=()=>trigger;
 let prevented=false,stopped=false;
