@@ -9,8 +9,8 @@
   function fallback(container,script){container.classList.add('game-cover-fallback');container.replaceChildren(window.RCCScriptArt.create(script));}
   function fillImage(container,script) {
     if(!script)return;
-    const src=images[script.game_id];
-    if(!src||!/^https:\/\/[^/]*rbxcdn\.com\//.test(src))return;
+    const src=images[script.game_id]||script.reference_image;
+    if(!src||!/^https:\/\/(?:[^/]*rbxcdn\.com\/|scriptblox\.com\/images\/)/.test(src))return;
     const image=document.createElement('img');image.src=src;image.alt='Imagen de referencia de '+script.game;image.loading='lazy';image.decoding='async';
     image.onerror=()=>fallback(container,script);
     container.replaceChildren(image);container.classList.remove('game-cover-fallback');

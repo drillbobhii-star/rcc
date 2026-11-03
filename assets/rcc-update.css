@@ -9,3 +9,9 @@ body[data-ui] .brand-symbol{color:#f6f9ff;background:linear-gradient(145deg,#fff
 .key-status{font-size:.85rem;color:var(--muted);padding:9px 0}.game-links{display:flex;gap:10px;flex-wrap:wrap}.game-links a{color:var(--accent)}
 @media(prefers-reduced-motion:no-preference){body:not(.motion-paused) .game-reference{animation:rcc-reference-in .4s ease both}@keyframes rcc-reference-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}}
 @media(max-width:600px){.game-reference{align-items:flex-start;gap:12px}.game-reference img{width:72px;height:72px}.game-reference .btn{padding:8px 12px}}
+
+.executor-warning{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin:12px 0 18px;border:1px solid #c6a66b55;border-left:3px solid #c6a66b;border-radius:14px;background:linear-gradient(115deg,#c6a66b18,#c6a66b05);color:var(--text)}
+.executor-warning-icon{display:grid;place-items:center;flex:0 0 22px;height:22px;border:1px solid #c6a66b80;border-radius:50%;color:#c6a66b;font-weight:800}.executor-warning strong{display:block;font-size:13px;line-height:1.5}.executor-warning p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.7}.card .executor-warning{padding:12px}.card .executor-warning p{font-size:11px}
+.catalog-news{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:16px 22px;margin:18px 0;border:1px solid var(--border-glass);border-radius:18px;background:var(--card-glass)}.catalog-news p{margin:4px 0;color:var(--muted);font-size:13px;line-height:1.6}.catalog-news button{flex-shrink:0}
+
+@media(max-width:600px){.catalog-news{align-items:flex-start}}
