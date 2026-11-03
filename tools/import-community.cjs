@@ -7,9 +7,9 @@ async function main() {
   const date = new Date().toISOString().slice(0,10);
   const target = Number(process.argv[2] || 2200);
   let added = 0;
-  for (let page = 1; page <= 250 && added < target; page++) {
+  for (let page = 1; page <= 900 && added < target; page++) {
     const response = await fetch(`https://scriptblox.com/api/script/fetch?page=${page}&mode=free`, {signal: AbortSignal.timeout(25000)});
-    if (!response.ok) throw new Error(`Public listing HTTP ${response.status}; page ${page}`);
+    if (!response.ok) { console.log(`Import stopped at page ${page}: HTTP ${response.status}`); break; }
     const {result} = await response.json();
     if (!Array.isArray(result?.scripts)) throw new Error('Unexpected public listing');
     for (const item of result.scripts) {
@@ -20,6 +20,7 @@ async function main() {
       if (!item.title || !item.game?.name || /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux/i.test(item.title)) continue;
       catalog.push({id, name:item.title.slice(0,180), description:`${item.game.name}. Publicación de la comunidad en ScriptBlox. ${item.key?'Requiere clave':'Sin clave indicada'} según la fuente. Contenido remoto y funcionamiento sin verificar.`,
         level:'free', device:'unknown', platform:'roblox', type:'loadstring', executors:['Ejecutor externo (sin verificar)'], tags:['Juegos','Comunidad',item.key?'Con clave':'Sin clave'], version:'1.0', created_at:date,
+        reference_image:typeof item.game.imageUrl==='string' && /^\/images\/[\w/.-]+$/.test(item.game.imageUrl)?'https://scriptblox.com'+item.game.imageUrl:undefined,
         code:`loadstring(game:HttpGet(${JSON.stringify('https://scriptblox.com/raw/'+item.slug)}))()`, game:item.game.name.slice(0,180), game_id:String(item.game.gameId || 0), catalog_section:'games',
         compatibility:{environment:'client',runtime:'Roblox · ejecutor externo',context:'Cliente de Roblox; publicación externa de la comunidad.',requirements:'API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.',verification:'unverified',test_details:`Ficha encontrada en el listado público el ${date}. No se descargó, auditó ni ejecutó el código remoto.`,mobile_status:'PC, Android e iOS sin comprobar.',executor_status:'unverified',sources:[source],checked_at:date}});
       ids.add(id); sources.add(source); added++;

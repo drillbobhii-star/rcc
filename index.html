@@ -419,7 +419,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
 <script src="assets/personalization.js" defer></script>
-<script src="assets/background-music.js" defer></script>
+<script src="assets/executor-downloads.js" defer></script>
+<link rel="stylesheet" href="assets/executor-downloads.css">
 <script src="assets/script-art.js" defer></script>
 <script src="assets/game-reference.js" defer></script>
 <link rel="stylesheet" href="assets/rcc-update.css">
@@ -464,6 +465,7 @@ window.rccSupabaseReady.catch(() => {});
 <!-- FONDOS ANIMADOS -->
 <div class="glass-background" id="glassBackground" aria-hidden="true">
   <div class="glass-lettering" id="glassLettering">
+    <div class="ambient-ribbons" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="bg-text" id="bgRccText">RCC</div>
     <div class="bg-text-rocio" id="bgRocioText">Rocio</div>
   </div>
@@ -610,38 +612,9 @@ window.rccSupabaseReady.catch(() => {});
           <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
           <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos de paneles</label><label>Volumen de paneles<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
-        <fieldset class="background-music-controls">
-          <legend>Música de fondo</legend>
-          <div class="appearance-controls">
-            <button id="musicShow" type="button" aria-expanded="false" aria-controls="musicExplorer">Mostrar música</button>
-            <button id="musicToggle" type="button" aria-pressed="true">Pausar música</button>
-            <label for="musicVolume">Volumen de música<input id="musicVolume" type="range" min="0" max="100" value="12" aria-describedby="musicVolumeValue"><output id="musicVolumeValue" for="musicVolume">12 %</output></label>
-          </div>
-          <p>Empieza bajito, al 12 %. El volumen y la pausa se recuerdan en este navegador.</p>
-        </fieldset>
         <p id="appearanceStatus" role="status" aria-live="polite">Estilo Azul glass activo.</p>
       </div>
     </details>
-    <section class="background-music-player" aria-labelledby="musicHeading">
-      <div class="music-video-frame"><div id="backgroundMusicPlayer"></div></div>
-      <div class="music-player-info"><span class="eyebrow">AMBIENTE RCC</span><h2 id="musicHeading">Tu música de fondo</h2><p id="musicNowPlaying">Primera canción · YouTube · en bucle</p>
-        <p id="musicStatus" role="status" aria-live="polite">Cargando música de YouTube…</p>
-        <button id="musicQuickToggle" class="btn btn-ghost" type="button">Pausar música</button>
-        <a id="musicExternalLink" href="https://www.youtube.com/watch?v=kXB2Of4QrNQ" target="_blank" rel="noopener noreferrer">Abrir en YouTube ↗</a>
-        <p>Ajusta el volumen en Personalización. Cada canción se repite hasta que elijas otra.</p>
-      </div>
-      <div id="musicExplorer" class="music-explorer" hidden>
-        <div class="music-explorer-heading"><div><span class="eyebrow">DESCUBRE EN YOUTUBE</span><h3>Elige qué suena</h3></div><button id="musicHide" class="btn btn-ghost" type="button">Ocultar música</button></div>
-        <form id="musicSearchForm" class="music-search-form" role="search" aria-label="Buscar música en YouTube">
-          <label for="musicQuery">Canción, artista o enlace de YouTube</label>
-          <div><input id="musicQuery" type="search" maxlength="160" placeholder="Busca una canción o pega su enlace" required><button class="btn btn-primary" type="submit">Buscar / reproducir</button></div>
-        </form>
-        <div class="music-discovery" role="group" aria-label="Explorar música"><button type="button" data-music-query="lofi para programar">Para programar</button><button type="button" data-music-query="música relajante">Relax</button><button type="button" data-music-query="música electrónica">Electrónica</button><button type="button" data-music-query="éxitos latinos">Latino</button><button id="musicDefault" type="button">Volver a la primera canción</button></div>
-        <p id="musicSearchStatus" role="status" aria-live="polite">Busca música o explora las sugerencias públicas de YouTube.</p>
-        <div id="musicResults" class="music-results" aria-busy="false"></div>
-        <p class="music-service-note">Resultados públicos de YouTube; no se conecta a tu cuenta ni a tus recomendaciones personales de YouTube Music. El reproductor de YouTube permite ajustar el volumen, pero no ofrece ecualizador.</p>
-      </div>
-    </section>
     <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
     <details class="code-compare personalization" id="codeCompare">
 <summary>Comparar códigos <small>HERRAMIENTA RCC 1.7</small></summary>
@@ -656,6 +629,7 @@ window.rccSupabaseReady.catch(() => {});
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
+<section class="catalog-news" id="catalogNews" role="status" aria-label="Novedades del catálogo"><div><strong>Catálogo actualizado · 3 de noviembre</strong><p>2.200 scripts añadidos · 371 nombres de juegos nuevos · imágenes de referencia. Avisos de compatibilidad y panel de ejecutores con confirmación de descarga. Publicaciones de la comunidad sin verificar.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <div class="grid" id="scripts">
@@ -1024,6 +998,7 @@ function render(reset = true){
       <h3>${escapeHTML(s.name)}</h3>
       <p class="desc">${escapeHTML(s.description || '')}</p>
       <p class="compat-status">${escapeHTML(verificationLabel(s))}</p>
+      ${executorWarning(s)}
       <div class="tags">
         ${(s.tags||[]).map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join('')}
         ${(s.executors||[]).slice(0,3).map(e=>`<span class="tag exec">⚡${escapeHTML(e)}</span>`).join('')}
@@ -1061,6 +1036,11 @@ function render(reset = true){
   });
 }
 
+function executorWarning(script){
+  if(!/loadstring|httpget/i.test(String(script.code||'')))return '';
+  return '<aside class="executor-warning" aria-label="Compatibilidad del ejecutor"><span class="executor-warning-icon" aria-hidden="true">!</span><div><strong>Requiere un ejecutor compatible</strong><p>Este código utiliza loadstring o HttpGet. En celular necesitas un ejecutor que admita estas funciones, como Delta o Fluxus. Comprueba su soporte y versión; la compatibilidad no está verificada.</p><button type="button" class="executor-help" data-open-executors>¿No tienes un ejecutor adecuado? Sí, ver opciones ↗</button></div></aside>';
+}
+
 function openScript(s){
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
@@ -1080,6 +1060,7 @@ function openScript(s){
       <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px; font-weight: 700;">Entornos declarados · ejecutores externos sin verificar</div>
       <div class="tags">${(s.executors||[]).map(e=>`<span class="tag exec">⚡ ${escapeHTML(e)}</span>`).join('')}</div>
     </div>
+    ${executorWarning(s)}
     <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
     <pre class="notranslate" translate="no"><code id="modalCode"></code></pre>
     <div class="actions">
