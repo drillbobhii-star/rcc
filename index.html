@@ -415,6 +415,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
+<script src="assets/assistant-guide.js" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -1234,6 +1235,7 @@ window.RCCNavigation = {
   suggestions: (query, limit=10) => getNavigationSearchIndex().suggest(query,limit),
   executors: () => getNavigationSearchIndex().executors,
   recommend: (query='') => getNavigationSearchIndex().recommend(query),
+  assistantSubjects: () => [...new Set(scripts.map(script => script.name).filter(Boolean))],
   section: selectSection
 };
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
