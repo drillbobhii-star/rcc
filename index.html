@@ -1077,7 +1077,7 @@ function openScript(s){
   document.getElementById('modalCode').textContent = s.code;
   window.enhanceGameDetail?.(s, modalBody);
   const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => window.openRccLab?.(s.code); modalBody.querySelector('.actions').prepend(explain);
-  if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
+  if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=s.release.changes.length?(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date:s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
   renderCompatibility(s);
   document.getElementById('voteBtn').onclick = e=>voteForScript(String(s.id),e.currentTarget);
   updateVoteButton(String(s.id),document.getElementById('voteBtn'));

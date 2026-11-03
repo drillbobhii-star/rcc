@@ -4,7 +4,7 @@
     requirements:'loadstring convierte texto en código; HttpGet obtiene contenido remoto. El script puede depender de ambas funciones. Revisa el dispositivo, la versión y los requisitos del ejecutor. El aviso detecta esas palabras en el código; no garantiza compatibilidad ni seguridad.',
     downloads:'Abre Panel de ejecutores y elige una opción. Revisa el dominio y el aviso; espera diez segundos y pulsa «Sí, ir a la descarga» para continuar. Cancelar o cambiar de ejecutor reinicia la espera. RCC no aloja los ejecutables ni verifica esas descargas.',
     safety:'Las páginas externas pueden incluir anuncios, redirecciones y botones engañosos. Mantén el antivirus y las protecciones del navegador activos. Si aparece un bloqueo, detente y verifica el origen. Nunca compartas contraseñas, cookies ni tokens. Revisa el código remoto antes de usarlo; una imagen o una ficha no garantiza seguridad.',
-    release:'Esta actualización incorpora avisos en fichas y modales para loadstring/HttpGet, un panel de ocho ejecutores con confirmación y espera de diez segundos, y nuevas animaciones de fondo. El catálogo también incluye publicaciones recientes con imágenes de referencia y fuentes sin verificar. Se retiraron el audio de fondo y el reproductor. Usa Novedades para consultar las fichas añadidas.'
+    release:'Esta actualización incorpora avisos en fichas y modales para loadstring/HttpGet, un panel de ocho ejecutores con confirmación y espera de diez segundos, y nuevas animaciones de fondo. El catálogo también incluye publicaciones recientes con imágenes de referencia y funciones sin verificar. Se retiraron el audio de fondo y el reproductor. Usa Novedades para consultar las fichas añadidas.'
   };
   const groups={
     updates:[['¿Qué cambió en esta actualización?','release'],['¿Dónde veo los scripts añadidos?','updates'],['¿Por qué ya no hay reproductor de música?','release'],['¿Dónde están los ocho ejecutores?','executors'],['¿Qué significa el aviso de compatibilidad?','requirements']],
@@ -14,7 +14,7 @@
   // 24 phrasings per published title; never allocate the full question bank.
   const templates=[
     '¿Dónde encuentro {s}?','¿Puedes buscar {s}?','¿Me muestras {s}?','¿Hay una ficha de {s}?','¿Cómo localizo {s}?','Quiero explorar {s}',
-    'Busca en RCC: {s}','Muéstrame el código publicado de {s}','¿Dónde reviso los requisitos de {s}?','¿Dónde consulto la fuente de {s}?','¿Dónde leo el código de {s}?','Quiero revisar la ficha de {s}',
+    'Busca en RCC: {s}','Muéstrame el código publicado de {s}','¿Dónde reviso los requisitos de {s}?','¿Dónde consulto las funciones de {s}?','¿Dónde leo el código de {s}?','Quiero revisar la ficha de {s}',
     '¿Dónde compruebo la plataforma de {s}?','¿Dónde veo las etiquetas de {s}?','¿Dónde reviso la descripción de {s}?','¿Cómo encuentro la publicación de {s}?','Busca la ficha llamada {s}','¿Qué muestra el catálogo sobre {s}?',
     '¿Dónde puedo revisar {s} antes de usarlo?','Quiero comprobar los detalles de {s}','¿Puedes localizar la entrada {s}?','Abre una búsqueda para {s}','¿Dónde verifico el entorno indicado para {s}?','Quiero consultar los avisos de {s}'
   ];

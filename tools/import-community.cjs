@@ -18,7 +18,7 @@ async function main() {
       const source = 'https://scriptblox.com/script/' + item.slug;
       if (ids.has(id) || sources.has(source) || item.isPatched || item.scriptType !== 'free') continue;
       if (!item.title || !item.game?.name || /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux/i.test(item.title)) continue;
-      catalog.push({id, name:item.title.slice(0,180), description:`${item.game.name}. Publicación de la comunidad en ScriptBlox. ${item.key?'Requiere clave':'Sin clave indicada'} según la fuente. Contenido remoto y funcionamiento sin verificar.`,
+      catalog.push({id, name:item.title.slice(0,180), description:`${item.game.name}. Funciones anunciadas en el título: ${item.title.slice(0,180)}. ${item.key?'Requiere clave':'Sin clave indicada'}. Contenido remoto y funcionamiento sin verificar.`,
         level:'free', device:'unknown', platform:'roblox', type:'loadstring', executors:['Ejecutor externo (sin verificar)'], tags:['Juegos','Comunidad',item.key?'Con clave':'Sin clave'], version:'1.0', created_at:date,
         reference_image:typeof item.game.imageUrl==='string' && /^\/images\/[\w/.-]+$/.test(item.game.imageUrl)?'https://scriptblox.com'+item.game.imageUrl:undefined,
         code:`loadstring(game:HttpGet(${JSON.stringify('https://scriptblox.com/raw/'+item.slug)}))()`, game:item.game.name.slice(0,180), game_id:String(item.game.gameId || 0), catalog_section:'games',
