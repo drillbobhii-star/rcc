@@ -459,6 +459,14 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/studio.css">
 <link rel="stylesheet" href="assets/search-experience.css">
 <link rel="stylesheet" href="assets/script-media.css">
+<link rel="stylesheet" href="assets/sky-studio.css">
+<script src="assets/sky-studio.js" defer></script>
+<link rel="stylesheet" href="assets/graphite-studio.css">
+<link rel="stylesheet" href="assets/floating-notifications.css">
+<script src="assets/floating-notifications.js" defer></script>
+<script src="assets/notification-banners.js" defer></script>
+<link rel="stylesheet" href="assets/notification-banners.css">
+<link rel="stylesheet" href="assets/prism-logo.css">
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -480,7 +488,7 @@ window.rccSupabaseReady.catch(() => {});
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-white-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8 3 16l7 8M22 8l7 8-7 8M19 5l-6 22"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
+    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-prism" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path class="prism-shell" d="M24 3 44 14 40 36 24 45 8 36 4 14Z"/><path class="prism-fold" d="m4 14 20 10 20-10M24 24v21"/><path class="prism-letter" d="M16 32V15h10a5 5 0 0 1 0 10H16m10 0 7 8"/><circle class="prism-satellite" cx="24" cy="3" r="2.3"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
 
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
@@ -559,8 +567,8 @@ window.rccSupabaseReady.catch(() => {});
         <a class="help-link" href="rocio-informacion.html">Rocío información ↗</a>
       </nav>
       <div class="hero-intro"><div class="hero-copy"><span class="eyebrow">BIBLIOTECA DE CÓDIGO · RCC</span>
-      <h2 id="heroTitle" tabindex="-1">Tu próxima idea empieza con código.</h2>
-      <p id="heroSubtitle">Lua, juegos y JavaScript: explora el catálogo gratuito y revisa los requisitos de cada código.</p>
+      <h2 id="heroTitle" tabindex="-1">Tu próxima idea empieza aquí.</h2>
+      <p id="heroSubtitle">Explora Lua, juegos y JavaScript a tu ritmo. Encuentra una idea, abre su código y hazla tuya.</p>
       <div class="studio-actions"><a class="studio-primary" href="#catalogHeading">Explorar códigos <span aria-hidden="true">↗</span></a><button type="button" data-motion-library>Probar animaciones <span aria-hidden="true">→</span></button><span class="studio-shortcut"><kbd>Ctrl / ⌘ K</kbd> para buscar</span></div>
       <section class="platform-spotlight" aria-label="Nuevos scripts independientes">
         <span class="eyebrow">NUEVO · CÓDIGO FUENTE INDEPENDIENTE</span>
@@ -599,8 +607,8 @@ window.rccSupabaseReady.catch(() => {});
     <details id="personalization" class="personalization">
       <summary><span><small>ESTUDIO VISUAL</small>Tu RCC, a tu estilo</span><span aria-hidden="true">＋</span></summary>
       <div class="personalization-body">
-        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Azul glass y negro glass, además de iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
-        <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="true"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito y logo blanco</small></button>
+        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Negro glass con textura de grafito y detalles azul claro; también Cielo, Azul glass, iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
+        <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="sky" aria-pressed="false"><span class="theme-art art-sky" aria-hidden="true">RCC</span><strong>Cielo</strong><small>Blanco, azul claro y tinta</small></button><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="true"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito, textura y azul claro</small></button>
           <button type="button" data-theme="monochrome" aria-pressed="false"><span class="theme-art art-monochrome" aria-hidden="true">RCC</span><strong>Diagonal infinito</strong><small>Mitad blanco, mitad negro · en movimiento</small></button>
           <button type="button" data-theme="ios" aria-pressed="false"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
           <button type="button" data-theme="android" aria-pressed="false"><span class="theme-art art-android" aria-hidden="true">RCC</span><strong>Android</strong><small>Formas y color material</small></button>
@@ -612,9 +620,9 @@ window.rccSupabaseReady.catch(() => {});
           <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
           <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
           <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
-          <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos de paneles</label><label>Volumen de paneles<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
+          <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos al interactuar</label><label>Volumen de interacción<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
         </div>
-        <p id="appearanceStatus" role="status" aria-live="polite">Estilo Azul glass activo.</p>
+        <p id="appearanceStatus" role="status" aria-live="polite">Estilo Negro glass activo.</p>
       </div>
     </details>
     <section class="catalog-heading" aria-labelledby="catalogHeading"><div><span class="eyebrow">EXPLORA LA BIBLIOTECA</span><h2 id="catalogHeading" tabindex="-1">Encuentra tu próximo script<span>.</span></h2></div><a href="compatibilidad.html">Guía de compatibilidad ↗</a></section>
@@ -662,9 +670,9 @@ window.rccSupabaseReady.catch(() => {});
 
 <dialog id="welcomeDialog" class="welcome-dialog" aria-labelledby="welcomeTitle">
   <div class="welcome-content">
-    <div class="welcome-top"><span class="welcome-kicker">RCC / PRIMERA VISITA</span><button type="button" class="tour-skip" id="tourSkip">Omitir presentación ↗</button></div>
+    <div class="welcome-top"><span class="welcome-kicker">BIENVENIDO A RCC / 01</span><button type="button" class="tour-skip" id="tourSkip">Cerrar presentación ↗</button></div>
     <div class="tour-progress" aria-label="Progreso"><span id="tourCounter">01 / 02</span><div><i id="tourProgress"></i></div></div>
-    <div class="welcome-stage" aria-hidden="true"><div class="welcome-orbit"></div><div class="welcome-emblem">RCC<span>EXPLORA. ENTIENDE. CREA.</span></div><span class="welcome-signal">TU ESPACIO DE CÓDIGO</span></div>
+    <div class="welcome-stage" aria-hidden="true"><div class="welcome-orbit"></div><div class="welcome-emblem">RCC<span>TU PRÓXIMO PROYECTO EMPIEZA AQUÍ.</span></div><span class="welcome-signal">BIBLIOTECA / ESTUDIO / COMUNIDAD</span></div>
     <h2 id="welcomeTitle" tabindex="-1">Un nuevo espacio para tus ideas.</h2>
     <section id="tourFirst">
       <p class="welcome-lead">Todo empieza en el panel superior. Explora la biblioteca, cambia tu estilo y abre las herramientas sin perder tu lugar.</p>
@@ -675,7 +683,7 @@ window.rccSupabaseReady.catch(() => {});
       <p class="welcome-lead">Tienes una biblioteca a tu alcance y un asistente de navegación para encontrar tu próximo ejemplo.</p>
       <div class="tour-warning"><span>ANTES DE EMPEZAR</span><h3>RCC no es una IA<br>ni un generador de código.</h3><p>Los códigos ya están publicados. El asistente busca en el catálogo y te guía por las funciones; no inventa scripts ni responde como una IA.</p></div>
       <p class="welcome-important">Lee los requisitos y prueba en una copia de tu proyecto. Los loaders descargan código remoto que el analizador no puede inspeccionar. «Jugar en Roblox» abre el juego, no ejecuta scripts.</p>
-      <p class="tour-memory">Recordamos esta presentación y tu última búsqueda en este navegador mientras conserves las cookies. Puedes volver a verla desde «Cómo usar RCC».</p>
+      <p class="tour-memory">Este recorrido aparece en tu primera visita si no has iniciado sesión. Puedes volver a verlo desde «Cómo usar RCC». Los menús y el asistente se abren solo cuando los eliges.</p>
     </section>
     <div class="tour-navigation"><button type="button" id="tourBack" hidden>← Anterior</button><button type="button" id="tourNext" class="welcome-confirm">Siguiente <span aria-hidden="true">→</span></button></div>
   </div>
@@ -932,7 +940,7 @@ function render(reset = true){
     document.getElementById('heroTitle').textContent='JavaScript para la web';
     document.getElementById('heroSubtitle').textContent='HTML, CSS y JavaScript en un archivo. Copia, descarga y empieza a crear tu página.';
   }
-  if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza con código.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';}
+  if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza aquí.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';}
   if (showFavorites) list = list.filter(s => favoriteIds.has(s.id));
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
@@ -1164,6 +1172,10 @@ async function shareCurrent(){
   try { await navigator.clipboard.writeText(url.href); showToast('Enlace copiado'); }
   catch { showToast('No se pudo copiar el enlace.'); }
 }
+window.rccOpenNotificationScript=id=>{
+  const script=scripts.find(row=>row.id===String(id));
+  if(script)openScript(script);else showToast('Este script ya no está disponible en el catálogo.');
+};
 function openSharedScript(){
   const id = new URLSearchParams(location.hash.slice(1)).get('script');
   const s = scripts.find(s=>s.id===id); if(s) openScript(s);
@@ -1377,7 +1389,8 @@ async function initializeAuth(){
     },0);});
     const {data,error}=await supabase.auth.getSession();if(error)throw error;
     await applySession(data.session?.user);
-  }catch(error){showToast(error?.code==='SUPABASE_NOT_CONFIGURED'?error.message:'No se pudo recuperar el acceso. Intenta iniciar sesión de nuevo.');}
+    return Boolean(data.session?.user);
+  }catch(error){showToast(error?.code==='SUPABASE_NOT_CONFIGURED'?error.message:'No se pudo recuperar el acceso. Intenta iniciar sesión de nuevo.');return null;}
 }
 function openPasswordRecovery(){ window.rccOpenRecovery(); }
 document.getElementById('logoutBtn').onclick=async e=>{
@@ -1426,7 +1439,7 @@ async function voteForScript(scriptId,button){
   finally{votePending.delete(key);if(button.isConnected)button.disabled=false;}
 }
 
-initializeAuth();
+window.rccSessionReady=initializeAuth();
 loadScripts();
 </script>
 

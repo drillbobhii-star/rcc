@@ -1,0 +1,14 @@
+.floating-notifications{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(22px,env(safe-area-inset-bottom));z-index:110;width:56px;height:56px}
+.floating-notifications[hidden],.floating-notification-panel[hidden]{display:none!important}
+.notification-bell{display:grid;place-items:center;width:56px;height:56px;border:1px solid var(--border-glass,#b6cee540);border-radius:20px;background:var(--card-glass,#17212bea);color:var(--accent,#b7d9ef);box-shadow:inset 0 1px 0 #ffffff20,0 12px 30px #02050950;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;transition:box-shadow .18s,border-color .18s}
+.notification-bell svg{width:25px;height:25px;pointer-events:none}
+.notification-bell:hover{border-color:var(--accent,#b7d9ef)}
+.notification-bell.is-dragging{cursor:grabbing;border-color:var(--accent,#b7d9ef);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent,#b7d9ef) 15%,transparent),0 16px 38px #02050970}
+.floating-notification-panel{position:fixed;box-sizing:border-box;width:min(330px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:20px;border:1px solid var(--border-glass,#b6cee540);border-radius:22px;background:color-mix(in srgb,var(--surface,#181818) 94%,transparent);color:var(--text,#eef2f7);box-shadow:inset 0 1px 0 #ffffff15,0 20px 60px #02050950;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.notification-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.notification-panel-heading h2{margin:0;font:700 18px 'Manrope',sans-serif;letter-spacing:-.4px}
+.notification-close{display:grid;place-items:center;min-width:44px;min-height:44px;border:1px solid var(--border-glass);border-radius:12px;color:var(--text);background:transparent;font:24px/1 sans-serif;cursor:pointer}
+.floating-notification-panel p{margin:16px 0;font:14px/1.7 'DM Sans',sans-serif;color:var(--muted,#a8b6c2)}
+.floating-notification-panel small{display:block;border-top:1px solid var(--border-glass);padding-top:14px;font:11px/1.7 'DM Sans',sans-serif;color:var(--muted,#a8b6c2)}
+.notification-bell:focus-visible,.notification-close:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+@media(prefers-reduced-motion:reduce){.notification-bell{transition:none}}

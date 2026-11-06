@@ -201,6 +201,88 @@ const APP_VERSION = '2.0';
     window.rccRefreshComposer(); loadComments(target,id);
   };
 
+  // Read-only notification feed. The existing tables remain the source of truth.
+  function startNotificationFeed() {
+    let owner=null, revision=0, running=false, refreshPending=false;
+    const seen=new Map();
+    const emit=(items,status='')=>window.dispatchEvent(new CustomEvent('rcc:notifications-update',{detail:{items,status}}));
+    async function poll() {
+      if(!owner || document.hidden) return;
+      if(running){refreshPending=true;return;}
+      running=true;
+      const userId=owner, token=revision;
+      const valid=()=>token===revision && currentUser?.id===userId;
+      try {
+        const sb=await window.rccSupabaseReady;
+        if(!valid())return;
+        const mine=[];
+        for(let offset=0;;offset+=500){
+          const result=await sb.from('comments').select('id,script_id').eq('user_id',userId).order('id').range(offset,offset+499).abortSignal(AbortSignal.timeout(8000));
+          if(result.error)throw result.error;
+          if(!valid())return;
+          mine.push(...(result.data||[]));
+          if((result.data||[]).length<500)break;
+        }
+        if(!mine.length){emit([]);return;}
+        const own=new Map(mine.map(row=>[String(row.id),row]));
+        const since=new Date(Date.now()-86400000).toISOString();
+        const rows=[], warnings=new Set();
+        for(let offset=0;offset<mine.length;offset+=100){
+          const ids=mine.slice(offset,offset+100).map(row=>row.id);
+          const results=await Promise.all([
+            sb.from('comments').select('id,parent_id,script_id,user_id,text,created_at').in('parent_id',ids).neq('user_id',userId).gte('created_at',since).order('created_at',{ascending:false}).limit(100).abortSignal(AbortSignal.timeout(8000)),
+            sb.from('comment_likes').select('comment_id,user_id,created_at').in('comment_id',ids).neq('user_id',userId).gte('created_at',since).order('created_at',{ascending:false}).limit(100).abortSignal(AbortSignal.timeout(8000))
+          ]);
+          if(!valid())return;
+          results.forEach((result,index)=>{
+            if(result.error){warnings.add(index?'No se pudieron consultar los Me gusta.':'No se pudieron consultar las respuestas.');return;}
+            for(const row of result.data||[]){
+              const script=own.get(String(index?row.comment_id:row.parent_id));
+              if(!script || !Number.isFinite(Date.parse(row.created_at)))continue;
+              rows.push({id:index?`like:${row.comment_id}:${row.user_id}:${row.created_at}`:`reply:${row.id}`,type:index?'like':'reply',scriptId:String(script.script_id),actor:row.user_id,text:row.text||'',createdAt:row.created_at});
+            }
+          });
+        }
+        rows.sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt)||a.id.localeCompare(b.id));
+        const recent=rows.slice(0,100), profiles=new Map();
+        const actors=[...new Set(recent.map(row=>row.actor))];
+        if(actors.length){
+          const result=await sb.from('profiles').select('user_id,display_name').in('user_id',actors).abortSignal(AbortSignal.timeout(8000));
+          for(const profile of result.data||[])profiles.set(profile.user_id,profile.display_name);
+        }
+        if(!valid())return;
+        const items=recent.map(row=>({...row,message:row.type==='like'?`A ${profiles.get(row.actor)||'un miembro'} le gustó tu comentario`:`${profiles.get(row.actor)||'Un miembro'} respondió a tu comentario: ${row.text}`}));
+        emit(items,[...warnings].join(' '));
+        // Only recent arrivals produce banners; older records remain in the bell panel.
+        for(const item of items.slice().reverse()){
+          if(!seen.has(item.id) && Date.parse(item.createdAt)>=Date.now()-300000){
+            window.dispatchEvent(new CustomEvent('rcc:notification',{detail:item}));
+          }
+          seen.set(item.id,Date.parse(item.createdAt));
+        }
+        for(const [id,time] of seen)if(time<Date.now()-86400000)seen.delete(id);
+      } catch {
+        if(valid())window.dispatchEvent(new CustomEvent('rcc:notifications-error',{detail:{message:'No se pudieron actualizar las notificaciones. Se reintentará automáticamente.'}}));
+      } finally {
+        running=false;
+        if(refreshPending){refreshPending=false;poll();}
+      }
+    }
+    function sync(){
+      const next=currentUser?.id||null;
+      if(next===owner)return;
+      owner=next;revision++;seen.clear();window.dispatchEvent(new Event('rcc:notifications-reset'));emit([]);
+      if(owner)poll();
+    }
+    new MutationObserver(sync).observe(document.getElementById('authEmail'),{attributes:true,attributeFilter:['hidden'],childList:true,subtree:true,characterData:true});
+    setInterval(poll,3000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll();});
+    window.addEventListener('rcc:notifications-refresh',poll);
+    sync();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startNotificationFeed,{once:true});
+  else startNotificationFeed();
+
   // --- 4. AVISO DE VERSIÓN ---
   try{
     const previous=localStorage.getItem('APP_VERSION');
