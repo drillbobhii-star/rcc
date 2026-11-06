@@ -79,7 +79,7 @@ const APP_VERSION = '2.0';
   let section=null, scriptId=null, loadRevision=0;
   
   window.rccRefreshCopy=()=>{ const button=document.getElementById('scriptCopyBtn'); if(button) button.textContent = (window.rccRequiresLogin && !currentUser) ? 'Inicia sesión para copiar' : 'Copiar código'; };
-  window.rccRefreshComposer=()=>{ if(!section?.isConnected) return; const form=section.querySelector('form'); form.hidden=!currentUser; section.querySelector('.comment-login').hidden=!!currentUser; };
+  window.rccRefreshComposer=()=>{ if(!section?.isConnected) return; const form=section.querySelector('form'); form.hidden=!currentUser; if(!currentUser) section.cancelReply(); section.querySelector('.comment-login').hidden=!!currentUser; };
 
   async function loadComments(target, id){
     const revision=++loadRevision, list=target.querySelector('.comment-list'); list.textContent='Cargando comentarios…';
@@ -98,26 +98,53 @@ const APP_VERSION = '2.0';
         if(profs) profs.forEach(p => profiles[p.user_id] = p);
       }
 
+      if(revision!==loadRevision || !target.isConnected) return;
       list.replaceChildren();
       if(!comments.length) list.textContent='Aún no hay comentarios. Comparte el primero.';
       
+      // Recorrer cada hilo sin perder comentarios huérfanos o ciclos malformados.
+      const children=new Map(), ids=new Set(comments.map(row=>String(row.id)));
       for(const row of comments){
+        const key=row.parent_id == null ? null : String(row.parent_id);
+        if(!children.has(key)) children.set(key,[]);
+        children.get(key).push(row);
+      }
+      const ordered=[], visited=new Set();
+      const visit=root=>{
+        const pending=[root];
+        while(pending.length){
+          const row=pending.pop(), key=String(row.id);
+          if(visited.has(key)) continue;
+          visited.add(key); ordered.push(row);
+          pending.push(...(children.get(key)||[]).slice().reverse());
+        }
+      };
+      comments.filter(row=>row.parent_id == null || !ids.has(String(row.parent_id))).forEach(visit);
+      comments.forEach(visit);
+      for(const row of ordered){
         const article=el('article'), person=el('div',null,'comment-person');
+        if(row.parent_id != null) article.classList.add('comment-reply');
         const prof = profiles[row.user_id] || {};
         
         if(prof.avatar_url && /^https:\/\//i.test(prof.avatar_url)){
           const image=el('img'); image.src=prof.avatar_url; image.alt=''; image.loading='lazy'; image.referrerPolicy='no-referrer'; image.onerror=()=>image.remove(); person.append(image);
         }
         
-        const authorName = prof.display_name || row.user_email.split('@')[0];
+        const authorName = prof.display_name || (row.user_email || 'Miembro').split('@')[0];
         const authorColor = prof.text_color || '#dce6f5';
         
         const author=el('strong', authorName); 
         if(/^#[a-f0-9]{6}$/i.test(authorColor)) author.style.color = authorColor;
         person.append(author);
+        if((row.user_email || '').trim().toLowerCase()==='drillbobhii@gmail.com'){
+          person.append(el('span','👑 Creador','comment-creator-badge'));
+          article.classList.add('comment-creator');
+        }
         
         const date=el('time',new Date(row.created_at).toLocaleString('es')); date.dateTime=row.created_at;
-        article.append(person, date, el('p', row.text));
+        const reply=el('button','Responder','btn btn-ghost comment-reply-button'); reply.type='button';
+        reply.onclick=()=>target.startReply(row.id,authorName);
+        article.append(person, date, el('p', row.text),reply);
         list.append(article);
       }
     } catch(error) {
@@ -138,20 +165,36 @@ const APP_VERSION = '2.0';
     const form=el('form'), input=el('textarea'); input.required=true; input.maxLength=2000; input.setAttribute('aria-label','Tu comentario'); input.placeholder='Comparte tu experiencia…';
     const send=el('button','Publicar comentario','btn btn-primary'); send.type='submit';
     const status=el('p'); status.setAttribute('role','status');
-    form.append(input,send,status); target.append(form); modalBody.append(target);
+    let parentId=null;
+    const replyContext=el('div',null,'comment-reply-context'), replyLabel=el('span'); replyContext.hidden=true;
+    const cancel=el('button','Cancelar respuesta','btn btn-ghost'); cancel.type='button';
+    target.cancelReply=()=>{ parentId=null; replyContext.hidden=true; replyLabel.textContent=''; send.textContent='Publicar comentario'; };
+    cancel.onclick=target.cancelReply;
+    target.startReply=(id,authorName)=>{
+      if(send.disabled) return;
+      if(!currentUser){ login.click(); return; }
+      parentId=id; replyLabel.textContent=`Respondiendo a ${authorName}`; replyContext.hidden=false;
+      send.textContent='Publicar respuesta'; form.hidden=false; status.textContent='';
+      input.focus(); form.scrollIntoView({block:'nearest',behavior:'smooth'});
+    };
+    replyContext.append(replyLabel,cancel);
+    form.append(replyContext,input,send,status); target.append(form); modalBody.append(target);
     
     form.onsubmit=async event=>{
       event.preventDefault(); send.disabled=true; status.textContent='Publicando…';
       try {
+        if(!currentUser) throw new Error('Inicia sesión para comentar.');
         const sb = await window.rccSupabaseReady;
+        if(!currentUser) throw new Error('Inicia sesión para comentar.');
         const { error } = await sb.from('comments').insert({
           script_id: String(id),
           user_id: currentUser.id,
           user_email: currentUser.email,
-          text: input.value
+          text: input.value,
+          parent_id: parentId
         });
         if(error) throw error;
-        input.value=''; status.textContent='Comentario publicado.'; await loadComments(target,id);
+        input.value=''; target.cancelReply(); status.textContent='Comentario publicado.'; await loadComments(target,id);
       } catch(error) { status.textContent = error.message || 'Error al publicar.'; }
       finally { send.disabled=false; }
     };
