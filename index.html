@@ -428,7 +428,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/interactive-glass.css">
 <script src="assets/interactive-glass.js" defer></script>
 <!-- Completa content con la clave pública anon al configurar el sitio estático. -->
-<meta name="<meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtpb0JYKlDM8U">"">
+<meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtpb0JYKlDM8U">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.js"></script>
 <script>
 window.rccAuthRedirect = 'https://rcc-3m0.pages.dev';
@@ -542,7 +542,7 @@ window.rccSupabaseReady.catch(() => {});
 
         <a class="roblox-follow" href="https://www.roblox.com/share?code=86b2c3c1d4ef024fafa196db62dac9a6&amp;type=Profile&amp;source=ProfileShare&amp;stamp=1793551063604" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 1 31 8 24 31 1 24Zm5 10-2 8 8 2 2-8Z"/></svg>Seguime en Roblox<span aria-hidden="true">↗</span></a>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
-        <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost login-unavailable" id="loginBtn" type="button" aria-disabled="true" aria-controls="loginNotice" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
+        <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button" aria-haspopup="dialog" aria-controls="authModal" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -1253,24 +1253,17 @@ const authForm = document.getElementById('authForm');
 const authStatus = document.getElementById('authStatus');
 let authReturnFocus = null;
 let passwordReset = false;
-let loginNoticeTimer;
-function hideLoginNotice(){
-  clearTimeout(loginNoticeTimer);
-  const notice=document.getElementById('loginNotice');
-  notice.hidden=true;notice.textContent='';
-  document.getElementById('loginBtn').setAttribute('aria-expanded','false');
-}
 function openAuth(){
-  clearTimeout(loginNoticeTimer);
-  const notice=document.getElementById('loginNotice');
-  notice.textContent='Estamos trabajando en el inicio de sesión y el acceso a cuentas. Mientras tanto, puedes explorar, copiar y descargar códigos sin iniciar sesión.';
-  notice.hidden=false;
+  authReturnFocus=document.activeElement;
+  authStatus.textContent='';
+  authModal.classList.add('open');document.body.style.overflow='hidden';
   document.getElementById('loginBtn').setAttribute('aria-expanded','true');
-  loginNoticeTimer=setTimeout(hideLoginNotice,6500);
+  document.getElementById(passwordReset?'authPassword':'authEmailInput').focus();
 }
 
 function closeAuth(){
   authModal.classList.remove('open');document.getElementById('authPassword').value='';
+  document.getElementById('loginBtn').setAttribute('aria-expanded','false');
   document.body.style.overflow=modal.classList.contains('open')?'hidden':'';
   authReturnFocus?.focus();
 }
@@ -1312,13 +1305,17 @@ async function submitAuth(register){
       for(const id of ['signupBtn','googleLoginBtn','forgotPasswordBtn'])document.getElementById(id).hidden=false;
       await applySession((await supabase.auth.getSession()).data.session?.user);closeAuth();showToast('Contraseña actualizada');return;
     }
-    const {data,error}=register?await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.rccAuthRedirect}}):await supabase.auth.signInWithPassword({email,password});
+    let {data,error}=register?await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.rccAuthRedirect}}):await supabase.auth.signInWithPassword({email,password});
     if(error)throw error;
     if(register&&data.user?.identities?.length===0)throw new Error('already registered');
-    const user=data.user;
-    document.getElementById('authPassword').value='';
-    if(data.session){await applySession(user);closeAuth();showToast(register?'Cuenta creada':'Sesión iniciada');}
-    else authStatus.textContent='Revisa tu correo y confirma tu cuenta. Después podrás guardar scripts y votar.';
+    if(register&&!data.session){
+      authStatus.textContent='Iniciando sesión…';
+      const result=await supabase.auth.signInWithPassword({email,password});
+      if(result.error)throw result.error;
+      data=result.data;
+    }
+    if(!data?.session?.user)throw new Error('No session returned');
+    await applySession(data.session.user);closeAuth();showToast(register?'Cuenta creada':'Sesión iniciada');
   }catch(error){authStatus.textContent=authError(error);}
   finally{setAuthBusy(false);}
 }
@@ -1347,7 +1344,6 @@ async function applySession(user){
   document.getElementById('authEmail').textContent=currentUser?.email||'';
   document.getElementById('authEmail').hidden=!currentUser;
   document.getElementById('loginBtn').hidden=!!currentUser;
-  if(currentUser)hideLoginNotice();
   document.getElementById('logoutBtn').hidden=!currentUser;
   if(previousId===currentUser?.id)return;
   sessionRevision++;votedIds.clear();favoriteIds=new Set();favoritesStatus='idle';

@@ -6,11 +6,13 @@ const element=()=>({hidden:false,disabled:false,value:'',textContent:'',isConnec
  classList:{contains:()=>false,add(){},remove(){}},setAttribute(){},addEventListener(){},querySelectorAll:()=>[],focus(){},reportValidity:()=>true});
 let next={data:[],error:null};
 let authListener;
+let signupResult={error:Error('already registered')};
+let loginResult;
 const account={id:'a',email:'member@example.test'};
 const supabase={auth:{getSession:async()=>({data:{session:null}}),signOut:async()=>({}),
  signInWithOAuth:async(options)=>{requests.push({oauth:options});return {}},
- signUp:async()=>({error:Error('already registered')}),
- signInWithPassword:async(credentials)=>{requests.push({login:credentials});return {data:{user:account,session:{user:account}}}},
+ signUp:async(credentials)=>{requests.push({signup:credentials});return signupResult},
+ signInWithPassword:async(credentials)=>{requests.push({login:credentials});return loginResult||{data:{user:account,session:{user:account}}}},
  onAuthStateChange:listener=>{authListener=listener}},from(table){
  const query={select(){requests.push({table,method:'SELECT'});return query},eq(){return query},
  insert(row){requests.push({table,method:'INSERT',row});return query},
@@ -25,6 +27,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
 (async()=>{
  await vm.runInContext(`toggleFavorite('sample',{})`,context);
  assert.equal(requests.length,0);assert.equal(messages.pop(),'Inicia sesión para guardar tus scripts favoritos en la nube');
+ assert.equal(context.document.body.style.overflow,'hidden');
  vm.runInContext(`currentUser={id:'a',email:'member@example.test'};`,context);
  await vm.runInContext(`toggleFavorite('sample',{})`,context);
  assert.equal(requests.at(-1).method,'INSERT');assert.equal(requests.at(-1).table,'favorites');assert.equal(requests.at(-1).row.user_id,'a');
@@ -44,6 +47,33 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  assert.equal(requests.find(request=>request.login)?.login.email,'member@example.test');
  assert.equal(els.get('authEmail').textContent,'member@example.test');
  assert.equal(els.get('authPassword').value,'');
+ const setCredentials=()=>{els.get('authEmailInput').value=' member@example.test ';els.get('authPassword').value='test-password'};
+ signupResult={data:{user:account,session:{user:account}}};
+ let loginCount=requests.filter(r=>r.login).length;
+ setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ assert.equal(requests.filter(r=>r.login).length,loginCount,'A signup session must not trigger a second login');
+ assert.equal(messages.pop(),'Cuenta creada');
+ signupResult={data:{user:account,session:null}};
+ setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ assert.equal(requests.filter(r=>r.login).length,++loginCount);
+ assert.equal(requests.filter(r=>r.login).at(-1).login.email,'member@example.test');
+ assert.equal(requests.filter(r=>r.login).at(-1).login.password,'test-password');
+ assert.equal(messages.pop(),'Cuenta creada');
+ loginResult={data:{session:null},error:{code:'email_not_confirmed',message:'Email not confirmed'}};
+ await vm.runInContext(`applySession(null)`,context);
+ setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ assert(els.get('authStatus').textContent.includes('Confirma tu correo'));
+ assert.equal(vm.runInContext(`currentUser`,context),null);
+ loginResult={data:{session:null}};
+ setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ assert(els.get('authStatus').textContent.includes('No se pudo acceder'));
+ assert.equal(vm.runInContext(`currentUser`,context),null);
+ signupResult={data:{user:{identities:[]},session:null}};
+ loginCount=requests.filter(r=>r.login).length;
+ setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ assert.equal(requests.filter(r=>r.login).length,loginCount,'Duplicate signup must not trigger login');
+ loginResult=undefined;
+
  await vm.runInContext(`initializeAuth()`,context);
  authListener('SIGNED_IN',{user:account});
  await new Promise(resolve=>setTimeout(resolve,10));
