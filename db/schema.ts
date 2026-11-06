@@ -45,3 +45,11 @@ export const browserJourneys = pgTable('browser_journeys', {
   state: jsonb().notNull().default({}),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const memberProfiles = pgTable('member_profiles', {
+  userId: text('user_id').primaryKey(),
+  avatarUrl: text('avatar_url').notNull().default(''),
+  displayName: text('display_name').notNull(),
+  textColor: text('text_color').notNull().default('#dce6f5'),
+}, table => [check('member_profiles_display_name_check', sql`char_length(${table.displayName}) between 1 and 80`),
+  check('member_profiles_text_color_check', sql`${table.textColor} ~ '^#[a-fA-F0-9]{6}$'`)]);
