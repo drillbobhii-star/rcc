@@ -542,7 +542,7 @@ window.rccSupabaseReady.catch(() => {});
 
         <a class="roblox-follow" href="https://www.roblox.com/share?code=86b2c3c1d4ef024fafa196db62dac9a6&amp;type=Profile&amp;source=ProfileShare&amp;stamp=1793551063604" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 1 31 8 24 31 1 24Zm5 10-2 8 8 2 2-8Z"/></svg>Seguime en Roblox<span aria-hidden="true">↗</span></a>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
-        <div class="auth-controls"><span id="authEmail" class="auth-email" aria-label="Correo de tu cuenta" hidden></span><button class="btn btn-ghost" id="loginBtn" type="button" aria-haspopup="dialog" aria-controls="authModal" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
+        <div class="auth-controls"><button type="button" id="authEmail" class="btn btn-ghost auth-email" aria-label="Editar tu perfil" hidden></button><button class="btn btn-ghost" id="loginBtn" type="button" aria-haspopup="dialog" aria-controls="authModal" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -697,6 +697,8 @@ window.rccSupabaseReady.catch(() => {});
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
 
+<link rel="stylesheet" href="assets/member-community.css">
+<script src="assets/member-community.js"></script>
 <script>
 let currentUser = null;
 let favoriteIds = new Set();
@@ -1046,6 +1048,7 @@ function executorWarning(script){
 function openScript(s){
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
+  window.rccRequiresLogin = s.requires_login === true;
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   const isLoadstring = s.type === 'loadstring';
   
@@ -1066,7 +1069,7 @@ function openScript(s){
     <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
     <pre class="notranslate" translate="no"><code id="modalCode"></code></pre>
     <div class="actions">
-      <button class="btn btn-primary" onclick="copyCode()">📋 Copiar código</button>
+      <button id="scriptCopyBtn" class="btn btn-primary" onclick="copyCode()">Copiar código</button>
       <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>
       <button class="btn btn-ghost" onclick="shareCurrent()">Copiar enlace</button>
       <button class="btn btn-ghost" id="voteBtn" type="button">👍 Me gusta</button>
@@ -1078,6 +1081,8 @@ function openScript(s){
   window.enhanceGameDetail?.(s, modalBody);
   const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => window.openRccLab?.(s.code); modalBody.querySelector('.actions').prepend(explain);
   if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=s.release.changes.length?(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date:s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
+  window.rccMountComments?.(String(s.id));
+  window.rccRefreshCopy?.();
   renderCompatibility(s);
   document.getElementById('voteBtn').onclick = e=>voteForScript(String(s.id),e.currentTarget);
   updateVoteButton(String(s.id),document.getElementById('voteBtn'));
@@ -1088,6 +1093,7 @@ function openScript(s){
 }
 
 function copyCode(){
+  if(window.rccRequiresLogin && !currentUser){openAuth();return;}
   const copiedId=currentCopiedId;
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
       recordCatalogAction(copiedId,'copy');
@@ -1345,6 +1351,8 @@ async function applySession(user){
   document.getElementById('authEmail').hidden=!currentUser;
   document.getElementById('loginBtn').hidden=!!currentUser;
   document.getElementById('logoutBtn').hidden=!currentUser;
+  window.rccRefreshCopy?.();
+  window.rccRefreshComposer?.();
   if(previousId===currentUser?.id)return;
   sessionRevision++;votedIds.clear();favoriteIds=new Set();favoritesStatus='idle';
   updateFavoriteCount();render();
@@ -1364,21 +1372,14 @@ async function initializeAuth(){
   try{
     const supabase=await window.rccSupabaseReady;
     supabase.auth.onAuthStateChange((event,session)=>{setTimeout(async()=>{
-      await applySession(session?.user);
       if(event==='PASSWORD_RECOVERY')openPasswordRecovery();
+      await applySession(session?.user);
     },0);});
     const {data,error}=await supabase.auth.getSession();if(error)throw error;
     await applySession(data.session?.user);
   }catch(error){showToast(error?.code==='SUPABASE_NOT_CONFIGURED'?error.message:'No se pudo recuperar el acceso. Intenta iniciar sesión de nuevo.');}
 }
-function openPasswordRecovery(){
-      passwordReset=true;document.getElementById('authTitle').textContent='Nueva contraseña';
-      document.getElementById('authEmailInput').value=currentUser?.email||'';
-      document.getElementById('authEmailInput').disabled=true;
-      authForm.querySelector('[type="submit"]').textContent='Guardar contraseña';
-      for(const id of ['signupBtn','googleLoginBtn','forgotPasswordBtn'])document.getElementById(id).hidden=true;
-      openAuth();authStatus.textContent='Elige tu nueva contraseña.';
-}
+function openPasswordRecovery(){ window.rccOpenRecovery(); }
 document.getElementById('logoutBtn').onclick=async e=>{
   const button=e.currentTarget;button.disabled=true;
   try{const {error}=await (await window.rccSupabaseReady).auth.signOut();if(error)throw error;await applySession(null);showToast('Sesión cerrada');}
@@ -1577,3 +1578,4 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 <script src="assets/code-compare.js"></script>
 </body>
 </html>
+

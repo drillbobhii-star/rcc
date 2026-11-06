@@ -1,0 +1,23 @@
+const fs=require('node:fs');
+const vm=require('node:vm');
+const assert=require('node:assert/strict');
+const html=fs.readFileSync('index.html','utf8');
+const copy=html.slice(html.indexOf('function copyCode(){'),html.indexOf('\nfunction closeModal'));
+let auth=0,copies=0;
+const context={window:{rccRequiresLogin:true},currentUser:null,currentCopiedId:'x',openAuth:()=>auth++,navigator:{clipboard:{writeText:()=>{copies++;return new Promise(()=>{});}}},document:{getElementById:()=>({textContent:'code'})}};
+vm.createContext(context);vm.runInContext(copy,context);
+context.copyCode();assert.equal(auth,1);assert.equal(copies,0);
+context.currentUser={id:'member'};context.copyCode();assert.equal(copies,1);
+context.currentUser=null;context.window.rccRequiresLogin=false;context.copyCode();assert.equal(copies,2);
+const source=fs.readFileSync('assets/member-community.js','utf8');
+const submit=source.slice(source.indexOf('recovery.form.onsubmit='),source.indexOf('\n  async function api'));
+(async()=>{
+  let sent;
+  const sandbox={recovery:{form:{},status:{}},savePassword:{},password:{value:'new-password'},window:{rccSupabaseReady:Promise.resolve({auth:{updateUser:async data=>{sent=data;return {error:null};}}})},showToast:()=>{},cloudError:e=>e.message};
+  vm.createContext(sandbox);vm.runInContext(submit,sandbox);
+  await sandbox.recovery.form.onsubmit({preventDefault(){}});
+  assert.equal(sent.password,'new-password');assert.equal(sandbox.password.value,'');assert.match(sandbox.recovery.status.textContent,/correctamente/);
+  sandbox.window.rccSupabaseReady=Promise.resolve({auth:{updateUser:async()=>({error:new Error('Password too weak')})}});
+  await sandbox.recovery.form.onsubmit({preventDefault(){}});assert.equal(sandbox.recovery.status.textContent,'Password too weak');assert.equal(sandbox.savePassword.disabled,false);
+  console.log('Member UI OK: guest and member copy guards; recovery success and actual provider errors.');
+})();
