@@ -1,15 +1,16 @@
 /* Browser appearance preferences are optional; unavailable storage never blocks the catalog. */
 (() => {
   const presets = {
+    sky: {name:'Cielo', accent:'#24618e', bg:'#eff7fc', surface:'#ffffff', radius:'24px'},
     monochrome: {name:'Diagonal blanco y negro', accent:'#f5f5f2', bg:'#111113', surface:'#202023', radius:'24px'},
     blue: {name:'Azul glass', accent:'#a8cefa', bg:'#0c1727', surface:'#142c46', radius:'24px'},
-    black: {name:'Negro glass', accent:'#ffffff', bg:'#090909', surface:'#181818', radius:'24px'},
+    black: {name:'Negro glass', accent:'#b7d9ef', bg:'#090909', surface:'#181818', radius:'24px'},
     ios: {name:'iOS', accent:'#9ec9f5', bg:'#101a26', surface:'#172635', radius:'24px'},
     android: {name:'Android', accent:'#c1d6a4', bg:'#171d16', surface:'#263024', radius:'30px'},
     hyper: {name:'HyperOS', accent:'#edbda1', bg:'#241b20', surface:'#34282d', radius:'20px'},
     nothing: {name:'Nothing', accent:'#f2a69c', bg:'#1c1c1e', surface:'#28282b', radius:'6px'}
   };
-  const defaults = {theme:'black', accent:presets.black.accent, glass:78, density:'comfortable', motion:true, corners:24, scale:100, blur:22, sound:false, volume:25};
+  const defaults = {paletteVersion:2, theme:'black', accent:presets.black.accent, glass:78, density:'comfortable', motion:true, corners:24, scale:100, blur:22, sound:false, volume:25};
   let state = {...defaults};
   try {
     const saved = JSON.parse(localStorage.getItem('rcc_appearance'));
@@ -21,6 +22,10 @@
       state.glass = Number.isFinite(saved.glass) ? Math.min(100, Math.max(55, saved.glass)) : 78;
       state.density = saved.density === 'compact' ? 'compact' : 'comfortable';
       state.motion = typeof saved.motion === 'boolean' ? saved.motion : true;
+      // Correct the previous release's light default while keeping Cielo selectable.
+      if (saved.theme === 'sky' && saved.paletteVersion !== 2) {
+        state.theme = 'black'; state.accent = presets.black.accent;
+      }
     }
   } catch {}
   const root = document.documentElement;
@@ -39,6 +44,7 @@
     root.style.setProperty('--bg', preset.bg);
     root.style.setProperty('--surface', preset.surface);
     root.style.setProperty('--accent', state.accent);
+    root.style.setProperty('--text', state.theme === 'sky' ? '#152431' : '#eef2f7');
     root.style.setProperty('--ui-radius', state.corners + 'px');
     root.style.setProperty('--glass-blur', state.blur + 'px');
     root.style.fontSize = state.scale + '%';
@@ -66,15 +72,19 @@
   for (const [id,key] of [['cornerAmount','corners'],['textScale','scale'],['blurAmount','blur'],['soundVolume','volume']]) document.getElementById(id).addEventListener('input', event => { state[key] = Number(event.target.value); apply(); });
   document.getElementById('soundEnabled').addEventListener('change', event => { state.sound = event.target.checked; apply(); });
   let audio;
-  document.addEventListener('click', event => {
+  let lastSound = 0;
+  function playSound(event) {
     if (!state.sound || !state.volume || !event.isTrusted) return;
-    const target = event.composedPath().find(item => item instanceof Element && item.matches('button,summary,a'));
-    if (!target) return;
+    const target = event.composedPath().find(item => item instanceof Element && item.matches('button,summary,a,input,select'));
+    if (!target || target.disabled || target.getAttribute('aria-disabled') === 'true') return;
+    if (target.matches('input') && !target.matches('[type=checkbox],[type=radio],[type=range]')) return;
+    if (performance.now() - lastSound < 65) return;
+    lastSound = performance.now();
     try {
       audio ||= new (window.AudioContext || window.webkitAudioContext)();
       if (audio.state === 'suspended') audio.resume().catch(() => {});
       const keys = Object.keys(presets); const base = 180 + keys.indexOf(state.theme) * 65;
-      const section = target.closest('#personalization') ? 1 : target.closest('#modal') ? 1.5 : target.closest('.section-tabs') ? 2 : 1.25;
+      const section = target.matches('input,select') ? 2.4 : target.closest('#personalization') ? 1 : target.closest('#modal,dialog') ? 1.5 : target.closest('.section-tabs,.dock-links') ? 2 : 1.25;
       const oscillator = audio.createOscillator(), gain = audio.createGain();
       oscillator.type = ['black','nothing'].includes(state.theme) ? 'triangle' : 'sine';
       oscillator.frequency.setValueAtTime(base * section, audio.currentTime);
@@ -84,7 +94,9 @@
       gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.15);
       oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(); oscillator.stop(audio.currentTime + 0.17);
     } catch { /* Optional sound never blocks navigation. */ }
-  });
+  }
+  document.addEventListener('click', playSound);
+  document.addEventListener('change', playSound);
   document.getElementById('resetAppearance').addEventListener('click', () => { state = {...defaults}; apply(); });
   trigger.addEventListener('click', () => {
     panel.open = !panel.open;

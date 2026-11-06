@@ -1,0 +1,20 @@
+body[data-ui] .brand-symbol.rcc-prism{display:inline-grid;place-items:center;width:46px;height:46px;flex-shrink:0;border:0;background:transparent;color:var(--accent);border-radius:0;box-shadow:none}
+.rcc-prism svg{width:46px;height:46px;overflow:visible}
+.prism-shell{fill:color-mix(in srgb,var(--accent) 9%,transparent);stroke:var(--accent);stroke-width:1.2;stroke-linejoin:round;stroke-dasharray:142;animation:prism-trace 7s ease-in-out infinite}
+.prism-fold{stroke:var(--accent);stroke-width:.7;opacity:.25}
+.prism-letter{stroke:var(--text);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.prism-satellite{fill:var(--accent);transform-origin:24px 24px;animation:prism-satellite 12s linear infinite}
+#logoHome[data-animation=orbit]{animation-name:prism-orbit}
+#logoHome[data-animation=glide]{animation-name:prism-glide}
+#logoHome[data-animation=tilt]{animation-name:prism-tilt}
+#logoHome[data-animation=breathe]{animation-name:prism-breathe}
+#logoHome[data-animation=none],#logoHome[data-animation=none] *{animation:none!important}
+@keyframes prism-trace{0%,20%,100%{stroke-dashoffset:0;opacity:1}50%{stroke-dashoffset:142;opacity:.5}75%{stroke-dashoffset:0;opacity:1}}
+@keyframes prism-satellite{to{transform:rotate(360deg)}}
+@keyframes prism-orbit{25%{transform:translate(3px,-3px) rotate(2deg)}75%{transform:translate(-3px,2px) rotate(-2deg)}}
+@keyframes prism-glide{50%{transform:translateX(7px)}}
+@keyframes prism-tilt{50%{transform:perspective(400px) rotateY(20deg) rotateX(-8deg)}}
+@keyframes prism-breathe{50%{transform:scale(1.04);opacity:.8}}
+body.motion-paused #logoHome,body.motion-paused #logoHome *{animation:none!important}
+@media(prefers-reduced-motion:reduce){#logoHome,#logoHome *{animation:none!important}}
+@media(max-width:600px){body[data-ui] .brand-symbol.rcc-prism,.rcc-prism svg{width:38px;height:38px}}

@@ -1,6 +1,6 @@
 {
   "format": "rcc-catalog-v1",
-  "total": 11790,
+  "total": 14790,
   "parts": [
     {
       "file": "catalog/part-001-381648ac977a5fa2.json",
@@ -78,9 +78,19 @@
       "bytes": 2095908
     },
     {
-      "file": "catalog/part-016-39d305bfd868a3bf.json",
-      "count": 985,
-      "bytes": 1387234
+      "file": "catalog/part-016-1114091f2bbf1761.json",
+      "count": 1512,
+      "bytes": 2096701
+    },
+    {
+      "file": "catalog/part-017-685e467f7f1092bd.json",
+      "count": 1560,
+      "bytes": 2096150
+    },
+    {
+      "file": "catalog/part-018-860496dbc4f245f3.json",
+      "count": 913,
+      "bytes": 1239135
     }
   ]
 }
