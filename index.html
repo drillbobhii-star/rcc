@@ -604,8 +604,13 @@ window.rccSupabaseReady.catch(() => {});
           <button type="button" data-theme="nothing" aria-pressed="false"><span class="theme-art art-nothing" aria-hidden="true">RCC</span><strong>Nothing</strong><small>Contraste y precisión</small></button>
         </div>
         <div class="appearance-controls">
+          <label>Color del fondo<input id="backgroundColor" type="color" value="#090909"></label>
+          <button id="resetBackgroundColor" type="button">Usar fondo del tema</button>
+          <label>Color de las letras del fondo<input id="backgroundTextColor" type="color" value="#b7d9ef"></label>
+          <label>Visibilidad de las letras<input id="backgroundTextOpacity" type="range" min="0" max="100" value="28"><output id="backgroundTextOpacityValue" for="backgroundTextOpacity">28%</output></label>
+          <label>Desenfoque de las letras<input id="backgroundTextBlur" type="range" min="0" max="40" value="12"><output id="backgroundTextBlurValue" for="backgroundTextBlur">12 px</output></label>
           <label>Color de acento<input id="accentColor" type="color" value="#9ec9f5"></label>
-          <label>Transparencia<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
+          <label>Transparencia del cristal<input id="glassAmount" type="range" min="55" max="100" value="78"><output id="glassValue" for="glassAmount">78%</output></label>
           <label>Densidad<select id="density"><option value="comfortable">Cómoda</option><option value="compact">Compacta</option></select></label>
           <label class="motion-control"><input id="motionEnabled" type="checkbox" checked> Activar animaciones de la interfaz</label>
           <label>Esquinas<input id="cornerAmount" type="range" min="4" max="36" value="24"></label><label>Tamaño de texto<input id="textScale" type="range" min="90" max="120" value="100"></label><label>Profundidad del cristal<input id="blurAmount" type="range" min="0" max="36" value="22"></label><label class="motion-control"><input id="soundEnabled" type="checkbox"> Sonidos al interactuar</label><label>Volumen de interacción<input id="soundVolume" type="range" min="0" max="100" value="25"></label><button id="resetAppearance" type="button">Restablecer estilo</button>
