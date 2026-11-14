@@ -1044,7 +1044,7 @@ function openScript(s){
   window.RCCScriptReview?.cancel(false);
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
-  window.rccRequiresLogin = s.requires_login === true;
+  window.rccRequiresLogin = s.requires_login === true || rccIsGateCandidate(s);
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   const isLoadstring = s.type === 'loadstring';
   
@@ -1090,7 +1090,8 @@ function openScript(s){
 }
 
 function copyCode(confirmed=false){
-  if(window.rccRequiresLogin && !currentUser){openAuth();return;}
+  const activeScript=scripts.find(s=>s.id===currentCopiedId);
+  if((window.rccRequiresLogin || (activeScript&&rccIsGateCandidate(activeScript)))&&!rccCanUnlock()){openAuth();return;}
   const selectedScript=scripts.find(s=>s.id===currentCopiedId);
   if(!confirmed&&window.RCCScriptReview?.confirm(selectedScript,()=>{if(currentCopiedId===selectedScript.id)copyCode(true);}))return;
   const copiedId=currentCopiedId;
@@ -1153,6 +1154,7 @@ let modalReturnFocus = null;
 function downloadCurrent(confirmed=false){
   const s = scripts.find(s=>s.id===currentCopiedId);
   if(!s) return;
+  if((s.requires_login===true||rccIsGateCandidate(s))&&!rccCanUnlock()){openAuth();return;}
   if(!confirmed&&window.RCCScriptReview?.confirm(s,()=>{if(currentCopiedId===s.id)downloadCurrent(true);}))return;
   const url = URL.createObjectURL(new Blob([s.code], {type:'text/plain;charset=utf-8'}));
   const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.'+(s.file_extension || 'lua'); a.click();
