@@ -1,62 +1,404 @@
-/* Community profiles and threads persisted through Netlify. */
+/* Perfiles, autenticación de recuperación y comentarios mediante Supabase directo. */
+const APP_VERSION = '3.0';
 (() => {
-  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
-  const api=(action,options)=>window.rccMemberAPI(action,options);
-  const fallback='/assets/default-avatar.svg';
-  function dialog(title){const d=el('dialog',null,'member-dialog social-dialog');d.setAttribute('aria-label',title);const close=el('button','Cerrar','btn btn-ghost social-close');close.type='button';close.onclick=()=>d.close();d.append(close);document.body.append(d);return d;}
-  function image(url){const img=el('img');img.src=/^https:\/\//.test(url||'')?url:fallback;img.alt='Foto de perfil';img.onerror=()=>{img.onerror=null;img.src=fallback;};return img;}
-  function paint(card,p){card.replaceChildren();const banner=el('div',null,'social-banner');if(/^https:\/\//.test(p.banner_url||''))banner.style.backgroundImage=`url("${p.banner_url.replace(/["\\\n\r]/g,'')}")`;const details=el('div',null,'social-details'),avatar=image(p.avatar_url),name=el('h2',p.display_name||'Miembro RCC','social-name');avatar.className='social-avatar';if(/^#[a-f0-9]{6}$/i.test(p.text_color||''))name.style.color=p.text_color;
-    if(p.is_creator){banner.dataset.effect=p.banner_effect||'none';name.dataset.effect=p.name_effect||'none';details.append(el('span','CREADOR RCC','social-founder'));}
-    details.append(avatar,name,el('p',p.bio||'Un espacio para compartir código.','social-bio'));
-    if(p.show_roblox&&/^\d+$/.test(p.roblox_id||'')){const link=el('a',`@${p.roblox_username} · ID ${p.roblox_id} ↗`,'social-roblox');link.href=`https://www.roblox.com/users/${p.roblox_id}/profile`;link.target='_blank';link.rel='noopener noreferrer';details.append(link);}
-    card.append(banner,details);
+  const el = (tag, text, cls) => {const node=document.createElement(tag);if(text)node.textContent=text;if(cls)node.className=cls;return node;};
+  
+  function dialog(title) {
+    const d=el('dialog',null,'member-dialog');d.setAttribute('aria-label',title);
+    d.append(el('h2',title));const form=el('form');d.append(form);
+    const status=el('p',null,'member-status');status.setAttribute('role','status');
+    const close=el('button','Cerrar','btn btn-ghost');close.type='button';close.onclick=()=>d.close();
+    form.append(status,close);document.body.append(d);return {d,form,status,close};
   }
-  let gateIds=new Set(),gateSize=-1;
-  window.rccCodeLocked=s=>{if(typeof scripts==='undefined')return true;if(scripts.length!==gateSize){gateSize=scripts.length;gateIds=new Set(scripts.map(x=>String(x.id)).sort().slice(Math.floor(scripts.length*.15)));}return gateIds.has(String(s.id));};
-  window.rccGateCard=(s,card)=>{if(currentUser||!window.rccCodeLocked(s))return;card.classList.add('member-locked-card');const label=el('span','Acceso con cuenta','member-lock-label');card.querySelector('.badges')?.append(label);};
-  window.rccApplyCodeGate=s=>{
-    const pre=document.getElementById('modalCode')?.parentElement;if(!pre||!window.rccRequiresLogin||currentUser)return;
-    pre.classList.add('member-code-blur');const gate=el('section',null,'member-code-gate');gate.append(el('span','TU BIBLIOTECA, SIN LÍMITES','eyebrow'),el('h3','Este código te espera.'),el('p','Inicia sesión o regístrate para ver todos los códigos y guardar tus favoritos.'));
-    for(const text of ['Iniciar sesión','Registrarse']){const b=el('button',text,text==='Iniciar sesión'?'btn btn-primary':'btn btn-ghost');b.type='button';b.onclick=()=>{openAuth();if(text==='Registrarse'){document.getElementById('signupRobloxLabel').hidden=false;document.getElementById('signupRoblox').focus();}};gate.append(b);}pre.after(gate);
+  function field(form,label,type,options={}) {
+    const wrapper=el('label',label),input=el('input');input.type=type;Object.assign(input,options);wrapper.append(input);form.prepend(wrapper);return input;
+  }
+
+  // --- 1. RECUPERACIÓN DE CONTRASEÑA ---
+  const recovery=dialog('Restablecer contraseña');
+  const password=field(recovery.form,'Nueva contraseña','password',{required:true,minLength:8,maxLength:128,autocomplete:'new-password'});
+  const savePassword=el('button','Guardar','btn btn-primary');savePassword.type='submit';recovery.status.before(savePassword);
+  window.rccOpenRecovery=()=>{ if(typeof closeAuth==='function') closeAuth(); recovery.status.textContent=''; if(!recovery.d.open) recovery.d.showModal(); password.focus(); };
+  recovery.form.onsubmit=async event=>{
+    event.preventDefault(); savePassword.disabled=true;
+    try {
+      const sb = await window.rccSupabaseReady;
+      const {error} = await sb.auth.updateUser({password:password.value});
+      if(error) throw error;
+      password.value=''; recovery.status.textContent='Contraseña actualizada correctamente.'; 
+      if(typeof showToast==='function') showToast('Contraseña actualizada correctamente.');
+    } catch(error) { recovery.status.textContent=error.message || 'Error al actualizar.'; }
+    finally { savePassword.disabled=false; }
   };
-  window.rccRefreshCopy=()=>{const b=document.getElementById('scriptCopyBtn');if(b)b.textContent=window.rccRequiresLogin&&!currentUser?'Inicia sesión para copiar':'Copiar código';};
-  const publicDialog=dialog('Perfil de la comunidad'),publicCard=el('div'),publicFavorites=el('section',null,'social-favorites');publicDialog.append(publicCard,publicFavorites);let publicRevision=0;
-  async function favorites(target,userId){target.replaceChildren(el('h3','Códigos favoritos'),el('p','Cargando favoritos…'));try{const {ids}=await api('favorites',{params:{user:userId}});if(target.dataset.user!==userId)return;target.replaceChildren(el('h3',`Códigos favoritos · ${ids.length}`));if(!ids.length)target.append(el('p','Todavía no hay favoritos.'));for(const id of ids){const s=scripts.find(s=>String(s.id)===id);if(!s)continue;const button=el('button',s.name+' ↗','social-favorite');button.type='button';button.onclick=()=>{publicDialog.close();account.close();openScript(s);};target.append(button);}}catch(e){target.replaceChildren(el('p',e.message));}}
-  async function openPublic(userId){const rev=++publicRevision;publicCard.textContent='Cargando perfil…';publicFavorites.replaceChildren();publicDialog.showModal();try{const {profile}=await api('profile',{params:{user:userId}});if(rev!==publicRevision)return;paint(publicCard,profile);publicFavorites.dataset.user=userId;await favorites(publicFavorites,userId);}catch(e){publicCard.textContent=e.message;}}
-  const account=dialog('Tu perfil'),accountCard=el('div'),editor=el('form',null,'social-editor'),status=el('p',null,'member-status'),ownFavorites=el('section',null,'social-favorites');status.setAttribute('role','status');account.append(accountCard,editor,ownFavorites);
-  const inputs={};
-  function field(key,label,type='text',maxLength=2000){const wrap=el('label',label),input=el('input');input.type=type;input.maxLength=maxLength;wrap.append(input);editor.append(wrap);inputs[key]=input;return input;}
-  field('display_name','Nombre visible','text',80).required=true;
-  field('bio','Biografía','text',240);
-  field('avatar_url','Foto de perfil · enlace HTTPS','url');field('banner_url','Banner · enlace HTTPS','url');
-  field('text_color','Color del nombre','color');field('roblox_query','Buscar usuario de Roblox · nombre o ID','text',24);
-  const hint=el('small','La vinculación muestra un perfil público de Roblox; no acredita su propiedad.');editor.append(hint);
-  const search=el('button','Buscar en Roblox','btn btn-ghost');search.type='button';editor.append(search);
-  search.onclick=async()=>{search.disabled=true;status.textContent='Buscando…';try{const {roblox}=await api('roblox',{params:{q:inputs.roblox_query.value}});status.textContent=`Encontrado: @${roblox.name} · ID ${roblox.id}`;inputs.roblox_query.value=roblox.id;if(!inputs.avatar_url.value)inputs.avatar_url.value=roblox.avatarUrl;preview();}catch(e){status.textContent=e.message;}finally{search.disabled=false;}};
-  field('show_roblox','Mostrar usuario de Roblox','checkbox');inputs.show_roblox.setAttribute('role','switch');
-  const exclusive=el('fieldset');exclusive.append(el('legend','Estudio del creador · efectos exclusivos'));
-  for(const [key,title] of [['name_effect','Animación del nombre'],['banner_effect','Efecto del banner']]){const label=el('label',title),select=el('select');for(const [value,text] of [['none','Sin efecto'],['shimmer','Destello'],['float','Flotación'],['aurora','Aurora']]){const option=el('option',text);option.value=value;select.append(option);}label.append(select);exclusive.append(label);inputs[key]=select;}
-  editor.append(exclusive);const save=el('button','Guardar perfil','btn btn-primary');save.type='submit';editor.append(save,status);
-  let loaded={},owner=null,accountRevision=0;
-  function preview(){const values=Object.fromEntries(Object.entries(inputs).map(([key,n])=>[key,n.type==='checkbox'?n.checked:n.value]));paint(accountCard,{...loaded,...values});const toggle=el('button','Mostrar usuario de Roblox','social-roblox-toggle');toggle.type='button';toggle.setAttribute('aria-pressed',String(inputs.show_roblox.checked));toggle.onclick=()=>{inputs.show_roblox.checked=!inputs.show_roblox.checked;preview();};accountCard.querySelector('.social-banner').append(toggle);}
-  editor.addEventListener('input',preview);
-  async function openAccount(){if(!currentUser){openAuth();return;}owner=currentUser.id;const revision=++accountRevision;account.showModal();editor.hidden=true;accountCard.textContent='Cargando tu perfil…';status.textContent='';try{const {profile}=await api('profile');if(revision!==accountRevision||owner!==currentUser?.id)return;loaded=profile;for(const [key,n]of Object.entries(inputs)){if(n.type==='checkbox')n.checked=!!profile[key];else n.value=profile[key]||(key==='text_color'?'#e8e5df':key.endsWith('_effect')?'none':'');}inputs.roblox_query.value=profile.roblox_id||profile.roblox_username||currentUser.userMetadata?.roblox_id||currentUser.user_metadata?.roblox_id||'';exclusive.hidden=!profile.is_creator;preview();editor.hidden=false;ownFavorites.dataset.user=owner;await favorites(ownFavorites,owner);}catch(e){accountCard.textContent=e.message;const retry=el('button','Reintentar','btn');retry.onclick=openAccount;accountCard.append(retry);}}
-  document.getElementById('authEmail').onclick=openAccount;
-  editor.onsubmit=async e=>{e.preventDefault();if(owner!==currentUser?.id)return;save.disabled=true;status.textContent='Guardando…';try{const body=Object.fromEntries(Object.entries(inputs).map(([k,n])=>[k,n.type==='checkbox'?n.checked:n.value]));await api('profile',{method:'PUT',body});if(owner!==currentUser?.id)return;loaded=(await api('profile')).profile;preview();status.textContent='Perfil guardado.';await refreshAccountButton();if(thread?.isConnected)loadThread(thread,threadScript);}catch(e){status.textContent=e.message;}finally{save.disabled=false;}};
-  async function refreshAccountButton(){const user=currentUser;if(!user)return;try{const {profile}=await api('profile');if(user.id!==currentUser?.id)return;const button=document.getElementById('authEmail');button.replaceChildren(image(profile.avatar_url),el('span',profile.display_name||'Mi perfil'),el('span','⌄'));button.setAttribute('aria-label','Abrir tu perfil y favoritos');}catch{document.getElementById('authEmail').textContent='Mi perfil ⌄';}}
-  window.addEventListener('rcc:profile-imported',refreshAccountButton);
-  window.addEventListener('rcc:session',()=>{accountRevision++;if(account.open)account.close();refreshAccountButton();});
-  let thread=null,threadScript=null,threadRevision=0;
-  window.rccRefreshComposer=()=>{if(!thread?.isConnected)return;thread.querySelector('form').hidden=!currentUser;thread.querySelector('.comment-login').hidden=!!currentUser;if(!currentUser)thread.cancelReply();};
-  async function loadThread(target,id){const revision=++threadRevision,list=target.querySelector('.comment-list');list.textContent='Cargando comentarios…';try{if(currentUser)await api('import',{method:'POST',params:{script:id},body:{}});const {comments}=await api('thread',{params:{script:id}});if(revision!==threadRevision||!target.isConnected)return;list.replaceChildren();window.RCCScriptReview?.comments(id,comments);if(!comments.length)list.textContent='Abre la conversación. Comparte el primer comentario.';
-      const map=new Map(comments.map(c=>[c.id,c])),children=new Map();for(const row of comments){const key=map.has(row.parent_id)?row.parent_id:null;if(!children.has(key))children.set(key,[]);children.get(key).push(row);}const visited=new Set();
-      function draw(row,depth=0){if(visited.has(row.id))return;visited.add(row.id);const article=el('article',null,depth?'comment-reply':''),person=el('div',null,'comment-person'),author=el('button',row.display_name||'Miembro RCC','comment-author-button');author.type='button';author.onclick=()=>openPublic(row.user_id);if(/^#[a-f0-9]{6}$/i.test(row.text_color||''))author.style.color=row.text_color;if(row.is_creator){author.dataset.effect=row.name_effect;person.append(el('span','CREADOR','social-founder'));}person.append(image(row.avatar_url),author);const text=el('p',row.text),date=el('time',new Date(row.created_at).toLocaleString('es')+(row.edited_at?' · editado':''));date.dateTime=row.created_at;const actions=el('div',null,'comment-actions'),reply=el('button','Responder','btn btn-ghost');reply.onclick=()=>target.startReply(row.id,row.display_name||'Miembro RCC');actions.append(reply);
-        if(row.mine){const edit=el('button','Editar','btn btn-ghost'),remove=el('button','Eliminar','btn btn-ghost');edit.onclick=()=>{const form=el('form'),input=el('textarea');input.value=row.text;input.required=true;input.maxLength=2000;input.setAttribute('aria-label','Editar comentario');const save=el('button','Guardar','btn btn-primary'),cancel=el('button','Cancelar','btn btn-ghost'),error=el('p');cancel.type='button';cancel.onclick=()=>form.remove();form.append(input,save,cancel,error);article.append(form);input.focus();form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{await api('comment',{method:'PUT',params:{script:id,id:row.id},body:{text:input.value}});await loadThread(target,id);}catch(e){error.textContent=e.message;save.disabled=false;}};};
-          remove.onclick=()=>{const confirm=el('div',null,'comment-delete-confirm');confirm.append(el('p','Se eliminarán este comentario y todas sus respuestas.'));const yes=el('button','Eliminar hilo','btn btn-primary'),no=el('button','Cancelar','btn btn-ghost'),error=el('p');no.onclick=()=>confirm.remove();yes.onclick=async()=>{yes.disabled=true;try{await api('comment',{method:'DELETE',params:{script:id,id:row.id}});target.cancelReply();await loadThread(target,id);}catch(e){error.textContent=e.message;yes.disabled=false;}};confirm.append(yes,no,error);article.append(confirm);};actions.append(edit,remove);}
-        article.append(person,date,text,actions);list.append(article);for(const c of children.get(row.id)||[])draw(c,depth+1);}
-      for(const row of children.get(null)||[])draw(row);for(const row of comments)draw(row);
-    }catch(e){if(revision!==threadRevision)return;list.textContent=e.message;const retry=el('button','Reintentar','btn');retry.onclick=()=>loadThread(target,id);list.append(retry);}}
-  window.rccMountComments=id=>{threadScript=id;const target=thread=el('section',null,'script-comments');target.append(el('h3','La conversación'),el('div',null,'comment-list'));const login=el('button','Inicia sesión para comentar','btn btn-ghost comment-login');login.onclick=openAuth;const form=el('form'),context=el('p'),input=el('textarea'),send=el('button','Publicar comentario','btn btn-primary'),status=el('p'),cancel=el('button','Cancelar respuesta','btn btn-ghost');cancel.type='button';cancel.hidden=true;let parent=null;input.required=true;input.maxLength=2000;input.placeholder='Comparte tu experiencia…';input.setAttribute('aria-label','Tu comentario');status.setAttribute('role','status');target.cancelReply=()=>{parent=null;context.textContent='';cancel.hidden=true;};cancel.onclick=target.cancelReply;target.startReply=(id,name)=>{if(!currentUser){openAuth();return;}parent=id;context.textContent='Respondiendo a '+name;cancel.hidden=false;input.focus();};form.append(context,cancel,input,send,status);target.append(login,form);modalBody.append(target);form.onsubmit=async e=>{e.preventDefault();send.disabled=true;try{await api('comment',{method:'POST',params:{script:id},body:{text:input.value,parent_id:parent}});input.value='';target.cancelReply();status.textContent='Publicado.';await loadThread(target,id);}catch(e){status.textContent=e.message;}finally{send.disabled=false;}};window.rccRefreshComposer();loadThread(target,id);};
-  const recovery=dialog('Restablecer contraseña'),recoveryForm=el('form'),password=el('input'),recoveryStatus=el('p'),savePassword=el('button','Guardar contraseña','btn btn-primary');password.type='password';password.required=true;password.minLength=8;password.autocomplete='new-password';password.setAttribute('aria-label','Nueva contraseña');recoveryForm.append(el('h2','Nueva contraseña'),password,savePassword,recoveryStatus);recovery.append(recoveryForm);window.rccOpenRecovery=()=>{closeAuth();recovery.showModal();password.focus();};recoveryForm.onsubmit=async e=>{e.preventDefault();savePassword.disabled=true;try{const {error}=await(await window.rccSupabaseReady).auth.updateUser({password:password.value});if(error)throw error;password.value='';recoveryStatus.textContent='Contraseña actualizada correctamente.';}catch(e){recoveryStatus.textContent=e.message;}finally{savePassword.disabled=false;}};
-  document.addEventListener('DOMContentLoaded',()=>{refreshAccountButton();const intro=el('div',null,'social-intro');intro.append(el('span','RCC / COMUNIDAD','eyebrow'),el('h3','Encuentra código.\nHazlo tuyo.'),el('p','Explora una selección abierta. Con tu cuenta, accede al catálogo completo, crea tu perfil y guarda lo que te inspira.'));const button=el('button','Explorar mis favoritos ↗','btn btn-primary');button.onclick=()=>document.getElementById('favoritesBtn').click();intro.append(button);document.querySelector('.hero')?.prepend(intro);});
+
+  // --- 2. PERFILES DE USUARIO ---
+  const profile=dialog('Tu perfil');
+  const color=field(profile.form,'Color del nombre','color',{value:'#dce6f5',required:true});
+  const avatar=field(profile.form,'Foto · URL HTTPS','url',{maxLength:2000,placeholder:'https://…'});
+  const name=field(profile.form,'Nombre visible','text',{required:true,maxLength:80});
+  const robloxUsername=field(profile.form,'Usuario de Roblox','text',{maxLength:20,placeholder:'Ej. Builderman',autocomplete:'off',spellcheck:false});
+  const robloxHint=el('small','Opcional. Si lo completas, se usará la foto de tu avatar de Roblox.','member-hint');
+  robloxUsername.parentElement.append(robloxHint);
+  name.parentElement.after(robloxUsername.parentElement);
+  const bannerUpload=field(profile.form,'Banner de perfil · imagen','file',{accept:'image/png,image/jpeg,image/webp',});
+  const bannerPreview=el('div',null,'profile-banner-preview');
+  bannerUpload.parentElement.after(bannerPreview);
+  let currentBannerUrl='';
+  bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';});
+  const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
+  
+  let profileOwner=null;
+  document.getElementById('authEmail').onclick=async()=>{
+    if(!currentUser) return;
+    profileOwner=currentUser.id; profile.form.reset(); profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
+    try {
+      const sb = await window.rccSupabaseReady;
+      const { data, error } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle();
+      if(error) throw error;
+      if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
+      name.value = data?.display_name || '';
+      avatar.value = data?.avatar_url || '';
+      currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
+      robloxUsername.value = data?.roblox_username || '';window.rccHasRobloxLink=!!data?.roblox_username;
+      color.value = data?.text_color || '#dce6f5';
+      profile.status.textContent='';
+    } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
+    finally { saveProfile.disabled=false; }
+  };
+
+  profile.form.onsubmit=async event=>{
+    event.preventDefault();
+    if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
+    saveProfile.disabled=true;
+    const defaultAvatarUrl=new URL('/assets/default-avatar.svg',window.location.origin).href;
+    let avatarUrl=avatar.value.trim() || defaultAvatarUrl;
+    let robloxWarning='';
+    try {
+      const username=robloxUsername.value.trim().replace(/^@/,'');
+      if(username){
+        profile.status.textContent='Buscando el avatar de Roblox…';
+        try {
+          const response=await fetch('/api/roblox-avatar',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({username}),
+            signal:AbortSignal.timeout(18000)
+          });
+          const result=await response.json().catch(()=>({}));
+          if(!response.ok || typeof result.avatarUrl!=='string' || !/^https:\/\//i.test(result.avatarUrl)){
+            throw new Error(result.error || 'No se pudo encontrar ese usuario de Roblox.');
+          }
+          avatarUrl=result.avatarUrl;
+        } catch {
+          avatarUrl=defaultAvatarUrl;
+          robloxWarning='No encontramos ese usuario de Roblox o el servicio no respondió. Se guardó tu perfil con la foto predeterminada.';
+        }
+      } else if(avatarUrl && new URL(avatarUrl).protocol!=='https:') {
+        throw new Error('Usa una URL HTTPS para tu foto.');
+      }
+      if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
+      const sb = await window.rccSupabaseReady;
+      const { error } = await sb.from('profiles').upsert({
+        user_id: currentUser.id,
+        display_name: name.value.trim(),
+        avatar_url: avatarUrl,
+        banner_url: currentBannerUrl,
+        roblox_username: username || robloxUsername.value.trim(),
+        text_color: color.value
+      });
+      if(error) throw error;
+      const bannerFile=bannerUpload.files?.[0];
+      if(bannerFile){
+        profile.status.textContent='Subiendo banner…';
+        const ext=({ 'image/jpeg':'jpg','image/png':'png','image/webp':'webp' })[bannerFile.type];
+        const sb2=await window.rccSupabaseReady;
+        const path=currentUser.id+'/banners/'+crypto.randomUUID()+'.'+ext;
+        const {data:uploaded,error:uploadError}=await sb2.storage.from('profile-media').upload(path,bannerFile,{upsert:false,contentType:bannerFile.type,cacheControl:'3600'});
+        if(uploadError)throw uploadError;
+        const {data:publicData}=sb2.storage.from('profile-media').getPublicUrl(uploaded.path);
+        currentBannerUrl=publicData.publicUrl;
+        const {error:updateError}=await sb2.from('profiles').update({banner_url:currentBannerUrl}).eq('user_id',currentUser.id);
+        if(updateError)throw updateError;
+        bannerUpload.value='';
+      }
+      window.rccHasRobloxLink=!!(username||robloxUsername.value.trim());
+      profile.status.textContent=robloxWarning || 'Perfil guardado.';
+      if(section?.isConnected) loadComments(section, scriptId);
+    } catch(error) { profile.status.textContent = error.message || 'Error al guardar.'; }
+    finally { saveProfile.disabled=false; }
+  };
+
+  // --- 3. COMENTARIOS ---
+  let section=null, scriptId=null, loadRevision=0;
+  const creatorEmail='drillbobhii@gmail.com';
+  const publicProfile=dialog('Perfil RCC');publicProfile.d.classList.add('rcc-profile-dialog');publicProfile.form.hidden=true;const publicClose=el('button','×','close');publicClose.type='button';publicClose.setAttribute('aria-label','Cerrar perfil');publicClose.onclick=()=>publicProfile.d.close();publicProfile.d.append(publicClose);
+  const publicBanner=el('div',null,'rcc-profile-banner'),publicContent=el('div',null,'rcc-profile-content');
+  const publicAvatar=el('img',null,'rcc-profile-avatar');publicAvatar.alt='Foto de perfil';
+  const publicName=el('div',null,'rcc-profile-name'),publicRoblox=el('div',null,'rcc-profile-roblox'),publicFounder=el('div','👑 RCC FOUNDER · DRILLBOBHII','rcc-founder-mark');
+  publicContent.append(publicAvatar,publicName,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.form);
+  function openPublicProfile(profileData={},isCreator=false){
+    publicName.textContent=profileData.display_name||'Miembro RCC';
+    publicAvatar.src=profileData.avatar_url||new URL('/assets/default-avatar.svg',location.origin).href;
+    publicRoblox.textContent=profileData.roblox_username?'Roblox: @'+profileData.roblox_username:'Cuenta de Roblox no vinculada';
+    publicBanner.style.backgroundImage=profileData.banner_url?'url("'+profileData.banner_url.replace(/["\\\\]/g,'')+'")':'';
+    publicBanner.classList.toggle('creator',isCreator);publicFounder.hidden=!isCreator;
+    publicProfile.d.querySelector('h2').textContent=isCreator?'Perfil del creador RCC':'Perfil de la comunidad';
+    publicProfile.status.textContent='';if(!publicProfile.d.open)publicProfile.d.showModal();
+  }
+  window.rccHasRobloxLink=false;
+
+  
+  window.rccRefreshCopy=()=>{ const button=document.getElementById('scriptCopyBtn'); if(button) button.textContent = (window.rccRequiresLogin && !currentUser) ? 'Inicia sesión para copiar' : 'Copiar código'; };
+  window.rccRefreshComposer=()=>{ if(!section?.isConnected) return; const form=section.querySelector('form'); form.hidden=!currentUser; if(!currentUser) section.cancelReply(); section.querySelector('.comment-login').hidden=!!currentUser; };
+  window.addEventListener('rcc:session',()=>{window.rccRefreshComposer();if(section?.isConnected)loadComments(section,scriptId);});
+
+  async function loadComments(target, id){
+    const revision=++loadRevision, list=target.querySelector('.comment-list'); list.textContent='Cargando comentarios…';
+    try {
+      const sb = await window.rccSupabaseReady;
+      // 1. Traer comentarios
+      const { data: comments, error: cError } = await sb.from('comments').select('*').eq('script_id', String(id)).order('created_at', { ascending: false });
+      if(cError) throw cError;
+      if(revision!==loadRevision || !target.isConnected) return;
+      
+      // 2. Traer perfiles de los usuarios que comentaron
+      const userIds = [...new Set(comments.map(c => c.user_id))];
+      let profiles = {};
+      if(userIds.length > 0) {
+        const { data: profs } = await sb.from('profiles').select('user_id,display_name,avatar_url,banner_url,roblox_username,text_color').in('user_id', userIds);
+        if(profs) profs.forEach(p => profiles[p.user_id] = p);
+      }
+
+      if(revision!==loadRevision || !target.isConnected) return;
+      window.RCCScriptReview?.comments(id, comments);
+      list.replaceChildren();
+      if(!comments.length) list.textContent='Aún no hay comentarios. Comparte el primero.';
+      
+      // Recorrer cada hilo sin perder comentarios huérfanos o ciclos malformados.
+      const children=new Map(), ids=new Set(comments.map(row=>String(row.id)));
+      for(const row of comments){
+        const key=row.parent_id == null ? null : String(row.parent_id);
+        if(!children.has(key)) children.set(key,[]);
+        children.get(key).push(row);
+      }
+      const ordered=[], visited=new Set();
+      const visit=root=>{
+        const pending=[root];
+        while(pending.length){
+          const row=pending.pop(), key=String(row.id);
+          if(visited.has(key)) continue;
+          visited.add(key); ordered.push(row);
+          pending.push(...(children.get(key)||[]).slice().reverse());
+        }
+      };
+      comments.filter(row=>row.parent_id == null || !ids.has(String(row.parent_id))).forEach(visit);
+      comments.forEach(visit);
+      for(const row of ordered){
+        const article=el('article'), person=el('div',null,'comment-person');
+        if(row.parent_id != null) article.classList.add('comment-reply');
+        const prof = profiles[row.user_id] || {};
+        
+        if(prof.avatar_url && /^https:\/\//i.test(prof.avatar_url)){
+          const image=el('img'); image.src=prof.avatar_url; image.alt=''; image.loading='lazy'; image.referrerPolicy='no-referrer'; image.onerror=()=>image.remove(); person.append(image);
+        }
+        
+        const authorName = prof.display_name || (row.user_email || 'Miembro').split('@')[0];
+        const authorColor = prof.text_color || '#dce6f5';
+        
+        const isCreator=(row.user_email||'').trim().toLowerCase()===creatorEmail;
+        const author=el('button',authorName,'comment-author-button');author.type='button';
+        if(/^#[a-f0-9]{6}$/i.test(authorColor)) author.style.color = authorColor;
+        author.onclick=()=>openPublicProfile(prof,isCreator);
+        person.append(author);
+        if(prof.banner_url){person.style.backgroundImage='linear-gradient(90deg,rgba(8,12,20,.86),rgba(8,12,20,.55)),url("'+String(prof.banner_url).replace(/["\\\\]/g,'')+'")';person.style.backgroundSize='cover';person.style.backgroundPosition='center';person.style.padding='10px 12px';person.style.borderRadius='12px';}
+        if(isCreator){
+          person.classList.add('comment-founder-person');
+          if(!prof.banner_url){person.style.background='linear-gradient(110deg,#4b3518,#141b2c 70%)';person.style.padding='10px 12px';person.style.borderRadius='12px';}
+          person.append(el('span','👑 RCC FOUNDER','comment-creator-badge'));
+          article.classList.add('comment-creator');
+        }
+        
+        const date=el('time',new Date(row.created_at).toLocaleString('es')); date.dateTime=row.created_at;
+        const reply=el('button','Responder','btn btn-ghost comment-reply-button'); reply.type='button';
+        reply.onclick=()=>target.startReply(row.id,authorName);
+        const message=el('p',row.text),actions=el('div',null,'comment-actions');
+        actions.append(reply);
+        if(currentUser?.id===row.user_id){
+          const edit=el('button','Editar','btn btn-ghost comment-edit-button');
+          edit.type='button';
+          edit.onclick=()=>{
+            if(article.querySelector('.comment-edit-form'))return;
+            const form=el('form',null,'comment-edit-form'),editor=el('textarea'),status=el('p');
+            editor.value=row.text;editor.required=true;editor.maxLength=2000;editor.setAttribute('aria-label','Editar comentario');
+            const save=el('button','Guardar cambios','btn btn-primary'),cancel=el('button','Cancelar','btn btn-ghost');
+            save.type='submit';cancel.type='button';cancel.onclick=()=>form.remove();
+            form.append(editor,save,cancel,status);article.append(form);editor.focus();
+            form.onsubmit=async event=>{
+              event.preventDefault();const text=editor.value.trim();if(!text)return;
+              save.disabled=true;status.textContent='Guardando…';
+              try{const sb=await window.rccSupabaseReady;const {error}=await sb.from('comments').update({text}).eq('id',row.id).eq('user_id',currentUser.id);if(error)throw error;await loadComments(target,id);}
+              catch(error){status.textContent=error.message||'No se pudo editar el comentario.';save.disabled=false;}
+            };
+          };
+          const remove=el('button','Eliminar','btn btn-ghost comment-delete-button');
+          remove.type='button';
+          remove.onclick=async()=>{
+            if(!window.confirm('¿Eliminar este comentario?'))return;
+            remove.disabled=true;
+            try{const sb=await window.rccSupabaseReady;const {error}=await sb.from('comments').delete().eq('id',row.id).eq('user_id',currentUser.id);if(error)throw error;await loadComments(target,id);}
+            catch(error){remove.disabled=false;window.alert(error.message||'No se pudo eliminar el comentario.');}
+          };
+          actions.append(edit,remove);
+        }
+        article.append(person,date,message,actions);
+        list.append(article);
+      }
+    } catch(error) {
+      if(revision!==loadRevision || !target.isConnected) return;
+      window.RCCScriptReview?.commentsUnavailable(id);
+      list.textContent = error.message || 'Error al cargar comentarios.';
+      const retry=el('button','Reintentar','btn btn-ghost'); retry.onclick=()=>loadComments(target,id); list.append(retry);
+    }
+  }
+
+  window.rccMountComments=id=>{
+    scriptId=id; const target=section=el('section',null,'script-comments'); target.append(el('h3','Comentarios'));
+    const list=el('div',null,'comment-list'); list.setAttribute('aria-live','polite'); target.append(list);
+    
+    const login=el('button','Inicia sesión para comentar','btn btn-ghost comment-login'); 
+    login.onclick = typeof openAuth === 'function' ? openAuth : () => {}; 
+    target.append(login);
+    
+    const form=el('form'), input=el('textarea'); input.required=true; input.maxLength=2000; input.setAttribute('aria-label','Tu comentario'); input.placeholder='Comparte tu experiencia…';
+    const send=el('button','Publicar comentario','btn btn-primary'); send.type='submit';
+    const status=el('p'); status.setAttribute('role','status');
+    let parentId=null;
+    const replyContext=el('div',null,'comment-reply-context'), replyLabel=el('span'); replyContext.hidden=true;
+    const cancel=el('button','Cancelar respuesta','btn btn-ghost'); cancel.type='button';
+    target.cancelReply=()=>{ parentId=null; replyContext.hidden=true; replyLabel.textContent=''; send.textContent='Publicar comentario'; };
+    cancel.onclick=target.cancelReply;
+    target.startReply=(id,authorName)=>{
+      if(send.disabled) return;
+      if(!currentUser){ login.click(); return; }
+      parentId=id; replyLabel.textContent=`Respondiendo a ${authorName}`; replyContext.hidden=false;
+      send.textContent='Publicar respuesta'; form.hidden=false; status.textContent='';
+      input.focus(); form.scrollIntoView({block:'nearest',behavior:'smooth'});
+    };
+    replyContext.append(replyLabel,cancel);
+    form.append(replyContext,input,send,status); target.append(form); modalBody.append(target);
+    
+    form.onsubmit=async event=>{
+      event.preventDefault(); send.disabled=true; status.textContent='Publicando…';
+      try {
+        if(!currentUser) throw new Error('Inicia sesión para comentar.');
+        const sb = await window.rccSupabaseReady;
+        if(!currentUser) throw new Error('Inicia sesión para comentar.');
+        const { error } = await sb.from('comments').insert({
+          script_id: String(id),
+          user_id: currentUser.id,
+          user_email: currentUser.email,
+          text: input.value,
+          parent_id: parentId
+        });
+        if(error) throw error;
+        input.value=''; target.cancelReply(); status.textContent='Comentario publicado.'; await loadComments(target,id);
+      } catch(error) { status.textContent = error.message || 'Error al publicar.'; }
+      finally { send.disabled=false; }
+    };
+    window.rccRefreshComposer(); loadComments(target,id);
+  };
+
+  // Read-only notification feed. The existing tables remain the source of truth.
+  function startNotificationFeed() {
+    let owner=null, revision=0, running=false, refreshPending=false;
+    const seen=new Map();
+    const emit=(items,status='')=>window.dispatchEvent(new CustomEvent('rcc:notifications-update',{detail:{items,status}}));
+    async function poll() {
+      if(!owner || document.hidden) return;
+      if(running){refreshPending=true;return;}
+      running=true;
+      const userId=owner, token=revision;
+      const valid=()=>token===revision && currentUser?.id===userId;
+      try {
+        const sb=await window.rccSupabaseReady;
+        if(!valid())return;
+        const mine=[];
+        for(let offset=0;;offset+=500){
+          const result=await sb.from('comments').select('id,script_id').eq('user_id',userId).order('id').range(offset,offset+499).abortSignal(AbortSignal.timeout(8000));
+          if(result.error)throw result.error;
+          if(!valid())return;
+          mine.push(...(result.data||[]));
+          if((result.data||[]).length<500)break;
+        }
+        if(!mine.length){emit([]);return;}
+        const own=new Map(mine.map(row=>[String(row.id),row]));
+        const since=new Date(Date.now()-86400000).toISOString();
+        const rows=[], warnings=new Set();
+        for(let offset=0;offset<mine.length;offset+=100){
+          const ids=mine.slice(offset,offset+100).map(row=>row.id);
+          const results=await Promise.all([
+            sb.from('comments').select('id,parent_id,script_id,user_id,text,created_at').in('parent_id',ids).neq('user_id',userId).gte('created_at',since).order('created_at',{ascending:false}).limit(100).abortSignal(AbortSignal.timeout(8000)),
+            sb.from('comment_likes').select('comment_id,user_id,created_at').in('comment_id',ids).neq('user_id',userId).gte('created_at',since).order('created_at',{ascending:false}).limit(100).abortSignal(AbortSignal.timeout(8000))
+          ]);
+          if(!valid())return;
+          results.forEach((result,index)=>{
+            if(result.error){warnings.add(index?'No se pudieron consultar los Me gusta.':'No se pudieron consultar las respuestas.');return;}
+            for(const row of result.data||[]){
+              const script=own.get(String(index?row.comment_id:row.parent_id));
+              if(!script || !Number.isFinite(Date.parse(row.created_at)))continue;
+              rows.push({id:index?`like:${row.comment_id}:${row.user_id}:${row.created_at}`:`reply:${row.id}`,type:index?'like':'reply',scriptId:String(script.script_id),actor:row.user_id,text:row.text||'',createdAt:row.created_at});
+            }
+          });
+        }
+        rows.sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt)||a.id.localeCompare(b.id));
+        const recent=rows.slice(0,100), profiles=new Map();
+        const actors=[...new Set(recent.map(row=>row.actor))];
+        if(actors.length){
+          const result=await sb.from('profiles').select('user_id,display_name').in('user_id',actors).abortSignal(AbortSignal.timeout(8000));
+          for(const profile of result.data||[])profiles.set(profile.user_id,profile.display_name);
+        }
+        if(!valid())return;
+        const items=recent.map(row=>({...row,message:row.type==='like'?`A ${profiles.get(row.actor)||'un miembro'} le gustó tu comentario`:`${profiles.get(row.actor)||'Un miembro'} respondió a tu comentario: ${row.text}`}));
+        emit(items,[...warnings].join(' '));
+        // Only recent arrivals produce banners; older records remain in the bell panel.
+        for(const item of items.slice().reverse()){
+          if(!seen.has(item.id) && Date.parse(item.createdAt)>=Date.now()-300000){
+            window.dispatchEvent(new CustomEvent('rcc:notification',{detail:item}));
+          }
+          seen.set(item.id,Date.parse(item.createdAt));
+        }
+        for(const [id,time] of seen)if(time<Date.now()-86400000)seen.delete(id);
+      } catch {
+        if(valid())window.dispatchEvent(new CustomEvent('rcc:notifications-error',{detail:{message:'No se pudieron actualizar las notificaciones. Se reintentará automáticamente.'}}));
+      } finally {
+        running=false;
+        if(refreshPending){refreshPending=false;poll();}
+      }
+    }
+    function sync(){
+      const next=currentUser?.id||null;
+      if(next===owner)return;
+      owner=next;revision++;seen.clear();window.dispatchEvent(new Event('rcc:notifications-reset'));emit([]);
+      if(owner)poll();
+    }
+    new MutationObserver(sync).observe(document.getElementById('authEmail'),{attributes:true,attributeFilter:['hidden'],childList:true,subtree:true,characterData:true});
+    setInterval(poll,3000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll();});
+    window.addEventListener('rcc:notifications-refresh',poll);
+    sync();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startNotificationFeed,{once:true});
+  else startNotificationFeed();
+
+  // --- 4. AVISO DE VERSIÓN ---
+  try{
+    const previous=localStorage.getItem('APP_VERSION');
+    if(previous && Number(previous)<Number(APP_VERSION)){
+      const update=dialog('¡Nueva actualización disponible!');
+      const reload=el('button','Recargar','btn btn-primary'); reload.type='button'; reload.onclick=()=>{localStorage.setItem('APP_VERSION',APP_VERSION);location.reload();};
+      update.form.prepend(reload); update.d.showModal();
+    } else {
+      localStorage.setItem('APP_VERSION',APP_VERSION);
+    }
+  }catch{}
 })();
