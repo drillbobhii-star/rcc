@@ -173,7 +173,7 @@
       url.search=new URLSearchParams({api_key:GIPHY_API_KEY,q:query,limit:'12',rating:'pg-13',lang:'en',bundle:'messaging_non_clips'}).toString();
       const request=fetch(url.toString()).then(response=>{if(!response.ok)throw new Error('GIPHY '+response.status);return response.json();})
         .then(data=>(data.data||[]).map(item=>({
-          url:item.images?.fixed_height_small?.webp||item.images?.fixed_height_small?.url||item.images?.fixed_height?.webp||item.images?.fixed_height?.url,
+          url:item.images?.fixed_height_small_still?.url||item.images?.fixed_height_still?.url||item.images?.fixed_height_small?.url||item.images?.fixed_height?.url,
           alt:item.title||'GIPHY reaction sticker'
         })).filter(item=>item.url))
         .catch(()=>[]);
