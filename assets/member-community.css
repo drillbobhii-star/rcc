@@ -43,3 +43,37 @@
 .member-locked-card h3,.member-locked-card .desc,.member-locked-card .compat-status,.member-locked-card .tags,.member-locked-card .meta{filter:blur(3px);user-select:none}
 .member-locked-card .member-lock-label{filter:none}
 .member-code-blur{filter:blur(7px);user-select:none;pointer-events:none}
+
+
+/* Perfil editable estilo red social: banner, avatar y edición en una sola vista */
+.rcc-edit-profile-dialog{width:min(760px,calc(100% - 24px));max-height:92vh;overflow-y:auto;padding:24px;background:linear-gradient(155deg,rgba(19,27,42,.98),rgba(10,14,24,.98));}
+.rcc-edit-profile-dialog>h2{position:sticky;top:0;z-index:6;margin:-24px -24px 18px;padding:18px 24px;background:rgba(15,21,34,.94);backdrop-filter:blur(18px);border-bottom:1px solid #ffffff18;}
+.rcc-edit-profile-hero{position:relative;height:220px;margin:0 0 66px;border-radius:18px;background:#111a2b;}
+.rcc-edit-profile-cover{position:absolute;inset:0;border-radius:18px;background:linear-gradient(115deg,#263c5d,#151d30 55%,#3b3151);background-position:center;background-size:cover;overflow:hidden;}
+.rcc-edit-profile-cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,#080d18b8);}
+.rcc-edit-profile-avatar{position:absolute;z-index:2;left:22px;bottom:-48px;width:112px;height:112px;border:4px solid #172236;border-radius:50%;object-fit:cover;background:#202b3d;box-shadow:0 8px 28px #0009;}
+.rcc-edit-profile-hero-title{position:absolute;z-index:2;left:150px;bottom:16px;color:#fff;font-size:1.1rem;font-weight:800;text-shadow:0 2px 12px #000;}
+.rcc-edit-profile-dialog form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start;}
+.rcc-edit-profile-dialog form>label{min-width:0;display:grid;gap:8px;color:#dce5f4;font-size:.9rem;}
+.rcc-edit-profile-dialog form>label input:not([type=checkbox]):not([type=file]),.rcc-edit-profile-dialog form>label input[type=file]{width:100%;min-width:0;padding:12px;border:1px solid #ffffff25;border-radius:12px;background:#0d1524;color:#eef3fb;font:inherit;}
+.rcc-edit-profile-dialog form>label:has(input[type=checkbox]){display:flex;align-items:center;gap:10px;}
+.rcc-edit-profile-dialog .creator-effects,.rcc-edit-profile-dialog .member-status,.rcc-edit-profile-dialog form>.btn,.rcc-edit-profile-dialog form>button{grid-column:1/-1;}
+.rcc-edit-profile-dialog .creator-effects{width:100%;}
+.rcc-edit-profile-dialog .member-status{margin:0;min-height:1.5em;}
+.rcc-edit-profile-dialog form>button{width:100%;min-height:48px;}
+.rcc-edit-profile-dialog .member-hint{font-size:.75rem;}
+@media(max-width:560px){.rcc-edit-profile-dialog{padding:16px}.rcc-edit-profile-dialog>h2{margin:-16px -16px 14px;padding:15px 16px}.rcc-edit-profile-hero{height:170px;margin-bottom:62px}.rcc-edit-profile-avatar{width:96px;height:96px;left:14px;bottom:-44px}.rcc-edit-profile-hero-title{left:122px;bottom:13px;font-size:.95rem}.rcc-edit-profile-dialog form{grid-template-columns:1fr}.rcc-edit-profile-dialog form>*{grid-column:1/-1}}
+/* Carga de catálogo y presentación con movimiento suave */
+.loading{position:relative;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;overflow:hidden;isolation:isolate;}
+.loading:before{content:"";width:42px;height:42px;border:3px solid #ffffff22;border-top-color:#b8d8ff;border-right-color:#e9bd65;border-radius:50%;animation:rccLoaderSpin 1s linear infinite;box-shadow:0 0 28px #9bcaff35;}
+.loading:after{content:"";position:absolute;width:min(340px,80%);height:90px;z-index:-1;border-radius:50%;background:radial-gradient(ellipse,#8bbdff25,transparent 70%);filter:blur(12px);animation:rccLoaderPulse 2.6s ease-in-out infinite;}
+@keyframes rccLoaderSpin{to{transform:rotate(360deg)}}
+@keyframes rccLoaderPulse{0%,100%{transform:scale(.72);opacity:.45}50%{transform:scale(1.18);opacity:1}}
+.welcome-stage{isolation:isolate;overflow:hidden;}
+.welcome-orbit{animation:rccWelcomeOrbit 12s linear infinite;transform-origin:center;}
+.welcome-emblem{animation:rccWelcomeFloat 4s ease-in-out infinite;text-shadow:0 0 30px #b8d8ff35;}
+.welcome-signal{animation:rccWelcomeSignal 3s ease-in-out infinite alternate;}
+@keyframes rccWelcomeOrbit{to{transform:rotate(360deg)}}
+@keyframes rccWelcomeFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.025)}}
+@keyframes rccWelcomeSignal{from{opacity:.45;letter-spacing:2px}to{opacity:1;letter-spacing:4px}}
+@media(prefers-reduced-motion:reduce){.loading:before,.loading:after,.welcome-orbit,.welcome-emblem,.welcome-signal{animation:none!important}}
