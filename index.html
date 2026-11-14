@@ -388,6 +388,10 @@ body.ios-glass .modal-box{border-radius:30px}
 body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6ed;outline-offset:4px}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){body.ios-glass{--bg-glass:#1a252b;--card-glass:#334249}}
 @media(max-width:600px){body.ios-glass .grid{grid-template-columns:minmax(0,1fr)}body.ios-glass .card{border-radius:22px}}
+
+/* RCC Roblox search + profile gating */
+.roblox-directory{max-width:1300px;margin:0 auto;padding:0 24px 24px;position:relative;z-index:2}.roblox-directory-box{padding:20px;border:1px solid var(--border-glass);border-radius:18px;background:var(--card-glass);backdrop-filter:blur(18px)}.roblox-directory h3{font-size:1.1rem;margin-bottom:6px}.roblox-directory p{color:var(--muted);font-size:.88rem;margin-bottom:14px}.roblox-search-row{display:flex;gap:10px;flex-wrap:wrap}.roblox-search-row input{flex:1;min-width:180px;padding:12px 14px;border-radius:12px;border:1px solid var(--border-glass);background:#ffffff0a;color:var(--text);font:inherit}.roblox-search-row button{padding:12px 18px;border-radius:12px;border:1px solid #8ca9d8;background:#8ca9d8;color:#101827;font-weight:800}.roblox-result{display:flex;align-items:center;gap:16px;margin-top:16px;padding:14px;border-radius:14px;background:#ffffff0a}.roblox-result img{width:76px;height:76px;object-fit:cover;border-radius:16px}.roblox-result[hidden]{display:none}.roblox-result small{display:block;color:var(--muted)}.script-gated{position:relative;overflow:hidden}.script-gate-overlay{position:absolute;inset:0;z-index:4;display:grid;place-items:center;text-align:center;padding:24px;background:linear-gradient(135deg,#080b13f2,#1b2032f0);backdrop-filter:blur(10px);border-radius:inherit}.script-gate-overlay strong{display:block;font-size:1.1rem}.script-gate-overlay p{max-width:340px;color:#c4cad8;margin:8px auto 14px;font-size:.86rem}.script-gate-overlay button{padding:10px 16px;border:1px solid #c8a65e;background:#c8a65e;color:#17120a;border-radius:10px;font-weight:800}.card.is-gated .card-action{opacity:.6}.rcc-profile-dialog{padding:0!important;overflow:hidden!important;max-width:560px!important;width:min(560px,calc(100% - 28px))!important;background:#0d111b!important;border:1px solid #ffffff30!important}.rcc-profile-dialog::backdrop{background:#02040bcc;backdrop-filter:blur(12px)}.rcc-profile-banner{height:170px;background:linear-gradient(120deg,#17253d,#34304d);background-size:cover;background-position:center;position:relative}.rcc-profile-banner.creator{height:210px;background-image:radial-gradient(circle at 75% 25%,#ffe7a455,transparent 32%),linear-gradient(120deg,#2b1b08,#151b31 52%,#5c421b)}.rcc-profile-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0d111b,transparent 75%)}.rcc-profile-content{position:relative;padding:0 24px 24px;margin-top:-48px}.rcc-profile-avatar{width:96px;height:96px;object-fit:cover;border-radius:50%;border:4px solid #0d111b;background:#222;position:relative;z-index:1}.rcc-profile-name{font-size:1.5rem;font-weight:900;margin-top:12px}.rcc-profile-roblox{color:#aab8d1;margin-top:6px;font-size:.9rem}.rcc-founder-mark{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid #e9bd65;border-radius:999px;color:#ffdf91;background:#e9bd6518;font-weight:900;font-size:.72rem;letter-spacing:1px;margin-top:10px}.rcc-profile-dialog .member-status{padding:0 24px 20px}.profile-banner-preview{height:90px;border-radius:12px;background:#1d2637 center/cover;margin:6px 0 10px;border:1px solid #ffffff22}.comment-person .comment-author-button{border:0;padding:0;background:transparent;color:inherit;font:inherit;font-weight:800;cursor:pointer;text-align:left}.comment-person .comment-author-button:hover{text-decoration:underline}.comment-banner-strip{height:48px;border-radius:9px;background:#273248 center/cover;margin:0 0 8px;border:1px solid #ffffff20}.comment-creator .comment-banner-strip{height:65px;background-image:linear-gradient(120deg,#5c421b,#111a30)}
+@media(max-width:600px){.roblox-directory{padding:0 16px 20px}.roblox-search-row button{width:100%}.rcc-profile-banner{height:135px}}
 </style>
 <link rel="stylesheet" href="assets/glass-controls.css">
 <link rel="stylesheet" href="assets/catalog-ui.css">
@@ -556,6 +560,7 @@ window.rccSupabaseReady.catch(() => {});
       <h2 id="heroTitle" tabindex="-1">Tu próxima idea empieza aquí.</h2>
       <p id="heroSubtitle">Explora Lua, juegos y JavaScript a tu ritmo. Encuentra una idea, abre su código y hazla tuya.</p>
       <div class="studio-actions"><a class="studio-primary" href="#catalogHeading">Explorar códigos <span aria-hidden="true">↗</span></a><button type="button" data-motion-library>Probar animaciones <span aria-hidden="true">→</span></button><span class="studio-shortcut"><kbd>Ctrl / ⌘ K</kbd> para buscar</span></div>
+      <section class="roblox-directory" aria-label="Buscador de usuarios Roblox"><div class="roblox-directory-box"><h3>🔎 Explorador de usuarios Roblox</h3><p>Busca por nombre de usuario o pega directamente un ID numérico.</p><form id="robloxDirectoryForm" class="roblox-search-row"><input id="robloxDirectoryInput" type="search" maxlength="32" placeholder="Ej. Builderman o 156" aria-label="Nombre de usuario o ID Roblox" required><button type="submit">Buscar usuario ↗</button></form><p id="robloxDirectoryStatus" role="status" aria-live="polite"></p><article id="robloxDirectoryResult" class="roblox-result" hidden></article></div></section>
       <section class="platform-spotlight" aria-label="Nuevos scripts independientes">
         <span class="eyebrow">NUEVO · CÓDIGO FUENTE INDEPENDIENTE</span>
         <p>60 scripts nuevos para FiveM, GameGuardian y AutoTouch. Revisa el entorno y la instalación en cada ficha; ejecución en dispositivos reales pendiente.</p>
@@ -681,8 +686,8 @@ window.rccSupabaseReady.catch(() => {});
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
 
-<link rel="stylesheet" href="assets/member-community.css?v=2.2">
-<script src="assets/member-community.js?v=2.2"></script>
+<link rel="stylesheet" href="assets/member-community.css?v=3.0">
+<script src="assets/member-community.js?v=3.0"></script>
 <script>
 let currentUser = null;
 let favoriteIds = new Set();
@@ -1021,7 +1026,9 @@ function render(reset = true){
     window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
-    card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
+    const gated=rccIsGateCandidate(s)&&!rccCanUnlock();
+    if(gated){card.classList.add('is-gated');card.querySelector('.card-action').textContent='🔒 Script bloqueado';rccShowGate(card);}
+    card.onclick = (e)=>{ e.stopPropagation(); if(gated){if(!currentUser)openAuth();else document.getElementById('authEmail').click();return;} openScript(s); };
     grid.appendChild(card);
     setTimeout(()=>card.classList.add('show'), Math.min(i,8)*35);
   });
@@ -1033,6 +1040,7 @@ function executorWarning(script){
 }
 
 function openScript(s){
+  if(rccIsGateCandidate(s)&&!rccCanUnlock()){showToast('Inicia sesión para desbloquear este script.');openAuth();return;}
   window.RCCScriptReview?.cancel(false);
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
@@ -1424,6 +1432,7 @@ async function voteForScript(scriptId,button){
   finally{votePending.delete(key);if(button.isConnected)button.disabled=false;}
 }
 
+document.getElementById('robloxDirectoryForm').addEventListener('submit',async event=>{event.preventDefault();const input=document.getElementById('robloxDirectoryInput'),status=document.getElementById('robloxDirectoryStatus'),result=document.getElementById('robloxDirectoryResult'),button=event.currentTarget.querySelector('button');const query=input.value.trim();result.hidden=true;status.textContent='Buscando en Roblox…';button.disabled=true;try{const response=await fetch('/api/roblox-lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query}),signal:AbortSignal.timeout(18000)});const data=await response.json();if(!response.ok)throw new Error(data.error||'No se encontró ese usuario.');const img=document.createElement('img');img.src=data.avatarUrl;img.alt='Avatar de '+data.name;img.loading='lazy';const details=document.createElement('div');const name=document.createElement('strong');name.textContent=data.name;const id=document.createElement('small');id.textContent='ID: '+data.id;const link=document.createElement('a');link.href='https://www.roblox.com/users/'+encodeURIComponent(data.id)+'/profile';link.target='_blank';link.rel='noopener noreferrer';link.textContent='Ver perfil ↗';details.append(name,id,link);result.replaceChildren(img,details);result.hidden=false;status.textContent='Usuario encontrado.';}catch(error){status.textContent=error.message||'No se pudo consultar Roblox.';}finally{button.disabled=false;}});
 window.rccSessionReady=initializeAuth();
 loadScripts();
 </script>
