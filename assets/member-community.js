@@ -268,7 +268,8 @@ const APP_VERSION = '3.0';
         reply.onclick=()=>target.startReply(row.id,authorName);
         const message=el('p',row.text),actions=el('div',null,'comment-actions');
         actions.append(reply);
-        if(currentUser?.id===row.user_id){
+        const isFounder=(currentUser?.email||'').trim().toLowerCase()===creatorEmail;
+        if(currentUser?.id===row.user_id || isFounder){
           const edit=el('button','Editar','btn btn-ghost comment-edit-button');
           edit.type='button';
           edit.onclick=()=>{
@@ -281,7 +282,7 @@ const APP_VERSION = '3.0';
             form.onsubmit=async event=>{
               event.preventDefault();const text=editor.value.trim();if(!text)return;
               save.disabled=true;status.textContent='Guardando…';
-              try{const sb=await window.rccSupabaseReady;const {error}=await sb.from('comments').update({text}).eq('id',row.id).eq('user_id',currentUser.id);if(error)throw error;await loadComments(target,id);}
+              try{const sb=await window.rccSupabaseReady;let query=sb.from('comments').update({text}).eq('id',row.id);if(!isFounder)query=query.eq('user_id',currentUser.id);const {error}=await query;if(error)throw error;await loadComments(target,id);}
               catch(error){status.textContent=error.message||'No se pudo editar el comentario.';save.disabled=false;}
             };
           };
@@ -290,7 +291,7 @@ const APP_VERSION = '3.0';
           remove.onclick=async()=>{
             if(!window.confirm('Se eliminarán este comentario y todas sus respuestas. ¿Continuar?'))return;
             remove.disabled=true;
-            try{const sb=await window.rccSupabaseReady;const {error}=await sb.from('comments').delete().eq('id',row.id).eq('user_id',currentUser.id);if(error)throw error;await loadComments(target,id);}
+            try{const sb=await window.rccSupabaseReady;let query=sb.from('comments').delete().eq('id',row.id);if(!isFounder)query=query.eq('user_id',currentUser.id);const {error}=await query;if(error)throw error;await loadComments(target,id);}
             catch(error){remove.disabled=false;window.alert(error.message||'No se pudo eliminar el comentario.');}
           };
           actions.append(edit,remove);
