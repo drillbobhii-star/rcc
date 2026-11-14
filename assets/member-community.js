@@ -32,9 +32,10 @@ const APP_VERSION = '3.0';
   };
 
   // --- 2. PERFILES DE USUARIO ---
-  const profile=dialog('Tu perfil');
+  const profile=dialog('Tu perfil');profile.d.classList.add('rcc-edit-profile-dialog');
+  const profileHero=el('div',null,'rcc-edit-profile-hero'),profileCover=el('div',null,'rcc-edit-profile-cover'),profileAvatarPreview=el('img',null,'rcc-edit-profile-avatar'),profileHeroTitle=el('div','Tu espacio en RCC','rcc-edit-profile-hero-title');profileAvatarPreview.alt='Vista previa del avatar';profileHero.append(profileCover,profileAvatarPreview,profileHeroTitle);profile.d.insertBefore(profileHero,profile.form);
   const color=field(profile.form,'Color del nombre','color',{value:'#dce6f5',required:true});
-  const avatar=field(profile.form,'Foto · URL HTTPS','url',{maxLength:2000,placeholder:'https://…'});
+  const avatar=field(profile.form,'Foto · URL HTTPS','url',{maxLength:2000,placeholder:'https://…'});avatar.addEventListener('input',()=>{profileAvatarPreview.src=avatar.value.trim()||new URL('/assets/default-avatar.svg',location.origin).href;});
   const name=field(profile.form,'Nombre visible','text',{required:true,maxLength:80});
   const robloxUsername=field(profile.form,'Usuario de Roblox','text',{maxLength:20,placeholder:'Ej. Builderman',autocomplete:'off',spellcheck:false});
   const robloxHint=el('small','Opcional. Si lo completas, se usará la foto de tu avatar de Roblox.','member-hint');
@@ -50,8 +51,7 @@ const APP_VERSION = '3.0';
   const nameEffect=makeEffect('Animación del nombre'),bannerEffect=makeEffect('Efecto del banner');
   profile.form.insertBefore(creatorEffects,profile.status);
   const bannerUpload=field(profile.form,'Banner de perfil · imagen','file',{accept:'image/png,image/jpeg,image/webp',});
-  const bannerPreview=el('div',null,'profile-banner-preview');
-  bannerUpload.parentElement.after(bannerPreview);
+  const bannerPreview=profileCover;bannerPreview.classList.add('profile-banner-preview');
   let currentBannerUrl='',currentRobloxId='';
   bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
@@ -59,14 +59,14 @@ const APP_VERSION = '3.0';
   let profileOwner=null;
   document.getElementById('authEmail').onclick=async()=>{
     if(!currentUser) return;
-    profileOwner=currentUser.id; profile.form.reset(); profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
+    profileOwner=currentUser.id;document.getElementById('authEmail').textContent='Mi perfil ✎';profile.form.reset(); profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
     try {
       const sb = await window.rccSupabaseReady;
       const { data, error } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle();
       if(error) throw error;
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
       name.value = data?.display_name || '';
-      avatar.value = data?.avatar_url || '';
+      avatar.value = data?.avatar_url || '';profileAvatarPreview.src=avatar.value||new URL('/assets/default-avatar.svg',location.origin).href;
       currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
       robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
       bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';
@@ -135,7 +135,7 @@ const APP_VERSION = '3.0';
         const {data:uploaded,error:uploadError}=await sb2.storage.from('profile-media').upload(path,bannerFile,{upsert:false,contentType:bannerFile.type,cacheControl:'3600'});
         if(uploadError)throw uploadError;
         const {data:publicData}=sb2.storage.from('profile-media').getPublicUrl(uploaded.path);
-        currentBannerUrl=publicData.publicUrl;
+        currentBannerUrl=publicData.publicUrl;bannerPreview.style.backgroundImage='url("'+currentBannerUrl+'")';
         const {error:updateError}=await sb2.from('profiles').update({banner_url:currentBannerUrl}).eq('user_id',currentUser.id);
         if(updateError)throw updateError;
         bannerUpload.value='';
