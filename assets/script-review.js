@@ -162,7 +162,24 @@
     {terms:/program|código|script|variable|compil|teclado|README|depur|desarroll/i,emoji:'💻'}
   ];
   function stickerKind(message){return stickerKinds.find(item=>item.terms.test(message))||{emoji:'😂'};}
-  function showSticker(box,message){box.querySelector('.review-tip-emoji').textContent=stickerKind(message).emoji;}
+  const stickerFiles={
+    '⚠️':'assets/memes/warning.svg',
+    '🤦':'assets/memes/bug.svg',
+    '🤔':'assets/memes/think.svg',
+    '💻':'assets/memes/code.svg',
+    '😂':'assets/memes/laugh.svg'
+  };
+  function showSticker(box,message){
+    const media=box.querySelector('.review-tip-media'),fallback=media?.querySelector('.review-tip-emoji');
+    if(!media||!fallback)return;
+    const emoji=stickerKind(message).emoji,file=stickerFiles[emoji]||stickerFiles['😂'];
+    let img=media.querySelector('img.review-tip-image');
+    if(!img){img=el('img',null,'review-tip-image');img.alt='';img.loading='lazy';img.decoding='async';media.insertBefore(img,fallback);}
+    img.onerror=()=>{img.hidden=true;fallback.hidden=false;};
+    img.onload=()=>{img.hidden=false;fallback.hidden=true;};
+    if(img.getAttribute('src')!==file)img.src=file;
+    fallback.textContent=emoji;
+  }
   const scriptForTip=new WeakMap(),tipStep=new WeakMap();
   function tip(s,detail=false){
     const box=el('aside',null,'review-tip'+(detail?' review-tip-detail':''));box.dataset.reviewScript=String(s.id);
@@ -239,6 +256,6 @@
     const box=visible[active++%visible.length],s=scriptForTip.get(box);if(!s)return;
     const list=messages(s),step=tipStep.get(box)||0;
     const body=box.querySelector('.review-tip-content > span');if(!body)return;const message=list[step%list.length];box.dataset.noteStep=String(step+1);body.textContent=message;showSticker(box,message);tipStep.set(box,step+1);box.dataset.visible='true';
-  },10000);
+  },7000);
   window.RCCScriptReview={assessment,messages,card,detail,comments,commentsUnavailable,summarize,confirm,cancel};
 })();
