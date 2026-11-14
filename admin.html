@@ -42,6 +42,8 @@
   #preview pre { white-space:pre-wrap; overflow-wrap:anywhere; background:#0d0d18; padding:12px; max-height:300px; overflow:auto; }
   button:focus-visible,.file-label:focus-within { outline:2px solid #b7a9ff; outline-offset:3px; }
   @media(max-width:520px){ .row { grid-template-columns:1fr; } }
+
+  .rcc-vip-admin{margin:20px 0;border-color:#bca5ff}.rcc-vip-admin h2{color:#d7c8ff}.rcc-vip-admin p{line-height:1.55;color:#b8b8ce}.rcc-vip-admin [hidden]{display:none!important}.rcc-vip-admin form{margin:16px 0}.rcc-vip-admin .rcc-vip-toggle{display:flex;align-items:center;gap:10px;color:#e8e8f5;font-size:1rem}.rcc-vip-admin .rcc-vip-toggle input{width:auto;accent-color:#a78bfa}.rcc-vip-admin button{cursor:pointer}
 </style>
 </head>
 <body>
@@ -62,6 +64,34 @@
       <button onclick="enviarMensaje()">Enviar</button>
     </div>
   </div>
+
+  
+  <section class="form-section rcc-vip-admin" id="vipAdminPanel" aria-labelledby="vipAdminHeading">
+    <h2 id="vipAdminHeading">💎 RCC Supporter · Gestión VIP</h2>
+    <p>Activa o retira manualmente el acceso de un miembro. La operación se valida en el servidor y se notifica al webhook de Discord.</p>
+    <form id="vipAdminLogin" autocomplete="on">
+      <label for="vipAdminEmail">Correo del administrador</label>
+      <input type="email" id="vipAdminEmail" autocomplete="username" required>
+      <label for="vipAdminPassword">Contraseña</label>
+      <input type="password" id="vipAdminPassword" autocomplete="current-password" required>
+      <button type="submit" class="btn-generate">Iniciar sesión como administrador</button>
+    </form>
+    <div id="vipAdminConsole" hidden>
+      <p id="vipAdminIdentity" role="status"></p>
+      <button type="button" id="vipAdminLogout" class="editor-tools">Cerrar sesión</button>
+      <form id="vipMemberSearch">
+        <label for="vipMemberEmail">Correo del miembro RCC / Ko-fi</label>
+        <input type="email" id="vipMemberEmail" required placeholder="miembro@ejemplo.com">
+        <button type="submit" class="btn-generate">Buscar miembro</button>
+      </form>
+      <section id="vipMemberResult" hidden aria-live="polite">
+        <p id="vipMemberIdentity"></p>
+        <label class="rcc-vip-toggle"><input type="checkbox" id="vipIsVip"> Es VIP</label>
+        <p id="vipAdminStatus" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+    <p id="vipAdminNotice" role="status" aria-live="polite"></p>
+  </section>
 
   <!-- SECCIÓN DEL FORMULARIO -->
   <div class="form-section">
@@ -314,6 +344,19 @@
     document.getElementById('preview').hidden=true; feedback('Hay cambios pendientes de validar.');
   });
 </script>
+
+
+<meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtpb0JYKlDM8U">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.js"></script>
+<script>
+window.rccAdminSupabaseReady = Promise.resolve().then(() => {
+  if (!window.supabase?.createClient) throw new Error('No se pudo cargar Supabase.');
+  return window.supabase.createClient('https://cbkrpyfkteomcukdisdw.supabase.co', document.querySelector('meta[name="supabase-anon-key"]').content.trim(), {
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+});
+</script>
+<script src="assets/admin-vip.js?v=1"></script>
 
 </body>
 </html>
