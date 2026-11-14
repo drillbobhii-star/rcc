@@ -171,17 +171,12 @@
   let memeCursor=0;
   function memeFor(message){
     const matching=memePool.filter(item=>item.tags.test(message));
-    const candidates=matching.length?matching:memePool;
-    for(let offset=0;offset<candidates.length;offset++){
-      const item=candidates[(memeCursor+offset)%candidates.length];
-      if(!usedMemeUrls.has(item.url)){
-        usedMemeUrls.add(item.url);memeCursor=(memeCursor+offset+1)%candidates.length;
-        if(usedMemeUrls.size===memePool.length)usedMemeUrls.clear();
-        return item;
-      }
-    }
-    const item=candidates[memeCursor%candidates.length];
-    memeCursor=(memeCursor+1)%candidates.length;usedMemeUrls.clear();usedMemeUrls.add(item.url);
+    const preferred=matching.length?matching:memePool;
+    const candidates=[...preferred,...memePool.filter(item=>!preferred.includes(item))];
+    let item=candidates.find(candidate=>!usedMemeUrls.has(candidate.url));
+    if(!item){usedMemeUrls.clear();item=candidates[0];}
+    usedMemeUrls.add(item.url);
+    memeCursor=(memePool.indexOf(item)+1)%memePool.length;
     return item;
   }
   function showSticker(box,message){
