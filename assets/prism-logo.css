@@ -18,3 +18,10 @@ body[data-ui] .brand-symbol.rcc-prism{display:inline-grid;place-items:center;wid
 body.motion-paused #logoHome,body.motion-paused #logoHome *{animation:none!important}
 @media(prefers-reduced-motion:reduce){#logoHome,#logoHome *{animation:none!important}}
 @media(max-width:600px){body[data-ui] .brand-symbol.rcc-prism,.rcc-prism svg{width:38px;height:38px}}
+/* Folded terminal ribbon: quiet float, orbiting registration dot. */
+.rcc-prism svg{animation:ribbon-float 5s ease-in-out infinite}
+.prism-shell{stroke-dasharray:none;animation:none;fill:color-mix(in srgb,var(--accent) 12%,transparent);stroke-width:1.5}
+.prism-fold{opacity:.6;stroke-width:1.2}
+.prism-letter{stroke-width:2.2}
+.prism-satellite{transform-origin:24px 24px;animation:prism-satellite 16s linear infinite}
+@keyframes ribbon-float{50%{transform:translateY(-3px) rotate(-4deg)}}
