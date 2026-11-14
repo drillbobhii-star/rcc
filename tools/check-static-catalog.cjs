@@ -25,7 +25,7 @@ assert.match(source,/cache:'force-cache'/,'Content-addressed catalog parts shoul
 assert.match(source,/request\(file,'reload'\)/,'A failed cached response must retry from the network');
 assert.match(source,/rootPath=file=>.*file\.replace/,'Catalog requests must resolve from the site root');
 assert.match(source,/const partPath=/,'Catalog part paths must remain explicitly restricted');
-const newLoader=fetch=>{const wrappedFetch=(url,options)=>fetch(String(url).replace(/^\\/+/,''),options);const context=vm.createContext({window:{},fetch:wrappedFetch,AbortController});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
+const newLoader=fetch=>{const wrappedFetch=(url,options)=>fetch(String(url).replace(/^\/+/,''),options);const context=vm.createContext({window:{},fetch:wrappedFetch,AbortController});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
 const plain=value=>JSON.parse(JSON.stringify(value));
 (async()=>{
  let active=0,peak=0;const progress=[];
