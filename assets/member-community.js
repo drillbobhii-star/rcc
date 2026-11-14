@@ -1,5 +1,5 @@
 /* Autenticación, comentarios y perfiles usando Supabase directamente. */
-const APP_VERSION = '2.1';
+const APP_VERSION = '3.0';
 (() => {
   const el = (tag, text, cls) => {const node=document.createElement(tag);if(text)node.textContent=text;if(cls)node.className=cls;return node;};
   
@@ -112,7 +112,7 @@ const APP_VERSION = '2.1';
         profile.status.textContent='Subiendo banner…';
         const ext=({ 'image/jpeg':'jpg','image/png':'png','image/webp':'webp' })[bannerFile.type];
         const sb2=await window.rccSupabaseReady;
-        const path='banners/'+currentUser.id+'/'+crypto.randomUUID()+'.'+ext;
+        const path=currentUser.id+'/banners/'+crypto.randomUUID()+'.'+ext;
         const {data:uploaded,error:uploadError}=await sb2.storage.from('profile-media').upload(path,bannerFile,{upsert:false,contentType:bannerFile.type,cacheControl:'3600'});
         if(uploadError)throw uploadError;
         const {data:publicData}=sb2.storage.from('profile-media').getPublicUrl(uploaded.path);
