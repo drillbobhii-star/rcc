@@ -443,7 +443,7 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/release17.css">
 <script src="assets/catalog-filters.js"></script>
 <script src="assets/catalog-search.js"></script>
-<script src="assets/catalog-loader.js?v=20261114-2"></script>
+<script src="assets/catalog-loader.js?v=20261114-3"></script>
 <script src="assets/trend-analysis.js"></script>
 <link rel="stylesheet" href="assets/studio.css">
 <link rel="stylesheet" href="assets/search-experience.css">
@@ -562,7 +562,6 @@ window.rccSupabaseReady.catch(() => {});
       <h2 id="heroTitle" tabindex="-1">Tu próxima idea empieza aquí.</h2>
       <p id="heroSubtitle">Explora Lua, juegos y JavaScript a tu ritmo. Encuentra una idea, abre su código y hazla tuya.</p>
       <div class="studio-actions"><a class="studio-primary" href="#catalogHeading">Explorar códigos <span aria-hidden="true">↗</span></a><button type="button" data-motion-library>Probar animaciones <span aria-hidden="true">→</span></button><span class="studio-shortcut"><kbd>Ctrl / ⌘ K</kbd> para buscar</span></div>
-      <section class="roblox-directory" aria-label="Buscador de usuarios Roblox"><div class="roblox-directory-box"><h3>🔎 Explorador de usuarios Roblox</h3><p>Busca por nombre de usuario o pega directamente un ID numérico.</p><form id="robloxDirectoryForm" class="roblox-search-row"><input id="robloxDirectoryInput" type="search" maxlength="32" placeholder="Ej. Builderman o 156" aria-label="Nombre de usuario o ID Roblox" required><button type="submit">Buscar usuario ↗</button></form><p id="robloxDirectoryStatus" role="status" aria-live="polite"></p><article id="robloxDirectoryResult" class="roblox-result" hidden></article></div></section>
       <section class="platform-spotlight" aria-label="Nuevos scripts independientes">
         <span class="eyebrow">NUEVO · CÓDIGO FUENTE INDEPENDIENTE</span>
         <p>60 scripts nuevos para FiveM, GameGuardian y AutoTouch. Revisa el entorno y la instalación en cada ficha; ejecución en dispositivos reales pendiente.</p>
@@ -640,7 +639,7 @@ window.rccSupabaseReady.catch(() => {});
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" aria-label="Novedades de la actualización"><div><strong>RCC al día · 14 de noviembre</strong><p>14.870 scripts, 80 incorporaciones con imágenes de sus juegos, nuevo logo animado y tema Naranja y blanco. Estrenamos notas breves con humor y reportes de comentarios junto a cada script. Los marcados como parcheados tienen un cartel y confirmación Sí/No con 5 segundos de lectura antes de copiar o descargar.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de la actualización"><div><strong>RCC al día · 14 de noviembre</strong><p>Carga progresiva: los primeros códigos aparecen mientras el resto del catálogo se descarga por lotes. La búsqueda espera a que termines de escribir para reducir los tirones. Retiramos el explorador de usuarios de la portada. También puedes personalizar tu perfil y editar o eliminar tus comentarios y sus respuestas asociadas.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <div class="grid" id="scripts">
@@ -699,6 +698,9 @@ let sessionRevision = 0;
 const favoritePending = new Set();
 let scripts = [];
 let catalogStatus = 'loading';
+let catalogLoading = false;
+let catalogTotal = 0;
+let catalogLoadError = false;
 
 // Desactivación temporal del gating del catálogo: no bloquear scripts por ID.
 function rccIsGateCandidate(_script) { return false; }
@@ -743,28 +745,35 @@ const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 
 async function loadScripts(){
-  catalogStatus='loading';render();
+  catalogLoading=true;catalogLoadError=false;catalogStatus='loading';render();
   try {
-    const data=await window.RCCCatalogLoader.load({onProgress:({loaded,total})=>{
-      document.getElementById('resultCount').textContent=`Cargando catálogo: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos…`;
+    const data=await window.RCCCatalogLoader.load({onBatch:batch=>{
+      catalogTotal=batch.total;
+      if(catalogStatus!=='ready'){
+        scripts=batch.scripts;catalogStatus='ready';buildSidebar();render();
+      }
+    },onProgress:({loaded,total})=>{
+      document.getElementById('resultCount').textContent=`Descargando: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos. Ya puedes explorar; la búsqueda completa estará disponible al terminar.`;
     }});
-    scripts=data;catalogStatus='ready';
+    scripts=data;catalogLoading=false;catalogStatus='ready';
     const tagSelect = document.getElementById('tagFilter');
     tagSelect.options.length=1;document.getElementById('gameFilter').options.length=1;
     [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
     document.getElementById('webCount').textContent='· '+scripts.filter(s=>s.catalog_section==='web').length;
     const games=scripts.filter(s=>s.catalog_section==='games');
     document.getElementById('gamesCount').textContent='· '+games.length;
-    const gameNames=[...new Set(games.map(s=>s.game))].sort((a,b)=>a.localeCompare(b,'es'));
-    gameNames.forEach(name=>document.getElementById('gameFilter').add(new Option(name+' ('+games.filter(s=>s.game===name).length+')',name)));
+    const gameCounts=new Map();
+    for(const game of games)gameCounts.set(game.game,(gameCounts.get(game.game)||0)+1);
+    [...gameCounts].sort(([a],[b])=>a.localeCompare(b,'es')).forEach(([name,count])=>document.getElementById('gameFilter').add(new Option(name+' ('+count+')',name)));
     document.querySelectorAll('[data-platform-shortcut]').forEach(button => button.disabled = false);
     updateRecentCount();
     buildSidebar();
-    render();
+    render(false);
     openSharedScript();
   } catch (err) {
     console.error(err);
-    catalogStatus='error';render();
+    catalogLoading=false;catalogLoadError=true;
+    catalogStatus=scripts.length?'ready':'error';render(false);
   }
 }
 
@@ -907,7 +916,7 @@ function render(reset = true){
     return;
   }
   document.querySelectorAll('[data-platform-shortcut]').forEach(button => button.setAttribute('aria-pressed', String(filterPlatform === button.dataset.platformShortcut)));
-  if(reset !== false) visibleLimit = 36;
+  if(reset !== false && reset !== 'append') visibleLimit = 36;
   const q = normalize(searchInput.value.trim());
   
   let list = [...scripts];
@@ -948,7 +957,11 @@ function render(reset = true){
   if(releaseView==='trending'){const ranks=new Map(window.RCCTrendAnalysis.rank(scripts,trendCounts).map((s,i)=>[s.id,i]));list.sort((a,b)=>ranks.get(a.id)-ranks.get(b.id));}
   if(releaseView==='updates') list.sort((a,b)=>(b.review?.sourceUpdatedAt||b.release?.date||b.created_at||'').localeCompare(a.review?.sourceUpdatedAt||a.release?.date||a.created_at||''));
   if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Novedades · noviembre de 2026'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Juegos y scripts destacados, con una selección que combina títulos del catálogo y códigos reutilizables según su utilidad, compatibilidad y código disponible. Las cifras altas son una simulación editorial de popularidad, no actividad registrada. Las acciones reales de los últimos 30 días se muestran por separado.':'Últimas incorporaciones, cambios de contenido registrados y scripts marcados como parcheados. Abre una ficha para ver sus notas breves.'; }
-  document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
+  document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`+(catalogLoading?` · Cargando el resto de ${catalogTotal.toLocaleString('es')}… La búsqueda se amplía al terminar.`:'');
+  if(catalogLoadError){
+    const retry=document.createElement('button');retry.type='button';retry.className='btn btn-ghost';retry.textContent='Carga incompleta · Reintentar';retry.onclick=loadScripts;
+    document.getElementById('resultCount').append(' ',retry);
+  }
   window.dispatchEvent(new CustomEvent('rcc:results', {detail:{count:list.length, query:searchInput.value.trim()}}));
   const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
   document.getElementById('statTotal').textContent = sectionScripts.length;
@@ -957,7 +970,9 @@ function render(reset = true){
   
   renderActiveFilters();
   if(typeof renderTrendsStatus==='function')renderTrendsStatus();
-  grid.innerHTML = '';
+  const appendOnly=reset==='append' && grid.firstElementChild?.classList.contains('card') && grid.children.length<Math.min(visibleLimit,list.length);
+  const startIndex=appendOnly?grid.children.length:0;
+  if(!appendOnly)grid.innerHTML = '';
   
   document.getElementById('loadMore').hidden=true;
   if(showFavorites && (!currentUser || favoritesStatus !== 'ready')){
@@ -977,7 +992,8 @@ function render(reset = true){
   
   const more=document.getElementById('loadMore');more.hidden=list.length<=visibleLimit;
   more.textContent=`Mostrar ${Math.min(36,Math.max(0,list.length-visibleLimit))} más (${Math.max(0,list.length-visibleLimit)} pendientes)`;
-  list.slice(0,visibleLimit).forEach((s,i)=>{
+  const cards=document.createDocumentFragment();
+  list.slice(startIndex,visibleLimit).forEach((s,i)=>{
     const plat = PLATFORMS.find(p=>p.id===s.platform);
     const card = document.createElement('div');
     card.className = 'card';
@@ -1034,9 +1050,10 @@ function render(reset = true){
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
     // Gating temporalmente desactivado: renderizar y abrir todas las tarjetas normalmente.
     card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
-    grid.appendChild(card);
+    cards.appendChild(card);
     setTimeout(()=>card.classList.add('show'), Math.min(i,8)*35);
   });
+  grid.appendChild(cards);
 }
 
 function executorWarning(script){
@@ -1135,7 +1152,8 @@ function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.rem
 document.getElementById('hamburger').onclick = openSidebar;
 overlay.onclick = closeSidebar;
 
-searchInput.addEventListener('input', render);
+let searchRenderTimer;
+searchInput.addEventListener('input',()=>{clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(()=>render(),180);});
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function verificationLabel(s){
@@ -1188,7 +1206,7 @@ document.getElementById('sortOrder').onchange = render;
 document.getElementById('environmentFilter').onchange = render;
 document.getElementById('verificationFilter').onchange = render;
 document.getElementById('reviewFilter').onchange = render;
-document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render(false);};
+document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render('append');};
 function clearCatalogFilters(){
   filterDevice=filterPlatform=filterExecutor=filterType='all';
   searchInput.value='';
@@ -1236,7 +1254,7 @@ function getNavigationSearchIndex() {
   return navigationSearchIndex;
 }
 window.RCCNavigation = {
-  ready: () => catalogStatus === 'ready',
+  ready: () => catalogStatus === 'ready' && !catalogLoading,
   status: () => catalogStatus,
   state: () => ({section:catalogSection, view:releaseView, query:searchInput.value, scroll:scrollY, limit:visibleLimit,
     device:filterDevice, platform:filterPlatform, executor:filterExecutor, type:filterType,
@@ -1442,7 +1460,6 @@ async function voteForScript(scriptId,button){
   finally{votePending.delete(key);if(button.isConnected)button.disabled=false;}
 }
 
-document.getElementById('robloxDirectoryForm').addEventListener('submit',async event=>{event.preventDefault();const input=document.getElementById('robloxDirectoryInput'),status=document.getElementById('robloxDirectoryStatus'),result=document.getElementById('robloxDirectoryResult'),button=event.currentTarget.querySelector('button');const query=input.value.trim();result.hidden=true;status.textContent='Buscando en Roblox…';button.disabled=true;try{const response=await fetch('/api/roblox-lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query}),signal:AbortSignal.timeout(18000)});const data=await response.json();if(!response.ok)throw new Error(data.error||'No se encontró ese usuario.');const img=document.createElement('img');img.src=data.avatarUrl;img.alt='Avatar de '+data.name;img.loading='lazy';const details=document.createElement('div');const name=document.createElement('strong');name.textContent=data.name;const id=document.createElement('small');id.textContent='ID: '+data.id;const link=document.createElement('a');link.href='https://www.roblox.com/users/'+encodeURIComponent(data.id)+'/profile';link.target='_blank';link.rel='noopener noreferrer';link.textContent='Ver perfil ↗';details.append(name,id,link);result.replaceChildren(img,details);result.hidden=false;status.textContent='Usuario encontrado.';}catch(error){status.textContent=error.message||'No se pudo consultar Roblox.';}finally{button.disabled=false;}});
 window.rccSessionReady=initializeAuth();
 loadScripts();
 </script>
