@@ -15,3 +15,13 @@ body[data-ui] .brand-symbol{color:#f6f9ff;background:linear-gradient(145deg,#fff
 .catalog-news{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:16px 22px;margin:18px 0;border:1px solid var(--border-glass);border-radius:18px;background:var(--card-glass)}.catalog-news p{margin:4px 0;color:var(--muted);font-size:13px;line-height:1.6}.catalog-news button{flex-shrink:0}
 
 @media(max-width:600px){.catalog-news{align-items:flex-start}}
+
+
+/* Independent safety notices on the RCC catalog */
+.rcc-safety-notices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0 24px}
+.rcc-safety-note{display:flex;align-items:flex-start;gap:12px;padding:15px 16px;border:1px solid var(--border-glass);border-radius:15px;background:var(--card-glass);min-width:0}
+.rcc-safety-note>span{font-size:19px;line-height:1.35;flex:0 0 auto}
+.rcc-safety-note strong{display:block;font-size:13px;line-height:1.5;color:var(--text)}
+.rcc-safety-note p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.7}
+.rcc-safety-note--ban{border-left:3px solid #d6a64d}
+@media(max-width:640px){.rcc-safety-notices{grid-template-columns:1fr}.rcc-safety-note{padding:13px}}
