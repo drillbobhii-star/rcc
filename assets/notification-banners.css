@@ -18,7 +18,7 @@
 body.motion-paused .notification-banner{animation:none}
 
 /* Swipe-to-dismiss message banners */
-.notification-banner{touch-action:pan-y;transition:transform .19s ease,opacity .19s ease}
+.notification-banner{touch-action:none;transition:transform .19s ease,opacity .19s ease}
 .notification-banner.is-swiping{transition:none;transform:translate(var(--swipe-x,0),var(--swipe-y,0));opacity:.88}
 .notification-banner.dismiss-left{transform:translate(-120vw,var(--swipe-y,0)) rotate(-7deg);opacity:0;pointer-events:none}
 .notification-banner.dismiss-right{transform:translate(120vw,var(--swipe-y,0)) rotate(7deg);opacity:0;pointer-events:none}
