@@ -209,8 +209,10 @@ const APP_VERSION = '2.1';
         if(/^#[a-f0-9]{6}$/i.test(authorColor)) author.style.color = authorColor;
         author.onclick=()=>openPublicProfile(prof,isCreator);
         person.append(author);
-        if(prof.banner_url){const banner=el('div',null,'comment-banner-strip');banner.style.backgroundImage='url("'+String(prof.banner_url).replace(/["\\\\]/g,'')+'")';article.append(banner);}
+        if(prof.banner_url){person.style.backgroundImage='linear-gradient(90deg,rgba(8,12,20,.86),rgba(8,12,20,.55)),url("'+String(prof.banner_url).replace(/["\\\\]/g,'')+'")';person.style.backgroundSize='cover';person.style.backgroundPosition='center';person.style.padding='10px 12px';person.style.borderRadius='12px';}
         if(isCreator){
+          person.classList.add('comment-founder-person');
+          if(!prof.banner_url){person.style.background='linear-gradient(110deg,#4b3518,#141b2c 70%)';person.style.padding='10px 12px';person.style.borderRadius='12px';}
           person.append(el('span','👑 RCC FOUNDER','comment-creator-badge'));
           article.classList.add('comment-creator');
         }
