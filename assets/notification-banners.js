@@ -60,6 +60,9 @@
       node.style.setProperty('--swipe-y',gesture.dy+'px');
       node.classList.toggle('is-swiping',Math.abs(gesture.dx)>8||Math.abs(gesture.dy)>8);
     });
+    node.addEventListener('click',event=>{
+      if(node.classList.contains('dismiss-left')||node.classList.contains('dismiss-right')||node.classList.contains('dismiss-up')){event.preventDefault();event.stopPropagation();}
+    },true);
     const finishSwipe=event=>{
       const gesture=record.swipe;if(!gesture||gesture.id!==event.pointerId)return;
       record.swipe=null;
