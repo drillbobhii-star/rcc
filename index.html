@@ -429,7 +429,7 @@ window.rccSupabaseReady = Promise.resolve().then(() => {
 });
 window.rccSupabaseReady.catch(() => {});
 </script>
-<script src="assets/member-access.js"></script>
+<script src="assets/member-access.js?v=4.0"></script>
 <link rel="stylesheet" href="assets/community.css">
 <link rel="stylesheet" href="assets/social-refresh.css">
 <style>
@@ -688,7 +688,7 @@ window.rccSupabaseReady.catch(() => {});
 <div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
 
 <link rel="stylesheet" href="assets/member-community.css?v=3.0">
-<script src="assets/member-community.js?v=3.0"></script>
+<script src="assets/member-community.js?v=4.0"></script>
 <script>
 let currentUser = null;
 let favoriteIds = new Set();
@@ -1345,7 +1345,8 @@ async function submitAuth(register){
       for(const id of ['signupBtn','googleLoginBtn','forgotPasswordBtn'])document.getElementById(id).hidden=false;
       await applySession((await supabase.auth.getSession()).data.session?.user);closeAuth();showToast('Contraseña actualizada');return;
     }
-    let {data,error}=register?await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.rccAuthRedirect}}):await supabase.auth.signInWithPassword({email,password});
+    const signupRoblox=document.getElementById('signupRoblox')?.value.trim()||'';
+    let {data,error}=register?await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.rccAuthRedirect,data:signupRoblox?{roblox_username:signupRoblox}:{}}}):await supabase.auth.signInWithPassword({email,password});
     if(error)throw error;
     if(register&&data.user?.identities?.length===0)throw new Error('already registered');
     if(register&&!data.session){
@@ -1370,7 +1371,7 @@ document.getElementById('googleLoginBtn').onclick=async()=>{
   setAuthBusy(true);authStatus.textContent='Conectando con Google…';
   try{
     const supabase=await window.rccSupabaseReady;
-    const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://rcc-3m0.pages.dev'}});
+    const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.rccAuthRedirect}});
     if(error)throw error;
   }catch{authStatus.textContent='No se pudo conectar con Google. Prueba de nuevo o usa tu correo.';}
   finally{setAuthBusy(false);}
@@ -1389,7 +1390,7 @@ async function applySession(user){
   if(previousId===currentUser?.id)return;
   sessionRevision++;votedIds.clear();favoriteIds=new Set();favoritesStatus='idle';
   updateFavoriteCount();render();
-  if(currentUser){try{await window.rccMemberAPI('import',{method:'POST',body:{}});window.dispatchEvent(new Event('rcc:profile-imported'));}catch{showToast('No se pudo recuperar el contenido anterior. Vuelve a iniciar sesión para reintentar.');}await loadFavorites();}
+  if(currentUser){window.dispatchEvent(new Event('rcc:profile-imported'));await loadFavorites();}
   if(modal.classList.contains('open')){updateVoteButton(String(currentCopiedId),document.getElementById('voteBtn'));}
 }
 function updateFavoriteCount(){document.getElementById('favoritesCount').textContent=favoriteIds.size;}
