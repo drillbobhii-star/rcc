@@ -155,53 +155,22 @@
     button.setAttribute('aria-label','Parcheado: ver advertencia de '+s.name);
     button.addEventListener('click',event=>{event.stopPropagation();confirm(s);});return button;
   }
-  // GIPHY: los stickers se consultan una vez por categoría y se reutilizan en memoria.
-  const GIPHY_API_KEY='IBfGdeg5RBbD2Gt8EvEEQSkRVqfhVLNV';
-  const giphyCache=new Map();
   const stickerKinds=[
-    {terms:/advert|pelig|baneo|sanci|riesgo|segur|parchead|contrase|privad|virus|permiso|desconocid/i,query:'warning reaction sticker',emoji:'⚠️'},
-    {terms:/error|bug|fall|roto|lag|fps|ping|servidor|problema|muri|funeral|cementerio/i,query:'facepalm reaction sticker',emoji:'🤦'},
-    {terms:/consejo|recomend|lee|revis|prueba|actualiz|document|respaldo|cuidado|mejor/i,query:'thinking reaction sticker',emoji:'🤔'},
-    {terms:/program|código|script|variable|compil|teclado|README|depur|desarroll/i,query:'programmer meme sticker',emoji:'💻'}
+    {terms:/advert|pelig|baneo|sanci|riesgo|segur|parchead|contrase|privad|virus|permiso|desconocid/i,emoji:'⚠️'},
+    {terms:/error|bug|fall|roto|lag|fps|ping|servidor|problema|muri|funeral|cementerio/i,emoji:'🤦'},
+    {terms:/consejo|recomend|lee|revis|prueba|actualiz|document|respaldo|cuidado|mejor/i,emoji:'🤔'},
+    {terms:/program|código|script|variable|compil|teclado|README|depur|desarroll/i,emoji:'💻'}
   ];
-  function stickerKind(message){
-    return stickerKinds.find(item=>item.terms.test(message))||{query:'funny reaction sticker',emoji:'😂'};
-  }
-  function getGiphyStickers(query){
-    if(!giphyCache.has(query)){
-      const url=new URL('https://api.giphy.com/v1/stickers/search');
-      url.search=new URLSearchParams({api_key:GIPHY_API_KEY,q:query,limit:'12',rating:'pg-13',lang:'en',bundle:'messaging_non_clips'}).toString();
-      const request=fetch(url.toString()).then(response=>{if(!response.ok)throw new Error('GIPHY '+response.status);return response.json();})
-        .then(data=>(data.data||[]).map(item=>({
-          url:item.images?.fixed_height_small_still?.url||item.images?.fixed_height_still?.url||item.images?.fixed_height_small?.url||item.images?.fixed_height?.url,
-          alt:item.title||'GIPHY reaction sticker'
-        })).filter(item=>item.url))
-        .catch(()=>[]);
-      giphyCache.set(query,request);
-    }
-    return giphyCache.get(query);
-  }
-  function showSticker(box,message,step){
-    const image=box.querySelector('.review-tip-sticker');
-    const fallback=box.querySelector('.review-tip-emoji');
-    const kind=stickerKind(message);
-    fallback.textContent=kind.emoji;fallback.hidden=false;image.hidden=true;image.removeAttribute('src');
-    getGiphyStickers(kind.query).then(items=>{
-      if(!box.isConnected||box.dataset.noteStep!==String(step)||!items.length)return;
-      const item=items[step%items.length];
-      image.alt=item.alt;image.src=item.url;image.hidden=false;fallback.hidden=true;
-    });
-  }
+  function stickerKind(message){return stickerKinds.find(item=>item.terms.test(message))||{emoji:'😂'};}
+  function showSticker(box,message){box.querySelector('.review-tip-emoji').textContent=stickerKind(message).emoji;}
   const scriptForTip=new WeakMap(),tipStep=new WeakMap();
   function tip(s,detail=false){
     const box=el('aside',null,'review-tip'+(detail?' review-tip-detail':''));box.dataset.reviewScript=String(s.id);
     const label=el('small','NOTA RCC'),content=el('div',null,'review-tip-content');
-    const media=el('div',null,'review-tip-media'),fallback=el('span','😂','review-tip-emoji'),image=el('img',null,'review-tip-sticker');
-    image.alt='Sticker de reacción';image.loading='lazy';image.decoding='async';image.referrerPolicy='no-referrer';image.hidden=true;
-    const body=el('span',messages(s)[0]),credit=el('a','Powered by GIPHY','review-tip-credit');
-    credit.href='https://giphy.com';credit.target='_blank';credit.rel='noopener noreferrer';credit.setAttribute('aria-label','Powered by GIPHY');
-    media.append(fallback,image);content.append(media,body);box.append(label,content,credit);
-    scriptForTip.set(box,s);tipStep.set(box,0);box.dataset.noteStep='0';showSticker(box,body.textContent,0);
+    const media=el('div',null,'review-tip-media'),fallback=el('span','😂','review-tip-emoji');
+    const body=el('span',messages(s)[0]);
+    media.append(fallback);content.append(media,body);box.append(label,content);
+    scriptForTip.set(box,s);tipStep.set(box,0);box.dataset.noteStep='0';showSticker(box,body.textContent);
     if(detail)box.dataset.visible='true';
     return box;
   }
@@ -221,14 +190,14 @@
     localSignals.set(String(id),summarize(rows));
     for(const box of document.querySelectorAll('[data-review-script]')){
       if(box.dataset.reviewScript!==String(id))continue;
-      const script=scriptForTip.get(box);if(script){tipStep.set(box,0);const body=box.querySelector('.review-tip-content > span');if(body){body.textContent=messages(script)[0];box.dataset.noteStep='0';showSticker(box,body.textContent,0);}}
+      const script=scriptForTip.get(box);if(script){tipStep.set(box,0);const body=box.querySelector('.review-tip-content > span');if(body){body.textContent=messages(script)[0];box.dataset.noteStep='0';showSticker(box,body.textContent);}}
     }
   }
   function commentsUnavailable(id){
     // Failed loading is not a negative report; retain only previously available evidence.
     localSignals.delete(String(id));
     for(const box of document.querySelectorAll('[data-review-script]'))if(box.dataset.reviewScript===String(id)){
-      const script=scriptForTip.get(box);if(script){const body=box.querySelector('.review-tip-content > span');if(body){body.textContent=messages(script)[0];box.dataset.noteStep='0';showSticker(box,body.textContent,0);}}
+      const script=scriptForTip.get(box);if(script){const body=box.querySelector('.review-tip-content > span');if(body){body.textContent=messages(script)[0];box.dataset.noteStep='0';showSticker(box,body.textContent);}}
     }
   }
   let dialog=null,timer=null,returnFocus=null;
@@ -269,7 +238,7 @@
     for(const box of all)if(!box.classList.contains('review-tip-detail'))delete box.dataset.visible;
     const box=visible[active++%visible.length],s=scriptForTip.get(box);if(!s)return;
     const list=messages(s),step=tipStep.get(box)||0;
-    const body=box.querySelector('.review-tip-content > span');if(!body)return;const message=list[step%list.length];box.dataset.noteStep=String(step+1);body.textContent=message;showSticker(box,message,step+1);tipStep.set(box,step+1);box.dataset.visible='true';
+    const body=box.querySelector('.review-tip-content > span');if(!body)return;const message=list[step%list.length];box.dataset.noteStep=String(step+1);body.textContent=message;showSticker(box,message);tipStep.set(box,step+1);box.dataset.visible='true';
   },10000);
   window.RCCScriptReview={assessment,messages,card,detail,comments,commentsUnavailable,summarize,confirm,cancel};
 })();
