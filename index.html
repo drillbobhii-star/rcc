@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- ETIQUETA DE VERIFICACIÓN DE MONETAG -->
-<meta name="monetag" content="e44ff31eaa440a1710ce15a33c12a881">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RCC — Lua, juegos y JavaScript</title>
-<meta name="monetag" content="44f35da9366291d38d9f74444af9bf00">
+
 <style>
   :root{
     --bg: #050505;
@@ -255,21 +253,8 @@
   .card-action:hover{
     transform:translateY(-2px); background:rgba(255,255,255,0.2);
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-  }
-
-  .ad-banner{max-width:1300px;margin:20px auto 0;padding:0 24px;position:relative;z-index:1}
-  .ad-box{
-    background:var(--card-glass); border:1px dashed rgba(255,255,255,0.2);
-    border-radius:16px; padding:20px; text-align:center; color:var(--muted);
-    font-size:.85rem; position:relative; min-height:80px; display:flex; align-items:center; justify-content:center;
-    backdrop-filter: blur(10px);
-  }
-  .ad-box::before{
-    content:"PUBLICIDAD";position:absolute;top:8px;left:12px;
-    font-size:.6rem;letter-spacing:2px;color:rgba(255,255,255,0.3); font-weight: 800;
-  }
-
-  .modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);}
+  } 
+.modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);}
   .modal.open{display:flex; animation: fadeIn 0.3s ease;}
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   
@@ -324,7 +309,7 @@
     .hero{padding:30px 16px 8px}
     .grid{padding:24px 16px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
     .active-filters{padding:16px 16px 0}
-    .ad-banner{padding:0 16px}
+    
     .bg-text{font-size: 80vw;}
     .bg-text-rocio{font-size: 40vw;}
   }
@@ -392,15 +377,13 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #b3d
 .appearance-toggle[aria-pressed="true"] .appearance-switch{background:#729d91}
 .appearance-toggle[aria-pressed="true"] .appearance-switch::after{transform:translateX(14px)}
 body.ios-glass{--bg-glass:rgba(26,37,43,.78);--card-glass:rgba(51,66,73,.64);--border-glass:rgba(225,244,246,.25);--border-hover:rgba(238,253,255,.55);--muted:#b9c8ce;background-image:radial-gradient(ellipse at 15% 10%,rgba(120,175,182,.24),transparent 55%),radial-gradient(ellipse at 90% 75%,rgba(178,160,132,.18),transparent 60%);background-attachment:fixed}
-body.ios-glass .sidebar,body.ios-glass header,body.ios-glass .card,body.ios-glass .modal-box,body.ios-glass .ad-box{background:var(--card-glass);-webkit-backdrop-filter:blur(24px) saturate(140%);backdrop-filter:blur(24px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 12px 32px rgba(6,17,23,.18)}
+body.ios-glass .sidebar,body.ios-glass header,body.ios-glass .card,body.ios-glass .modal-box{background:var(--card-glass);-webkit-backdrop-filter:blur(24px) saturate(140%);backdrop-filter:blur(24px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 12px 32px rgba(6,17,23,.18)}
 body.ios-glass .sidebar,body.ios-glass header,body.ios-glass .modal-box{background:var(--bg-glass)}
 body.ios-glass .card{border-radius:28px}
 body.ios-glass .card:hover{background:rgba(75,94,102,.78);border-color:var(--border-hover)}
 body.ios-glass .search-top input,body.ios-glass .device-toggle,body.ios-glass .section-tabs,body.ios-glass .appearance-toggle{box-shadow:inset 0 1px 0 rgba(255,255,255,.14);border-radius:20px}
 body.ios-glass .section-tabs{width:fit-content;padding:6px;background:rgba(210,234,241,.07);border:1px solid var(--border-glass)}
 body.ios-glass .section-tabs button{border-radius:15px}
-body.ios-glass .ad-box{border-style:solid;border-radius:22px;line-height:1.6;padding:28px 20px 20px;color:#e0e9ed}
-body.ios-glass .ad-box::before{color:#b9c8ce}
 body.ios-glass .modal-box{border-radius:30px}
 body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6ed;outline-offset:4px}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){body.ios-glass{--bg-glass:#1a252b;--card-glass:#334249}}
@@ -646,25 +629,7 @@ window.rccSupabaseReady.catch(() => {});
       <div class="loading">⏳ Cargando scripts...</div>
     </div>
     <button id="loadMore" class="load-more" hidden>Mostrar más scripts</button>
-    <div class="ad-banner">
-      <div class="ad-box">Esta página contiene anuncios. No entrar a cualquier enlace.</div>
-    </div>
-    <div style="display: flex; justify-content: center; margin: 20px 0;">
-<script type="text/javascript">
-	atOptions = {
-		'key' : '6133676',
-		'format' : 'iframe',
-		'height' : 250,
-		'width' : 300,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/6133676/invoke.js"></script>
-    </div>
-
-    <div class="ad-banner" style="margin-bottom:40px">
-      <div class="ad-box">Esta página contiene anuncios. No entrar a cualquier enlace.</div>
-    </div>
+</div>
   </div>
 </div>
 
