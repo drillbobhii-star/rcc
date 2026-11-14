@@ -1,12 +1,16 @@
 # Configuración de perfiles sociales RCC (Supabase)
 
-La columna `profiles.banner_url` ya fue creada por el propietario. La implementación también guarda `roblox_username` para que el perfil público pueda mostrar la cuenta vinculada sin revelar el correo.
+La implementación necesita las columnas `profiles.banner_url` y `profiles.roblox_username` para guardar y mostrar el banner y la cuenta de Roblox vinculada. Ejecuta la migración idempotente siguiente en el mismo proyecto Supabase que utiliza el sitio publicado.
 
 Ejecuta una vez en Supabase SQL Editor:
 
 ```sql
 alter table public.profiles
+  add column if not exists banner_url text,
   add column if not exists roblox_username text;
+
+-- Refresca la caché de esquema de PostgREST para que la API vea las columnas nuevas.
+notify pgrst, 'reload schema';
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('profile-media', 'profile-media', true, 5242880, array['image/png','image/jpeg','image/webp'])
