@@ -21,11 +21,11 @@ for(const file of files){
 }
 const source=fs.readFileSync(path.join(root,'assets/catalog-loader.js'),'utf8');
 assert.match(source,/json\('scripts\.json'\)/,'Mutable manifest must be fetched with the default revalidation policy');
-assert.match(source,/cache:'force-cache'/,'Content-addressed catalog parts should reuse the browser cache');
+assert.match(source,/request\(file,'force-cache'\)/,'Content-addressed catalog parts should reuse the browser cache');
 assert.match(source,/request\(file,'reload'\)/,'A failed cached response must retry from the network');
 assert.match(source,/rootPath=file=>.*file\.replace/,'Catalog requests must resolve from the site root');
 assert.match(source,/const partPath=/,'Catalog part paths must remain explicitly restricted');
-const newLoader=fetch=>{const wrappedFetch=(url,options)=>fetch(String(url).replace(/^\/+/,''),options);const context=vm.createContext({window:{},fetch:wrappedFetch,AbortController});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
+const newLoader=fetch=>{const wrappedFetch=(url,options)=>fetch(String(url).replace(/^\/+/,''),options);const context=vm.createContext({window:{},fetch:wrappedFetch,AbortController,AbortSignal,setTimeout});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
 const plain=value=>JSON.parse(JSON.stringify(value));
 (async()=>{
  let active=0,peak=0;const progress=[];
@@ -37,6 +37,15 @@ const plain=value=>JSON.parse(JSON.stringify(value));
  const loaded=await loader.load({onProgress:p=>progress.push(p)});
  assert.deepEqual(plain(loaded),catalog,'All original fields, ordering and code must survive loading');
  assert(peak<=3&&peak>1,'Part requests must use bounded parallelism');
+ let firstBatchRequests=0;let requests=0;let batchCount=0;
+ const progressive=newLoader(async file=>{requests++;return {ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))};});
+ const progressivelyLoaded=await progressive.load({onBatch:batch=>{
+   batchCount++;
+   if(batchCount===1){firstBatchRequests=requests;assert.equal(batch.scripts.length,manifest.parts[0].count);assert.equal(batch.complete,false);}
+   assert.equal(batch.total,catalog.length);
+ }});
+ assert.equal(firstBatchRequests,2,'First results must appear after only the manifest and first part');
+ assert(batchCount>1);assert.deepEqual(plain(progressivelyLoaded),catalog);
  assert.equal(progress.at(-1).loaded,catalog.length);assert.equal(progress.at(-1).total,catalog.length);
  // A missing file must fail as a whole, so UI retry can never silently lose scripts.
  let failing=true;
