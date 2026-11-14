@@ -155,40 +155,52 @@
     button.setAttribute('aria-label','Parcheado: ver advertencia de '+s.name);
     button.addEventListener('click',event=>{event.stopPropagation();confirm(s);});return button;
   }
-  const stickerKinds=[
-    {terms:/advert|pelig|baneo|sanci|riesgo|segur|parchead|contrase|privad|virus|permiso|desconocid/i,emoji:'🚨',label:'ALERTA RCC',colors:['#ff4d6d','#54152d']},
-    {terms:/error|bug|fall|roto|lag|fps|ping|servidor|problema|muri|funeral|cementerio/i,emoji:'💀',label:'BUG DETECTADO',colors:['#8b5cf6','#25124d']},
-    {terms:/consejo|recomend|lee|revis|prueba|actualiz|document|respaldo|cuidado|mejor/i,emoji:'🧠',label:'MODO CONSEJO',colors:['#00bfa6','#064e50']},
-    {terms:/program|código|script|variable|compil|teclado|README|depur|desarroll/i,emoji:'🤓',label:'MODO PROGRAMADOR',colors:['#3b82f6','#172554']},
-    {terms:/humor|jaja|xd|chiste|funeral|cementerio|muert|fantasma/i,emoji:'😭',label:'NO PUEDE SER',colors:['#f59e0b','#713f12']},
-    {terms:/cuenta|clave|contrase|token|cookie|privad|permiso/i,emoji:'🕵️',label:'OJO CON ESO',colors:['#ec4899','#500724']},
-    {terms:/rendimiento|móvil|pc|pantalla|memoria|cpu|fluidez|ventilador/i,emoji:'🥶',label:'TU DISPOSITIVO',colors:['#06b6d4','#164e63']}
+  // Reacciones con memes reales. Se evita repetir una imagen hasta recorrer la colección.
+  const memePool=[
+    {url:'https://images3.memedroid.com/images/UPLOADED4/60c87b2a7d7d4.jpeg',tags:/bug|error|fall|depur|código|script|roto|problema/i,alt:'Meme de Bob Esponja buscando un bug'},
+    {url:'https://habrastorage.org/getpro/habr/upload_files/066/ad2/923/066ad292392b914125988d6458340b78.png',tags:/bug|error|fall|actualiz|refactor|código|program/i,alt:'Meme del programador que encuentra cientos de bugs'},
+    {url:'https://media2.dev.to/dynamic/image/width%3D800%2Cheight%3D%2Cfit%3Dscale-down%2Cgravity%3Dauto%2Cformat%3Dauto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fayxw43n4iqk97wlghlal.png',tags:/bug|error|fall|muri|funeral|servidor|lag/i,alt:'Meme del programador desesperado por los bugs'},
+    {url:'https://i.pinimg.com/originals/69/89/18/6989189dfce513a154132b09b7d699e5.jpg',tags:/bug|error|arreg|fix|problema|código|program/i,alt:'Meme de arreglar un bug y crear más problemas'},
+    {url:'https://i.programmerhumor.io/2026/06/07ce566accf57ec98411f0608b461e712aa33debef9e332ed906d217379f9cd2.jpeg',tags:/bug|error|web|program|desarroll|fall/i,alt:'Meme de reacción de programador al encontrar un bug'},
+    {url:'https://i.pinimg.com/736x/90/b7/3d/90b73dcd76b0d8ec6b400cd9e869a359.jpg',tags:/bug|error|reporte|tester|fall|prueba/i,alt:'Meme de las reacciones ante un bug'},
+    {url:'https://i.programmerhumor.io/2025/03/cbcadcd1bff220ce9ccd7541429352e1.jpeg',tags:/bug|error|arreg|problema|código|program/i,alt:'Meme de arreglar un bug y terminar en otro'},
+    {url:'https://i.imgflip.com/5sfe1o.jpg',tags:/advert|pelig|baneo|sanci|riesgo|sorpr|cuenta|segur|parchead|contrase|privad|virus|permiso/i,alt:'Gatito con reacción dramática'},
+    {url:'https://img-9gag-fun.9cache.com/photo/aWjyvq4_460s.jpg',tags:/actualiz|refactor|código|program|cambio|prueba/i,alt:'Meme de refactorizar y seguir teniendo bugs'}
   ];
-  function stickerKind(message){return stickerKinds.find(item=>item.terms.test(message))||{emoji:'😂',label:'REACCIÓN RCC',colors:['#f97316','#7c2d12']};}
-  function memeSvg(message,kind,uniqueKey){
-    let hash=2166136261;const source=String(uniqueKey)+'|'+String(message);
-    for(let i=0;i<source.length;i++){hash^=source.charCodeAt(i);hash=Math.imul(hash,16777619);}
-    const n=hash>>>0,angle=n%360,shape=n%3,accent=kind.colors[0],dark=kind.colors[1];
-    const caption=String(message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,52);
-    const decor=shape===0?'<circle cx="24" cy="28" r="13" fill="#fff" opacity=".22"/><path d="M145 18l8 17 18 3-13 13 3 18-16-9-16 9 3-18-13-13 18-3z" fill="#fff" opacity=".2"/>':shape===1?'<path d="M12 28l18-18 18 18-18 18zM137 142l18-18 18 18-18 18z" fill="#fff" opacity=".2"/>':'<path d="M0 112Q45 72 90 112T180 112V180H0z" fill="#fff" opacity=".14"/><circle cx="150" cy="28" r="18" fill="#fff" opacity=".16"/>';
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+accent+'"/><stop offset="1" stop-color="'+dark+'"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity=".25"/></filter></defs><rect width="180" height="180" rx="22" fill="url(#g)"/>'+decor+'<g transform="rotate('+(angle%15-7)+' 90 83)" filter="url(#s)"><rect x="39" y="28" width="102" height="103" rx="25" fill="#fff"/><text x="90" y="101" text-anchor="middle" font-size="59">'+kind.emoji+'</text></g><rect x="8" y="8" width="164" height="22" rx="8" fill="#111827" opacity=".78"/><text x="90" y="23" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="900" letter-spacing="1" fill="#fff">'+kind.label+'</text><text x="90" y="153" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="800" fill="#fff">RCC MEME #'+(n%9999)+'</text><text x="90" y="166" text-anchor="middle" font-family="Arial,sans-serif" font-size="6.5" fill="#fff" opacity=".9">'+caption+'</text></svg>';
+  const usedMemeUrls=new Set();
+  let memeCursor=0;
+  function memeFor(message){
+    const matching=memePool.filter(item=>item.tags.test(message));
+    const candidates=matching.length?matching:memePool;
+    for(let offset=0;offset<candidates.length;offset++){
+      const item=candidates[(memeCursor+offset)%candidates.length];
+      if(!usedMemeUrls.has(item.url)){
+        usedMemeUrls.add(item.url);memeCursor=(memeCursor+offset+1)%candidates.length;
+        if(usedMemeUrls.size===memePool.length)usedMemeUrls.clear();
+        return item;
+      }
+    }
+    const item=candidates[memeCursor%candidates.length];
+    memeCursor=(memeCursor+1)%candidates.length;usedMemeUrls.clear();usedMemeUrls.add(item.url);
+    return item;
   }
   function showSticker(box,message){
-    const media=box.querySelector('.review-tip-media'),fallback=media?.querySelector('.review-tip-emoji');
-    if(!media||!fallback)return;
-    const kind=stickerKind(message),img=(()=>{let node=media.querySelector('img.review-tip-image');if(!node){node=el('img',null,'review-tip-image');node.alt='';node.loading='lazy';node.decoding='async';media.insertBefore(node,fallback);}return node;})();
-    const uniqueKey=[box.dataset.reviewScript||'',box.dataset.reviewImageId||'',box.dataset.noteStep||'0'].join(':');
-    img.onerror=()=>{img.hidden=true;fallback.hidden=false;};img.onload=()=>{img.hidden=false;fallback.hidden=true;};
-    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(memeSvg(message,kind,uniqueKey));
-    fallback.textContent=kind.emoji;
+    const media=box.querySelector('.review-tip-media');
+    if(!media)return;
+    let img=media.querySelector('img.review-tip-image');
+    if(!img){img=el('img',null,'review-tip-image');img.loading='lazy';img.decoding='async';media.append(img);}
+    const meme=memeFor(message);
+    img.alt=meme.alt;img.hidden=false;media.classList.remove('review-meme-missing');
+    img.onerror=()=>{img.hidden=true;media.classList.add('review-meme-missing');};
+    img.src=meme.url;
   }
   const scriptForTip=new WeakMap(),tipStep=new WeakMap();let tipImageCounter=0;
   function tip(s,detail=false){
     const box=el('aside',null,'review-tip'+(detail?' review-tip-detail':''));box.dataset.reviewScript=String(s.id);box.dataset.reviewImageId=String(++tipImageCounter);
     const label=el('small','NOTA RCC'),content=el('div',null,'review-tip-content');
-    const media=el('div',null,'review-tip-media'),fallback=el('span','😂','review-tip-emoji');
+    const media=el('div',null,'review-tip-media');
     const body=el('span',messages(s)[0]);
-    media.append(fallback);content.append(body,media);box.append(label,content);
+    content.append(body,media);box.append(label,content);
     scriptForTip.set(box,s);tipStep.set(box,0);box.dataset.noteStep='0';showSticker(box,body.textContent);
     if(detail)box.dataset.visible='true';
     return box;
