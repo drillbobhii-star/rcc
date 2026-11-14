@@ -6,7 +6,7 @@ El catálogo se publica como archivos estáticos JSON. No utiliza Functions, bas
 
 `assets/catalog-loader.js` descarga el índice y las partes, con un máximo de tres solicitudes simultáneas. Reúne las entradas en su orden original, comprueba los recuentos y los identificadores, y entrega el mismo catálogo completo a la interfaz existente. La búsqueda, los filtros, los favoritos, los enlaces a fichas, las tendencias y la copia o descarga del código conservan su funcionamiento. La interfaz muestra el progreso y permite reintentar si falla una parte; no presenta un catálogo parcial como si estuviera completo.
 
-Los nombres de las partes incluyen una huella de su contenido. Las solicitudes revalidan la caché para evitar mezclar versiones del índice y de los datos.
+Los nombres de las partes incluyen una huella SHA-256 truncada de su contenido. El cargador revalida `scripts.json` en cada carga y solicita las partes con `cache: 'force-cache'`: una URL de parte identifica contenido inmutable, por lo que el navegador puede reutilizarlo entre visitas. El índice nunca se trata como inmutable. La política HTTP/CDN publicada debe seguir alineada con esta distinción: revalidación para `scripts.json` y caché prolongada solo para `catalog/part-*.json` con nombre hasheado.
 
 ## Publicación
 
