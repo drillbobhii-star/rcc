@@ -15,3 +15,26 @@
 .member-dialog input[type=file]{padding:10px}.profile-banner-preview{width:100%;}.rcc-profile-dialog .member-status{margin:0}.rcc-profile-dialog .member-dialog-close{display:none}.comment-person .comment-author-button{font-size:.92rem}
 
 .member-dialog [hidden]{display:none!important}.rcc-profile-dialog{position:relative}.rcc-profile-dialog>.close{position:absolute;right:14px;top:12px;z-index:5;border-radius:50%;width:38px;height:38px;background:#090d18bb;color:#fff}.rcc-profile-dialog h2{position:absolute;top:16px;left:20px;z-index:3;padding:7px 11px;border-radius:9px;background:#05070b88;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase}.rcc-profile-banner.creator{box-shadow:inset 0 -45px 60px #0d111b;}.rcc-profile-banner.creator~.rcc-profile-content .rcc-profile-name{text-shadow:0 0 22px #e9bd6577}.rcc-founder-mark{box-shadow:0 0 24px #e9bd6530}
+
+/* Perfil social completo y efectos reservados al creador */
+.creator-effects{border:1px solid #e9bd6555;border-radius:14px;padding:12px;display:grid;gap:10px}
+.creator-effects legend{color:#f8d989;font-weight:800;padding:0 6px}
+.creator-effects select{width:100%;padding:10px;border-radius:10px;background:#161d2b;color:inherit;border:1px solid #ffffff30}
+.rcc-profile-bio{color:#c4cad8;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0}
+.rcc-profile-roblox{display:inline-block;color:#e9c77d;margin-top:8px;text-decoration:none;font-weight:700}
+.rcc-profile-roblox:hover{text-decoration:underline}
+.rcc-profile-name[data-effect="shimmer"],.comment-author-button[data-effect="shimmer"]{background:linear-gradient(90deg,#e9bd65,#fff4c8,#c18b36,#fff4c8);background-size:220% auto;color:transparent!important;background-clip:text;-webkit-background-clip:text;animation:rccFounderShimmer 3s linear infinite}
+.rcc-profile-name[data-effect="float"]{animation:rccFounderFloat 3s ease-in-out infinite}
+.rcc-profile-banner[data-effect="aurora"]{animation:rccFounderAurora 8s ease-in-out infinite alternate}
+.rcc-profile-banner.creator{box-shadow:inset 0 -45px 60px #0d111b,0 0 26px #e9bd6530}
+.rcc-founder-mark,.comment-creator-badge{animation:rccFounderGlow 3s ease-in-out infinite alternate}
+@keyframes rccFounderShimmer{to{background-position:220% center}}
+@keyframes rccFounderFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes rccFounderAurora{0%{filter:hue-rotate(-12deg) brightness(.9)}100%{filter:hue-rotate(22deg) brightness(1.15)}}
+@keyframes rccFounderGlow{from{box-shadow:0 0 5px #e9bd6530}to{box-shadow:0 0 22px #e9bd6590}}
+.member-locked-card .member-lock-label{display:inline-flex;padding:4px 8px;border:1px solid #e9bd65;border-radius:999px;color:#f8d989;font-size:.68rem;font-weight:800}
+.member-code-blur{filter:blur(7px);user-select:none;pointer-events:none}
+.member-code-gate{position:relative;margin:-24px 0 20px;padding:22px;border:1px solid #e9bd65;border-radius:14px;background:linear-gradient(135deg,#121827f5,#2b2418f2);text-align:center}
+.member-code-gate h3{margin:8px 0;color:#f8d989}
+.member-code-gate p{color:#d5d9e2}
+@media(prefers-reduced-motion:reduce){.rcc-profile-name[data-effect],.rcc-profile-banner[data-effect],.rcc-founder-mark,.comment-creator-badge{animation:none!important}}
