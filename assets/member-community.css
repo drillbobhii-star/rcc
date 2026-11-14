@@ -13,3 +13,5 @@
 
 /* Social profile v3 */
 .member-dialog input[type=file]{padding:10px}.profile-banner-preview{width:100%;}.rcc-profile-dialog .member-status{margin:0}.rcc-profile-dialog .member-dialog-close{display:none}.comment-person .comment-author-button{font-size:.92rem}
+
+.member-dialog [hidden]{display:none!important}.rcc-profile-dialog{position:relative}.rcc-profile-dialog>.close{position:absolute;right:14px;top:12px;z-index:5;border-radius:50%;width:38px;height:38px;background:#090d18bb;color:#fff}.rcc-profile-dialog h2{position:absolute;top:16px;left:20px;z-index:3;padding:7px 11px;border-radius:9px;background:#05070b88;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase}.rcc-profile-banner.creator{box-shadow:inset 0 -45px 60px #0d111b;}.rcc-profile-banner.creator~.rcc-profile-content .rcc-profile-name{text-shadow:0 0 22px #e9bd6577}.rcc-founder-mark{box-shadow:0 0 24px #e9bd6530}
