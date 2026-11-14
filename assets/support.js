@@ -62,3 +62,118 @@ form.addEventListener('submit', async event => {
     button.textContent = isError ? 'Enviar informe' : 'Enviar consulta';
   }
 });
+
+/* RCC AI assistant */
+(() => {
+  const chatForm = document.getElementById('rccAiForm');
+  if (!chatForm) return;
+  const input = document.getElementById('rccAiInput');
+  const messages = document.getElementById('rccAiMessages');
+  const send = document.getElementById('rccAiSend');
+  const chatStatus = document.getElementById('rccAiStatus');
+  const welcome = document.getElementById('rccAiWelcome');
+  const NAME_KEY = 'rcc_ai_display_name';
+  const HISTORY_KEY = 'rcc_ai_history';
+  let history = [];
+  let busy = false;
+
+  const safeRead = (key) => { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; } };
+  const copiedScript = () => {
+    const value = safeRead('rcc_ai_last_copied');
+    if (!value || typeof value !== 'object') return null;
+    return { id: String(value.id || '').slice(0,80), name: String(value.name || 'Script RCC').slice(0,160), code: String(value.code || '').slice(0,9000), copiedAt: String(value.copiedAt || '').slice(0,40) };
+  };
+  let displayName = '';
+  try { displayName = String(localStorage.getItem(NAME_KEY) || '').trim().slice(0,80); } catch {}
+  if (!displayName) {
+    const entered = window.prompt('¡Bienvenido a RCC! ¿Cómo te llamas?');
+    displayName = String(entered || 'Invitado').trim().slice(0,80) || 'Invitado';
+    try { localStorage.setItem(NAME_KEY, displayName); } catch {}
+  }
+  welcome.textContent = `¡Hola, ${displayName}! Soy el asistente de RCC. Puedes preguntarme por los scripts del catálogo.`;
+  try { history = (safeRead(HISTORY_KEY) || []).filter(item => item && ['user','assistant'].includes(item.role)).slice(-8); } catch { history = []; }
+
+  function addMessage(role, content) {
+    const bubble = document.createElement('div');
+    bubble.className = 'rcc-ai-message ' + role;
+    const label = document.createElement('strong');
+    label.textContent = role === 'user' ? displayName : 'RCC AI';
+    const body = document.createElement('p');
+    body.textContent = content;
+    bubble.append(label, body);
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+  }
+  history.forEach(item => addMessage(item.role, item.content));
+  if (!history.length) {
+    const copied = copiedScript();
+    if (copied) {
+      const hello = `Vi que copiaste el script ${copied.name}. ¿Quieres que te explique cómo ejecutarlo en Delta o necesitas ayuda con algo más?`;
+      addMessage('assistant', hello);
+      history.push({ role:'assistant', content:hello });
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-8))); } catch {}
+    } else {
+      addMessage('assistant', `¡Hola, ${displayName}! ¿Qué necesitas resolver hoy en RCC?`);
+    }
+  }
+  const threshold = 100;
+  input.addEventListener('input', () => input.classList.toggle('is-zoomed', input.value.length > threshold));
+  input.addEventListener('blur', () => input.classList.remove('is-zoomed'));
+
+  chatForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const message = input.value.trim();
+    if (!message || busy) return;
+    busy = true;
+    send.disabled = true;
+    chatStatus.textContent = 'RCC está pensando…';
+    addMessage('user', message);
+    history.push({ role:'user', content:message });
+    input.value = '';
+    input.classList.remove('is-zoomed');
+    try {
+      const copied = copiedScript();
+      let authorization = '';
+      try {
+        if (window.rccSupabaseReady) {
+          const client = await window.rccSupabaseReady;
+          const { data } = await client.auth.getSession();
+          const token = data?.session?.access_token;
+          if (token) authorization = 'Bearer ' + token;
+          const user = data?.session?.user;
+          const metadataName = user?.user_metadata?.full_name || user?.user_metadata?.name;
+          if (metadataName) displayName = String(metadataName).slice(0,80);
+        }
+      } catch {}
+      const headers = { 'Content-Type':'application/json' };
+      if (authorization) headers.Authorization = authorization;
+      const response = await fetch('/api/support-ai', {
+        method:'POST',
+        headers,
+        body:JSON.stringify({
+          message,
+          displayName,
+          copiedScript:copied,
+          history:history.slice(-8)
+        })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'No se pudo conectar con RCC AI.');
+      const answer = String(result.reply || 'Estoy aquí para ayudarte con RCC.');
+      addMessage('assistant', answer);
+      history.push({ role:'assistant', content:answer });
+      history = history.slice(-8);
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch {}
+      if (result.penalty_seconds > 0 && !result.owner && window.RCCPenalty) {
+        window.RCCPenalty.apply(result.penalty_seconds, result.penalty_reason);
+      }
+      chatStatus.textContent = '';
+    } catch (error) {
+      chatStatus.textContent = error.message || 'Error al contactar con el asistente.';
+    } finally {
+      busy = false;
+      send.disabled = false;
+      input.focus();
+    }
+  });
+})();
