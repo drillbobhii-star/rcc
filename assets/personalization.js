@@ -11,7 +11,7 @@
     hyper: {name:'HyperOS', accent:'#edbda1', bg:'#241b20', surface:'#34282d', radius:'20px'},
     nothing: {name:'Nothing', accent:'#f2a69c', bg:'#1c1c1e', surface:'#28282b', radius:'6px'}
   };
-  const defaults = {paletteVersion:2, theme:'black', accent:presets.black.accent, glass:78, density:'comfortable', motion:true, corners:24, scale:100, blur:22, sound:false, volume:25};
+  const defaults = {paletteVersion:2, theme:'black', accent:presets.black.accent, customBg:null, bgTextColor:presets.black.accent, bgTextOpacity:28, bgTextBlur:12, glass:78, density:'comfortable', motion:true, corners:24, scale:100, blur:22, sound:false, volume:25};
   let state = {...defaults};
   try {
     const saved = JSON.parse(localStorage.getItem('rcc_appearance'));
@@ -20,6 +20,10 @@
       for (const [key,min,max] of [['corners',4,36],['scale',90,120],['blur',0,36],['volume',0,100]]) state[key] = Number.isFinite(saved[key]) ? Math.max(min,Math.min(max,saved[key])) : defaults[key];
       state.sound = saved.sound === true;
       state.accent = /^#[0-9a-f]{6}$/i.test(saved.accent) ? saved.accent : presets[saved.theme].accent;
+      state.customBg = saved.customBg === null || saved.customBg === undefined ? null : (/^#[0-9a-f]{6}$/i.test(saved.customBg) ? saved.customBg : null);
+      state.bgTextColor = /^#[0-9a-f]{6}$/i.test(saved.bgTextColor) ? saved.bgTextColor : presets[saved.theme].accent;
+      state.bgTextOpacity = Number.isFinite(saved.bgTextOpacity) ? Math.max(0, Math.min(100, saved.bgTextOpacity)) : defaults.bgTextOpacity;
+      state.bgTextBlur = Number.isFinite(saved.bgTextBlur) ? Math.max(0, Math.min(40, saved.bgTextBlur)) : defaults.bgTextBlur;
       state.glass = Number.isFinite(saved.glass) ? Math.min(100, Math.max(55, saved.glass)) : 78;
       state.density = saved.density === 'compact' ? 'compact' : 'comfortable';
       state.motion = typeof saved.motion === 'boolean' ? saved.motion : true;
@@ -40,8 +44,8 @@
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     const progress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
     const eased = progress * progress * (3 - 2 * progress);
-    const amount = eased * (state.theme === 'monochrome' ? 0.055 : 0.095);
-    const base = hexRgb(presets[state.theme].bg);
+    const amount = eased * (state.theme === 'monochrome' ? 0.12 : 0.20);
+    const base = hexRgb(state.customBg || presets[state.theme].bg);
     const tint = hexRgb(state.accent);
     const blended = base.map((channel, index) => Math.round(channel + (tint[index] - channel) * amount));
     root.style.setProperty('--scroll-bg', '#' + blended.map(channel => channel.toString(16).padStart(2, '0')).join(''));
@@ -59,6 +63,10 @@
   const panel = document.getElementById('personalization');
   const trigger = document.getElementById('appearanceToggle');
   const accent = document.getElementById('accentColor');
+  const backgroundColor = document.getElementById('backgroundColor');
+  const backgroundTextColor = document.getElementById('backgroundTextColor');
+  const backgroundTextOpacity = document.getElementById('backgroundTextOpacity');
+  const backgroundTextBlur = document.getElementById('backgroundTextBlur');
   const glass = document.getElementById('glassAmount');
   const density = document.getElementById('density');
   const motion = document.getElementById('motionEnabled');
@@ -68,7 +76,16 @@
     document.body.dataset.density = state.density;
     document.body.classList.toggle('ios-glass', state.theme === 'ios');
     document.body.classList.toggle('motion-paused', !state.motion);
-    root.style.setProperty('--bg', preset.bg);
+    root.style.setProperty('--bg', state.customBg || preset.bg);
+    root.style.setProperty('--bg-decoration-color', state.bgTextColor);
+    root.style.setProperty('--bg-decoration-opacity', String(state.bgTextOpacity / 100 * 0.28));
+    root.style.setProperty('--bg-decoration-blur', state.bgTextBlur + 'px');
+    backgroundColor.value = state.customBg || preset.bg;
+    backgroundTextColor.value = state.bgTextColor;
+    backgroundTextOpacity.value = state.bgTextOpacity;
+    backgroundTextBlur.value = state.bgTextBlur;
+    document.getElementById('backgroundTextOpacityValue').value = state.bgTextOpacity + '%';
+    document.getElementById('backgroundTextBlurValue').value = state.bgTextBlur + ' px';
     updateScrollTint();
     root.style.setProperty('--surface', preset.surface);
     root.style.setProperty('--accent', state.accent);
@@ -93,6 +110,11 @@
   document.querySelectorAll('[data-theme]').forEach(button => button.addEventListener('click', () => {
     state.theme = button.dataset.theme; state.accent = presets[state.theme].accent; apply();
   }));
+  backgroundColor.addEventListener('input', () => { state.customBg = backgroundColor.value; apply(); });
+  document.getElementById('resetBackgroundColor').addEventListener('click', () => { state.customBg = null; apply(); });
+  backgroundTextColor.addEventListener('input', () => { state.bgTextColor = backgroundTextColor.value; apply(); });
+  backgroundTextOpacity.addEventListener('input', () => { state.bgTextOpacity = Number(backgroundTextOpacity.value); apply(); });
+  backgroundTextBlur.addEventListener('input', () => { state.bgTextBlur = Number(backgroundTextBlur.value); apply(); });
   accent.addEventListener('input', () => { state.accent = accent.value; apply(); });
   glass.addEventListener('input', () => { state.glass = Number(glass.value); apply(); });
   density.addEventListener('change', () => { state.density = density.value; apply(); });
