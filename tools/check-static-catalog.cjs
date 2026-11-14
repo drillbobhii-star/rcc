@@ -21,7 +21,9 @@ for(const file of files){
 }
 const source=fs.readFileSync(path.join(root,'assets/catalog-loader.js'),'utf8');
 assert.match(source,/json\('scripts\.json'\)/,'Mutable manifest must be fetched with the default revalidation policy');
-assert.match(source,/json\(part\.file,\{cache:'force-cache'\}\)/,'Content-addressed catalog parts should reuse the browser cache');
+assert.match(source,/cache:'force-cache'/,'Content-addressed catalog parts should reuse the browser cache');
+assert.match(source,/request\(file,'reload'\)/,'A failed cached response must retry from the network');
+assert.match(source,/rootPath=file=> '\/'+file/,'Catalog requests must resolve from the site root');
 assert.match(source,/const partPath=/,'Catalog part paths must remain explicitly restricted');
 const newLoader=fetch=>{const context=vm.createContext({window:{},fetch,AbortController});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
 const plain=value=>JSON.parse(JSON.stringify(value));
