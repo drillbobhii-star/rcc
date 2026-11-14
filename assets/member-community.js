@@ -40,6 +40,11 @@ const APP_VERSION = '2.1';
   const robloxHint=el('small','Opcional. Si lo completas, se usará la foto de tu avatar de Roblox.','member-hint');
   robloxUsername.parentElement.append(robloxHint);
   name.parentElement.after(robloxUsername.parentElement);
+  const bannerUpload=field(profile.form,'Banner de perfil · imagen','file',{accept:'image/png,image/jpeg,image/webp',});
+  const bannerPreview=el('div',null,'profile-banner-preview');
+  bannerUpload.parentElement.after(bannerPreview);
+  let currentBannerUrl='';
+  bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
   
   let profileOwner=null;
@@ -53,7 +58,8 @@ const APP_VERSION = '2.1';
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
       name.value = data?.display_name || '';
       avatar.value = data?.avatar_url || '';
-      robloxUsername.value = '';
+      currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
+      robloxUsername.value = data?.roblox_username || '';
       color.value = data?.text_color || '#dce6f5';
       profile.status.textContent='';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
@@ -96,9 +102,25 @@ const APP_VERSION = '2.1';
         user_id: currentUser.id,
         display_name: name.value.trim(),
         avatar_url: avatarUrl,
+        banner_url: currentBannerUrl,
+        roblox_username: username || robloxUsername.value.trim(),
         text_color: color.value
       });
       if(error) throw error;
+      const bannerFile=bannerUpload.files?.[0];
+      if(bannerFile){
+        profile.status.textContent='Subiendo banner…';
+        const ext=({ 'image/jpeg':'jpg','image/png':'png','image/webp':'webp' })[bannerFile.type];
+        const sb2=await window.rccSupabaseReady;
+        const path='banners/'+currentUser.id+'/'+crypto.randomUUID()+'.'+ext;
+        const {data:uploaded,error:uploadError}=await sb2.storage.from('profile-media').upload(path,bannerFile,{upsert:false,contentType:bannerFile.type,cacheControl:'3600'});
+        if(uploadError)throw uploadError;
+        const {data:publicData}=sb2.storage.from('profile-media').getPublicUrl(uploaded.path);
+        currentBannerUrl=publicData.publicUrl;
+        const {error:updateError}=await sb2.from('profiles').update({banner_url:currentBannerUrl}).eq('user_id',currentUser.id);
+        if(updateError)throw updateError;
+        bannerUpload.value='';
+      }
       profile.status.textContent=robloxWarning || 'Perfil guardado.';
       if(section?.isConnected) loadComments(section, scriptId);
     } catch(error) { profile.status.textContent = error.message || 'Error al guardar.'; }
@@ -107,6 +129,23 @@ const APP_VERSION = '2.1';
 
   // --- 3. COMENTARIOS ---
   let section=null, scriptId=null, loadRevision=0;
+  const creatorEmail='drillbobhii@gmail.com';
+  const publicProfile=dialog('Perfil RCC');publicProfile.d.classList.add('rcc-profile-dialog');publicProfile.form.remove();
+  const publicBanner=el('div',null,'rcc-profile-banner'),publicContent=el('div',null,'rcc-profile-content');
+  const publicAvatar=el('img',null,'rcc-profile-avatar');publicAvatar.alt='Foto de perfil';
+  const publicName=el('div',null,'rcc-profile-name'),publicRoblox=el('div',null,'rcc-profile-roblox'),publicFounder=el('div','👑 RCC FOUNDER · DRILLBOBHII','rcc-founder-mark');
+  publicContent.append(publicAvatar,publicName,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.status);
+  function openPublicProfile(profileData={},isCreator=false){
+    publicName.textContent=profileData.display_name||'Miembro RCC';
+    publicAvatar.src=profileData.avatar_url||new URL('/assets/default-avatar.svg',location.origin).href;
+    publicRoblox.textContent=profileData.roblox_username?'Roblox: @'+profileData.roblox_username:'Cuenta de Roblox no vinculada';
+    publicBanner.style.backgroundImage=profileData.banner_url?'url("'+profileData.banner_url.replace(/["\\\\]/g,'')+'")':'';
+    publicBanner.classList.toggle('creator',isCreator);publicFounder.hidden=!isCreator;
+    publicProfile.d.querySelector('h2').textContent=isCreator?'Perfil del creador RCC':'Perfil de la comunidad';
+    publicProfile.status.textContent='';if(!publicProfile.d.open)publicProfile.d.showModal();
+  }
+  window.rccHasRobloxLink=false;
+
   
   window.rccRefreshCopy=()=>{ const button=document.getElementById('scriptCopyBtn'); if(button) button.textContent = (window.rccRequiresLogin && !currentUser) ? 'Inicia sesión para copiar' : 'Copiar código'; };
   window.rccRefreshComposer=()=>{ if(!section?.isConnected) return; const form=section.querySelector('form'); form.hidden=!currentUser; if(!currentUser) section.cancelReply(); section.querySelector('.comment-login').hidden=!!currentUser; };
@@ -124,7 +163,7 @@ const APP_VERSION = '2.1';
       const userIds = [...new Set(comments.map(c => c.user_id))];
       let profiles = {};
       if(userIds.length > 0) {
-        const { data: profs } = await sb.from('profiles').select('*').in('user_id', userIds);
+        const { data: profs } = await sb.from('profiles').select('user_id,display_name,avatar_url,banner_url,roblox_username,text_color').in('user_id', userIds);
         if(profs) profs.forEach(p => profiles[p.user_id] = p);
       }
 
@@ -164,11 +203,14 @@ const APP_VERSION = '2.1';
         const authorName = prof.display_name || (row.user_email || 'Miembro').split('@')[0];
         const authorColor = prof.text_color || '#dce6f5';
         
-        const author=el('strong', authorName); 
+        const isCreator=(row.user_email||'').trim().toLowerCase()===creatorEmail;
+        const author=el('button',authorName,'comment-author-button');author.type='button';
         if(/^#[a-f0-9]{6}$/i.test(authorColor)) author.style.color = authorColor;
+        author.onclick=()=>openPublicProfile(prof,isCreator);
         person.append(author);
-        if((row.user_email || '').trim().toLowerCase()==='drillbobhii@gmail.com'){
-          person.append(el('span','👑 Creador','comment-creator-badge'));
+        if(prof.banner_url){const banner=el('div',null,'comment-banner-strip');banner.style.backgroundImage='url("'+String(prof.banner_url).replace(/["\\\\]/g,'')+'")';article.append(banner);}
+        if(isCreator){
+          person.append(el('span','👑 RCC FOUNDER','comment-creator-badge'));
           article.classList.add('comment-creator');
         }
         
