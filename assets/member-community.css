@@ -10,3 +10,6 @@
 .comment-reply-button:focus-visible,.comment-reply-context button:focus-visible{outline:2px solid #e9bd65;outline-offset:3px}
 
 .member-hint{display:block;color:var(--muted);font-size:.78rem;line-height:1.45;margin-top:-4px}
+
+/* Social profile v3 */
+.member-dialog input[type=file]{padding:10px}.profile-banner-preview{width:100%;}.rcc-profile-dialog .member-status{margin:0}.rcc-profile-dialog .member-dialog-close{display:none}.comment-person .comment-author-button{font-size:.92rem}
