@@ -15,7 +15,7 @@ export async function onRequestPost({ request }: { request: Request }) {
     const query = String(payload.query ?? payload.username ?? '').trim().replace(/^@/, '');
     if (!query || query.length > 24) return reply({ error: 'Escribe un usuario o ID de Roblox válido.' }, 400);
     let userId: number, name: string;
-    if (/^\\d{1,20}$/.test(query)) {
+    if (/^\d{1,20}$/.test(query)) {
       userId = Number(query);
       if (!Number.isSafeInteger(userId) || userId <= 0) return reply({ error: 'El ID de Roblox no es válido.' }, 400);
       const response = await fetch('https://users.roblox.com/v1/users/' + userId, { signal: AbortSignal.timeout(8000) });
@@ -46,7 +46,7 @@ export async function onRequestPost({ request }: { request: Request }) {
     if (!thumbnail.ok) return reply({ error: 'No se pudo obtener la foto de Roblox.' }, 502);
     const thumbnailData = await thumbnail.json() as { data?: Array<{ state?: string; imageUrl?: string | null }> };
     const image = thumbnailData.data?.[0];
-    if (!image?.imageUrl || !/^https:\\/\\//i.test(image.imageUrl)) return reply({ error: 'Roblox aún no tiene una foto disponible para esa cuenta.' }, 404);
+    if (!image?.imageUrl || !image.imageUrl.startsWith('https://')) return reply({ error: 'Roblox aún no tiene una foto disponible para esa cuenta.' }, 404);
     return reply({ id: userId, name, avatarUrl: image.imageUrl });
   } catch {
     return reply({ error: 'No se pudo consultar Roblox en este momento.' }, 503);
