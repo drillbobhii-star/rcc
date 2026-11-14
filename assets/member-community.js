@@ -1,5 +1,5 @@
 /* Autenticación, comentarios y perfiles usando Supabase directamente. */
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.1';
 (() => {
   const el = (tag, text, cls) => {const node=document.createElement(tag);if(text)node.textContent=text;if(cls)node.className=cls;return node;};
   
@@ -36,6 +36,10 @@ const APP_VERSION = '2.0';
   const color=field(profile.form,'Color del nombre','color',{value:'#dce6f5',required:true});
   const avatar=field(profile.form,'Foto · URL HTTPS','url',{maxLength:2000,placeholder:'https://…'});
   const name=field(profile.form,'Nombre visible','text',{required:true,maxLength:80});
+  const robloxUsername=field(profile.form,'Usuario de Roblox','text',{maxLength:20,placeholder:'Ej. Builderman',autocomplete:'off',spellcheck:false});
+  const robloxHint=el('small','Opcional. Si lo completas, se usará la foto de tu avatar de Roblox.','member-hint');
+  robloxUsername.parentElement.append(robloxHint);
+  name.parentElement.after(robloxUsername.parentElement);
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
   
   let profileOwner=null;
@@ -49,6 +53,7 @@ const APP_VERSION = '2.0';
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
       name.value = data?.display_name || '';
       avatar.value = data?.avatar_url || '';
+      robloxUsername.value = '';
       color.value = data?.text_color || '#dce6f5';
       profile.status.textContent='';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
@@ -59,17 +64,41 @@ const APP_VERSION = '2.0';
     event.preventDefault();
     if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
     saveProfile.disabled=true;
+    let avatarUrl=avatar.value.trim();
+    let robloxWarning='';
     try {
-      if(avatar.value && new URL(avatar.value).protocol!=='https:') throw new Error('Usa una URL HTTPS para tu foto.');
+      const username=robloxUsername.value.trim().replace(/^@/,'');
+      if(username){
+        profile.status.textContent='Buscando el avatar de Roblox…';
+        try {
+          const response=await fetch('/api/roblox-avatar',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({username}),
+            signal:AbortSignal.timeout(18000)
+          });
+          const result=await response.json().catch(()=>({}));
+          if(!response.ok || typeof result.avatarUrl!=='string' || !/^https:\/\//i.test(result.avatarUrl)){
+            throw new Error(result.error || 'No se pudo encontrar ese usuario de Roblox.');
+          }
+          avatarUrl=result.avatarUrl;
+        } catch {
+          avatarUrl='';
+          robloxWarning='No encontramos ese usuario de Roblox o el servicio no respondió. Se guardó tu perfil con la foto predeterminada.';
+        }
+      } else if(avatarUrl && new URL(avatarUrl).protocol!=='https:') {
+        throw new Error('Usa una URL HTTPS para tu foto.');
+      }
+      if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
       const sb = await window.rccSupabaseReady;
       const { error } = await sb.from('profiles').upsert({
         user_id: currentUser.id,
         display_name: name.value.trim(),
-        avatar_url: avatar.value.trim(),
+        avatar_url: avatarUrl,
         text_color: color.value
       });
       if(error) throw error;
-      profile.status.textContent='Perfil guardado.';
+      profile.status.textContent=robloxWarning || 'Perfil guardado.';
       if(section?.isConnected) loadComments(section, scriptId);
     } catch(error) { profile.status.textContent = error.message || 'Error al guardar.'; }
     finally { saveProfile.disabled=false; }
