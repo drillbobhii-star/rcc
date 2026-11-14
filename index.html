@@ -697,6 +697,9 @@ let sessionRevision = 0;
 const favoritePending = new Set();
 let scripts = [];
 let catalogStatus = 'loading';
+
+// Desactivación temporal del gating del catálogo: no bloquear scripts por ID.
+function rccIsGateCandidate(_script) { return false; }
 let catalogSection = 'all';
 let releaseView = '';
 let trendCounts = {};
@@ -1026,9 +1029,8 @@ function render(reset = true){
     window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
-    const gated=rccIsGateCandidate(s)&&!rccCanUnlock();
-    if(gated){card.classList.add('is-gated');card.querySelector('.card-action').textContent='🔒 Script bloqueado';rccShowGate(card);}
-    card.onclick = (e)=>{ e.stopPropagation(); if(gated){if(!currentUser)openAuth();else document.getElementById('authEmail').click();return;} openScript(s); };
+    // Gating temporalmente desactivado: renderizar y abrir todas las tarjetas normalmente.
+    card.onclick = (e)=>{ e.stopPropagation(); openScript(s); };
     grid.appendChild(card);
     setTimeout(()=>card.classList.add('show'), Math.min(i,8)*35);
   });
@@ -1040,11 +1042,11 @@ function executorWarning(script){
 }
 
 function openScript(s){
-  if(rccIsGateCandidate(s)&&!rccCanUnlock()){showToast('Inicia sesión para desbloquear este script.');openAuth();return;}
+  // Sin bloqueo temporal: permitir abrir cualquier script del catálogo.
   window.RCCScriptReview?.cancel(false);
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
-  window.rccRequiresLogin = s.requires_login === true || rccIsGateCandidate(s);
+  window.rccRequiresLogin = false;
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   const isLoadstring = s.type === 'loadstring';
   
@@ -1091,7 +1093,7 @@ function openScript(s){
 
 function copyCode(confirmed=false){
   const activeScript=scripts.find(s=>s.id===currentCopiedId);
-  if((window.rccRequiresLogin || (activeScript&&rccIsGateCandidate(activeScript)))&&!rccCanUnlock()){openAuth();return;}
+  // Sin bloqueo temporal: permitir copiar scripts.
   const selectedScript=scripts.find(s=>s.id===currentCopiedId);
   if(!confirmed&&window.RCCScriptReview?.confirm(selectedScript,()=>{if(currentCopiedId===selectedScript.id)copyCode(true);}))return;
   const copiedId=currentCopiedId;
@@ -1154,7 +1156,7 @@ let modalReturnFocus = null;
 function downloadCurrent(confirmed=false){
   const s = scripts.find(s=>s.id===currentCopiedId);
   if(!s) return;
-  if((s.requires_login===true||rccIsGateCandidate(s))&&!rccCanUnlock()){openAuth();return;}
+  // Sin bloqueo temporal: permitir descargar scripts.
   if(!confirmed&&window.RCCScriptReview?.confirm(s,()=>{if(currentCopiedId===s.id)downloadCurrent(true);}))return;
   const url = URL.createObjectURL(new Blob([s.code], {type:'text/plain;charset=utf-8'}));
   const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.'+(s.file_extension || 'lua'); a.click();
