@@ -19,8 +19,6 @@ body[data-ui="orange"] .btn-primary{background:#ad4515;color:#fffdf9}
 .review-tip{pointer-events:auto}
 .review-tip small{pointer-events:none}
 @media(max-width:600px){.review-tip-media{flex-basis:50px;width:50px;height:50px}.review-tip-content{gap:8px}}
-@media(prefers-reduced-motion:reduce){.review-tip-sticker{transition:none}}
-
 /* Keep reaction emoji centered inside a fixed square. */
 .review-tip-media{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 58px;width:58px;height:58px;min-width:58px;min-height:58px;overflow:hidden;isolation:isolate}
 .review-tip-emoji{position:relative;z-index:1;display:block;line-height:1}
