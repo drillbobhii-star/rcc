@@ -1,5 +1,5 @@
 /* All themes share the catalog layout and controls. */
-:root{--surface:#172635;--bg:#101a26;--text:#eef2f7;--muted:#b3bfca;--accent:#9ec9f5;--surface-opacity:78%;--ui-radius:24px}body[data-ui]{--muted:#b3bfca;--card-glass:color-mix(in srgb,var(--surface) var(--surface-opacity),transparent);--bg-glass:var(--card-glass);--border-glass:color-mix(in srgb,var(--accent) 23%,transparent);background:var(--bg);color:var(--text)}
+:root{--surface:#172635;--bg:#101a26;--text:#eef2f7;--muted:#b3bfca;--accent:#9ec9f5;--surface-opacity:78%;--ui-radius:24px}body[data-ui]{transition:background-color .32s ease;--muted:#b3bfca;--card-glass:color-mix(in srgb,var(--surface) var(--surface-opacity),transparent);--bg-glass:var(--card-glass);--border-glass:color-mix(in srgb,var(--accent) 23%,transparent);background:var(--scroll-bg,var(--bg));color:var(--text)}
 body[data-ui] .bg-text{display:block;color:var(--accent);font-family:'Manrope',sans-serif;font-size:42vw;letter-spacing:-.09em;filter:none;opacity:.045;animation:rcc-drift 24s ease-in-out infinite;z-index:0}
 body[data-ui] .bg-text-rocio{display:block;color:var(--accent);font:800 14vw 'Manrope',sans-serif;filter:none;opacity:.035;animation:rcc-orbit 36s ease-in-out infinite;z-index:0}
 body[data-ui] .blob{display:block;background:var(--accent);opacity:.10;filter:blur(90px);max-width:75vw;max-height:75vw}
