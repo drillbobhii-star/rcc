@@ -59,7 +59,7 @@ const APP_VERSION = '2.1';
       name.value = data?.display_name || '';
       avatar.value = data?.avatar_url || '';
       currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
-      robloxUsername.value = data?.roblox_username || '';
+      robloxUsername.value = data?.roblox_username || '';window.rccHasRobloxLink=!!data?.roblox_username;
       color.value = data?.text_color || '#dce6f5';
       profile.status.textContent='';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
@@ -121,6 +121,7 @@ const APP_VERSION = '2.1';
         if(updateError)throw updateError;
         bannerUpload.value='';
       }
+      window.rccHasRobloxLink=!!(username||robloxUsername.value.trim());
       profile.status.textContent=robloxWarning || 'Perfil guardado.';
       if(section?.isConnected) loadComments(section, scriptId);
     } catch(error) { profile.status.textContent = error.message || 'Error al guardar.'; }
@@ -130,11 +131,11 @@ const APP_VERSION = '2.1';
   // --- 3. COMENTARIOS ---
   let section=null, scriptId=null, loadRevision=0;
   const creatorEmail='drillbobhii@gmail.com';
-  const publicProfile=dialog('Perfil RCC');publicProfile.d.classList.add('rcc-profile-dialog');publicProfile.form.remove();
+  const publicProfile=dialog('Perfil RCC');publicProfile.d.classList.add('rcc-profile-dialog');publicProfile.form.hidden=true;const publicClose=el('button','×','close');publicClose.type='button';publicClose.setAttribute('aria-label','Cerrar perfil');publicClose.onclick=()=>publicProfile.d.close();publicProfile.d.append(publicClose);
   const publicBanner=el('div',null,'rcc-profile-banner'),publicContent=el('div',null,'rcc-profile-content');
   const publicAvatar=el('img',null,'rcc-profile-avatar');publicAvatar.alt='Foto de perfil';
   const publicName=el('div',null,'rcc-profile-name'),publicRoblox=el('div',null,'rcc-profile-roblox'),publicFounder=el('div','👑 RCC FOUNDER · DRILLBOBHII','rcc-founder-mark');
-  publicContent.append(publicAvatar,publicName,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.status);
+  publicContent.append(publicAvatar,publicName,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.form);
   function openPublicProfile(profileData={},isCreator=false){
     publicName.textContent=profileData.display_name||'Miembro RCC';
     publicAvatar.src=profileData.avatar_url||new URL('/assets/default-avatar.svg',location.origin).href;
