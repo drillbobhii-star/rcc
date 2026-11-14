@@ -15,19 +15,13 @@ body[data-ui="orange"] .btn-primary{background:#ad4515;color:#fffdf9}
 .review-tip-content{display:flex;align-items:center;gap:10px;min-width:0}
 .review-tip-media{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;overflow:hidden;border-radius:10px;background:color-mix(in srgb,var(--accent) 9%,transparent)}
 .review-tip-emoji{font-size:29px;line-height:1}
-.review-tip-sticker{display:block;width:58px;height:58px;object-fit:contain;opacity:0;transition:opacity .3s ease}
-.review-tip-sticker:not([hidden]){opacity:1}
 .review-tip-content>span{flex:1;min-width:0}
-.review-tip-credit{display:inline-block;margin-top:5px;color:var(--muted);font-size:8px;line-height:1.2;text-decoration:none;opacity:.8;pointer-events:auto}
-.review-tip-credit:hover{text-decoration:underline;opacity:1}
 .review-tip{pointer-events:auto}
 .review-tip small{pointer-events:none}
-@media(max-width:600px){.review-tip-media,.review-tip-sticker{width:50px;height:50px}.review-tip-media{flex-basis:50px}.review-tip-content{gap:8px}}
+@media(max-width:600px){.review-tip-media{flex-basis:50px;width:50px;height:50px}.review-tip-content{gap:8px}}
 @media(prefers-reduced-motion:reduce){.review-tip-sticker{transition:none}}
 
-/* Keep one clean sticker frame inside its own square; avoid animated overlays. */
+/* Keep reaction emoji centered inside a fixed square. */
 .review-tip-media{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 58px;width:58px;height:58px;min-width:58px;min-height:58px;overflow:hidden;isolation:isolate}
-.review-tip-sticker{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center;overflow:hidden}
 .review-tip-emoji{position:relative;z-index:1;display:block;line-height:1}
-.review-tip-sticker:not([hidden])~.review-tip-emoji{display:none}
 @media(max-width:600px){.review-tip-media{flex-basis:50px;width:50px;height:50px;min-width:50px;min-height:50px}}
