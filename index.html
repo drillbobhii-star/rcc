@@ -1062,8 +1062,8 @@ function render(reset = true){
 
 function executorWarning(script){
   const code=String(script.code||'');
-  const remote=/loadstring|httpget|request\\s*\\(/i.test(code);
-  const executor=/getgenv|hookfunction|firetouchinterest|syn\\.|identifyexecutor/i.test(code);
+  const remote=/loadstring|httpget|request\s*\(/i.test(code);
+  const executor=/getgenv|hookfunction|firetouchinterest|syn\.|identifyexecutor/i.test(code);
   const notes=[];
   if(remote)notes.push('<p><strong>Contenido remoto:</strong> este código puede descargar o ejecutar contenido externo que podría cambiar después de publicarse. No lo ejecutes si no confías en la fuente.</p>');
   if(executor)notes.push('<p><strong>Funciones de ejecutor:</strong> requiere APIs externas cuya compatibilidad y seguridad no están verificadas.</p>');
