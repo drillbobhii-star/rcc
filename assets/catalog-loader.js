@@ -3,12 +3,13 @@
   const partPath=/^catalog\/part-\d{3,}-[a-f0-9]{16}\.json$/;
   async function load({onProgress=()=>{}}={}){
     const controller=new AbortController();
-    async function json(file){
-      const response=await fetch(file,{cache:'no-cache',signal:controller.signal});
+    async function json(file,{cache='no-cache'}={}){
+      const response=await fetch(file,{cache,signal:controller.signal});
       if(!response.ok)throw Error('No se pudo cargar una parte del catálogo');
       return response.json();
     }
     try{
+      // The manifest is mutable: always revalidate it before choosing content hashes.
       const manifest=await json('scripts.json');
       if(Array.isArray(manifest))return manifest;
       if(manifest?.format!=='rcc-catalog-v1'||!Number.isSafeInteger(manifest.total)||manifest.total<0||!Array.isArray(manifest.parts)||manifest.parts.length>1000)throw Error('Índice de catálogo inválido');
@@ -24,7 +25,8 @@
       async function worker(){
         while(cursor<manifest.parts.length){
           const index=cursor++,part=manifest.parts[index];
-          const rows=await json(part.file);
+          // Part filenames contain a content hash, so the same URL can never mean new data.
+          const rows=await json(part.file,{cache:'force-cache'});
           if(!Array.isArray(rows)||rows.length!==part.count)throw Error('Parte incompleta del catálogo');
           results[index]=rows;loaded+=rows.length;onProgress({loaded,total:manifest.total});
         }
