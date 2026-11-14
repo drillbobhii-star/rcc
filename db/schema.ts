@@ -1,3 +1,4 @@
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pgTable, uuid, timestamp, text, primaryKey, index, check, boolean, jsonb } from 'drizzle-orm/pg-core';
 
@@ -24,6 +25,8 @@ export const comments = pgTable('comments', {
   userId: text('user_id').notNull(),
   author: text().notNull(),
   body: text().notNull(),
+  parentId: uuid('parent_id').references((): AnyPgColumn => comments.id, { onDelete: 'cascade' }),
+  editedAt: timestamp('edited_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, table => [index('comments_script_date_idx').on(table.scriptId, table.createdAt),
   check('comments_body_length', sql`char_length(${table.body}) between 1 and 2000`)]);
@@ -49,7 +52,21 @@ export const browserJourneys = pgTable('browser_journeys', {
 export const memberProfiles = pgTable('member_profiles', {
   userId: text('user_id').primaryKey(),
   avatarUrl: text('avatar_url').notNull().default(''),
+  bannerUrl: text('banner_url').notNull().default(''),
+  bio: text().notNull().default(''),
+  robloxId: text('roblox_id').notNull().default(''),
+  robloxUsername: text('roblox_username').notNull().default(''),
+  showRoblox: boolean('show_roblox').notNull().default(false),
+  nameEffect: text('name_effect').notNull().default('none'),
+  bannerEffect: text('banner_effect').notNull().default('none'),
+  isCreator: boolean('is_creator').notNull().default(false),
   displayName: text('display_name').notNull(),
   textColor: text('text_color').notNull().default('#dce6f5'),
 }, table => [check('member_profiles_display_name_check', sql`char_length(${table.displayName}) between 1 and 80`),
   check('member_profiles_text_color_check', sql`${table.textColor} ~ '^#[a-fA-F0-9]{6}$'`)]);
+
+// One-time imports keep old account content from reappearing after deletion.
+export const communityImports = pgTable('community_imports', {
+  key: text().primaryKey(),
+  importedAt: timestamp('imported_at', { withTimezone: true }).notNull().defaultNow(),
+});
