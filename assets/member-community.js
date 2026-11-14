@@ -41,6 +41,23 @@ const APP_VERSION = '3.0';
   robloxUsername.parentElement.append(robloxHint);
   name.parentElement.after(robloxUsername.parentElement);
   const bio=field(profile.form,'Biografía','text',{maxLength:240,placeholder:'Un espacio para compartir código.'});
+  const profileHero=el('section',null,'rcc-instagram-editor');
+  const profileCover=el('div',null,'rcc-instagram-cover');
+  const profileAvatar=el('img',null,'rcc-instagram-avatar');profileAvatar.alt='Vista previa de tu avatar';profileAvatar.src='/assets/default-avatar.svg';
+  const profileHeroName=el('h3','Tu espacio en RCC','rcc-instagram-name');
+  const profileHeroBio=el('p','Tu biografía aparecerá aquí.','rcc-instagram-bio');
+  const profileHeroHint=el('small','Vista previa de tu perfil','rcc-instagram-hint');
+  profileCover.append(profileAvatar);profileHero.append(profileCover,profileHeroName,profileHeroBio,profileHeroHint);
+  profile.form.insertBefore(profileHero,profile.form.firstChild);
+  const updateProfilePreview=()=>{
+    profileHeroName.textContent=name.value.trim()||'Tu espacio en RCC';
+    profileHeroBio.textContent=bio.value.trim()||'Tu biografía aparecerá aquí.';
+    profileAvatar.src=avatar.value.trim()||'/assets/default-avatar.svg';
+    profileCover.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
+    profileHero.style.setProperty('--profile-preview-color',color.value||'#dce6f5');
+  };
+  [name,bio,avatar,color].forEach(input=>input.addEventListener('input',updateProfilePreview));
+
   const showRoblox=field(profile.form,'Mostrar ID de Roblox','checkbox',{checked:false});
   const showRobloxButton=el('button','Mostrar ID de Roblox','btn btn-ghost');showRobloxButton.type='button';showRobloxButton.setAttribute('aria-pressed','false');
   showRobloxButton.onclick=()=>{showRoblox.checked=!showRoblox.checked;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';};
@@ -53,7 +70,7 @@ const APP_VERSION = '3.0';
   const bannerPreview=el('div',null,'profile-banner-preview');
   bannerUpload.parentElement.after(bannerPreview);
   let currentBannerUrl='',currentRobloxId='';
-  bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';});
+  bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';currentBannerUrl=local;updateProfilePreview();});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
   
   let profileOwner=null;
@@ -66,8 +83,9 @@ const APP_VERSION = '3.0';
       if(error) throw error;
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
       name.value = data?.display_name || '';
+      updateProfilePreview();
       avatar.value = data?.avatar_url || '';
-      currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
+      currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';updateProfilePreview();
       robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
       bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';
       const isCreator=(currentUser?.email||'').trim().toLowerCase()===creatorEmail;creatorEffects.hidden=!isCreator;
