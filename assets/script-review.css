@@ -10,3 +10,17 @@ body[data-ui="orange"] :is(.hero-intro,.catalog-heading,.stat,.compat-note){colo
 body[data-ui="orange"] :is(.badge,.tag,.executor-warning,.compat-detail,.review-tip,.patched-confirm){color:#352317;background:#fff2e7;border-color:#c4551d55}
 body[data-ui="orange"] :is(.sidebar,header,.card,.modal-box,.personalization,.catalog-tools){box-shadow:0 6px 24px #8d451009}
 body[data-ui="orange"] .btn-primary{background:#ad4515;color:#fffdf9}
+
+/* RCC note stickers: text and reaction change together. */
+.review-tip-content{display:flex;align-items:center;gap:10px;min-width:0}
+.review-tip-media{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;overflow:hidden;border-radius:10px;background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.review-tip-emoji{font-size:29px;line-height:1}
+.review-tip-sticker{display:block;width:58px;height:58px;object-fit:contain;opacity:0;transition:opacity .3s ease}
+.review-tip-sticker:not([hidden]){opacity:1}
+.review-tip-content>span{flex:1;min-width:0}
+.review-tip-credit{display:inline-block;margin-top:5px;color:var(--muted);font-size:8px;line-height:1.2;text-decoration:none;opacity:.8;pointer-events:auto}
+.review-tip-credit:hover{text-decoration:underline;opacity:1}
+.review-tip{pointer-events:auto}
+.review-tip small{pointer-events:none}
+@media(max-width:600px){.review-tip-media,.review-tip-sticker{width:50px;height:50px}.review-tip-media{flex-basis:50px}.review-tip-content{gap:8px}}
+@media(prefers-reduced-motion:reduce){.review-tip-sticker{transition:none}}
