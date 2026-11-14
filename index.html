@@ -1061,8 +1061,15 @@ function render(reset = true){
 }
 
 function executorWarning(script){
-  if(!/loadstring|httpget/i.test(String(script.code||'')))return '';
-  return '<aside class="executor-warning" aria-label="Compatibilidad del ejecutor"><span class="executor-warning-icon" aria-hidden="true">!</span><div><strong>Requiere un ejecutor compatible</strong><p>Este código utiliza loadstring o HttpGet. En celular necesitas un ejecutor que admita estas funciones, como Delta o Fluxus. Comprueba su soporte y versión; la compatibilidad no está verificada.</p><button type="button" class="executor-help" data-open-executors>¿No tienes un ejecutor adecuado? Sí, ver opciones ↗</button></div></aside>';
+  const code=String(script.code||'');
+  const remote=/loadstring|httpget|request\\s*\\(/i.test(code);
+  const executor=/getgenv|hookfunction|firetouchinterest|syn\\.|identifyexecutor/i.test(code);
+  const notes=[];
+  if(remote)notes.push('<p><strong>Contenido remoto:</strong> este código puede descargar o ejecutar contenido externo que podría cambiar después de publicarse. No lo ejecutes si no confías en la fuente.</p>');
+  if(executor)notes.push('<p><strong>Funciones de ejecutor:</strong> requiere APIs externas cuya compatibilidad y seguridad no están verificadas.</p>');
+  notes.push('<p><strong>Riesgo de cuenta:</strong> usar scripts o ejecutores puede infringir las reglas de Roblox y provocar restricciones o baneos. Si decides continuar, asumes ese riesgo; RCC no garantiza que una cuenta esté protegida.</p>');
+  notes.push('<p>Prueba solo en un entorno que controles. Nunca compartas tu contraseña, cookies ni tokens.</p>');
+  return '<aside class="executor-warning" aria-label="Advertencias de seguridad"><span class="executor-warning-icon" aria-hidden="true">!</span><div><strong>Lee antes de ejecutar</strong>'+notes.join('')+(remote?'<button type="button" class="executor-help" data-open-executors>Consultar entornos compatibles ↗</button>':'')+'</div></aside>';
 }
 
 function openScript(s){
