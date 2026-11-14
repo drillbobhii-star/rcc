@@ -45,7 +45,7 @@ const APP_VERSION = '3.0';
   const showRobloxButton=el('button','Mostrar ID de Roblox','btn btn-ghost');showRobloxButton.type='button';showRobloxButton.setAttribute('aria-pressed','false');
   showRobloxButton.onclick=()=>{showRoblox.checked=!showRoblox.checked;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';};
   showRoblox.parentElement.after(showRobloxButton);
-  const creatorEffects=el('fieldset',null,'creator-effects');creatorEffects.append(el('legend','Estudio del creador · efectos exclusivos'));
+  const creatorEffects=el('fieldset',null,'creator-effects');creatorEffects.hidden=true;creatorEffects.append(el('legend','Estudio del creador · efectos exclusivos'));
   const makeEffect=(label)=>{const wrap=el('label',label),select=el('select');for(const [value,title] of [['none','Sin efecto'],['shimmer','Destello'],['float','Flotación'],['aurora','Aurora']]){const option=el('option',title);option.value=value;select.append(option);}wrap.append(select);creatorEffects.append(wrap);return select;};
   const nameEffect=makeEffect('Animación del nombre'),bannerEffect=makeEffect('Efecto del banner');
   profile.form.insertBefore(creatorEffects,profile.status);
