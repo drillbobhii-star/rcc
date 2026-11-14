@@ -642,13 +642,10 @@ window.rccSupabaseReady.catch(() => {});
 <section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>Ampliamos la biblioteca con más scripts para diferentes juegos y seguimos sumando códigos, contenido y mejoras en los perfiles, la comunidad y las opciones de personalización.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
-    <section class="rcc-safety-notices" aria-label="Avisos de seguridad">
-      <article class="rcc-safety-note rcc-safety-note--ban"><span aria-hidden="true">⚠️</span><div><strong>Uso de scripts y riesgo de sanciones</strong><p>El uso de scripts de terceros puede infringir las reglas del juego y provocar advertencias, suspensiones o baneos. Infórmate antes de usarlos. Cualquier decisión de uso es tu responsabilidad.</p></div></article>
-      <article class="rcc-safety-note"><span aria-hidden="true">🛡️</span><div><strong>Descargas y archivos</strong><p>Descarga únicamente desde fuentes oficiales o confiables. No ejecutes archivos desconocidos ni compartas contraseñas, cookies o tokens de tu cuenta.</p></div></article>
-      <article class="rcc-safety-note"><span aria-hidden="true">💻</span><div><strong>Instalación en PC</strong><p>Windows puede bloquear o poner en cuarentena ejecutables no reconocidos. No desactives Microsoft Defender ni el antivirus para instalarlos. Verifica el editor, la firma y la procedencia; si no puedes confirmar que un archivo es seguro, no lo ejecutes.</p></div></article>
-      <article class="rcc-safety-note"><span aria-hidden="true">🎮</span><div><strong>Compatibilidad por script</strong><p>Lee los requisitos y la advertencia de cada ficha por separado. La compatibilidad puede variar según el juego, su versión y el entorno; una etiqueta de dispositivo no garantiza que haya sido probado.</p></div></article>
-    </section>
-    <div class="grid" id="scripts">
+    <section class="rcc-safety-notices" aria-label="Avisos importantes">
+      <article class="rcc-safety-note rcc-safety-note--ban"><span aria-hidden="true">⚠️</span><div><strong>Uso bajo tu responsabilidad</strong><p>Si decides descargar o utilizar scripts, lo haces bajo tu propia responsabilidad. Su uso puede implicar riesgos o sanciones según las reglas del juego.</p></div></article>
+      <article class="rcc-safety-note"><span aria-hidden="true">📋</span><div><strong>Lee los requisitos</strong><p>Antes de utilizar cada script, revisa sus requisitos, compatibilidad e indicaciones específicas en su ficha.</p></div></article>
+    </section>    <div class="grid" id="scripts">
       <div class="loading">⏳ Cargando scripts...</div>
     </div>
     <button id="loadMore" class="load-more" hidden>Mostrar más scripts</button>
