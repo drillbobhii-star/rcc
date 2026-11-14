@@ -154,7 +154,7 @@ form.addEventListener('submit', async event => {
           message,
           displayName,
           copiedScript:copied,
-          history:history.slice(-8)
+          history:history.slice(0, -1).slice(-7)
         })
       });
       const result = await response.json();
