@@ -177,14 +177,14 @@
     const media=box.querySelector('.review-tip-media'),fallback=media?.querySelector('.review-tip-emoji');
     if(!media||!fallback)return;
     const kind=stickerKind(message),img=(()=>{let node=media.querySelector('img.review-tip-image');if(!node){node=el('img',null,'review-tip-image');node.alt='';node.loading='lazy';node.decoding='async';media.insertBefore(node,fallback);}return node;})();
-    const uniqueKey=[box.dataset.reviewScript||'',box.dataset.noteStep||'0'].join(':');
+    const uniqueKey=[box.dataset.reviewScript||'',box.dataset.reviewImageId||'',box.dataset.noteStep||'0'].join(':');
     img.onerror=()=>{img.hidden=true;fallback.hidden=false;};img.onload=()=>{img.hidden=false;fallback.hidden=true;};
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(memeSvg(message,kind,uniqueKey));
     fallback.textContent=kind.emoji;
   }
-  const scriptForTip=new WeakMap(),tipStep=new WeakMap();
+  const scriptForTip=new WeakMap(),tipStep=new WeakMap();let tipImageCounter=0;
   function tip(s,detail=false){
-    const box=el('aside',null,'review-tip'+(detail?' review-tip-detail':''));box.dataset.reviewScript=String(s.id);
+    const box=el('aside',null,'review-tip'+(detail?' review-tip-detail':''));box.dataset.reviewScript=String(s.id);box.dataset.reviewImageId=String(++tipImageCounter);
     const label=el('small','NOTA RCC'),content=el('div',null,'review-tip-content');
     const media=el('div',null,'review-tip-media'),fallback=el('span','😂','review-tip-emoji');
     const body=el('span',messages(s)[0]);
