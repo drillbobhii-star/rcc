@@ -156,29 +156,31 @@
     button.addEventListener('click',event=>{event.stopPropagation();confirm(s);});return button;
   }
   const stickerKinds=[
-    {terms:/advert|pelig|baneo|sanci|riesgo|segur|parchead|contrase|privad|virus|permiso|desconocid/i,emoji:'⚠️'},
-    {terms:/error|bug|fall|roto|lag|fps|ping|servidor|problema|muri|funeral|cementerio/i,emoji:'🤦'},
-    {terms:/consejo|recomend|lee|revis|prueba|actualiz|document|respaldo|cuidado|mejor/i,emoji:'🤔'},
-    {terms:/program|código|script|variable|compil|teclado|README|depur|desarroll/i,emoji:'💻'}
+    {terms:/advert|pelig|baneo|sanci|riesgo|segur|parchead|contrase|privad|virus|permiso|desconocid/i,emoji:'🚨',label:'ALERTA RCC',colors:['#ff4d6d','#54152d']},
+    {terms:/error|bug|fall|roto|lag|fps|ping|servidor|problema|muri|funeral|cementerio/i,emoji:'💀',label:'BUG DETECTADO',colors:['#8b5cf6','#25124d']},
+    {terms:/consejo|recomend|lee|revis|prueba|actualiz|document|respaldo|cuidado|mejor/i,emoji:'🧠',label:'MODO CONSEJO',colors:['#00bfa6','#064e50']},
+    {terms:/program|código|script|variable|compil|teclado|README|depur|desarroll/i,emoji:'🤓',label:'MODO PROGRAMADOR',colors:['#3b82f6','#172554']},
+    {terms:/humor|jaja|xd|chiste|funeral|cementerio|muert|fantasma/i,emoji:'😭',label:'NO PUEDE SER',colors:['#f59e0b','#713f12']},
+    {terms:/cuenta|clave|contrase|token|cookie|privad|permiso/i,emoji:'🕵️',label:'OJO CON ESO',colors:['#ec4899','#500724']},
+    {terms:/rendimiento|móvil|pc|pantalla|memoria|cpu|fluidez|ventilador/i,emoji:'🥶',label:'TU DISPOSITIVO',colors:['#06b6d4','#164e63']}
   ];
-  function stickerKind(message){return stickerKinds.find(item=>item.terms.test(message))||{emoji:'😂'};}
-  const stickerFiles={
-    '⚠️':'assets/memes/warning.svg',
-    '🤦':'assets/memes/bug.svg',
-    '🤔':'assets/memes/think.svg',
-    '💻':'assets/memes/code.svg',
-    '😂':'assets/memes/laugh.svg'
-  };
+  function stickerKind(message){return stickerKinds.find(item=>item.terms.test(message))||{emoji:'😂',label:'REACCIÓN RCC',colors:['#f97316','#7c2d12']};}
+  function memeSvg(message,kind,uniqueKey){
+    let hash=2166136261;const source=String(uniqueKey)+'|'+String(message);
+    for(let i=0;i<source.length;i++){hash^=source.charCodeAt(i);hash=Math.imul(hash,16777619);}
+    const n=hash>>>0,angle=n%360,shape=n%3,accent=kind.colors[0],dark=kind.colors[1];
+    const caption=String(message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,52);
+    const decor=shape===0?'<circle cx="24" cy="28" r="13" fill="#fff" opacity=".22"/><path d="M145 18l8 17 18 3-13 13 3 18-16-9-16 9 3-18-13-13 18-3z" fill="#fff" opacity=".2"/>':shape===1?'<path d="M12 28l18-18 18 18-18 18zM137 142l18-18 18 18-18 18z" fill="#fff" opacity=".2"/>':'<path d="M0 112Q45 72 90 112T180 112V180H0z" fill="#fff" opacity=".14"/><circle cx="150" cy="28" r="18" fill="#fff" opacity=".16"/>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+accent+'"/><stop offset="1" stop-color="'+dark+'"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity=".25"/></filter></defs><rect width="180" height="180" rx="22" fill="url(#g)"/>'+decor+'<g transform="rotate('+(angle%15-7)+' 90 83)" filter="url(#s)"><rect x="39" y="28" width="102" height="103" rx="25" fill="#fff"/><text x="90" y="101" text-anchor="middle" font-size="59">'+kind.emoji+'</text></g><rect x="8" y="8" width="164" height="22" rx="8" fill="#111827" opacity=".78"/><text x="90" y="23" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="900" letter-spacing="1" fill="#fff">'+kind.label+'</text><text x="90" y="153" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="800" fill="#fff">RCC MEME #'+(n%9999)+'</text><text x="90" y="166" text-anchor="middle" font-family="Arial,sans-serif" font-size="6.5" fill="#fff" opacity=".9">'+caption+'</text></svg>';
+  }
   function showSticker(box,message){
     const media=box.querySelector('.review-tip-media'),fallback=media?.querySelector('.review-tip-emoji');
     if(!media||!fallback)return;
-    const emoji=stickerKind(message).emoji,file=stickerFiles[emoji]||stickerFiles['😂'];
-    let img=media.querySelector('img.review-tip-image');
-    if(!img){img=el('img',null,'review-tip-image');img.alt='';img.loading='lazy';img.decoding='async';media.insertBefore(img,fallback);}
-    img.onerror=()=>{img.hidden=true;fallback.hidden=false;};
-    img.onload=()=>{img.hidden=false;fallback.hidden=true;};
-    if(img.getAttribute('src')!==file)img.src=file;
-    fallback.textContent=emoji;
+    const kind=stickerKind(message),img=(()=>{let node=media.querySelector('img.review-tip-image');if(!node){node=el('img',null,'review-tip-image');node.alt='';node.loading='lazy';node.decoding='async';media.insertBefore(node,fallback);}return node;})();
+    const uniqueKey=[box.dataset.reviewScript||'',box.dataset.noteStep||'0'].join(':');
+    img.onerror=()=>{img.hidden=true;fallback.hidden=false;};img.onload=()=>{img.hidden=false;fallback.hidden=true;};
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(memeSvg(message,kind,uniqueKey));
+    fallback.textContent=kind.emoji;
   }
   const scriptForTip=new WeakMap(),tipStep=new WeakMap();
   function tip(s,detail=false){
