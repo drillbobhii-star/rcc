@@ -20,6 +20,9 @@ for(const file of files){
   if(fs.existsSync(target)&&fs.statSync(target).isFile())assert(fs.statSync(target).size<=25*1024*1024,`${file}: exceeds Cloudflare's 25 MiB limit`);
 }
 const source=fs.readFileSync(path.join(root,'assets/catalog-loader.js'),'utf8');
+assert.match(source,/json\('scripts\\.json'\)/,'Mutable manifest must be fetched with the default revalidation policy');
+assert.match(source,/json\(part\.file,\{cache:'force-cache'\}\)/,'Content-addressed catalog parts should reuse the browser cache');
+assert.match(source,/partPath=\/\^catalog\\\\\/part-/,'Catalog part paths must remain restricted to the local catalog directory');
 const newLoader=fetch=>{const context=vm.createContext({window:{},fetch,AbortController});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
 const plain=value=>JSON.parse(JSON.stringify(value));
 (async()=>{
