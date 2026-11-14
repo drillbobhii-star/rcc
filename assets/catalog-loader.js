@@ -5,14 +5,14 @@
     const controller=new AbortController();
     async function json(file,{cache='no-cache'}={}){
       const response=await fetch(file,{cache,signal:controller.signal});
-      if(!response.ok)throw Error('No se pudo cargar una parte del catálogo');
+      if(!response.ok)throw Error('HTTP '+response.status+' al cargar '+file);
       return response.json();
     }
     try{
       // The manifest is mutable: always revalidate it before choosing content hashes.
       const manifest=await json('scripts.json');
       if(Array.isArray(manifest))return manifest;
-      if(manifest?.format!=='rcc-catalog-v1'||!Number.isSafeInteger(manifest.total)||manifest.total<0||!Array.isArray(manifest.parts)||manifest.parts.length>1000)throw Error('Índice de catálogo inválido');
+      if(manifest?.format!=='rcc-catalog-v1'||!Number.isSafeInteger(manifest.total)||manifest.total<0||!Array.isArray(manifest.parts)||manifest.parts.length>1000)throw Error('Índice de catálogo inválido: revisa que scripts.json sea la versión actual');
       const files=new Set();
       for(const part of manifest.parts){
         if(!partPath.test(part.file)||files.has(part.file)||!Number.isSafeInteger(part.count)||part.count<1||!Number.isSafeInteger(part.bytes)||part.bytes<2||part.bytes>2*1024*1024)throw Error('Parte de catálogo inválida');
@@ -27,7 +27,7 @@
           const index=cursor++,part=manifest.parts[index];
           // Part filenames contain a content hash, so the same URL can never mean new data.
           const rows=await json(part.file,{cache:'force-cache'});
-          if(!Array.isArray(rows)||rows.length!==part.count)throw Error('Parte incompleta del catálogo');
+          if(!Array.isArray(rows)||rows.length!==part.count)throw Error('Parte incompleta o JSON inválido: '+part.file+' (esperados '+part.count+', recibidos '+(Array.isArray(rows)?rows.length:'no es una lista')+')');
           results[index]=rows;loaded+=rows.length;onProgress({loaded,total:manifest.total});
         }
       }
