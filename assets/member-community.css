@@ -54,3 +54,16 @@
 .rcc-instagram-hint{display:block;margin:0 20px 16px;color:#8993a6;font-size:.75rem}
 .profile-banner-preview{min-height:92px;border-radius:12px;background-position:center;background-size:cover}
 @media(max-width:560px){.rcc-instagram-cover{height:120px}.rcc-instagram-avatar{width:76px;height:76px;bottom:-36px}.rcc-instagram-name{margin-top:46px}}
+
+
+/* Vista previa de perfil como acceso principal y personalización desplegable */
+.rcc-instagram-editor{display:block;width:100%;padding:0;text-align:left;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;outline-offset:4px}
+.rcc-instagram-editor:hover,.rcc-instagram-editor:focus-visible{transform:translateY(-1px);box-shadow:0 0 0 2px rgba(142,164,255,.42),0 16px 42px rgba(0,0,0,.28)}
+.rcc-instagram-editor[aria-expanded="true"]{box-shadow:0 0 0 1px rgba(142,164,255,.32),0 16px 42px rgba(0,0,0,.28)}
+.rcc-profile-customization{display:grid;gap:12px;margin-top:14px;padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(5,8,14,.34);animation:rccProfileExpand .22s ease both}
+.rcc-profile-customization[hidden]{display:none}
+.auth-email{display:inline-flex;align-items:center;gap:9px;max-width:220px}
+.auth-profile-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.25)}
+.auth-email span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes rccProfileExpand{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.rcc-instagram-editor,.rcc-profile-customization{animation:none;transition:none}}

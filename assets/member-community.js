@@ -72,6 +72,22 @@ const APP_VERSION = '3.0';
   let currentBannerUrl='',currentRobloxId='';
   bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';currentBannerUrl=local;updateProfilePreview();});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
+  const profileCustomization=el('div',null,'rcc-profile-customization');
+  profileCustomization.hidden=true;
+  [color.parentElement,avatar.parentElement,name.parentElement,robloxUsername.parentElement,bio.parentElement,showRoblox.parentElement,showRobloxButton,creatorEffects,bannerUpload.parentElement,bannerPreview,saveProfile].forEach(node=>profileCustomization.append(node));
+  profileHero.setAttribute('role','button');profileHero.setAttribute('tabindex','0');profileHero.setAttribute('aria-expanded','false');
+  profileHeroHint.textContent='Toca la vista previa para personalizar tu perfil';
+  const toggleProfileCustomization=()=>{
+    profileCustomization.hidden=!profileCustomization.hidden;
+    profileHero.setAttribute('aria-expanded',String(!profileCustomization.hidden));
+    profileHeroHint.textContent=profileCustomization.hidden?'Toca la vista previa para personalizar tu perfil':'Personalización abierta · toca para cerrar';
+  };
+  profileHero.addEventListener('click',toggleProfileCustomization);
+  profileHero.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleProfileCustomization();}});
+  profile.form.insertBefore(profileCustomization,profile.status);
+  const profileNavButton=document.getElementById('authEmail');
+  if(profileNavButton){profileNavButton.textContent='Ver mi perfil';profileNavButton.setAttribute('aria-label','Vista previa y personalización de tu perfil');}
+
   
   let profileOwner=null;
   document.getElementById('authEmail').onclick=async()=>{
@@ -91,6 +107,9 @@ const APP_VERSION = '3.0';
       const isCreator=(currentUser?.email||'').trim().toLowerCase()===creatorEmail;creatorEffects.hidden=!isCreator;
       nameEffect.value=isCreator?(data?.name_effect||'none'):'none';bannerEffect.value=isCreator?(data?.banner_effect||'none'):'none';
       color.value = data?.text_color || '#dce6f5';
+      updateProfilePreview();
+      profileCustomization.hidden=true;profileHero.setAttribute('aria-expanded','false');profileHeroHint.textContent='Toca la vista previa para personalizar tu perfil';
+      if(profileNavButton){profileNavButton.replaceChildren();const navAvatar=el('img',null,'auth-profile-avatar');navAvatar.alt='';navAvatar.src=data?.avatar_url||'/assets/default-avatar.svg';const navName=el('span',data?.display_name||'Mi perfil');profileNavButton.append(navAvatar,navName);}
       profile.status.textContent='';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
     finally { saveProfile.disabled=false; }
@@ -108,20 +127,29 @@ const APP_VERSION = '3.0';
       if(username){
         profile.status.textContent='Buscando el avatar de Roblox…';
         try {
-          const response=await fetch('/api/roblox-avatar',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({query:username}),
-            signal:AbortSignal.timeout(18000)
-          });
-          const result=await response.json().catch(()=>({}));
+          const controller=new AbortController();
+          const timeoutId=setTimeout(()=>controller.abort(),18000);
+          let response,result;
+          try {
+            response=await fetch('/api/roblox-avatar',{
+              method:'POST',
+              headers:{'Content-Type':'application/json','Accept':'application/json'},
+              body:JSON.stringify({query:username}),
+              signal:controller.signal
+            });
+            result=await response.json().catch(()=>({}));
+          } finally { clearTimeout(timeoutId); }
           if(!response.ok || typeof result.avatarUrl!=='string' || !/^https:\/\//i.test(result.avatarUrl)){
-            throw new Error(result.error || 'No se pudo encontrar ese usuario de Roblox.');
+            throw new Error(result.error || (response.status===404?'No se encontró ese usuario de Roblox.':`Roblox respondió con error (${response.status}).`));
           }
           avatarUrl=result.avatarUrl;currentRobloxId=String(result.id||'');robloxUsername.value=result.name||username;
-        } catch {
-          avatarUrl=defaultAvatarUrl;
-          robloxWarning='No encontramos ese usuario de Roblox o el servicio no respondió. Se guardó tu perfil con la foto predeterminada.';
+          avatar.value=avatarUrl;updateProfilePreview();
+        } catch(error) {
+          avatarUrl=avatar.value.trim()||defaultAvatarUrl;
+          updateProfilePreview();
+          robloxWarning=error?.name==='AbortError'
+            ? 'Roblox tardó demasiado en responder. Puedes guardar el perfil y volver a intentar el avatar más tarde.'
+            : (error?.message||'No se pudo consultar Roblox. Puedes usar una foto HTTPS manualmente.');
         }
       } else { currentRobloxId=''; }
       if(!username && avatarUrl && new URL(avatarUrl).protocol!=='https:') {
@@ -159,6 +187,8 @@ const APP_VERSION = '3.0';
         bannerUpload.value='';
       }
       window.rccHasRobloxLink=!!(username||robloxUsername.value.trim());
+      updateProfilePreview();
+      if(profileNavButton){const navName=profileNavButton.querySelector('span');if(navName)navName.textContent=name.value.trim()||'Mi perfil';const navAvatar=profileNavButton.querySelector('img');if(navAvatar)navAvatar.src=avatarUrl;}
       profile.status.textContent=robloxWarning || 'Perfil guardado.';
       if(section?.isConnected) loadComments(section, scriptId);
     } catch(error) { profile.status.textContent = error.message || 'Error al guardar.'; }
