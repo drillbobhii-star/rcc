@@ -40,10 +40,19 @@ const APP_VERSION = '3.0';
   const robloxHint=el('small','Opcional. Si lo completas, se usará la foto de tu avatar de Roblox.','member-hint');
   robloxUsername.parentElement.append(robloxHint);
   name.parentElement.after(robloxUsername.parentElement);
+  const bio=field(profile.form,'Biografía','text',{maxLength:240,placeholder:'Un espacio para compartir código.'});
+  const showRoblox=field(profile.form,'Mostrar ID de Roblox','checkbox',{checked:false});
+  const showRobloxButton=el('button','Mostrar ID de Roblox','btn btn-ghost');showRobloxButton.type='button';showRobloxButton.setAttribute('aria-pressed','false');
+  showRobloxButton.onclick=()=>{showRoblox.checked=!showRoblox.checked;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';};
+  showRoblox.parentElement.after(showRobloxButton);
+  const creatorEffects=el('fieldset',null,'creator-effects');creatorEffects.append(el('legend','Estudio del creador · efectos exclusivos'));
+  const makeEffect=(label)=>{const wrap=el('label',label),select=el('select');for(const [value,title] of [['none','Sin efecto'],['shimmer','Destello'],['float','Flotación'],['aurora','Aurora']]){const option=el('option',title);option.value=value;select.append(option);}wrap.append(select);creatorEffects.append(wrap);return select;};
+  const nameEffect=makeEffect('Animación del nombre'),bannerEffect=makeEffect('Efecto del banner');
+  profile.form.insertBefore(creatorEffects,profile.status);
   const bannerUpload=field(profile.form,'Banner de perfil · imagen','file',{accept:'image/png,image/jpeg,image/webp',});
   const bannerPreview=el('div',null,'profile-banner-preview');
   bannerUpload.parentElement.after(bannerPreview);
-  let currentBannerUrl='';
+  let currentBannerUrl='',currentRobloxId='';
   bannerUpload.addEventListener('change',()=>{const file=bannerUpload.files?.[0];if(!file)return;if(file.size>5*1024*1024){bannerUpload.value='';profile.status.textContent='El banner debe pesar menos de 5 MB.';return;}if(!/^image\/(png|jpeg|webp)$/.test(file.type)){bannerUpload.value='';profile.status.textContent='Usa una imagen PNG, JPG o WEBP.';return;}const local=URL.createObjectURL(file);bannerPreview.style.backgroundImage='url("'+local+'")';});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
   
@@ -59,7 +68,10 @@ const APP_VERSION = '3.0';
       name.value = data?.display_name || '';
       avatar.value = data?.avatar_url || '';
       currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
-      robloxUsername.value = data?.roblox_username || '';window.rccHasRobloxLink=!!data?.roblox_username;
+      robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
+      bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';
+      const isCreator=(currentUser?.email||'').trim().toLowerCase()===creatorEmail;creatorEffects.hidden=!isCreator;
+      nameEffect.value=isCreator?(data?.name_effect||'none'):'none';bannerEffect.value=isCreator?(data?.banner_effect||'none'):'none';
       color.value = data?.text_color || '#dce6f5';
       profile.status.textContent='';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
@@ -81,19 +93,20 @@ const APP_VERSION = '3.0';
           const response=await fetch('/api/roblox-avatar',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({username}),
+            body:JSON.stringify({query:username}),
             signal:AbortSignal.timeout(18000)
           });
           const result=await response.json().catch(()=>({}));
           if(!response.ok || typeof result.avatarUrl!=='string' || !/^https:\/\//i.test(result.avatarUrl)){
             throw new Error(result.error || 'No se pudo encontrar ese usuario de Roblox.');
           }
-          avatarUrl=result.avatarUrl;
+          avatarUrl=result.avatarUrl;currentRobloxId=String(result.id||'');robloxUsername.value=result.name||username;
         } catch {
           avatarUrl=defaultAvatarUrl;
           robloxWarning='No encontramos ese usuario de Roblox o el servicio no respondió. Se guardó tu perfil con la foto predeterminada.';
         }
-      } else if(avatarUrl && new URL(avatarUrl).protocol!=='https:') {
+      } else { currentRobloxId=''; }
+      if(!username && avatarUrl && new URL(avatarUrl).protocol!=='https:') {
         throw new Error('Usa una URL HTTPS para tu foto.');
       }
       if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
@@ -103,7 +116,13 @@ const APP_VERSION = '3.0';
         display_name: name.value.trim(),
         avatar_url: avatarUrl,
         banner_url: currentBannerUrl,
-        roblox_username: username || robloxUsername.value.trim(),
+        roblox_username: robloxUsername.value.trim(),
+        roblox_id: currentRobloxId,
+        show_roblox: !!showRoblox.checked,
+        bio: bio.value.trim(),
+        name_effect: nameEffect.value,
+        banner_effect: bannerEffect.value,
+        is_creator: (currentUser.email||'').trim().toLowerCase()===creatorEmail,
         text_color: color.value
       });
       if(error) throw error;
@@ -134,23 +153,49 @@ const APP_VERSION = '3.0';
   const publicProfile=dialog('Perfil RCC');publicProfile.d.classList.add('rcc-profile-dialog');publicProfile.form.hidden=true;const publicClose=el('button','×','close');publicClose.type='button';publicClose.setAttribute('aria-label','Cerrar perfil');publicClose.onclick=()=>publicProfile.d.close();publicProfile.d.append(publicClose);
   const publicBanner=el('div',null,'rcc-profile-banner'),publicContent=el('div',null,'rcc-profile-content');
   const publicAvatar=el('img',null,'rcc-profile-avatar');publicAvatar.alt='Foto de perfil';
-  const publicName=el('div',null,'rcc-profile-name'),publicRoblox=el('div',null,'rcc-profile-roblox'),publicFounder=el('div','👑 RCC FOUNDER · DRILLBOBHII','rcc-founder-mark');
-  publicContent.append(publicAvatar,publicName,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.form);
+  const publicName=el('div',null,'rcc-profile-name'),publicBio=el('p',null,'rcc-profile-bio'),publicRoblox=el('a',null,'rcc-profile-roblox'),publicFounder=el('div','👑 RCC FOUNDER · DRILLBOBHII','rcc-founder-mark');
+  publicContent.append(publicAvatar,publicName,publicBio,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.form);
   function openPublicProfile(profileData={},isCreator=false){
     publicName.textContent=profileData.display_name||'Miembro RCC';
     publicAvatar.src=profileData.avatar_url||new URL('/assets/default-avatar.svg',location.origin).href;
-    publicRoblox.textContent=profileData.roblox_username?'Roblox: @'+profileData.roblox_username:'Cuenta de Roblox no vinculada';
+    publicBio.textContent=profileData.bio||'';publicBio.hidden=!publicBio.textContent;
+    publicRoblox.removeAttribute('href');publicRoblox.removeAttribute('target');publicRoblox.removeAttribute('rel');
+    if(profileData.show_roblox && /^\\d+$/.test(String(profileData.roblox_id||''))){publicRoblox.textContent='@'+(profileData.roblox_username||'Roblox')+' · ID '+profileData.roblox_id+' ↗';publicRoblox.href='https://www.roblox.com/users/'+profileData.roblox_id+'/profile';publicRoblox.target='_blank';publicRoblox.rel='noopener noreferrer';}
+    else publicRoblox.textContent=profileData.roblox_username?'Cuenta de Roblox privada':'Cuenta de Roblox no vinculada';
     publicBanner.style.backgroundImage=profileData.banner_url?'url("'+profileData.banner_url.replace(/["\\\\]/g,'')+'")':'';
     publicBanner.classList.toggle('creator',isCreator);publicFounder.hidden=!isCreator;
+    publicName.dataset.effect=isCreator?(profileData.name_effect||'none'):'none';publicBanner.dataset.effect=isCreator?(profileData.banner_effect||'none'):'none';
     publicProfile.d.querySelector('h2').textContent=isCreator?'Perfil del creador RCC':'Perfil de la comunidad';
     publicProfile.status.textContent='';if(!publicProfile.d.open)publicProfile.d.showModal();
   }
   window.rccHasRobloxLink=false;
 
   
+  let gateIds=new Set(),gateSize=-1;
+  window.rccCodeLocked=s=>typeof rccIsGateCandidate==='function'?rccIsGateCandidate(s):false;
+  window.rccGateCard=(s,card)=>{
+    if(currentUser||!window.rccCodeLocked(s))return;
+    card.classList.add('member-locked-card');
+    const label=el('span','Acceso con cuenta','member-lock-label');
+    card.querySelector('.badges')?.append(label);
+  };
+  window.rccApplyCodeGate=s=>{
+    const pre=document.getElementById('modalCode')?.parentElement;
+    if(!pre||!window.rccRequiresLogin||currentUser||pre.parentElement.querySelector('.member-code-gate'))return;
+    pre.classList.add('member-code-blur');
+    const gate=el('section',null,'member-code-gate');
+    gate.append(el('span','TU BIBLIOTECA, SIN LÍMITES','eyebrow'),el('h3','Este código te espera.'),el('p','Inicia sesión o regístrate para ver este código y guardar tus favoritos.'));
+    for(const text of ['Iniciar sesión','Registrarse']){
+      const button=el('button',text,text==='Iniciar sesión'?'btn btn-primary':'btn btn-ghost');button.type='button';
+      button.onclick=()=>{openAuth();if(text==='Registrarse'){const label=document.getElementById('signupRobloxLabel');if(label)label.hidden=false;}};
+      gate.append(button);
+    }
+    pre.after(gate);
+  };
+
   window.rccRefreshCopy=()=>{ const button=document.getElementById('scriptCopyBtn'); if(button) button.textContent = (window.rccRequiresLogin && !currentUser) ? 'Inicia sesión para copiar' : 'Copiar código'; };
   window.rccRefreshComposer=()=>{ if(!section?.isConnected) return; const form=section.querySelector('form'); form.hidden=!currentUser; if(!currentUser) section.cancelReply(); section.querySelector('.comment-login').hidden=!!currentUser; };
-  window.addEventListener('rcc:session',()=>{window.rccRefreshComposer();if(section?.isConnected)loadComments(section,scriptId);});
+  window.addEventListener('rcc:session',()=>{window.rccRefreshComposer();if(currentUser){const script=typeof scripts!=='undefined'?scripts.find(item=>String(item.id)===String(currentCopiedId)):null;const code=document.getElementById('modalCode');if(script&&code&&window.rccRequiresLogin){code.textContent=script.code;code.parentElement.classList.remove('member-code-blur');code.parentElement.parentElement.querySelector('.member-code-gate')?.remove();window.rccRequiresLogin=false;}}if(section?.isConnected)loadComments(section,scriptId);});
 
   async function loadComments(target, id){
     const revision=++loadRevision, list=target.querySelector('.comment-list'); list.textContent='Cargando comentarios…';
@@ -165,7 +210,7 @@ const APP_VERSION = '3.0';
       const userIds = [...new Set(comments.map(c => c.user_id))];
       let profiles = {};
       if(userIds.length > 0) {
-        const { data: profs } = await sb.from('profiles').select('user_id,display_name,avatar_url,banner_url,roblox_username,text_color').in('user_id', userIds);
+        const { data: profs } = await sb.from('profiles').select('user_id,display_name,avatar_url,banner_url,roblox_username,roblox_id,show_roblox,bio,name_effect,banner_effect,is_creator,text_color').in('user_id', userIds);
         if(profs) profs.forEach(p => profiles[p.user_id] = p);
       }
 
@@ -243,7 +288,7 @@ const APP_VERSION = '3.0';
           const remove=el('button','Eliminar','btn btn-ghost comment-delete-button');
           remove.type='button';
           remove.onclick=async()=>{
-            if(!window.confirm('¿Eliminar este comentario?'))return;
+            if(!window.confirm('Se eliminarán este comentario y todas sus respuestas. ¿Continuar?'))return;
             remove.disabled=true;
             try{const sb=await window.rccSupabaseReady;const {error}=await sb.from('comments').delete().eq('id',row.id).eq('user_id',currentUser.id);if(error)throw error;await loadComments(target,id);}
             catch(error){remove.disabled=false;window.alert(error.message||'No se pudo eliminar el comentario.');}
