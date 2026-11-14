@@ -418,7 +418,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtpb0JYKlDM8U">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.js"></script>
 <script>
-window.rccAuthRedirect = 'https://rcc-3m0.pages.dev';
+window.rccAuthRedirect = window.location.origin;
 window.rccSupabaseReady = Promise.resolve().then(() => {
   const anonKey = document.querySelector('meta[name="supabase-anon-key"]').content.trim();
   if (!anonKey) throw Object.assign(new Error('Falta configurar la clave pública de Supabase.'), {code:'SUPABASE_NOT_CONFIGURED'});
@@ -429,7 +429,9 @@ window.rccSupabaseReady = Promise.resolve().then(() => {
 });
 window.rccSupabaseReady.catch(() => {});
 </script>
+<script src="assets/member-access.js"></script>
 <link rel="stylesheet" href="assets/community.css">
+<link rel="stylesheet" href="assets/social-refresh.css">
 <style>
 .auth-controls [hidden]{display:none!important}.auth-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.auth-email{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem;color:var(--muted)}
 #authModal{z-index:2100}#authModal .modal-box{width:min(100%,440px)}#authForm{display:grid;gap:14px}#authForm label{display:grid;gap:8px}#authForm input{width:100%;padding:13px;border:1px solid var(--border-glass);border-radius:14px;background:rgba(255,255,255,.06);color:var(--text);font:inherit}#authStatus{min-height:2.5em;color:var(--muted)}.favorite-button{margin-left:auto}.favorite-button[aria-pressed="true"]{color:#ffa9bd}button:disabled{opacity:.6;cursor:wait}
@@ -681,7 +683,7 @@ window.rccSupabaseReady.catch(() => {});
 
 <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
   <div class="modal-box"><div class="modal-head"><h3 id="authTitle">Tu cuenta RCC</h3><button class="close" id="closeAuth" type="button" aria-label="Cerrar acceso">×</button></div>
-    <div class="modal-body"><form id="authForm"><p class="auth-intro">Guarda tus scripts en la nube y participa en la comunidad.</p><label>Correo electrónico<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="8" maxlength="128"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button><button class="btn btn-ghost" id="googleLoginBtn" type="button">Continuar con Google</button></div><button class="btn btn-ghost" id="forgotPasswordBtn" type="button">Olvidé mi contraseña</button><p id="authStatus" role="status" aria-live="polite"></p></form></div>
+    <div class="modal-body"><form id="authForm"><p class="auth-intro">Guarda tus scripts en la nube y participa en la comunidad.</p><label>Correo electrónico<input id="authEmailInput" type="email" autocomplete="email" required maxlength="254"></label><label id="signupRobloxLabel" hidden>Busca tu Roblox · nombre o ID<input id="signupRoblox" type="text" maxlength="24" placeholder="Nombre de usuario o ID" autocomplete="off"><small>Vinculamos tu perfil público. Nunca pedimos tu contraseña de Roblox.</small></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password" required minlength="8" maxlength="128"></label><div class="actions"><button class="btn btn-primary" type="submit">Entrar</button><button class="btn btn-ghost" id="signupBtn" type="button">Registrarse</button><button class="btn btn-ghost" id="googleLoginBtn" type="button">Continuar con Google</button></div><button class="btn btn-ghost" id="forgotPasswordBtn" type="button">Olvidé mi contraseña</button><p id="authStatus" role="status" aria-live="polite"></p></form></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite">¡Copiado!</div>
@@ -1025,6 +1027,7 @@ function render(reset = true){
       }
       count.append(label,metrics,reason,actual);card.querySelector('.meta').before(count);
     }
+    window.rccGateCard?.(s, card);
     window.RCCScriptReview?.card(s, card);
     window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
@@ -1046,7 +1049,7 @@ function openScript(s){
   window.RCCScriptReview?.cancel(false);
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
-  window.rccRequiresLogin = false;
+  window.rccRequiresLogin = window.rccCodeLocked?.(s) || false;
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   const isLoadstring = s.type === 'loadstring';
   
@@ -1075,9 +1078,10 @@ function openScript(s){
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
     </div>
   `;
-  document.getElementById('modalCode').textContent = s.code;
+  document.getElementById('modalCode').textContent = window.rccRequiresLogin && !currentUser ? '-- Inicia sesión o regístrate para ver este código.' : s.code;
+  window.rccApplyCodeGate?.(s);
   window.enhanceGameDetail?.(s, modalBody);
-  const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => window.openRccLab?.(s.code); modalBody.querySelector('.actions').prepend(explain);
+  const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => {if(window.rccRequiresLogin && !currentUser){openAuth();return;}window.openRccLab?.(s.code);}; modalBody.querySelector('.actions').prepend(explain);
   if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=s.release.changes.length?(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date:s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
   window.RCCScriptReview?.detail(s, modalBody);
   window.rccMountComments?.(String(s.id));
@@ -1092,6 +1096,7 @@ function openScript(s){
 }
 
 function copyCode(confirmed=false){
+  if(window.rccRequiresLogin && !currentUser){openAuth();return;}
   const activeScript=scripts.find(s=>s.id===currentCopiedId);
   // Sin bloqueo temporal: permitir copiar scripts.
   const selectedScript=scripts.find(s=>s.id===currentCopiedId);
@@ -1154,6 +1159,7 @@ function renderCompatibility(s){
 const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 let modalReturnFocus = null;
 function downloadCurrent(confirmed=false){
+  if(window.rccRequiresLogin && !currentUser){openAuth();return;}
   const s = scripts.find(s=>s.id===currentCopiedId);
   if(!s) return;
   // Sin bloqueo temporal: permitir descargar scripts.
@@ -1296,6 +1302,7 @@ authModal.addEventListener('keydown',e=>{
 });
 function cloudError(error){return error?.message||'No se pudo completar la operación. Vuelve a intentarlo.';}
 function authError(error){
+  if(/Roblox/.test(error?.message||''))return error.message;
   if(error?.code==='SUPABASE_NOT_CONFIGURED')return error.message;
   const message=String(error?.message||'')+' '+String(error?.cause?.message||'');
   if(/already|exists|registered|registrad/i.test(message))return 'Ya se usó este correo. Inicia sesión o recupera tu contraseña.';
@@ -1324,10 +1331,7 @@ async function submitAuth(register){
     if(error)throw error;
     if(register&&data.user?.identities?.length===0)throw new Error('already registered');
     if(register&&!data.session){
-      authStatus.textContent='Iniciando sesión…';
-      const result=await supabase.auth.signInWithPassword({email,password});
-      if(result.error)throw result.error;
-      data=result.data;
+      authStatus.textContent='Cuenta creada. Revisa tu correo y confirma el enlace para iniciar sesión.';return;
     }
     if(!data?.session?.user)throw new Error('No session returned');
     await applySession(data.session.user);closeAuth();showToast(register?'Cuenta creada':'Sesión iniciada');
@@ -1335,7 +1339,7 @@ async function submitAuth(register){
   finally{setAuthBusy(false);}
 }
 authForm.onsubmit=e=>{e.preventDefault();submitAuth(false);};
-document.getElementById('signupBtn').onclick=()=>submitAuth(true);
+document.getElementById('signupBtn').onclick=()=>{const label=document.getElementById('signupRobloxLabel');if(label.hidden){label.hidden=false;document.getElementById('signupRoblox').focus();authStatus.textContent='Busca tu Roblox y vuelve a pulsar Registrarse.';return;}submitAuth(true);};
 document.getElementById('forgotPasswordBtn').onclick=async()=>{
   const email=document.getElementById('authEmailInput');
   if(!email.reportValidity()||!email.value)return;
@@ -1362,10 +1366,12 @@ async function applySession(user){
   document.getElementById('logoutBtn').hidden=!currentUser;
   window.rccRefreshCopy?.();
   window.rccRefreshComposer?.();
+  window.dispatchEvent(new Event('rcc:session'));
+  if(modal.classList.contains('open')){const active=scripts.find(s=>s.id===currentCopiedId);if(active)openScript(active);}
   if(previousId===currentUser?.id)return;
   sessionRevision++;votedIds.clear();favoriteIds=new Set();favoritesStatus='idle';
   updateFavoriteCount();render();
-  if(currentUser)await loadFavorites();
+  if(currentUser){try{await window.rccMemberAPI('import',{method:'POST',body:{}});window.dispatchEvent(new Event('rcc:profile-imported'));}catch{showToast('No se pudo recuperar el contenido anterior. Vuelve a iniciar sesión para reintentar.');}await loadFavorites();}
   if(modal.classList.contains('open')){updateVoteButton(String(currentCopiedId),document.getElementById('voteBtn'));}
 }
 function updateFavoriteCount(){document.getElementById('favoritesCount').textContent=favoriteIds.size;}

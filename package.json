@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node --experimental-strip-types tools/check-community-api.mjs && node tools/check-executor-downloads.mjs",
-    "test:static": "node tools/check-static-catalog.cjs"
+    "test:static": "node tools/check-static-catalog.cjs",
+    "test:social": "node --experimental-strip-types tools/check-social-profiles.mjs"
   },
   "keywords": [],
   "author": "",
