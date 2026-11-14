@@ -38,3 +38,8 @@
 .member-code-gate h3{margin:8px 0;color:#f8d989}
 .member-code-gate p{color:#d5d9e2}
 @media(prefers-reduced-motion:reduce){.rcc-profile-name[data-effect],.rcc-profile-banner[data-effect],.rcc-founder-mark,.comment-creator-badge{animation:none!important}}
+
+.member-locked-card{position:relative;overflow:hidden}
+.member-locked-card h3,.member-locked-card .desc,.member-locked-card .compat-status,.member-locked-card .tags,.member-locked-card .meta{filter:blur(3px);user-select:none}
+.member-locked-card .member-lock-label{filter:none}
+.member-code-blur{filter:blur(7px);user-select:none;pointer-events:none}
