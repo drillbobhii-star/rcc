@@ -30,6 +30,32 @@
     }
   } catch {}
   const root = document.documentElement;
+  // Scroll tint is derived from the visitor's active theme and custom accent.
+  // It never changes or persists the selected appearance preferences.
+  function hexRgb(hex) {
+    const value = /^#[0-9a-f]{6}$/i.test(hex) ? hex.slice(1) : '000000';
+    return [0, 2, 4].map(index => parseInt(value.slice(index, index + 2), 16));
+  }
+  function updateScrollTint() {
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const progress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+    const eased = progress * progress * (3 - 2 * progress);
+    const amount = eased * (state.theme === 'monochrome' ? 0.055 : 0.095);
+    const base = hexRgb(presets[state.theme].bg);
+    const tint = hexRgb(state.accent);
+    const blended = base.map((channel, index) => Math.round(channel + (tint[index] - channel) * amount));
+    root.style.setProperty('--scroll-bg', '#' + blended.map(channel => channel.toString(16).padStart(2, '0')).join(''));
+  }
+  let scrollFrame = 0;
+  function scheduleScrollTint() {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      updateScrollTint();
+    });
+  }
+  window.addEventListener('scroll', scheduleScrollTint, {passive:true});
+  window.addEventListener('resize', scheduleScrollTint, {passive:true});
   const panel = document.getElementById('personalization');
   const trigger = document.getElementById('appearanceToggle');
   const accent = document.getElementById('accentColor');
@@ -43,6 +69,7 @@
     document.body.classList.toggle('ios-glass', state.theme === 'ios');
     document.body.classList.toggle('motion-paused', !state.motion);
     root.style.setProperty('--bg', preset.bg);
+    updateScrollTint();
     root.style.setProperty('--surface', preset.surface);
     root.style.setProperty('--accent', state.accent);
     root.style.setProperty('--text', ['sky','orange'].includes(state.theme) ? '#352317' : '#eef2f7');
