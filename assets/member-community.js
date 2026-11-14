@@ -37,6 +37,7 @@ const APP_VERSION = '3.0';
   const color=field(profile.form,'Color del nombre','color',{value:'#dce6f5',required:true});
   const avatar=field(profile.form,'Foto · URL HTTPS','url',{maxLength:2000,placeholder:'https://…'});avatar.addEventListener('input',()=>{profileAvatarPreview.src=avatar.value.trim()||new URL('/assets/default-avatar.svg',location.origin).href;});
   const name=field(profile.form,'Nombre visible','text',{required:true,maxLength:80});
+  name.addEventListener('input',()=>{profileHeroTitle.textContent=name.value.trim()||'Tu espacio en RCC';});
   const robloxUsername=field(profile.form,'Usuario de Roblox','text',{maxLength:20,placeholder:'Ej. Builderman',autocomplete:'off',spellcheck:false});
   const robloxHint=el('small','Opcional. Si lo completas, se usará la foto de tu avatar de Roblox.','member-hint');
   robloxUsername.parentElement.append(robloxHint);
@@ -77,6 +78,8 @@ const APP_VERSION = '3.0';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
     finally { saveProfile.disabled=false; }
   };
+
+  window.addEventListener('rcc:session',()=>{if(currentUser){const trigger=document.getElementById('authEmail');trigger.textContent='Mi perfil ✎';trigger.setAttribute('aria-label','Abrir mi perfil');trigger.title='Editar tu perfil';}});
 
   profile.form.onsubmit=async event=>{
     event.preventDefault();
