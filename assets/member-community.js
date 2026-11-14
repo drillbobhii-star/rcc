@@ -66,7 +66,7 @@ const APP_VERSION = '3.0';
       const { data, error } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle();
       if(error) throw error;
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
-      name.value = data?.display_name || '';
+      name.value = data?.display_name || '';profileHeroTitle.textContent=name.value||'Tu espacio en RCC';
       avatar.value = data?.avatar_url || '';profileAvatarPreview.src=avatar.value||new URL('/assets/default-avatar.svg',location.origin).href;
       currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
       robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
