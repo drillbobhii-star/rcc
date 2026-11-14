@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-14T01:16:12.224Z",
+  "total": 14870,
+  "sources": {
+    "Otras fuentes": 5351,
+    "ScriptBlox": 7039,
+    "RScripts": 2480
+  },
+  "reviewed": 7012,
+  "patched": 39,
+  "changed": 711,
+  "added": 80,
+  "unavailable": 536,
+  "comments": "Se leyeron los comentarios públicos accesibles de ScriptBlox; RScripts no ofreció un endpoint de comentarios accesible en esta revisión. Los reportes son orientativos, no pruebas de ejecución.",
+  "limitations": "Revisión de metadatos públicos. No demuestra ejecución, ausencia de sanciones ni historial completo de versiones.",
+  "pending": 7860,
+  "pendingExternal": 2509,
+  "withHistory": 293,
+  "latestReview": {
+    "checkedAt": "2026-11-14T01:42:28.812Z",
+    "requested": 7039,
+    "reviewed": 7010,
+    "unavailable": 268,
+    "commentThreads": 6772,
+    "commentsRead": 18102,
+    "partialThreads": 4,
+    "rsPages": 65
+  }
+}

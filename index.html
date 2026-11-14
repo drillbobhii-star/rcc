@@ -450,6 +450,9 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/notification-banners.js" defer></script>
 <link rel="stylesheet" href="assets/notification-banners.css">
 <link rel="stylesheet" href="assets/prism-logo.css">
+<link rel="stylesheet" href="assets/script-review.css">
+<script src="assets/review-signals.js"></script>
+<script src="assets/script-review.js"></script>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -471,7 +474,7 @@ window.rccSupabaseReady.catch(() => {});
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-prism" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path class="prism-shell" d="M24 3 44 14 40 36 24 45 8 36 4 14Z"/><path class="prism-fold" d="m4 14 20 10 20-10M24 24v21"/><path class="prism-letter" d="M16 32V15h10a5 5 0 0 1 0 10H16m10 0 7 8"/><circle class="prism-satellite" cx="24" cy="3" r="2.3"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
+    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-prism" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path class="prism-shell" d="M9 7h24l8 8v26H15l-8-8V7Z"/><path class="prism-fold" d="M33 7v9h8M7 32h9v9"/><path class="prism-letter" d="m17 19-6 5 6 5m14-10 6 5-6 5m-5-13-5 16"/><circle class="prism-satellite" cx="38" cy="8" r="2.5"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
 
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
@@ -541,7 +544,7 @@ window.rccSupabaseReady.catch(() => {});
       <nav class="section-tabs" aria-label="Secciones del catálogo">
         <button id="libraryTab" type="button" aria-pressed="true">Panel principal</button>
         <button id="executorsMainBtn" type="button" data-open-executors aria-haspopup="dialog" aria-controls="executorDrawer">Ejecutores compatibles <span aria-hidden="true">↗</span></button>
-        <button id="trendingTab" type="button" aria-pressed="false">Tendencia</button><button id="updatesTab" type="button" aria-pressed="false">Actualizados · 1.7</button>
+        <button id="trendingTab" type="button" aria-pressed="false">Tendencia</button><button id="updatesTab" type="button" aria-pressed="false">Novedades</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
         <a class="help-link" href="#analysis">Sección de prueba ↗</a>
@@ -587,11 +590,13 @@ window.rccSupabaseReady.catch(() => {});
         <div class="stat"><b id="statMobile">0</b><small>Para móvil</small></div>
       </div>
     </section>
-    <details id="personalization" class="personalization">
+
+<details id="personalization" class="personalization">
       <summary><span><small>ESTUDIO VISUAL</small>Tu RCC, a tu estilo</span><span aria-hidden="true">＋</span></summary>
       <div class="personalization-body">
-        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Negro glass con textura de grafito y detalles azul claro; también Cielo, Azul glass, iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
+        <div class="personalization-intro"><h2>Una interfaz que se siente tuya.</h2><p>Negro glass con textura de grafito y detalles azul claro; también Naranja y blanco, Cielo, Azul glass, iOS, Android, HyperOS y Nothing. Ajusta el cristal, las formas, el texto y los sonidos. Vista previa instantánea; preferencias guardadas en este navegador.</p></div>
         <div class="theme-options" role="group" aria-label="Estilo de interfaz"><button type="button" data-theme="sky" aria-pressed="false"><span class="theme-art art-sky" aria-hidden="true">RCC</span><strong>Cielo</strong><small>Blanco, azul claro y tinta</small></button><button type="button" data-theme="blue" aria-pressed="false"><span class="theme-art art-blue" aria-hidden="true">RCC</span><strong>Azul glass</strong><small>Cristal azul profundo</small></button><button type="button" data-theme="black" aria-pressed="true"><span class="theme-art art-black" aria-hidden="true">RCC</span><strong>Negro glass</strong><small>Grafito, textura y azul claro</small></button>
+          <button type="button" data-theme="orange" aria-pressed="false"><span class="theme-art art-orange" aria-hidden="true">RCC</span><strong>Naranja y blanco</strong><small>Papel cálido y naranja terracota</small></button>
           <button type="button" data-theme="monochrome" aria-pressed="false"><span class="theme-art art-monochrome" aria-hidden="true">RCC</span><strong>Diagonal infinito</strong><small>Mitad blanco, mitad negro · en movimiento</small></button>
           <button type="button" data-theme="ios" aria-pressed="false"><span class="theme-art art-ios" aria-hidden="true">RCC</span><strong>iOS</strong><small>Cristal y profundidad</small></button>
           <button type="button" data-theme="android" aria-pressed="false"><span class="theme-art art-android" aria-hidden="true">RCC</span><strong>Android</strong><small>Formas y color material</small></button>
@@ -618,11 +623,12 @@ window.rccSupabaseReady.catch(() => {});
 <span id="resultCount" role="status" aria-live="polite"></span>
 <label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
 <label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="browser">Navegador web</option><option value="fivem-client">FiveM cliente</option><option value="fivem-server">FiveM servidor</option><option value="gameguardian">GameGuardian Android</option><option value="autotouch">AutoTouch iOS</option><option value="legacy">Catálogo anterior</option></select></label>
+<label>Estado del script <select id="reviewFilter"><option value="all">Todos</option><option value="patched">Parcheados</option><option value="source-unpatched">Sin parcheo declarado</option><option value="unknown">Estado no declarado</option><option value="pending">Pendientes de revisión</option></select></label>
 <label>Prueba <select id="verificationFilter"><option value="all">Todas</option><option value="lua-tested">Lua ejecutado en emulador</option><option value="syntax-only">Solo sintaxis</option><option value="js-syntax">Sintaxis JavaScript revisada</option><option value="unverified">Sin verificar</option></select></label>
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" role="status" aria-label="Novedades del catálogo"><div><strong>¡Actualización Masiva en RCC! 🚀</strong><p>Llegamos a los 14,790 scripts (con 3,000 juegos nuevos). Ahora disfruta de notificaciones en tiempo real con sonido 🔔, respuestas y sistema de Me gusta en los comentarios, además de nuestro nuevo logo animado Prisma RCC. Todo con una interfaz optimizada para móviles.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de la actualización"><div><strong>RCC al día · 14 de noviembre</strong><p>14.870 scripts, 80 incorporaciones con imágenes de sus juegos, nuevo logo animado y tema Naranja y blanco. Estrenamos notas breves con humor y reportes de comentarios junto a cada script. Los marcados como parcheados tienen un cartel y confirmación Sí/No con 5 segundos de lectura antes de copiar o descargar.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <div class="grid" id="scripts">
@@ -858,7 +864,7 @@ function renderActiveFilters(){
     add(typeLabel, ()=>{ filterType='all'; buildSidebar(); render(); });
   }
   if(searchInput.value.trim()) add('Búsqueda: '+searchInput.value.trim(),()=>{searchInput.value='';render();});
-  for(const [id,label,empty] of [['tagFilter','Etiqueta',''],['environmentFilter','Entorno','all'],['verificationFilter','Prueba','all'],['gameFilter','Juego','all'],['originFilter','Tipo de juego','all']]){
+  for(const [id,label,empty] of [['tagFilter','Etiqueta',''],['environmentFilter','Entorno','all'],['verificationFilter','Prueba','all'],['reviewFilter','Estado del script','all'],['gameFilter','Juego','all'],['originFilter','Tipo de juego','all']]){
     const control=document.getElementById(id);
     if(control.value && control.value!==empty && (catalogSection==='games'||!['gameFilter','originFilter'].includes(id))) add(label+': '+(control.selectedOptions[0]?.textContent||control.value),()=>{control.value=empty;render();});
   }
@@ -890,7 +896,9 @@ function render(reset = true){
   const q = normalize(searchInput.value.trim());
   
   let list = [...scripts];
-  if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7');
+  const reviewFilter=document.getElementById('reviewFilter').value;
+  if(reviewFilter!=='all')list=list.filter(s=>(s.review?.status||'pending')===reviewFilter);
+  if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7'||s.review?.updateAvailable||s.review?.status==='patched'||s.tags?.includes('Nueva incorporación'));
   if(releaseView==='trending') list=window.RCCTrendAnalysis.rank(list,trendCounts);
   if(catalogSection==='games'){
     list=list.filter(s=>s.catalog_section==='games');
@@ -923,8 +931,8 @@ function render(reset = true){
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
   if(showRecent) list.sort((a,b)=>recentIds.indexOf(a.id)-recentIds.indexOf(b.id));
   if(releaseView==='trending'){const ranks=new Map(window.RCCTrendAnalysis.rank(scripts,trendCounts).map((s,i)=>[s.id,i]));list.sort((a,b)=>ranks.get(a.id)-ranks.get(b.id));}
-  if(releaseView==='updates') list.sort((a,b)=>(b.release?.date||'').localeCompare(a.release?.date||''));
-  if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Actualizados · versión 1.7'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Juegos y scripts destacados, con una selección que combina títulos del catálogo y códigos reutilizables según su utilidad, compatibilidad y código disponible. Las cifras altas son una simulación editorial de popularidad, no actividad registrada. Las acciones reales de los últimos 30 días se muestran por separado.':'Consulta los cambios de cada código al abrir su ficha. La versión del catálogo no certifica los scripts remotos.'; }
+  if(releaseView==='updates') list.sort((a,b)=>(b.review?.sourceUpdatedAt||b.release?.date||b.created_at||'').localeCompare(a.review?.sourceUpdatedAt||a.release?.date||a.created_at||''));
+  if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Novedades · noviembre de 2026'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Juegos y scripts destacados, con una selección que combina títulos del catálogo y códigos reutilizables según su utilidad, compatibilidad y código disponible. Las cifras altas son una simulación editorial de popularidad, no actividad registrada. Las acciones reales de los últimos 30 días se muestran por separado.':'Últimas incorporaciones, cambios de contenido registrados y scripts marcados como parcheados. Abre una ficha para ver sus notas breves.'; }
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`;
   window.dispatchEvent(new CustomEvent('rcc:results', {detail:{count:list.length, query:searchInput.value.trim()}}));
   const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
@@ -1004,6 +1012,7 @@ function render(reset = true){
       }
       count.append(label,metrics,reason,actual);card.querySelector('.meta').before(count);
     }
+    window.RCCScriptReview?.card(s, card);
     window.enhanceGameCard?.(s, card);
     const heart = card.querySelector('.favorite-button');
     heart.onclick = e=>{e.stopPropagation();toggleFavorite(s.id,heart);};
@@ -1019,6 +1028,7 @@ function executorWarning(script){
 }
 
 function openScript(s){
+  window.RCCScriptReview?.cancel(false);
   modalReturnFocus = document.activeElement;
   currentCopiedId = s.id;
   window.rccRequiresLogin = s.requires_login === true;
@@ -1054,6 +1064,7 @@ function openScript(s){
   window.enhanceGameDetail?.(s, modalBody);
   const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => window.openRccLab?.(s.code); modalBody.querySelector('.actions').prepend(explain);
   if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=s.release.changes.length?(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date:s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
+  window.RCCScriptReview?.detail(s, modalBody);
   window.rccMountComments?.(String(s.id));
   window.rccRefreshCopy?.();
   renderCompatibility(s);
@@ -1065,8 +1076,10 @@ function openScript(s){
   modal.querySelector('.close').focus();
 }
 
-function copyCode(){
+function copyCode(confirmed=false){
   if(window.rccRequiresLogin && !currentUser){openAuth();return;}
+  const selectedScript=scripts.find(s=>s.id===currentCopiedId);
+  if(!confirmed&&window.RCCScriptReview?.confirm(selectedScript,()=>{if(currentCopiedId===selectedScript.id)copyCode(true);}))return;
   const copiedId=currentCopiedId;
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
       recordCatalogAction(copiedId,'copy');
@@ -1085,7 +1098,7 @@ function copyCode(){
   }).catch(()=>showToast('No se pudo copiar. Selecciona el código y cópialo manualmente.'));
 }
 
-function closeModal(){ window.RCCStopScriptVideo?.(); modal.classList.remove('open'); document.body.style.overflow=''; modalReturnFocus?.focus(); }
+function closeModal(){ window.RCCScriptReview?.cancel(); window.RCCStopScriptVideo?.(); modal.classList.remove('open'); document.body.style.overflow=''; modalReturnFocus?.focus(); }
 modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !authModal.classList.contains('open')) closeModal(); });
 
@@ -1124,9 +1137,10 @@ function renderCompatibility(s){
 }
 const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 let modalReturnFocus = null;
-function downloadCurrent(){
+function downloadCurrent(confirmed=false){
   const s = scripts.find(s=>s.id===currentCopiedId);
   if(!s) return;
+  if(!confirmed&&window.RCCScriptReview?.confirm(s,()=>{if(currentCopiedId===s.id)downloadCurrent(true);}))return;
   const url = URL.createObjectURL(new Blob([s.code], {type:'text/plain;charset=utf-8'}));
   const a = document.createElement('a'); a.href=url; a.download=s.name.replace(/[^a-z0-9_-]/gi,'_')+'.'+(s.file_extension || 'lua'); a.click();
   recordCatalogAction(s.id,'download');
@@ -1150,11 +1164,12 @@ document.getElementById('tagFilter').onchange = render;
 document.getElementById('sortOrder').onchange = render;
 document.getElementById('environmentFilter').onchange = render;
 document.getElementById('verificationFilter').onchange = render;
+document.getElementById('reviewFilter').onchange = render;
 document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render(false);};
 function clearCatalogFilters(){
   filterDevice=filterPlatform=filterExecutor=filterType='all';
   searchInput.value='';
-  for(const id of ['gameFilter','originFilter','environmentFilter','verificationFilter'])document.getElementById(id).value='all';
+  for(const id of ['gameFilter','originFilter','environmentFilter','verificationFilter','reviewFilter'])document.getElementById(id).value='all';
   document.getElementById('tagFilter').value='';
   document.getElementById('sortOrder').value='newest';
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev==='all'));
@@ -1203,12 +1218,12 @@ window.RCCNavigation = {
   state: () => ({section:catalogSection, view:releaseView, query:searchInput.value, scroll:scrollY, limit:visibleLimit,
     device:filterDevice, platform:filterPlatform, executor:filterExecutor, type:filterType,
     tag:document.getElementById('tagFilter').value, environment:document.getElementById('environmentFilter').value,
-    verification:document.getElementById('verificationFilter').value, sort:document.getElementById('sortOrder').value,
+    verification:document.getElementById('verificationFilter').value, review:document.getElementById('reviewFilter').value, sort:document.getElementById('sortOrder').value,
     game:document.getElementById('gameFilter').value, origin:document.getElementById('originFilter').value}),
   restore: state => {
     selectSection(state.section, {view:state.view, device:state.device, platform:state.platform, executor:state.executor, type:state.type});
     searchInput.value = state.query || '';
-    for (const [id,key] of [['tagFilter','tag'],['environmentFilter','environment'],['verificationFilter','verification'],['sortOrder','sort'],['gameFilter','game'],['originFilter','origin']]) {
+    for (const [id,key] of [['tagFilter','tag'],['environmentFilter','environment'],['verificationFilter','verification'],['reviewFilter','review'],['sortOrder','sort'],['gameFilter','game'],['originFilter','origin']]) {
       const control = document.getElementById(id);
       if ([...control.options].some(option => option.value === state[key])) control.value = state[key];
     }

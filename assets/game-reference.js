@@ -9,11 +9,16 @@
   function fallback(container,script){container.classList.add('game-cover-fallback');container.replaceChildren(window.RCCScriptArt.create(script));}
   function fillImage(container,script) {
     if(!script)return;
-    const src=images[script.game_id]||script.reference_image;
-    if(!src||!/^https:\/\/(?:[^/]*rbxcdn\.com\/|scriptblox\.com\/images\/)/.test(src))return;
-    const image=document.createElement('img');image.src=src;image.alt='Imagen de referencia de '+script.game;image.loading='lazy';image.decoding='async';
-    image.onerror=()=>fallback(container,script);
-    container.replaceChildren(image);container.classList.remove('game-cover-fallback');
+    const candidates=[...new Set([images[script.game_id],script.reference_image])].filter(src=>
+      typeof src==='string' && /^https:\/\/(?:(?:[\w-]+\.)?rbxcdn\.com\/|scriptblox\.com\/images\/|rscripts\.net\/assets\/(?:games|scripts)\/)/.test(src));
+    let index=0;
+    function next(){
+      const src=candidates[index++];if(!src){fallback(container,script);return;}
+      const image=document.createElement('img');image.src=src;image.alt='Imagen de referencia de '+(script.game||script.name);image.loading='lazy';image.decoding='async';
+      image.onerror=()=>{if(container.firstChild===image)next();};
+      container.replaceChildren(image);container.classList.remove('game-cover-fallback');
+    }
+    next();
   }
   function cover(script) {
     const element=document.createElement('div');element.className='game-cover game-cover-fallback';element.dataset.gameImage=script.game_id||'';element.dataset.gameName=script.game||script.name;element._rccScript=script;

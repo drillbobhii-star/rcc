@@ -1,6 +1,7 @@
 /* Browser appearance preferences are optional; unavailable storage never blocks the catalog. */
 (() => {
   const presets = {
+    orange: {name:'Naranja y blanco', accent:'#ad4515', bg:'#fff6ee', surface:'#fffdf9', radius:'24px'},
     sky: {name:'Cielo', accent:'#24618e', bg:'#eff7fc', surface:'#ffffff', radius:'24px'},
     monochrome: {name:'Diagonal blanco y negro', accent:'#f5f5f2', bg:'#111113', surface:'#202023', radius:'24px'},
     blue: {name:'Azul glass', accent:'#a8cefa', bg:'#0c1727', surface:'#142c46', radius:'24px'},
@@ -44,7 +45,7 @@
     root.style.setProperty('--bg', preset.bg);
     root.style.setProperty('--surface', preset.surface);
     root.style.setProperty('--accent', state.accent);
-    root.style.setProperty('--text', state.theme === 'sky' ? '#152431' : '#eef2f7');
+    root.style.setProperty('--text', ['sky','orange'].includes(state.theme) ? '#352317' : '#eef2f7');
     root.style.setProperty('--ui-radius', state.corners + 'px');
     root.style.setProperty('--glass-blur', state.blur + 'px');
     root.style.fontSize = state.scale + '%';

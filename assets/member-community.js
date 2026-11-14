@@ -99,6 +99,7 @@ const APP_VERSION = '2.0';
       }
 
       if(revision!==loadRevision || !target.isConnected) return;
+      window.RCCScriptReview?.comments(id, comments);
       list.replaceChildren();
       if(!comments.length) list.textContent='Aún no hay comentarios. Comparte el primero.';
       
@@ -149,6 +150,7 @@ const APP_VERSION = '2.0';
       }
     } catch(error) {
       if(revision!==loadRevision || !target.isConnected) return;
+      window.RCCScriptReview?.commentsUnavailable(id);
       list.textContent = error.message || 'Error al cargar comentarios.';
       const retry=el('button','Reintentar','btn btn-ghost'); retry.onclick=()=>loadComments(target,id); list.append(retry);
     }
