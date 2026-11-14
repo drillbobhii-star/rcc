@@ -1,6 +1,6 @@
 /* Loads the complete static catalog in small, versioned parts (three requests at a time). */
 (() => {
-  const partPath=/^catalog\\/part-\\d{3,}-[a-f0-9]{16}\\.json$/;
+  const partPath=/^catalog\/part-\d{3,}-[a-f0-9]{16}\.json$/;
   async function load({onProgress=()=>{}}={}){
     const controller=new AbortController();
     async function json(file,{cache='no-cache'}={}){
