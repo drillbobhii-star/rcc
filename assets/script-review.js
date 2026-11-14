@@ -186,7 +186,7 @@
     const label=el('small','NOTA RCC'),content=el('div',null,'review-tip-content');
     const media=el('div',null,'review-tip-media'),fallback=el('span','😂','review-tip-emoji');
     const body=el('span',messages(s)[0]);
-    media.append(fallback);content.append(media,body);box.append(label,content);
+    media.append(fallback);content.append(body,media);box.append(label,content);
     scriptForTip.set(box,s);tipStep.set(box,0);box.dataset.noteStep='0';showSticker(box,body.textContent);
     if(detail)box.dataset.visible='true';
     return box;
