@@ -64,7 +64,8 @@ const APP_VERSION = '2.1';
     event.preventDefault();
     if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
     saveProfile.disabled=true;
-    let avatarUrl=avatar.value.trim();
+    const defaultAvatarUrl=new URL('/assets/default-avatar.svg',window.location.origin).href;
+    let avatarUrl=avatar.value.trim() || defaultAvatarUrl;
     let robloxWarning='';
     try {
       const username=robloxUsername.value.trim().replace(/^@/,'');
@@ -83,7 +84,7 @@ const APP_VERSION = '2.1';
           }
           avatarUrl=result.avatarUrl;
         } catch {
-          avatarUrl='';
+          avatarUrl=defaultAvatarUrl;
           robloxWarning='No encontramos ese usuario de Roblox o el servicio no respondió. Se guardó tu perfil con la foto predeterminada.';
         }
       } else if(avatarUrl && new URL(avatarUrl).protocol!=='https:') {
