@@ -1,7 +1,8 @@
 (() => {
   'use strict';
   const VIP_PERCENTAGE = 35;
-  const state = { isVip: false, isAdmin: false, checkoutUrl: 'https://ko-fi.com/lubensdrill/tiers', loading: false };
+  const DEFAULT_CHECKOUT_URL = 'https://ko-fi.com/lubensdrill/tiers';
+  const state = { isVip: false, isAdmin: false, checkoutUrl: DEFAULT_CHECKOUT_URL, loading: false };
   const modal = document.getElementById('rccSubscribeModal');
   const supportButton = document.getElementById('rccSupportButton');
   const checkoutButton = document.getElementById('rccKofiButton');
@@ -58,7 +59,7 @@
       const result = await response.json();
       state.isVip = result.isVip === true;
       state.isAdmin = result.isAdmin === true;
-      state.checkoutUrl = typeof result.checkoutUrl === 'string' && /^https:\/\/(?:www\.)?ko-fi\.com\//.test(result.checkoutUrl) ? result.checkoutUrl : null;
+      state.checkoutUrl = typeof result.checkoutUrl === 'string' && /^https:\/\/(?:www\.)?ko-fi\.com\//.test(result.checkoutUrl) ? result.checkoutUrl : DEFAULT_CHECKOUT_URL;
     } catch {
       state.isVip = false;
       state.isAdmin = false;
