@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const VIP_PERCENTAGE = 35;
-  const state = { isVip: false, isAdmin: false, checkoutUrl: null, loading: false };
+  const state = { isVip: false, isAdmin: false, checkoutUrl: 'https://ko-fi.com/lubensdrill/tiers', loading: false };
   const modal = document.getElementById('rccSubscribeModal');
   const supportButton = document.getElementById('rccSupportButton');
   const checkoutButton = document.getElementById('rccKofiButton');
