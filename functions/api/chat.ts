@@ -322,29 +322,33 @@ async function broadcastMessage(env: Env, actor: Actor, content: string) {
   if (!content.trim()) return json({ error: "Escribe el anuncio antes de enviarlo." }, 400);
   const conversations = await rest<Array<{ id: string; user_id: string }>>(env,
     "rcc_chat_conversations?enabled=eq.true&select=id,user_id&order=updated_at.desc&limit=5000");
-  const profiles = await rest<Array<{ user_id: string; is_banned: boolean }>>(env,
-    "profiles?select=user_id,is_banned&limit=5000");
-  const banned = new Set(profiles.filter(p => p.is_banned).map(p => p.user_id));
-  const targets = conversations.filter(c => !banned.has(c.user_id));
   const now = new Date().toISOString();
-  for (let i = 0; i < targets.length; i += 200) {
-    const batch = targets.slice(i, i + 200);
+  let delivered = 0;
+  for (let i = 0; i < conversations.length; i += 200) {
+    const batch = conversations.slice(i, i + 200);
+    const userIds = batch.map(c => c.user_id);
+    const profiles = await rest<Array<{ user_id: string; is_banned: boolean }>>(env,
+      "profiles?user_id=in.(" + userIds.join(",") + ")&select=user_id,is_banned&limit=300");
+    const banned = new Set(profiles.filter(p => p.is_banned).map(p => p.user_id));
+    const targets = batch.filter(c => !banned.has(c.user_id));
+    if (!targets.length) continue;
     await rest(env, "rcc_chat_messages", {
       method: "POST", headers: { Prefer: "return=minimal" },
-      body: JSON.stringify(batch.map(conversation => ({
+      body: JSON.stringify(targets.map(conversation => ({
         conversation_id: conversation.id,
         sender_id: actor.id,
         sender_role: "admin",
         content: content.trim(),
       }))),
     });
-    const ids = batch.map(c => c.id);
+    const ids = targets.map(c => c.id);
     await rest(env, "rcc_chat_conversations?id=in.(" + ids.join(",") + ")", {
       method: "PATCH", headers: { Prefer: "return=minimal" },
       body: JSON.stringify({ updated_at: now }),
     });
+    delivered += targets.length;
   }
-  return json({ ok: true, delivered: targets.length });
+  return json({ ok: true, delivered });
 }
 export async function onRequest({ request, env }: { request: Request; env: Env }) {
   if (!["GET", "POST"].includes(request.method)) return new Response(null, { status: 405 });
