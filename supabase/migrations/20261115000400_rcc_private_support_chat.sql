@@ -45,6 +45,7 @@ create table if not exists public.rcc_chat_conversations (
   enabled boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  last_user_seen_at timestamptz,
   admin_typing_until timestamptz,
   user_typing_until timestamptz
 );
@@ -125,3 +126,23 @@ create policy rcc_chat_files_server_only
 
 -- No anon/authenticated bucket policies are created. Backend service-role
 -- operations issue short-lived signed URLs only to the conversation parties.
+
+
+-- Admin Web Push subscriptions (VAPID keys and browser endpoints).
+-- Only the authenticated server-side admin API may read or manage them.
+create table if not exists public.rcc_chat_push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists rcc_chat_push_subscriptions_user_idx
+  on public.rcc_chat_push_subscriptions (user_id);
+
+alter table public.rcc_chat_push_subscriptions enable row level security;
+revoke all on public.rcc_chat_push_subscriptions from anon, authenticated;
+grant all on public.rcc_chat_push_subscriptions to service_role;
