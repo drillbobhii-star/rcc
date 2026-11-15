@@ -45,7 +45,7 @@ Apply supabase/migrations/20261115000400_rcc_private_support_chat.sql after depl
 - Creates rcc_chat_push_subscriptions for admin-device Web Push subscriptions.
 - Keeps the legacy chat-files bucket private, but the current chat is text-only and no longer uploads or serves attachments.
 
-No new environment variable is required beyond the existing SUPABASE_URL, SUPABASE_ANON_KEY, and server-only SUPABASE_SERVICE_ROLE_KEY.
+For chat and admin API access, configure SUPABASE_URL, SUPABASE_ANON_KEY, and server-only SUPABASE_SERVICE_ROLE_KEY. Add the VAPID variables described below to enable native Web Push.
 
 The admin chat is restricted to the exact allowlisted account drillbobhii@gmail.com on both the client and functions/api/chat.ts. Internal notes live in rcc_admin_private_notes, not profiles.bio, so they are never included in public profile reads.
 
