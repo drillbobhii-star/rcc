@@ -7,20 +7,28 @@ if (!applicationId || !botToken) {
   process.exit(1);
 }
 
-const command = {
-  name: "rcc",
-  description: "Pide a RCC Admin que te ayude a administrar este servidor",
-  type: 1,
-  options: [
-    {
-      type: 3,
-      name: "solicitud",
+const commands = [
+  {
+    name: "rcc",
+    description: "Pide a RCC Admin que te ayude a administrar este servidor",
+    type: 1,
+    options: [{
+      type: 3, name: "solicitud",
       description: "Describe en español lo que quieres que haga",
-      required: true,
-      max_length: 1000
-    }
-  ]
-};
+      required: true, max_length: 1000
+    }]
+  },
+  {
+    name: "hablar",
+    description: "Habla con RCC sin ejecutar acciones administrativas",
+    type: 1,
+    options: [{
+      type: 3, name: "mensaje",
+      description: "Escribe tu mensaje para RCC",
+      required: true, max_length: 1500
+    }]
+  }
+];
 
 const route = guildId
   ? "https://discord.com/api/v10/applications/" + applicationId + "/guilds/" + guildId + "/commands"
@@ -32,7 +40,7 @@ const response = await fetch(route, {
     Authorization: "Bot " + botToken,
     "Content-Type": "application/json"
   },
-  body: JSON.stringify([command])
+  body: JSON.stringify(commands)
 });
 
 const responseText = await response.text();
@@ -42,5 +50,5 @@ if (!response.ok) {
 }
 
 console.log(guildId
-  ? "Comando /rcc registrado para el servidor configurado."
-  : "Comando /rcc registrado globalmente. La propagación global puede tardar.");
+  ? "Comandos /rcc y /hablar registrados para el servidor configurado."
+  : "Comandos /rcc y /hablar registrados globalmente. La propagación global puede tardar.");

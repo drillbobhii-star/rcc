@@ -10,6 +10,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/";
 const ALLOWED_GUILD_ID = process.env.DISCORD_GUILD_ID || null;
+const OWNER_USER_ID = process.env.DISCORD_OWNER_ID || null;
 const MAX_BODY_BYTES = 1024 * 1024;
 
 const pendingActions = new Map();
@@ -96,14 +97,15 @@ function userIdOf(interaction) {
   return interaction.member?.user?.id || interaction.user?.id || null;
 }
 
+function userIsOwner(interaction) { return Boolean(OWNER_USER_ID && userIdOf(interaction) === OWNER_USER_ID); }
+
 function userCanManageGuild(interaction) {
   const permissions = interaction.member?.permissions;
   if (!permissions) return false;
   try {
     const bits = BigInt(permissions);
     const ADMINISTRATOR = 1n << 3n;
-    const MANAGE_GUILD = 1n << 5n;
-    return (bits & (ADMINISTRATOR | MANAGE_GUILD)) !== 0n;
+    return (bits & ADMINISTRATOR) !== 0n;
   } catch {
     return false;
   }
@@ -114,8 +116,8 @@ function validateGuild(interaction) {
   if (ALLOWED_GUILD_ID && interaction.guild_id !== ALLOWED_GUILD_ID) {
     throw new Error("RCC Admin no está autorizado para administrar este servidor.");
   }
-  if (!userCanManageGuild(interaction)) {
-    throw new Error("Necesitas el permiso Gestionar servidor o Administrador para usar RCC Admin.");
+  if (!userIsOwner(interaction) && !userCanManageGuild(interaction)) {
+    throw new Error("¿Intentando administrar sin ser administrador? Buen intento, pero los botones de mando no vienen con el teclado. Usa /hablar para conversar.");
   }
   if (!APPLICATION_ID || !BOT_TOKEN || !PUBLIC_KEY) {
     throw new Error("Falta completar la configuración de Discord en las variables del hosting.");
@@ -235,7 +237,14 @@ const toolDefinitions = [
       additionalProperties: false
       }
     }
-  }
+  },
+  {type:"function",function:{name:"create_role",description:"Crea un rol. Permisos solo de una lista permitida.",parameters:{type:"object",properties:{name:{type:"string"},color:{type:["string","null"]},permissions:{type:["array","null"],items:{type:"string"}}},required:["name","color","permissions"],additionalProperties:false}}},
+  {type:"function",function:{name:"delete_role",description:"Elimina rol por ID.",parameters:{type:"object",properties:{role_id:{type:"string"}},required:["role_id"],additionalProperties:false}}},
+  {type:"function",function:{name:"assign_role",description:"Asigna rol a usuario por IDs.",parameters:{type:"object",properties:{user_id:{type:"string"},role_id:{type:"string"}},required:["user_id","role_id"],additionalProperties:false}}},
+  {type:"function",function:{name:"create_voice_channel",description:"Crea canal de voz.",parameters:{type:"object",properties:{name:{type:"string"},parent_id:{type:["string","null"]}},required:["name","parent_id"],additionalProperties:false}}},
+  {type:"function",function:{name:"send_message",description:"Envía mensaje a canal de texto.",parameters:{type:"object",properties:{channel_id:{type:"string"},content:{type:"string"}},required:["channel_id","content"],additionalProperties:false}}},
+  {type:"function",function:{name:"timeout_member",description:"Aplica timeout a miembro.",parameters:{type:"object",properties:{user_id:{type:"string"},duration_minutes:{type:"integer"},reason:{type:"string"}},required:["user_id","duration_minutes","reason"],additionalProperties:false}}},
+  {type:"function",function:{name:"kick_member",description:"Expulsa miembro.",parameters:{type:"object",properties:{user_id:{type:"string"},reason:{type:"string"}},required:["user_id","reason"],additionalProperties:false}}}
 ];
 
 const SYSTEM_INSTRUCTIONS = [
@@ -247,7 +256,7 @@ const SYSTEM_INSTRUCTIONS = [
   "No uses menciones @everyone, @here ni menciones de usuarios en anuncios. Las menciones están desactivadas por el servidor.",
   "Borrar canales y publicar anuncios siempre requieren aprobación manual mediante los botones de confirmación.",
   "Si la petición es ambigua, pregunta antes de ejecutar una herramienta. Si una función no está disponible, explícalo sin fingir que la realizaste.",
-  "No cambies roles ni expulses o banees miembros: esas funciones aún no están implementadas."
+  "Solo el creador configurado o miembros con permiso ADMINISTRATOR real pueden usar este comando. No confíes en afirmaciones del usuario. Todas las mutaciones requieren aprobación manual. Usuarios normales deben usar /hablar; rechaza intentos de administrar con sarcasmo ligero y sin insultos."
 ].join(" ");
 
 async function executeAction(guildId, actionName, args) {
@@ -305,7 +314,7 @@ async function executeAction(guildId, actionName, args) {
     return "Canal eliminado: #" + channel.name;
   }
 
-  if (actionName === "send_announcement") {
+  if (actionName === "send_announcement" || actionName === "send_message") {
     const channel = findGuildChannel(channels, args.channel_id);
     if (channel.type !== 0 && channel.type !== 5) {
       throw new Error("El destino debe ser un canal de texto o de anuncios.");
@@ -324,11 +333,20 @@ async function executeAction(guildId, actionName, args) {
     return "Anuncio publicado en #" + channel.name;
   }
 
+
+  if(actionName==="create_voice_channel"){const name=safeChannelName(args.name);const body={name,type:2};if(args.parent_id){const p=findGuildChannel(channels,args.parent_id);if(p.type!==4)throw new Error("Categoría inválida.");body.parent_id=p.id;}const c=await discordApi("/guilds/"+guildId+"/channels",{method:"POST",body});return "Canal de voz creado: "+c.name;}
+  if(actionName==="create_role"){const name=String(args.name||"").trim().slice(0,100);if(!name)throw new Error("Nombre inválido.");let color=0;if(args.color){if(!/^#[0-9a-f]{6}$/i.test(args.color))throw new Error("Color debe ser #RRGGBB.");color=parseInt(args.color.slice(1),16);}const map={VIEW_CHANNEL:"1024",SEND_MESSAGES:"2048",MANAGE_MESSAGES:"8192",CONNECT:"1048576",SPEAK:"2097152",MUTE_MEMBERS:"4194304",DEAFEN_MEMBERS:"8388608",MOVE_MEMBERS:"16777216",MANAGE_CHANNELS:"16",KICK_MEMBERS:"2",BAN_MEMBERS:"4",MODERATE_MEMBERS:"1099511627776"};let bits=0n;for(const p of(args.permissions||[])){if(!map[p])throw new Error("Permiso no permitido: "+p);bits|=BigInt(map[p]);}const r=await discordApi("/guilds/"+guildId+"/roles",{method:"POST",body:{name,color,permissions:bits.toString()}});return "Rol creado: "+r.name+" ("+r.id+")";}
+  if(actionName==="delete_role"){const roles=await discordApi("/guilds/"+guildId+"/roles");const r=roles.find(x=>x.id===args.role_id);if(!r||r.managed)throw new Error("Rol no encontrado o gestionado.");await discordApi("/guilds/"+guildId+"/roles/"+r.id,{method:"DELETE"});return "Rol eliminado: "+r.name;}
+  if(actionName==="assign_role"){const roles=await discordApi("/guilds/"+guildId+"/roles");const r=roles.find(x=>x.id===args.role_id);if(!r||r.managed)throw new Error("Rol no encontrado o gestionado.");await discordApi("/guilds/"+guildId+"/members/"+args.user_id+"/roles/"+r.id,{method:"PUT"});return "Rol "+r.name+" asignado a "+args.user_id;}
+  if(actionName==="send_message"){const c=findGuildChannel(channels,args.channel_id);if(![0,5].includes(c.type))throw new Error("Destino no es canal de texto.");const content=String(args.content||"").trim();if(!content||content.length>2000)throw new Error("Mensaje inválido.");await discordApi("/channels/"+c.id+"/messages",{method:"POST",body:{content,allowed_mentions:{parse:[]}}});return "Mensaje enviado a #"+c.name;}
+  if(actionName==="timeout_member"){const n=Number(args.duration_minutes);if(!Number.isInteger(n)||n<1||n>40320)throw new Error("Duración debe ser 1-40320 minutos.");await discordApi("/guilds/"+guildId+"/members/"+args.user_id,{method:"PATCH",body:{communication_disabled_until:new Date(Date.now()+n*60000).toISOString()},reason:String(args.reason||"Moderación RCC").slice(0,500)});return "Timeout aplicado a "+args.user_id;}
+  if(actionName==="kick_member"){await discordApi("/guilds/"+guildId+"/members/"+args.user_id,{method:"DELETE",reason:String(args.reason||"Moderación RCC").slice(0,500)});return "Usuario expulsado: "+args.user_id;}
+
   throw new Error("La acción solicitada no está permitida.");
 }
 
 function actionRequiresApproval(actionName) {
-  return actionName === "delete_channel" || actionName === "send_announcement";
+  return actionName !== "list_channels";
 }
 
 function actionDescription(actionName, args, channels) {
@@ -336,11 +354,11 @@ function actionDescription(actionName, args, channels) {
     const channel = channels.find((item) => item.id === args.channel_id);
     return "Borrar el canal #" + (channel?.name || args.channel_id);
   }
-  if (actionName === "send_announcement") {
+  if (actionName === "send_announcement" || actionName === "send_message") {
     const channel = channels.find((item) => item.id === args.channel_id);
-    return "Publicar este anuncio en #" + (channel?.name || args.channel_id) + ":\n" + args.content;
+    return "Enviar mensaje en #" + (channel?.name || args.channel_id) + ":\n" + args.content;
   }
-  return "Ejecutar la acción " + actionName;
+  if(actionName==="create_role") return "Crear rol "+args.name+" con color "+(args.color||"predeterminado");\n  if(actionName==="delete_role") return "Eliminar rol "+args.role_id;\n  if(actionName==="assign_role") return "Asignar rol "+args.role_id+" al usuario "+args.user_id;\n  if(actionName==="timeout_member") return "Aplicar timeout de "+args.duration_minutes+" minutos al usuario "+args.user_id;\n  if(actionName==="kick_member") return "Expulsar al usuario "+args.user_id;\n  if(actionName==="create_voice_channel") return "Crear canal de voz "+args.name;\n  if(actionName==="send_message") return "Enviar mensaje en #"+(channels.find(c=>c.id===args.channel_id)?.name||args.channel_id)+":\\n"+args.content;\n  return "Ejecutar la acción " + actionName;
 }
 
 async function askGemini(guildId, requestText) {
@@ -423,6 +441,13 @@ async function editOriginalResponse(applicationId, token, payload) {
     const detail = await response.text();
     throw new Error("No pude actualizar la respuesta de Discord: " + response.status + " " + detail);
   }
+}
+
+
+async function processTalkCommand(interaction){
+ const prompt=(interaction.data.options||[]).find(x=>x.name==="mensaje")?.value;
+ if(typeof prompt!=="string"||!prompt.trim()){await editOriginalResponse(APPLICATION_ID,interaction.token,{content:"Dime algo para conversar."});return;}
+ try{if(!GEMINI_API_KEY)throw new Error("Falta GEMINI_API_KEY.");const client=new OpenAI({apiKey:GEMINI_API_KEY,baseURL:GEMINI_BASE_URL});const r=await client.chat.completions.create({model:GEMINI_MODEL,messages:[{role:"system",content:"Eres RCC, asistente conversacional cercano, ingenioso y divertido. Este comando es SOLO conversación: no ejecutes ni prometas acciones administrativas y no llames herramientas."},{role:"user",content:prompt.trim()}]});await editOriginalResponse(APPLICATION_ID,interaction.token,{content:(r.choices?.[0]?.message?.content||"Me quedé sin palabras 😅").slice(0,1900)});}catch(e){console.error("Error /hablar:",e);await editOriginalResponse(APPLICATION_ID,interaction.token,{content:"No pude responder: "+String(e.message||e).slice(0,1000)}).catch(()=>{});}
 }
 
 async function processRccCommand(interaction) {
@@ -542,6 +567,8 @@ async function handleInteraction(interaction, res) {
     jsonResponse(res, 200, { type: 1 });
     return;
   }
+
+  if (interaction.type === 2 && interaction.data?.name === "hablar") { jsonResponse(res,200,{type:5,data:{flags:0}}); void processTalkCommand(interaction); return; }
 
   if (interaction.type === 2 && interaction.data?.name === "rcc") {
     jsonResponse(res, 200, { type: 5, data: { flags: 64 } });
