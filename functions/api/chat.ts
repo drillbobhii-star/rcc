@@ -230,6 +230,10 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
   if (origin && origin !== new URL(request.url).origin) return json({ error: "Origen no permitido." }, 403);
   const actor = await actorFor(request, env);
   if (actor instanceof Response) return actor;
+  if (request.method === "POST") {
+    const length = Number(request.headers.get("content-length") || 0);
+    if (length > MAX_FILE_SIZE + 512 * 1024) return json({ error: "La solicitud supera el límite de 10 MB." }, 413);
+  }
 
   try {
     if (request.method === "GET") {
