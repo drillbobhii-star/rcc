@@ -125,7 +125,14 @@ async function getMessages(env: Env, actor: Actor, conversationId: string) {
       body: JSON.stringify({ read_at: new Date().toISOString() }),
     });
   }
-  return json({ enabled: conversation.enabled === true, messages: await hydrateMessages(env, messages) });
+  return json({
+    enabled: conversation.enabled === true,
+    typing: {
+      admin: Number(new Date(String(conversation.admin_typing_until || 0))) > Date.now(),
+      user: Number(new Date(String(conversation.user_typing_until || 0))) > Date.now(),
+    },
+    messages: await hydrateMessages(env, messages)
+  });
 }
 async function createSignedMessage(env: Env, actor: Actor, conversation: Record<string, unknown>, content: string, file?: File) {
   if (content.length > MAX_MESSAGE_LENGTH) return json({ error: "El mensaje supera los 5.000 caracteres." }, 413);
@@ -261,6 +268,24 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       }
       if (!conversation) return json({ error: "Conversación no encontrada." }, 404);
       return await createSignedMessage(env, actor, conversation, content, file);
+    }
+
+    if (action === "typing") {
+      if (!/^[0-9a-f-]{36}$/i.test(conversationId)) return json({ error: "Conversación inválida." }, 400);
+      const rows = await rest<Array<Record<string, unknown>>>(env, "rcc_chat_conversations?id=eq." + encodeURIComponent(conversationId) + "&select=*&limit=1");
+      const conversation = rows[0];
+      if (!conversation) return json({ error: "Conversación no encontrada." }, 404);
+      if (actor.role === "user") {
+        if (conversation.user_id !== actor.id) return json({ error: "No tienes acceso a esta conversación." }, 403);
+        const banned = await profileState(env, actor.id);
+        if (banned.isBanned || conversation.enabled !== true) return json({ error: "Chat no disponible." }, 403);
+      }
+      const field = actor.role === "admin" ? "admin_typing_until" : "user_typing_until";
+      await rest(env, "rcc_chat_conversations?id=eq." + encodeURIComponent(conversationId), {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ [field]: new Date(Date.now() + 4500).toISOString() }),
+      });
+      return json({ ok: true });
     }
 
     if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
