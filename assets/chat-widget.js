@@ -4,7 +4,7 @@
   const MAX_FILE = 10 * 1024 * 1024;
   let client = null, session = null, conversationId = null, enabled = true;
   let panel = null, messagesEl = null, input = null, fileInput = null;
-  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false;
+  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0;
   const $ = id => document.getElementById(id);
 
   function el(tag, attrs = {}, text = "") {
@@ -79,7 +79,7 @@
     head.querySelector("button").addEventListener("click", () => setOpen(false));
     attach.addEventListener("click", () => fileInput.click());
     send.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", event => {
+    input.addEventListener("input", () => {\n      if (typingTimer) clearTimeout(typingTimer);\n      typingTimer = setTimeout(() => { void sendTyping(); }, 250);\n    });\n    input.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }
     });
     fileInput.addEventListener("change", () => {
@@ -137,14 +137,14 @@
     }
     return state;
   }
-  async function poll() {
+  async function sendTyping() {\n    if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;\n    typingLastSent = Date.now();\n    try { const form = new FormData(); form.set("action", "typing"); form.set("conversationId", conversationId); await request("", { method:"POST", body:form }); } catch (_) {}\n  }\n  async function poll() {
     if (!session || !conversationId) return;
     try {
       const state = await loadState();
       if (!state) return;
       if (!enabled) { $("rccChatStatus").textContent = "Chat cerrado por el administrador."; return; }
       const result = await request("?action=messages&conversationId=" + encodeURIComponent(conversationId));
-      const messages = result.messages || [];
+      const messages = result.messages || [];\n      if (result.typing?.admin) $("rccChatStatus").textContent = "El Creador está escribiendo…";
       const newestAdmin = [...messages].reverse().find(message => message.sender_role === "admin");
       if (newestAdmin && newestAdmin.id !== lastAdminMessage) {
         if (lastAdminMessage !== null) {
