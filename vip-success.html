@@ -44,10 +44,15 @@
 
   <section id="signedIn" hidden>
     <div class="step"><span class="number">1</span><div><strong>Cuenta RCC autenticada</strong><p id="identity"></p></div></div>
-    <div class="step"><span class="number">2</span><div><strong>Únete a nuestro Discord</strong><p>Entra primero al servidor oficial de RCC. Después podrás vincular tu cuenta y recibir tu rol VIP.</p></div></div>
-    <a id="joinDiscordFirst" class="link" href="https://discord.gg/AfqEKsBS8d" target="_blank" rel="noopener noreferrer">Unirme a nuestro Discord</a>
-    <p>Cuando hayas entrado al servidor, continúa con el siguiente botón:</p>
-    <button id="linkDiscord" class="secondary" type="button">Ya me uní, vincular mi cuenta</button>
+    <section id="vipActions" hidden>
+      <div class="step"><span class="number">2</span><div><strong>Únete a nuestro Discord</strong><p>Entra primero al servidor oficial de RCC. Después podrás vincular tu cuenta y recibir tu rol VIP.</p></div></div>
+      <a id="joinDiscordFirst" class="link" href="https://discord.gg/AfqEKsBS8d" target="_blank" rel="noopener noreferrer">Unirme a nuestro Discord</a>
+      <p>Cuando hayas entrado al servidor, continúa con el siguiente botón:</p>
+      <button id="linkDiscord" class="secondary" type="button">Ya me uní, vincular mi cuenta</button>
+    </section>
+    <section id="vipDenied" hidden role="alert">
+      <p>No hemos detectado un pago con este correo. Si ya pagaste en Ko-fi, asegúrate de haber usado este mismo correo electrónico.</p>
+    </section>
     <button id="logout" class="secondary" type="button">Cambiar cuenta RCC</button>
   </section>
 
@@ -171,12 +176,28 @@
       return;
     }
     $('identity').textContent = session.user?.email || 'Cuenta RCC autenticada';
+    $('vipActions').hidden = true;
+    $('vipDenied').hidden = true;
+    showStatus('Comprobando tu estado VIP…');
+
+    // This RPC returns only the current authenticated user's VIP boolean.
+    // Do not expose Discord join/link actions until it explicitly returns true.
     const sb = await getClient();
+    const { data: isVip, error: vipError } = await sb.rpc('rcc_is_my_vip');
+    if (vipError) throw vipError;
+
+    if (isVip !== true) {
+      $('vipDenied').hidden = false;
+      showStatus('No hemos detectado un pago con este correo. Si ya pagaste en Ko-fi, asegúrate de haber usado este mismo correo electrónico.', 'error');
+      return;
+    }
+
+    $('vipActions').hidden = false;
     const { data: userData, error } = await sb.auth.getUser();
     if (error) throw error;
     const hasDiscord = userData.user?.identities?.some(identity => identity.provider === 'discord');
     if (hasDiscord) await syncDiscordLink(session);
-    else showStatus('Sesión lista. Ahora vincula tu cuenta de Discord.');
+    else showStatus('¡Tu VIP está confirmado! Paso 2: únete a nuestro Discord y después vincula tu cuenta.');
   }
 
   $('emailLoginToggle').addEventListener('click', () => {
