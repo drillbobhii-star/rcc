@@ -54,10 +54,29 @@
         const { data } = await client.auth.getSession();
         if (data?.session?.access_token) headers.Authorization = 'Bearer ' + data.session.access_token;
       } catch {}
+      const client = await window.rccSupabaseReady;
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+      if (sessionError) throw sessionError;
+      const user = sessionData?.session?.user || null;
+
+      // Read the signed-in user's VIP entitlement from the membership table itself.
+      // RLS must allow authenticated users to SELECT only their own user_id row.
+      state.isVip = false;
+      if (user?.id) {
+        const { data: membership, error: membershipError } = await client
+          .from('rcc_vip_memberships')
+          .select('is_vip')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (membershipError) throw membershipError;
+        state.isVip = membership?.is_vip === true;
+      }
+
+      // Keep the server endpoint for admin status and the checkout URL only;
+      // it is no longer the source of truth for the user's VIP entitlement.
       const response = await fetch('/api/vip-membership', { headers, cache: 'no-store' });
-      if (!response.ok) throw new Error('No se pudo consultar la membresía.');
+      if (!response.ok) throw new Error('No se pudo consultar la configuración de membresía.');
       const result = await response.json();
-      state.isVip = result.isVip === true;
       state.isAdmin = result.isAdmin === true;
       state.checkoutUrl = typeof result.checkoutUrl === 'string' && /^https:\/\/(?:www\.)?ko-fi\.com\//.test(result.checkoutUrl) ? result.checkoutUrl : DEFAULT_CHECKOUT_URL;
     } catch {
