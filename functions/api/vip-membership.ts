@@ -7,6 +7,7 @@ type Env = {
   DISCORD_WEBHOOK_URL?: string;
   RCC_VIP_API_URL?: string;
   RCC_VIP_WEBHOOK_SECRET?: string;
+  DISCORD_INVITE_URL?: string;
 };
 
 type AuthUser = {
@@ -98,8 +99,12 @@ async function grantDiscordRole(env: Env, discordId: string) {
     body: JSON.stringify({ discord_id: discordId }),
     signal: AbortSignal.timeout(12000),
   });
-  if (!response.ok) throw new Error('Railway no pudo asignar el rol VIP de Discord (HTTP ' + response.status + ').');
-  return true;
+  const result = await response.json().catch(() => ({})) as { status?: string; invite_url?: string | null; error?: string };
+  if (result.status === 'NOT_IN_GUILD') {
+    return { status: 'NOT_IN_GUILD' as const, inviteUrl: result.invite_url || env.DISCORD_INVITE_URL || null };
+  }
+  if (!response.ok) throw new Error(result.error || 'Railway no pudo asignar el rol VIP de Discord (HTTP ' + response.status + ').');
+  return { status: 'ROLE_GRANTED' as const, inviteUrl: null };
 }
 
 async function notifyDiscord(env: Env, email: string, isVip: boolean, adminEmail: string) {
@@ -244,7 +249,11 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       let roleGranted = false;
       if (isVip) {
         try {
-          roleGranted = await grantDiscordRole(env, discordId);
+          const grantResult = await grantDiscordRole(env, discordId);
+          if (grantResult.status === 'NOT_IN_GUILD') {
+            return reply({ ok: true, status: 'NOT_IN_GUILD', discordLinked: true, isVip: true, roleGranted: false, inviteUrl: grantResult.inviteUrl });
+          }
+          roleGranted = grantResult.status === 'ROLE_GRANTED';
         } catch (error) {
           return reply({ error: error instanceof Error ? error.message : 'Discord no pudo asignar el rol VIP.', discordLinked: true, isVip: true }, 502);
         }
