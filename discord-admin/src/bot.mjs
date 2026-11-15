@@ -16,7 +16,10 @@ const CFG = {
   guildId: process.env.DISCORD_GUILD_ID.trim(),
   ownerId: process.env.DISCORD_OWNER_ID.trim(),
   model: process.env.OPENAI_MODEL?.trim(),
+  geminiModel: process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash',
+  announcementChannelId: process.env.DISCORD_ANNOUNCEMENT_CHANNEL_ID?.trim() || null,
 };
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim() || null;
 const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY.trim() });
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const pending = new Map();
@@ -252,6 +255,61 @@ async function askAI(instruction, guild, interaction) {
   }
   return { text: (response?.output_text || 'Solicitud procesada.').trim().slice(0, 1700), confirmations };
 }
+
+async function getAnnouncementChannel(guild) {
+  await guild.channels.fetch();
+  const channel = CFG.announcementChannelId
+    ? await guild.channels.fetch(CFG.announcementChannelId).catch(() => null)
+    : guild.channels.cache.find((item) => ['anuncios', 'anuncio', 'announcements', 'announcement'].includes(norm(item.name)));
+  if (!channel || ![ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(channel.type)) {
+    throw new Error('No encontré el canal de anuncios. Configura DISCORD_ANNOUNCEMENT_CHANNEL_ID con su ID en Railway.');
+  }
+  return channel;
+}
+
+async function generateAnnouncement(guild) {
+  if (!GEMINI_API_KEY) throw new Error('Falta configurar GEMINI_API_KEY en Railway.');
+  const channel = await getAnnouncementChannel(guild);
+  const githubResponse = await fetch('https://api.github.com/repos/drillbobhii-star/rcc/commits?per_page=5', {
+    headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'RCC-Discord-Admin' },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!githubResponse.ok) throw new Error('GitHub respondió con HTTP ' + githubResponse.status + ' al consultar los commits.');
+  const commits = await githubResponse.json();
+  if (!Array.isArray(commits) || commits.length === 0) throw new Error('GitHub no devolvió commits recientes.');
+  const commitMessages = commits.slice(0, 5).map((item, index) =>
+    (index + 1) + '. ' + String(item.commit?.message || 'Commit sin mensaje').split('\n')[0].slice(0, 300)
+  ).join('\n');
+  const prompt = 'Eres el Community Manager de RCC. Basado en estos cambios recientes, escribe un anuncio para Discord con un tono juvenil, hype y un poco de humor.\n\nÚltimos commits de RCC:\n' + commitMessages + '\n\nRedacta un único anuncio claro, listo para publicar, en español. No inventes funciones que no aparezcan en los commits. Máximo 1700 caracteres.';
+  const geminiResponse = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(CFG.geminiModel) + ':generateContent?key=' + encodeURIComponent(GEMINI_API_KEY),
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, maxOutputTokens: 600 },
+      }),
+      signal: AbortSignal.timeout(30000),
+    },
+  );
+  const generated = await geminiResponse.json().catch(() => ({}));
+  if (!geminiResponse.ok) {
+    const message = generated.error?.message || 'Gemini respondió con HTTP ' + geminiResponse.status;
+    throw new Error('No pude generar el anuncio: ' + message.slice(0, 300));
+  }
+  const draft = generated.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('').trim();
+  if (!draft) throw new Error('Gemini no devolvió texto para el anuncio.');
+  return { channel, draft: draft.slice(0, 1800), commitMessages };
+}
+
+function announcementButtons(id) {
+  return [new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('rcc:announcement:publish:' + id).setLabel('Publicar').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('rcc:announcement:cancel:' + id).setLabel('Cancelar').setStyle(ButtonStyle.Secondary),
+  )];
+}
+
 function rateLimit(user) {
   const now = Date.now();
   const recent = (requests.get(user) || []).filter((time) => now - time < 60000);
@@ -264,6 +322,35 @@ function rateLimit(user) {
 client.on(Events.InteractionCreate, async (interaction) => {
   try {
     if (interaction.isButton()) {
+      const announcementMatch = interaction.customId.match(/^rcc:announcement:(publish|cancel):([a-f0-9]+)$/);
+      if (announcementMatch) {
+        const [, decision, id] = announcementMatch;
+        const item = pending.get(id);
+        if (!item || item.kind !== 'announcement' || Date.now() > item.expiresAt) {
+          pending.delete(id);
+          await interaction.reply({ content: 'Este anuncio ya no está disponible o ha caducado. Ejecuta /rcc anuncio otra vez.', flags: MessageFlags.Ephemeral });
+          return;
+        }
+        if (interaction.user.id !== CFG.ownerId || interaction.user.id !== item.userId || interaction.guildId !== item.guildId) {
+          await interaction.reply({ content: 'Solo el dueño que solicitó el anuncio puede aprobarlo.', flags: MessageFlags.Ephemeral });
+          return;
+        }
+        pending.delete(id);
+        await interaction.deferUpdate();
+        if (decision === 'cancel') {
+          await interaction.webhook.editMessage(interaction.message.id, { content: '🛑 Anuncio cancelado. No se publicó nada.', components: [] });
+          return;
+        }
+        try {
+          const guild = await client.guilds.fetch(item.guildId);
+          const channel = await getAnnouncementChannel(guild);
+          await channel.send({ content: item.message, allowedMentions: { parse: [] } });
+          await interaction.webhook.editMessage(interaction.message.id, { content: '🚀 ¡Publicado correctamente en #' + channel.name + '!', components: [] });
+        } catch (error) {
+          await interaction.webhook.editMessage(interaction.message.id, { content: '❌ No pude publicar el anuncio: ' + String(error.message || error).slice(0, 500), components: [] });
+        }
+        return;
+      }
       const match = interaction.customId.match(/^rcc:(yes|no):([a-f0-9]+)$/);
       if (!match) return;
       const item = pending.get(match[2]);
@@ -301,7 +388,32 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return;
     }
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-    const instruction = interaction.options.getString('instruccion', true).trim();
+    const subcommand = interaction.options.getSubcommand();
+    if (subcommand === 'anuncio') {
+      try {
+        const { channel, draft, commitMessages } = await generateAnnouncement(interaction.guild);
+        const id = randomBytes(6).toString('hex');
+        pending.set(id, {
+          kind: 'announcement',
+          message: draft,
+          userId: interaction.user.id,
+          guildId: interaction.guildId,
+          expiresAt: Date.now() + 120000,
+        });
+        const preview = '📝 **Borrador de anuncio para #' + channel.name + '**\n\n' + draft +
+          '\n\n<sub>Basado en los últimos ' + commitMessages.split('\n').length + ' commits. Caduca en 2 minutos.</sub>\n¿Lo publicamos?';
+        await interaction.editReply({ content: preview.slice(0, 2000), components: announcementButtons(id) });
+      } catch (error) {
+        console.error('Error en /rcc anuncio:', error instanceof Error ? error.message : String(error));
+        await interaction.editReply('No pude preparar el anuncio: ' + String(error.message || error).slice(0, 700));
+      }
+      return;
+    }
+    if (subcommand !== 'instruccion') {
+      await interaction.editReply('Subcomando no reconocido.');
+      return;
+    }
+    const instruction = interaction.options.getString('texto', true).trim();
     try {
       const result = await askAI(instruction, interaction.guild, interaction);
       const extra = result.confirmations.length
