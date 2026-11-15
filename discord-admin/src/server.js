@@ -240,6 +240,24 @@ const toolDefinitions = [
 ];
 
 for (const [name, description, properties, required] of [
+  ["update_channel_permissions","Configura permisos de un canal para @everyone y un rol nombrado. permissions es un objeto con view_channel y send_messages booleanos.",{channel_name:{type:"string"},role_name:{type:"string"},permissions:{type:"object",properties:{view_channel:{type:"boolean"},send_messages:{type:"boolean"}},required:["view_channel","send_messages"],additionalProperties:false}},["channel_name","role_name","permissions"]],
+  ["rename_channel","Renombra un canal por su nombre actual.",{channel_name:{type:"string"},new_name:{type:"string"}},["channel_name","new_name"]],
+  ["create_invite","Crea un enlace de invitación para un canal; max_age en segundos, 0 significa nunca expira.",{channel_name:{type:"string"},max_age:{type:"integer",minimum:0,maximum:604800}},["channel_name","max_age"]],
+  ["delete_channel","Solicita borrar un canal. Siempre requiere confirmación manual.",{channel_name:{type:"string"}},["channel_name"]],
+  ["ban_member","Solicita banear un usuario por ID. Siempre requiere confirmación manual.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},reason:{type:"string"}},["user_id","reason"]],
+  ["unban_member","Retira el baneo de un usuario por ID.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"}},["user_id"]],
+  ["set_nickname","Cambia el apodo de un miembro.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},new_nickname:{type:["string","null"],maxLength:32}},["user_id","new_nickname"]],
+  ["timeout_member","Aplica timeout de 1 a 40320 minutos (28 días).",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},minutes:{type:"integer",minimum:1,maximum:40320},reason:{type:"string"}},["user_id","minutes","reason"]],
+  ["update_role_color","Cambia el color de un rol usando HEX #RRGGBB.",{role_name:{type:"string"},color_hex:{type:"string",pattern:"^#[0-9a-fA-F]{6}$"}},["role_name","color_hex"]],
+  ["update_role_permissions","Reemplaza los permisos de un rol por la lista indicada. Usa nombres de permisos Discord.",{role_name:{type:"string"},permissions:{type:"array",items:{type:"string"},maxItems:40}},["role_name","permissions"]],
+  ["delete_role","Solicita borrar un rol. Siempre requiere confirmación manual.",{role_name:{type:"string"}},["role_name"]],
+  ["pin_message","Fija un mensaje existente por ID en un canal.",{channel_name:{type:"string"},message_id:{type:"string",pattern:"^[0-9]{17,20}$"}},["channel_name","message_id"]],
+  ["create_emoji","Crea un emoji del servidor desde una URL HTTPS de imagen.",{emoji_name:{type:"string",pattern:"^[a-zA-Z0-9_]{2,32}$"},image_url:{type:"string"}},["emoji_name","image_url"]]
+]) {
+  toolDefinitions.push({ type:"function", function:{ name, description, parameters:{ type:"object", properties, required, additionalProperties:false } } });
+}
+
+for (const [name, description, properties, required] of [
   ["purge_messages", "Borra de 1 a 100 mensajes recientes (menores de 14 días), previa confirmación.",
     { channel_id: { type: "string" }, count: { type: "integer", minimum: 1, maximum: 100 } }, ["channel_id", "count"]],
   ["lock_channel", "Impide enviar mensajes a @everyone en un canal de texto; otros permisos explícitos pueden permitir escribir.",
