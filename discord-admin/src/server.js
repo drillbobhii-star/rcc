@@ -514,7 +514,7 @@ async function generateRccAnnouncement(guildId) {
     throw new Error("No encontré el canal de anuncios. Configura DISCORD_ANNOUNCEMENT_CHANNEL_ID o crea un canal llamado #anuncios.");
   }
 
-  const githubResponse = await fetch("https://api.github.com/repos/drillbobhii-star/rcc/commits?per_page=5", {
+  const githubResponse = await fetch("https://api.github.com/repos/drillbobhii-star/rcc/commits?per_page=20", {
     headers: {
       Accept: "application/vnd.github+json",
       "User-Agent": "RCC-Discord-Admin"
@@ -529,7 +529,7 @@ async function generateRccAnnouncement(guildId) {
     throw new Error("GitHub no devolvió commits recientes.");
   }
 
-  const commitMessages = commits.slice(0, 5).map((item, index) =>
+  const commitMessages = commits.slice(0, 20).map((item, index) =>
     (index + 1) + ". " + String(item.commit?.message || "Commit sin mensaje").split(/\r?\n/, 1)[0].slice(0, 300)
   ).join("\n");
 
@@ -547,7 +547,7 @@ async function generateRccAnnouncement(guildId) {
   const draft = response.choices?.[0]?.message?.content?.trim();
   if (!draft) throw new Error("Gemini no devolvió texto para el anuncio.");
 
-  return { channel, draft: draft.slice(0, 1800), commitCount: Math.min(commits.length, 5) };
+  return { channel, draft: draft.slice(0, 1800), commitCount: Math.min(commits.length, 20) };
 }
 
 // Discord HTTP Interactions mode: callback type 5 is the REST equivalent of
