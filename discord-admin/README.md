@@ -9,6 +9,11 @@ Servicio independiente para administrar un servidor Discord desde el proyecto RC
 - Google Gemini mediante el endpoint compatible con OpenAI.
 - Crear categorías y canales de texto.
 - Renombrar canales y consultar la estructura del servidor.
+- `purge_messages`: borrar de 1 a 100 mensajes recientes con confirmación; omite mensajes de 14 días o más.
+- `lock_channel` / `unlock_channel`: cambiar el permiso de enviar mensajes de @everyone conservando los demás permisos. Los administradores y otros permisos explícitos pueden seguir permitiendo escribir.
+- `server_info`: consultar miembros aproximados, boosts y número de canales.
+- `user_info`: consultar un miembro por su ID, con roles y fechas de creación e ingreso.
+- Indicador «Escribiendo…» inmediato mientras se procesa la orden, además de la respuesta diferida del comando.
 - Publicar anuncios solo después de aprobación manual.
 - Borrar canales solo después de aprobación manual.
 - Verificación de firmas Ed25519 de Discord y restricción a un servidor.
@@ -48,7 +53,7 @@ Se utiliza la librería cliente OpenAI solo como cliente HTTP compatible. El tr�
 
 `https://generativelanguage.googleapis.com/v1beta/openai/`
 
-El servidor usa Chat Completions y llamadas a herramientas (function calling). La clave es `GEMINI_API_KEY`, no se requiere una clave de OpenAI.
+El servidor usa Chat Completions y llamadas a herramientas (function calling). Mantiene `gemini-3.8-flash` como modelo predeterminado, limita la respuesta a 1024 tokens y cada consulta a 25 segundos, sin reintentos automáticos. Una variable `GEMINI_MODEL` ya configurada prevalece sobre el valor predeterminado. La clave es `GEMINI_API_KEY`, no se requiere una clave de OpenAI.
 
 ## Despliegue en Railway
 
@@ -84,5 +89,6 @@ Railway mantiene el servicio como un despliegue persistente, sujeto al estado y 
 - La IA solo puede llamar herramientas permitidas por el código; no ejecuta código arbitrario.
 - Discord aplica igualmente los permisos efectivos y la jerarquía del rol del bot.
 - El endpoint VIP exige `RCC_VIP_WEBHOOK_SECRET`, valida el ID de usuario y solo asigna `DISCORD_VIP_ROLE_ID` dentro de `DISCORD_GUILD_ID`.
+- Para las nuevas herramientas necesita Ver canal, Leer historial de mensajes, Gestionar mensajes y Gestionar roles (para modificar sobrescrituras de permisos). Para mostrar «Escribiendo…» necesita Enviar mensajes.
 - El bot necesita permiso Gestionar roles y su rol más alto debe estar por encima del rol VIP.
 - El mapa de confirmaciones está en memoria; mantén una sola réplica mientras se usa esta versión inicial.

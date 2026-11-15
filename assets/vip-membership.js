@@ -4,6 +4,8 @@
   const DEFAULT_CHECKOUT_URL = 'https://ko-fi.com/lubensdrill/tiers';
   const state = { isVip: false, isAdmin: false, checkoutUrl: DEFAULT_CHECKOUT_URL, loading: false };
   const modal = document.getElementById('rccSubscribeModal');
+  const scriptModal = document.getElementById('modal');
+  const modalBody = document.getElementById('modalBody');
   const supportButton = document.getElementById('rccSupportButton');
   const checkoutButton = document.getElementById('rccKofiButton');
   const checkoutStatus = document.getElementById('rccCheckoutStatus');
@@ -63,9 +65,6 @@
       }
 
       const user = session?.user || null;
-      const headers = session?.access_token
-        ? { Authorization: 'Bearer ' + session.access_token }
-        : {};
 
       // Reset immediately for signed-out accounts; never retain a previous user's VIP flag.
       let isVip = false;
@@ -79,15 +78,9 @@
         isVip = membership?.is_vip === true;
       }
 
-      const response = await fetch('/api/vip-membership', { headers, cache: 'no-store' });
-      if (!response.ok) throw new Error('No se pudo consultar la configuración de membresía.');
-      const result = await response.json();
-
       // Ignore stale responses if a newer sign-in/sign-out event has already started.
       if (requestId !== statusRequestId) return;
       state.isVip = isVip;
-      state.isAdmin = result.isAdmin === true;
-      state.checkoutUrl = typeof result.checkoutUrl === 'string' && /^https:\/\/(?:www\.)?ko-fi\.com\//.test(result.checkoutUrl) ? result.checkoutUrl : DEFAULT_CHECKOUT_URL;
     } catch (error) {
       if (requestId !== statusRequestId) return;
       console.error('[RCC VIP] No se pudo actualizar el estado:', error);
@@ -108,9 +101,11 @@
       const client = await window.rccSupabaseReady;
       // Subscribe before the initial read so sign-in changes cannot be missed.
       let currentUserId = null;
-      const { data, error } = client.auth.onAuthStateChange((_event, session) => {
+      const { data, error } = client.auth.onAuthStateChange((event, session) => {
+        // Invalidate pending reads immediately, before the deferred auth refresh runs.
+        ++statusRequestId;
         const nextUserId = session?.user?.id || null;
-        if (nextUserId !== currentUserId) {
+        if (event === 'SIGNED_OUT' || nextUserId !== currentUserId) {
           currentUserId = nextUserId;
           // Do not briefly expose the previous account's VIP state after an account switch/sign-out.
           state.isVip = false;
@@ -118,7 +113,7 @@
           if (activeScript) applyModalGate(activeScript);
         }
         // Defer Supabase queries outside the auth callback to avoid blocking its internal lock.
-        Promise.resolve().then(() => refreshStatus(session));
+        setTimeout(() => { void refreshStatus(session); }, 0);
       });
       if (error) throw error;
       window.rccVipAuthSubscription = data?.subscription || null;
@@ -164,20 +159,24 @@
     if (state.isVip) {
       pre?.classList.remove('rcc-vip-code-locked');
       code.textContent = script.code;
-      modal?.querySelector('.rcc-vip-modal-gate')?.remove();
-      modal?.querySelector('#scriptCopyBtn')?.removeAttribute('disabled');
-      modal?.querySelector('#scriptCopyBtn')?.removeAttribute('hidden');
+      scriptModal?.querySelectorAll('.actions button').forEach(button => {
+        if (/Descargar/.test(button.textContent)) button.disabled = false;
+        if (/¿Qué hace este código\?/.test(button.textContent)) button.hidden = false;
+      });
+      scriptModal?.querySelector('.rcc-vip-modal-gate')?.remove();
+      scriptModal?.querySelector('#scriptCopyBtn')?.removeAttribute('disabled');
+      scriptModal?.querySelector('#scriptCopyBtn')?.removeAttribute('hidden');
       return;
     }
     code.textContent = '-- 🔒 Código exclusivo RCC Supporter. Suscríbete para desbloquear este script.';
     pre?.classList.add('rcc-vip-code-locked');
     const copy = document.getElementById('scriptCopyBtn');
     if (copy) { copy.disabled = true; copy.hidden = true; }
-    modal?.querySelectorAll('.actions button').forEach(button => {
+    scriptModal?.querySelectorAll('.actions button').forEach(button => {
       if (/Descargar/.test(button.textContent)) button.disabled = true;
       if (/¿Qué hace este código\?/.test(button.textContent)) button.hidden = true;
     });
-    if (!modal?.querySelector('.rcc-vip-modal-gate')) {
+    if (!scriptModal?.querySelector('.rcc-vip-modal-gate')) {
       const gate = document.createElement('section');
       gate.className = 'rcc-vip-modal-gate';
       const heading = document.createElement('strong');
@@ -231,8 +230,8 @@
   checkoutButton?.addEventListener('click', () => {
     if (state.checkoutUrl) window.open(state.checkoutUrl, '_blank', 'noopener,noreferrer');
   });
-  window.addEventListener('rcc:session', refreshStatus);
-  window.addEventListener('focus', refreshStatus);
+  window.addEventListener('rcc:session', () => { void refreshStatus(); });
+  window.addEventListener('focus', () => { void refreshStatus(); });
   window.RCCVIP = {
     get isVip() { return state.isVip; },
     isVipScript,
