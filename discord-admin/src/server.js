@@ -568,7 +568,8 @@ async function processApproval(interaction, customId) {
   const pendingId = parts[2];
   const pending = pendingActions.get(pendingId);
 
-  if (!pending) {
+  if (!pending || (pending.expiresAt && Date.now() > pending.expiresAt)) {
+    pendingActions.delete(pendingId);
     await editOriginalResponse(APPLICATION_ID, interaction.token, {
       content: "Esta solicitud ya no está disponible o ha caducado.",
       components: []
