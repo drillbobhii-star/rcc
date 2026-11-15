@@ -70,3 +70,12 @@ export const communityImports = pgTable('community_imports', {
   key: text().primaryKey(),
   importedAt: timestamp('imported_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Administrative confirmation requests; claimed atomically before execution.
+export const discordPendingActions = pgTable('discord_pending_actions', {
+  id: uuid().primaryKey(),
+  userId: text('user_id').notNull(),
+  guildId: text('guild_id').notNull(),
+  payload: jsonb().notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});

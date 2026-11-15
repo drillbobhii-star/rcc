@@ -5,15 +5,18 @@
   "scripts": {
     "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node tools/check-executor-downloads.mjs && node tools/check-vip-membership.mjs",
     "test:static": "node tools/check-static-catalog.cjs",
-    "test:vip": "node tools/check-vip-membership.mjs"
+    "test:vip": "node tools/check-vip-membership.mjs && node tools/check-vip-runtime.mjs",
+    "test:discord": "node tools/check-discord-admin.mjs && node tools/check-discord-interactions.mjs && npm --prefix discord-admin run check"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@google/genai": "^3.3.0",
     "@netlify/database": "^2.0.1",
     "@netlify/functions": "^6.0.2",
+    "@netlify/server": "^0.1.6",
     "drizzle-orm": "^1.0.0-beta.22",
     "openai": "^7.43.0"
   },

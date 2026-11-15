@@ -4,13 +4,17 @@
   "private": true,
   "type": "module",
   "description": "Discord administration assistant for the RCC project",
-  "engines": { "node": ">=20.11.0" },
+  "engines": {
+    "node": ">=20.11.0"
+  },
   "scripts": {
     "start": "node src/server.js",
     "register": "node --env-file=.env scripts/register-commands.js",
-    "check": "node --check src/server.js && node --check scripts/register-commands.js"
+    "check": "node --check src/server.js && node --check src/admin-tools.js && node --check src/pending-actions.js && node --check scripts/register-commands.js"
   },
   "dependencies": {
-    "openai": "^7.43.0"
+    "@google/genai": "^3.3.0",
+    "@netlify/server": "^0.1.6",
+    "@netlify/database": "^2.0.1"
   }
 }
