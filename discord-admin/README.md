@@ -12,6 +12,7 @@ Servicio independiente para administrar un servidor Discord desde el proyecto RC
 - Publicar anuncios solo después de aprobación manual.
 - Borrar canales solo después de aprobación manual.
 - Verificación de firmas Ed25519 de Discord y restricción a un servidor.
+- Endpoint privado `POST /vip/grant` para asignar el rol RCC Supporter después de un pago verificado o una vinculación OAuth.
 - No requiere Gateway ni Privileged Gateway Intents.
 
 La primera versión todavía no implementa gestión de roles, expulsiones, baneos ni funciones de voz. Tener permisos activados en Discord no implementa automáticamente esas funciones.
@@ -34,6 +35,8 @@ Configura estas variables en Railway > servicio > Variables:
 - `GEMINI_MODEL`: por defecto `gemini-3.8-flash`.
 - `DISCORD_GUILD_ID`: ID del servidor autorizado.
 - `DISCORD_ANNOUNCEMENT_CHANNEL_ID`: ID del canal donde se publican los anuncios aprobados (opcional; si se omite, detecta un canal llamado `anuncios`, `anuncio`, `announcements` o `announcement`).
+- `DISCORD_VIP_ROLE_ID`: ID del rol de Discord que recibe un Supporter.
+- `RCC_VIP_WEBHOOK_SECRET`: secreto largo compartido con Cloudflare Pages para autenticar llamadas a `POST /vip/grant`.
 - `REGISTER_COMMANDS_ON_START`: `true`.
 - `PORT`: Railway lo proporciona automáticamente; localmente se usa 3000.
 
@@ -80,4 +83,6 @@ Railway mantiene el servicio como un despliegue persistente, sujeto al estado y 
 - Las menciones masivas están desactivadas en los mensajes enviados.
 - La IA solo puede llamar herramientas permitidas por el código; no ejecuta código arbitrario.
 - Discord aplica igualmente los permisos efectivos y la jerarquía del rol del bot.
+- El endpoint VIP exige `RCC_VIP_WEBHOOK_SECRET`, valida el ID de usuario y solo asigna `DISCORD_VIP_ROLE_ID` dentro de `DISCORD_GUILD_ID`.
+- El bot necesita permiso Gestionar roles y su rol más alto debe estar por encima del rol VIP.
 - El mapa de confirmaciones está en memoria; mantén una sola réplica mientras se usa esta versión inicial.
