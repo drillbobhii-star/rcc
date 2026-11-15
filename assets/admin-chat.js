@@ -279,7 +279,7 @@
       }
       await poll();
       pollTimer = setInterval(() => { void poll(); },4000);
-      if (Notification.permission === "granted") void enablePush(false);
+      if ("Notification" in window && Notification.permission === "granted") void enablePush(false);
       client.auth.onAuthStateChange((_event,next) => {
         session = next;
         if (!session?.access_token || session.user?.email?.trim().toLowerCase() !== ADMIN_EMAIL) {
@@ -334,7 +334,7 @@
   $("rccEnablePush").addEventListener("click",() => enablePush(true));
   document.querySelector('.admin-tab[data-tab="messages"]')?.addEventListener("click",() => {
     void poll();
-    if (Notification.permission === "default") void enablePush(true);
+    if ("Notification" in window && Notification.permission === "default") void enablePush(true);
   });
   window.addEventListener("pagehide",() => { if (pollTimer) clearInterval(pollTimer); });
   void start();
