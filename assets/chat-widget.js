@@ -1,9 +1,8 @@
 (() => {
   "use strict";
   const ADMIN_EMAIL = "drillbobhii@gmail.com";
-  const MAX_FILE = 10 * 1024 * 1024;
   let client = null, session = null, conversationId = null, enabled = true;
-  let panel = null, messagesEl = null, input = null, fileInput = null;
+  let panel = null, messagesEl = null, input = null;
   let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null;
   const $ = id => document.getElementById(id);
 
@@ -19,11 +18,10 @@
   }
   async function request(path = "", options = {}) {
     if (!session?.access_token) throw new Error("Inicia sesión para usar soporte.");
+    const headers = { Authorization:"Bearer " + session.access_token, ...(options.headers || {}) };
+    if (options.body && typeof options.body === "string") headers["Content-Type"] = "application/json";
     const response = await fetch("/api/chat" + path, {
-      ...options,
-      headers: { Authorization: "Bearer " + session.access_token, ...(options.headers || {}) },
-      cache: "no-store",
-      credentials: "same-origin"
+      ...options, headers, cache:"no-store", credentials:"same-origin"
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || "No se pudo conectar con soporte.");
@@ -33,8 +31,8 @@
     if ($("rccChatLauncher")) return;
     const style = el("style");
     style.textContent = [
-      "#rccChatLauncher{position:fixed;right:22px;bottom:22px;z-index:9500;border:1px solid #ffffff30;border-radius:999px;padding:14px 18px;background:linear-gradient(130deg,#715be0,#2488a5);color:#fff;font:700 14px system-ui;box-shadow:0 12px 38px #0008;cursor:pointer}",
-      "#rccChatPanel{position:fixed;right:22px;bottom:86px;width:min(390px,calc(100vw - 24px));height:min(590px,calc(100vh - 120px));z-index:9510;display:flex;flex-direction:column;border:1px solid #a8a5ff42;border-radius:20px;background:rgba(12,15,27,.97);color:#f5f6ff;box-shadow:0 22px 70px #000b;backdrop-filter:blur(22px);overflow:hidden;font-family:Inter,system-ui,sans-serif}",
+      "#rccChatLauncher{position:fixed;left:22px;bottom:22px;z-index:9500;border:1px solid #ffffff30;border-radius:999px;padding:14px 18px;background:linear-gradient(130deg,#715be0,#2488a5);color:#fff;font:700 14px system-ui;box-shadow:0 12px 38px #0008;cursor:pointer}",
+      "#rccChatPanel{position:fixed;left:22px;bottom:86px;width:min(390px,calc(100vw - 24px));height:min(590px,calc(100vh - 120px));z-index:9510;display:flex;flex-direction:column;border:1px solid #a8a5ff42;border-radius:20px;background:rgba(12,15,27,.97);color:#f5f6ff;box-shadow:0 22px 70px #000b;backdrop-filter:blur(22px);overflow:hidden;font-family:Inter,system-ui,sans-serif}",
       "#rccChatPanel[hidden],#rccChatLauncher[hidden]{display:none}",
       ".rcc-chat-head{display:flex;align-items:center;justify-content:space-between;padding:15px;background:linear-gradient(120deg,#48398a,#1b6276);font-weight:800}",
       ".rcc-chat-close{border:0;background:#ffffff20;color:white;border-radius:9px;width:30px;height:30px;font-size:19px;cursor:pointer}",
@@ -42,42 +40,35 @@
       ".rcc-chat-bubble{max-width:85%;padding:10px 12px;border-radius:14px;background:#252b43;align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.5}",
       ".rcc-chat-bubble.mine{align-self:flex-end;background:#6554bd}",
       ".rcc-chat-bubble small{display:block;color:#c1c8e5;font-size:10px;margin-top:5px}",
-      ".rcc-chat-bubble img{display:block;max-width:100%;max-height:190px;border-radius:9px;margin-top:6px}",
-      ".rcc-chat-bubble a{color:#a7eaff}",
       ".rcc-chat-composer{padding:11px;border-top:1px solid #ffffff18;display:grid;grid-template-columns:1fr auto;gap:8px}",
       "#rccChatInput{min-width:0;resize:none;height:44px;max-height:100px;border:1px solid #ffffff24;border-radius:11px;background:#11182a;color:#fff;padding:11px;font:13px system-ui}",
-      ".rcc-chat-actions{display:flex;gap:6px;align-items:center}",
       ".rcc-chat-actions button{border:0;border-radius:10px;background:#6656c2;color:white;padding:10px;cursor:pointer;font-weight:750}",
-      "#rccChatAttach{background:#ffffff18}",
       "#rccChatStatus{font-size:11px;color:#aeb7d5;padding:0 12px 8px;min-height:18px}",
-      "#rccChatToast{position:fixed;right:20px;bottom:85px;z-index:9520;padding:12px 16px;background:#242b43;border:1px solid #9e91ff70;border-radius:12px;color:#fff;box-shadow:0 10px 40px #0009;max-width:min(340px,calc(100vw - 40px))}",
+      "#rccChatToast{position:fixed;left:20px;bottom:85px;z-index:9520;padding:12px 16px;background:#242b43;border:1px solid #9e91ff70;border-radius:12px;color:#fff;box-shadow:0 10px 40px #0009;max-width:min(340px,calc(100vw - 40px))}",
       "#rccChatToast[hidden]{display:none}",
       "#rccBanOverlay{position:fixed;inset:0;z-index:2147483000;background:rgba(4,6,13,.98);display:grid;place-items:center;padding:24px;color:#fff;text-align:center;font-family:system-ui,sans-serif}",
       "#rccBanOverlay[hidden]{display:none}",
       "#rccBanOverlay section{max-width:500px;padding:35px;border:1px solid #ff647344;border-radius:22px;background:linear-gradient(145deg,#201725,#101827);box-shadow:0 25px 80px #000a}",
       "#rccBanOverlay h1{font-size:25px;margin:12px 0;color:#ff9ca8}",
       "#rccBanOverlay p{color:#d2d5e6;line-height:1.6}",
-      "@media(max-width:520px){#rccChatLauncher{right:14px;bottom:14px}#rccChatPanel{right:8px;bottom:74px;width:calc(100vw - 16px);height:min(76vh,600px)}}"
+      "@media(max-width:520px){#rccChatLauncher{left:14px;bottom:14px}#rccChatPanel{left:8px;bottom:74px;width:calc(100vw - 16px);height:min(76vh,600px)}}"
     ].join("");
-    const launcher = el("button", { id:"rccChatLauncher", type:"button", hidden:true }, "✉  Soporte RCC");
-    panel = el("section", { id:"rccChatPanel", hidden:true, "aria-label":"Chat de soporte RCC" });
+    const launcher = el("button", { id:"rccChatLauncher", type:"button", hidden:true }, "✉  RCC Mensajes");
+    panel = el("section", { id:"rccChatPanel", hidden:true, "aria-label":"Chat de mensajes RCC" });
     const head = el("div", { class:"rcc-chat-head" });
-    head.append(el("span", {}, "Soporte privado RCC"), el("button", { class:"rcc-chat-close", type:"button", "aria-label":"Cerrar chat" }, "×"));
+    head.append(el("span", {}, "Mensajes privados RCC"), el("button", { class:"rcc-chat-close", type:"button", "aria-label":"Cerrar chat" }, "×"));
     messagesEl = el("div", { id:"rccChatMessages", "aria-live":"polite" });
     const composer = el("div", { class:"rcc-chat-composer" });
     input = el("textarea", { id:"rccChatInput", placeholder:"Escribe tu mensaje…", maxlength:"5000" });
     const actions = el("div", { class:"rcc-chat-actions" });
-    const attach = el("button", { id:"rccChatAttach", type:"button", title:"Adjuntar archivo" }, "＋");
     const send = el("button", { id:"rccChatSend", type:"button" }, "Enviar");
-    fileInput = el("input", { type:"file", hidden:true, accept:"image/*,.pdf,.txt,.csv,.json,.zip,.docx" });
-    actions.append(attach, send); composer.append(input, actions);
+    actions.append(send); composer.append(input, actions);
     const status = el("div", { id:"rccChatStatus", role:"status" });
-    panel.append(head, messagesEl, composer, fileInput, status);
+    panel.append(head, messagesEl, composer, status);
     const toast = el("div", { id:"rccChatToast", hidden:true, role:"alert" });
     document.head.append(style); document.body.append(launcher, panel, toast);
     launcher.addEventListener("click", () => setOpen(true));
     head.querySelector("button").addEventListener("click", () => setOpen(false));
-    attach.addEventListener("click", () => fileInput.click());
     send.addEventListener("click", sendMessage);
     input.addEventListener("input", () => {
       if (typingTimer) clearTimeout(typingTimer);
@@ -85,9 +76,6 @@
     });
     input.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }
-    });
-    fileInput.addEventListener("change", () => {
-      if (fileInput.files?.[0]) $("rccChatStatus").textContent = "Adjunto: " + fileInput.files[0].name;
     });
   }
   function notify(text) {
@@ -100,9 +88,7 @@
   }
   async function ensureConversation() {
     if (conversationId) return;
-    const form = new FormData();
-    form.set("action", "ensureConversation");
-    const result = await request("", { method:"POST", body:form });
+    const result = await request("", { method:"POST", body:JSON.stringify({action:"ensureConversation"}) });
     conversationId = result.id;
     enabled = result.enabled === true;
   }
@@ -133,10 +119,6 @@
     for (const msg of messages) {
       const bubble = el("article", { class:"rcc-chat-bubble" + (msg.sender_role === "user" ? " mine" : "") });
       if (msg.content) bubble.append(document.createTextNode(msg.content));
-      if (msg.file_url) {
-        if ((msg.file_type || "").startsWith("image/")) bubble.append(el("img", { src:msg.file_url, alt:msg.file_name || "Imagen adjunta", loading:"lazy" }));
-        bubble.append(el("a", { href:msg.file_url, target:"_blank", rel:"noopener noreferrer" }, "📎 " + (msg.file_name || "Descargar archivo")));
-      }
       bubble.append(el("small", {}, new Date(msg.created_at).toLocaleString()));
       messagesEl.append(bubble);
     }
@@ -149,7 +131,7 @@
     enabled = state.conversation?.enabled !== false;
     $("rccChatLauncher").hidden = false;
     if (!enabled && chatVisible) {
-      setOpen(false);
+      await setOpen(false);
       notify("Chat cerrado por el administrador.");
     }
     return state;
@@ -157,7 +139,9 @@
   async function sendTyping() {
     if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;
     typingLastSent = Date.now();
-    try { const form = new FormData(); form.set("action", "typing"); form.set("conversationId", conversationId); await request("", { method:"POST", body:form }); } catch (_) {}
+    try {
+      await request("", { method:"POST", body:JSON.stringify({action:"typing",conversationId}) });
+    } catch (_) {}
   }
   async function poll() {
     if (!session) return;
@@ -168,7 +152,6 @@
       if (!enabled) { $("rccChatStatus").textContent = "Chat cerrado por el administrador."; return; }
       const result = await request("?action=messages&conversationId=" + encodeURIComponent(conversationId));
       const messages = result.messages || [];
-
       const newestAdmin = [...messages].reverse().find(message => message.sender_role === "admin");
       if (newestAdmin && newestAdmin.id !== lastAdminMessage) {
         if (lastAdminMessage !== null || !newestAdmin.read_at) {
@@ -178,7 +161,9 @@
         lastAdminMessage = newestAdmin.id;
       }
       renderMessages(messages);
-      $("rccChatStatus").textContent = result.typing?.admin ? "El Creador está escribiendo…" : "Soporte RCC · " + (messages.length ? "Mensajes protegidos" : "Cuéntanos cómo podemos ayudarte");
+      $("rccChatStatus").textContent = result.typing?.admin
+        ? "El Creador está escribiendo…"
+        : "RCC Mensajes · " + (messages.length ? "Conversación privada" : "Escríbenos cuando lo necesites");
     } catch (error) {
       if (/restringida/i.test(error.message)) blockAccount();
       else console.warn("[RCC chat]", error.message);
@@ -186,20 +171,16 @@
   }
   async function sendMessage() {
     if (busy || !enabled) return;
-    const file = fileInput.files?.[0];
     const text = input.value.trim();
-    if (!text && !file) return;
-    if (!conversationId) { try { await ensureConversation(); } catch (error) { $("rccChatStatus").textContent = error.message; return; } }
-    if (file && file.size > MAX_FILE) { $("rccChatStatus").textContent = "El archivo supera 10 MB."; return; }
+    if (!text) return;
+    if (!conversationId) {
+      try { await ensureConversation(); }
+      catch (error) { $("rccChatStatus").textContent = error.message; return; }
+    }
     busy = true; $("rccChatSend").disabled = true;
     try {
-      const form = new FormData();
-      form.set("action", "send");
-      form.set("conversationId", conversationId || "");
-      form.set("content", text);
-      if (file) form.set("file", file, file.name);
-      await request("", { method:"POST", body:form });
-      input.value = ""; fileInput.value = "";
+      await request("", { method:"POST", body:JSON.stringify({action:"send",conversationId,content:text}) });
+      input.value = "";
       $("rccChatStatus").textContent = "Enviado";
       await poll();
     } catch (error) {
@@ -222,8 +203,9 @@
     ensureUi();
     const state = await loadState();
     if (!state) return;
-    if (state.conversation?.enabled === false) $("rccChatStatus").textContent = "Chat cerrado por el administrador.";
-    else $("rccChatStatus").textContent = "Soporte RCC · Puedes escribirnos.";
+    $("rccChatStatus").textContent = state.conversation?.enabled === false
+      ? "Chat cerrado por el administrador."
+      : "RCC Mensajes · Puedes escribirnos.";
     await poll();
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(() => { void poll(); }, 4000);
