@@ -5,6 +5,32 @@
 alter table public.profiles
   add column if not exists is_banned boolean not null default false;
 
+-- Users must not be able to lift their own restriction by calling
+-- Supabase UPDATE directly. Only server-side service_role changes this flag.
+create or replace function public.rcc_protect_account_ban_flag()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, auth
+as $
+begin
+  if new.is_banned is distinct from old.is_banned
+     and coalesce(auth.role(), '') <> 'service_role' then
+    raise exception 'is_banned can only be changed by the RCC support backend'
+      using errcode = '42501';
+  end if;
+  return new;
+end;
+$;
+
+revoke all on function public.rcc_protect_account_ban_flag() from public, anon, authenticated;
+
+drop trigger if exists trg_rcc_protect_account_ban_flag on public.profiles;
+create trigger trg_rcc_protect_account_ban_flag
+before update of is_banned on public.profiles
+for each row
+execute function public.rcc_protect_account_ban_flag();
+
 create table if not exists public.rcc_chat_conversations (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null unique references auth.users(id) on delete cascade,
