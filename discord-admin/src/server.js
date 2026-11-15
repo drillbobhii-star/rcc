@@ -1149,10 +1149,26 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
+      // Check membership first so a user outside the guild gets a stable,
+      // machine-readable response instead of a generic Discord API failure.
+      try {
+        await discordApi("/guilds/" + guildId + "/members/" + discordId);
+      } catch (memberError) {
+        if (String(memberError.message || "").includes("Discord API 404")) {
+          jsonResponse(res, 200, {
+            status: "NOT_IN_GUILD",
+            discord_id: discordId,
+            invite_url: process.env.DISCORD_INVITE_URL || null
+          });
+          return;
+        }
+        throw memberError;
+      }
+
       await discordApi("/guilds/" + guildId + "/members/" + discordId + "/roles/" + roleId, {
         method: "PUT"
       });
-      jsonResponse(res, 200, { ok: true, discord_id: discordId, role_id: roleId });
+      jsonResponse(res, 200, { ok: true, status: "ROLE_GRANTED", discord_id: discordId, role_id: roleId });
     } catch (error) {
       console.error("Error al asignar rol VIP:", error);
       jsonResponse(res, 502, { error: String(error.message || error).slice(0, 500) });
