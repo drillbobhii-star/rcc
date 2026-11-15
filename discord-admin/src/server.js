@@ -288,6 +288,122 @@ const SYSTEM_INSTRUCTIONS = [
 async function executeAction(guildId, actionName, args) {
   const channels = await getGuildChannels(guildId);
 
+  const roles = await discordApi("/guilds/" + guildId + "/roles");
+  const findChannelByName = (name) => {
+    const normalized = safeChannelName(name);
+    const matches = channels.filter(c => c.name.toLowerCase() === normalized);
+    if (matches.length !== 1) throw new Error(matches.length ? "Hay varios canales con ese nombre; usa un nombre único." : "No encontré el canal #" + normalized + ".");
+    return matches[0];
+  };
+  const findRoleByName = (name) => {
+    if (typeof name !== "string" || !name.trim()) throw new Error("Nombre de rol inválido.");
+    const matches = roles.filter(r => r.name.toLowerCase() === name.trim().toLowerCase());
+    if (matches.length !== 1) throw new Error(matches.length ? "Hay varios roles con ese nombre." : "No encontré el rol " + name + ".");
+    return matches[0];
+  };
+  const overwritePermission = async (channelId, targetId, type, allow, deny) =>
+    discordApi("/channels/" + channelId + "/permissions/" + targetId, {
+      method:"PUT", body:{type,allow:allow.toString(),deny:deny.toString()}
+    });
+
+  if (actionName === "update_channel_permissions") {
+    const channel = findChannelByName(args.channel_name);
+    const role = findRoleByName(args.role_name);
+    if (![0,5].includes(channel.type)) throw new Error("La Zona VIP debe ser un canal de texto o anuncios.");
+    const VIEW_CHANNEL = 1n << 10n, SEND_MESSAGES = 1n << 11n;
+    const everyoneAllow = 0n, everyoneDeny = VIEW_CHANNEL | SEND_MESSAGES;
+    const vipAllow = (args.permissions.view_channel ? VIEW_CHANNEL : 0n) |
+      (args.permissions.send_messages ? SEND_MESSAGES : 0n);
+    const vipDeny = (args.permissions.view_channel ? 0n : VIEW_CHANNEL) |
+      (args.permissions.send_messages ? 0n : SEND_MESSAGES);
+    await overwritePermission(channel.id, guildId, 0, everyoneAllow, everyoneDeny);
+    await overwritePermission(channel.id, role.id, 0, vipAllow, vipDeny);
+    return "Hecho, jefe. #"+channel.name+" ahora deniega acceso a @everyone y aplica los permisos indicados al rol "+role.name+".";
+  }
+
+  if (actionName === "rename_channel" && args.channel_name) {
+    const channel = findChannelByName(args.channel_name);
+    const updated = await discordApi("/channels/"+channel.id,{method:"PATCH",body:{name:safeChannelName(args.new_name)}});
+    return "Hecho, jefe. Canal renombrado a #"+updated.name;
+  }
+  if (actionName === "create_invite") {
+    const channel = findChannelByName(args.channel_name);
+    const invite = await discordApi("/channels/"+channel.id+"/invites",{method:"POST",body:{max_age:args.max_age,max_uses:0,temporary:false,unique:true}});
+    return "Hecho, jefe. Invitación: https://discord.gg/"+invite.code;
+  }
+  if (actionName === "ban_member") {
+    if (!/^\\d{17,20}$/.test(args.user_id)) throw new Error("ID de usuario inválido.");
+    await discordApi("/guilds/"+guildId+"/bans/"+args.user_id,{method:"PUT",body:{delete_message_seconds:0}});
+    return "Usuario baneado: "+args.user_id;
+  }
+  if (actionName === "unban_member") {
+    if (!/^\\d{17,20}$/.test(args.user_id)) throw new Error("ID de usuario inválido.");
+    await discordApi("/guilds/"+guildId+"/bans/"+args.user_id,{method:"DELETE"});
+    return "Hecho, jefe. Baneo retirado para "+args.user_id;
+  }
+  if (actionName === "set_nickname") {
+    const nick = args.new_nickname === null ? null : String(args.new_nickname).trim();
+    if (nick !== null && (!nick || nick.length > 32)) throw new Error("El apodo debe tener entre 1 y 32 caracteres.");
+    await discordApi("/guilds/"+guildId+"/members/"+args.user_id,{method:"PATCH",body:{nick}});
+    return "Hecho, jefe. Apodo actualizado.";
+  }
+  if (actionName === "timeout_member") {
+    const until = new Date(Date.now()+args.minutes*60000).toISOString();
+    await discordApi("/guilds/"+guildId+"/members/"+args.user_id,{method:"PATCH",body:{communication_disabled_until:until}});
+    return "Hecho, jefe. Timeout aplicado durante "+args.minutes+" minutos.";
+  }
+  if (actionName === "update_role_color") {
+    const role = findRoleByName(args.role_name);
+    const color = Number.parseInt(args.color_hex.slice(1),16);
+    await discordApi("/guilds/"+guildId+"/roles/"+role.id,{method:"PATCH",body:{color}});
+    return "Hecho, jefe. Color actualizado para "+role.name+".";
+  }
+  if (actionName === "update_role_permissions") {
+    const role = findRoleByName(args.role_name);
+    const bits = {
+      create_instant_invite:1n<<0n, kick_members:1n<<1n, ban_members:1n<<2n,
+      administrator:1n<<3n, manage_channels:1n<<4n, manage_guild:1n<<5n,
+      add_reactions:1n<<6n, view_audit_log:1n<<7n, priority_speaker:1n<<8n,
+      stream:1n<<9n, view_channel:1n<<10n, send_messages:1n<<11n,
+      manage_messages:1n<<13n, embed_links:1n<<14n, attach_files:1n<<15n,
+      read_message_history:1n<<16n, mention_everyone:1n<<17n, connect:1n<<20n,
+      speak:1n<<21n, mute_members:1n<<22n, deafen_members:1n<<23n,
+      move_members:1n<<24n, manage_roles:1n<<28n, manage_webhooks:1n<<29n,
+      manage_emojis_and_stickers:1n<<30n, moderate_members:1n<<40n
+    };
+    let permissionBits=0n;
+    for (const permission of args.permissions) {
+      if (!Object.prototype.hasOwnProperty.call(bits,permission)) throw new Error("Permiso no reconocido: "+permission);
+      permissionBits |= bits[permission];
+    }
+    await discordApi("/guilds/"+guildId+"/roles/"+role.id,{method:"PATCH",body:{permissions:permissionBits.toString()}});
+    return "Hecho, jefe. Permisos actualizados para "+role.name+".";
+  }
+  if (actionName === "delete_role") {
+    const role = findRoleByName(args.role_name);
+    await discordApi("/guilds/"+guildId+"/roles/"+role.id,{method:"DELETE"});
+    return "Rol eliminado: "+role.name;
+  }
+  if (actionName === "pin_message") {
+    const channel = findChannelByName(args.channel_name);
+    await discordApi("/channels/"+channel.id+"/pins/"+args.message_id,{method:"PUT"});
+    return "Hecho, jefe. Mensaje fijado en #"+channel.name+".";
+  }
+  if (actionName === "create_emoji") {
+    const parsed = new URL(args.image_url);
+    if (parsed.protocol !== "https:") throw new Error("La imagen debe usar HTTPS.");
+    const imageResponse = await fetch(parsed,{signal:AbortSignal.timeout(10000),redirect:"error"});
+    if (!imageResponse.ok) throw new Error("No se pudo descargar la imagen del emoji.");
+    const type = imageResponse.headers.get("content-type")?.split(";")[0];
+    if (!["image/png","image/jpeg","image/gif","image/webp"].includes(type)) throw new Error("Formato de imagen no compatible.");
+    const imageBytes = Buffer.from(await imageResponse.arrayBuffer());
+    if (!imageBytes.length || imageBytes.length > 256*1024) throw new Error("La imagen debe pesar como máximo 256 KB.");
+    const mime = type === "image/jpeg" ? "image/jpeg" : type;
+    const dataUri = "data:"+mime+";base64,"+imageBytes.toString("base64");
+    const emoji = await discordApi("/guilds/"+guildId+"/emojis",{method:"POST",body:{name:args.emoji_name,image:dataUri}});
+    return "Hecho, jefe. Emoji creado: <:"+emoji.name+":"+emoji.id+">";
+  }
+
   if (actionName === "list_channels") {
     return channels.map((channel) => ({
       id: channel.id,
