@@ -5,6 +5,7 @@ Servicio independiente del sitio RCC. Mantiene una conexión Gateway con Discord
 ## Funciones iniciales
 
 - Comando /rcc instruccion para dar instrucciones en español.
+- Comando /rcc anuncio: lee los últimos cinco commits de GitHub, genera un borrador con Gemini y exige aprobación explícita con los botones Publicar o Cancelar antes de enviarlo al canal de anuncios.
 - Consultar canales y roles; crear categorías, canales de texto y roles.
 - Renombrar canales, actualizar temas y asignar roles por mención o ID.
 - Preparar anuncios, eliminaciones, expulsiones, baneos, timeouts y borrado de mensajes para confirmación explícita.
@@ -20,7 +21,10 @@ DISCORD_APPLICATION_ID: Application ID de General Information.
 DISCORD_GUILD_ID: ID del servidor. Activa Developer Mode y copia el Server ID.
 DISCORD_OWNER_ID: tu ID de usuario de Discord. Activa Developer Mode y copia tu User ID.
 OPENAI_API_KEY: clave de OpenAI API. Mantener secreta.
-OPENAI_MODEL: opcional; por defecto gpt-6-astra.
+OPENAI_MODEL: modelo de OpenAI para /rcc instruccion (configúralo según tu cuenta).
+GEMINI_API_KEY: clave de Google AI Studio para /rcc anuncio. Mantener secreta.
+GEMINI_MODEL: opcional; por defecto gemini-2.5-flash.
+DISCORD_ANNOUNCEMENT_CHANNEL_ID: ID del canal de anuncios; si se omite, el bot busca un canal llamado anuncios, anuncio, announcements o announcement.
 
 No subas .env, el token de Discord ni la API key a GitHub. Configura estos valores como variables secretas en el proveedor donde alojes el worker.
 
@@ -28,7 +32,7 @@ No subas .env, el token de Discord ni la API key a GitHub. Configura estos valor
 
 En la carpeta discord-admin, copia .env.example como .env y completa las variables. Después ejecuta npm install, npm run check, npm run register y npm start.
 
-El comando register publica /rcc en el servidor configurado. Hay que repetirlo cuando cambie la definición del comando.
+El comando register publica /rcc con los subcomandos instruccion y anuncio en el servidor configurado. Hay que repetirlo cuando cambie la definición del comando.
 
 ## Despliegue
 
@@ -40,6 +44,6 @@ No despliegues el bot en Netlify Functions: necesita una conexión Gateway persi
 
 El bot usa únicamente el intent Guilds. No necesita Presence, Server Members ni Message Content para /rcc y no lee mensajes normales. Discord también exige que se concedan los permisos necesarios y que el rol del bot esté por encima de los roles que administra.
 
-Aunque la aplicación tenga permisos amplios, el código limita las órdenes al dueño configurado y a un solo servidor. Anuncios, eliminaciones, expulsiones, baneos, timeouts y borrado de mensajes siempre requieren pulsar Confirmar. Los botones caducan en dos minutos. Las menciones automáticas están desactivadas en anuncios.
+Aunque la aplicación tenga permisos amplios, el código limita las órdenes al dueño configurado y a un solo servidor. Anuncios generados por /rcc anuncio, eliminaciones, expulsiones, baneos, timeouts y borrado de mensajes siempre requieren pulsar Confirmar. El borrador de /rcc anuncio se publica únicamente en DISCORD_ANNOUNCEMENT_CHANNEL_ID (o en el canal de anuncios detectado automáticamente). Los botones caducan en dos minutos. Las menciones automáticas están desactivadas en anuncios.
 
 Esta integración usa la API de OpenAI por separado; no transfiere esta conversación de ChatGPT ni usa automáticamente una suscripción ChatGPT. La API puede generar cargos por uso.
