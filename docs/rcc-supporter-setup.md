@@ -1,41 +1,77 @@
-# RCC Supporter: suscripción mensual y gestión VIP
+# RCC Supporter: pagos Ko-fi, membresía VIP y Discord OAuth
 
-## 1. Crear el producto en Ko-fi
+## 1. Crear el tier en Ko-fi
 
 1. En Ko-fi, abre **Memberships** y crea un tier llamado **RCC Supporter**.
-2. Configura el precio en **USD $1.99 por mes** y añade los beneficios: acceso a la Zona VIP, insignia RCC Supporter y rol de Discord.
-3. Enlaza tu servidor de Discord en la configuración de Ko-fi y selecciona el rol que corresponde a este tier.
-4. Copia la URL de tu página de tiers. Normalmente tiene la forma `https://ko-fi.com/TU_USUARIO/tiers`.
+2. Configura el precio en **USD $1.99 por mes**.
+3. En Ko-fi abre **Settings → API / Webhooks** (el nombre puede variar) y crea un webhook para pagos de membresía.
+4. Copia el **Verification Token** que muestra Ko-fi.
+5. Configura la URL del webhook como `https://TU-DOMINIO-RCC/api/kofi-webhook`.
+6. En el mensaje de agradecimiento del tier, añade el enlace `https://TU-DOMINIO-RCC/vip-success.html` para que el comprador complete la vinculación de Discord después del pago.
 
-El sitio ya incluye tu enlace exacto como valor predeterminado: `https://ko-fi.com/lubensdrill/tiers`. La función usa `RCC_KOFI_MONTHLY_URL` si está definida en el entorno de Cloudflare Pages; si no está definida o está vacía, utiliza ese enlace predeterminado. El botón de RCC se habilitará con esta URL.
+El botón de RCC ya usa `https://ko-fi.com/lubensdrill/tiers` como enlace predeterminado.
 
-## 2. Configurar Cloudflare Pages
+## 2. Aplicar la migración de Supabase
 
-Añade estas variables a **Settings → Environment variables** (producción y preview, según corresponda):
+Ejecuta una vez `supabase/migrations/20261115100000_kofi_vip_and_discord_link.sql` en el SQL Editor del mismo proyecto Supabase que usa RCC.
+
+La migración añade `profiles.is_supporter` y `profiles.discord_id`, impide vincular un mismo Discord a dos perfiles y crea `rcc_kofi_events` para que los reintentos de Ko-fi no dupliquen el procesamiento. La tabla `profiles` guarda `user_id`, no el correo; por eso el webhook localiza primero al usuario por su correo verificado en Supabase Auth y después actualiza el perfil asociado.
+
+## 3. Configurar Cloudflare Pages
+
+Añade estas variables como **Secrets / Environment variables** en producción:
 
 - `SUPABASE_URL`: `https://cbkrpyfkteomcukdisdw.supabase.co`
-- `SUPABASE_ANON_KEY`: clave pública anon del proyecto Supabase.
+- `SUPABASE_ANON_KEY`: clave pública anon de Supabase.
 - `SUPABASE_SERVICE_ROLE_KEY`: service-role key del mismo proyecto (**secreto; nunca en el navegador**).
-- `RCC_ADMIN_EMAIL`: correo exacto de la cuenta autorizada para activar o retirar VIP.
-- `RCC_KOFI_MONTHLY_URL` (opcional): URL de tu página Ko-fi Membership Tiers. Valor predeterminado: `https://ko-fi.com/lubensdrill/tiers`.
-- `DISCORD_WEBHOOK_URL`: webhook privado del canal donde quieres recibir los cambios manuales de VIP. El endpoint lo reutiliza para notificar activaciones y retiradas.
+- `RCC_ADMIN_EMAIL`: `drillbobhii@gmail.com` (mantiene los permisos de Creador/admin separados del estado Supporter).
+- `KOFI_VERIFICATION_TOKEN`: token de verificación copiado desde Ko-fi.
+- `RCC_VIP_API_URL`: URL HTTPS completa del endpoint Railway, por ejemplo `https://TU-SERVICIO.up.railway.app/vip/grant`.
+- `RCC_VIP_WEBHOOK_SECRET`: secreto aleatorio largo compartido con Railway. Usa exactamente el mismo valor en ambos servicios.
+- `RCC_KOFI_MONTHLY_URL` (opcional): URL de Ko-fi Membership Tiers.
+- `DISCORD_WEBHOOK_URL` (opcional): webhook privado para avisos de cambios manuales desde el panel admin.
 
-La función valida el JWT de Supabase y compara el correo del usuario con `RCC_ADMIN_EMAIL`. Solo el servidor usa `SUPABASE_SERVICE_ROLE_KEY` para leer y modificar membresías.
+No publiques ni compartas la service-role key, el token de Ko-fi ni el secreto compartido.
 
-## 3. Crear la tabla VIP
+## 4. Configurar Railway y el rol de Discord
 
-Ejecuta una vez el SQL de `supabase/migrations/20261114190000_create_rcc_vip_memberships.sql` en el SQL Editor del proyecto Supabase. La tabla no concede permisos directos a usuarios autenticados; las modificaciones pasan por la función de servidor.
+En el servicio Railway de `discord-admin`, añade:
 
-Después de desplegar, abre `/admin.html`, inicia sesión con la cuenta indicada en `RCC_ADMIN_EMAIL`, busca al miembro por su correo y activa o desactiva **Es VIP**. La acción se registra en la tabla y se envía un aviso al webhook de Discord cuando esté configurado.
+- `DISCORD_GUILD_ID`: ID del servidor RCC.
+- `DISCORD_BOT_TOKEN`: token privado del bot ya existente.
+- `DISCORD_VIP_ROLE_ID`: ID del rol RCC Supporter.
+- `RCC_VIP_WEBHOOK_SECRET`: el mismo secreto configurado en Cloudflare Pages.
 
-## 4. Cobros, cancelaciones y permisos de Discord
+El bot y el comprador deben estar dentro del servidor; el bot necesita permiso **Gestionar roles** y su rol más alto debe estar por encima del rol RCC Supporter. El endpoint privado `POST /vip/grant` valida el secreto compartido antes de pedir a Discord que asigne el rol.
 
-El checkout mensual lo gestiona Ko-fi. La activación VIP del catálogo es manual: después de confirmar el pago, busca el correo del comprador en el panel admin y activa **Es VIP**. Cuando la persona cancele o termine su periodo de acceso, vuelve al panel y desactívalo. El repositorio no recibe ni verifica automáticamente los eventos de pago/cancelación de Ko-fi.
+## 5. Activar Discord OAuth en Supabase
 
-El rol de Discord se configura en Ko-fi para ese tier; la notificación webhook de RCC solo informa al equipo de que el acceso manual se activó o retiró. No sustituye la asignación del rol gestionada por Ko-fi.
+1. En Supabase abre **Authentication → Sign In / Providers** y activa **Discord**.
+2. Introduce el Client ID y Client Secret de la aplicación OAuth de Discord.
+3. En Discord Developer Portal, añade como OAuth2 Redirect URI la URL de callback que muestra Supabase, normalmente `https://TU-PROYECTO.supabase.co/auth/v1/callback`.
+4. En Supabase **Authentication → URL Configuration**, añade `https://TU-DOMINIO-RCC/vip-success.html` a las Redirect URLs permitidas.
+5. Habilita el enlace manual de identidades si tu configuración de Supabase lo requiere.
 
-## 5. Alcance del desenfoque
+El usuario debe iniciar sesión primero en su cuenta RCC y después pulsar **Vincular mi Discord**. Si todavía no tiene cuenta, puede crearla desde esta página con el mismo correo de Ko-fi y verificarlo. La página usa Supabase OAuth para enlazar la identidad Discord con esa misma cuenta; el servidor extrae el ID de la identidad verificada, no confía en un ID enviado libremente por el navegador.
 
-La selección de scripts VIP es estable y marca aproximadamente el 35 % del catálogo. La interfaz desenfoca las tarjetas y el código de esos scripts para cuentas sin acceso.
+## 6. Flujo automático y separación de permisos
 
-**Importante:** el catálogo actual se distribuye como JSON público. Por eso, el desenfoque es una barrera visual y no una protección fuerte del contenido: una persona con conocimientos técnicos podría descargar los datos públicos. Para ocultar realmente los códigos es necesario mover los scripts VIP a almacenamiento privado y servirlos únicamente después de validar el acceso en el servidor. Esta PR no finge implementar esa protección de almacenamiento que el repositorio todavía no tiene.
+- Ko-fi envía el evento de suscripción a `/api/kofi-webhook`.
+- El webhook valida el Verification Token, comprueba que sea una suscripción de al menos USD $1.99 y obtiene el correo del comprador.
+- Busca ese correo en Supabase Auth, encuentra su perfil y activa tanto `profiles.is_supporter = true` como `rcc_vip_memberships.is_vip = true`. Funciona para cualquier comprador, no exige que sea el creador. Si aún no tiene una cuenta RCC o no ha verificado el correo, el pago queda pendiente y puede reclamarlo después desde la página de éxito usando ese mismo correo.
+- Si el perfil ya tiene `discord_id`, el webhook solicita a Railway que asigne el rol VIP.
+- Si todavía no tiene Discord vinculado, el comprador abre `/vip-success.html`, inicia sesión o crea/verifica la cuenta RCC con el correo usado al comprar y completa Discord OAuth. La API reclama cualquier pago pendiente de ese correo, guarda el ID verificado y solicita el rol inmediatamente.
+- El correo `drillbobhii@gmail.com` conserva sus poderes de Creador mediante `RCC_ADMIN_EMAIL`. Comprar el tier no convierte a ningún otro usuario en administrador.
+
+El webhook procesa de forma idempotente los IDs de evento de Ko-fi. Esta implementación activa la membresía cuando llega un pago válido; la cancelación/fin de periodo debe retirarse desde el panel admin hasta que se integre un evento de cancelación fiable de Ko-fi.
+
+## 7. Comprobación
+
+1. Aplica la migración y configura todos los secretos.
+2. Verifica que `https://TU-SERVICIO.up.railway.app/healthz` responde JSON con `{"ok":true}`.
+3. Para comprobar la activación, usa un evento de suscripción USD de al menos $1.99 y revisa los logs de Cloudflare Pages. El evento genérico de prueba de Ko-fi puede ignorarse si no cumple ese importe.
+4. Comprueba que el perfil comprador tiene `is_supporter = true` y la fila de `rcc_vip_memberships` tiene `is_vip = true`.
+5. Abre `/vip-success.html`, inicia sesión con ese mismo correo y vincula Discord.
+6. Comprueba que el rol RCC Supporter aparece en el usuario dentro del servidor.
+
+**Nota:** el catálogo actual distribuye algunos datos de scripts como JSON público; el desenfoque VIP de la interfaz no es protección criptográfica del contenido. Esta integración automatiza el estado de membresía y el rol de Discord, pero no convierte los datos públicos del catálogo en almacenamiento privado.
