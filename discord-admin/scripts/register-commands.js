@@ -13,11 +13,23 @@ const command = {
   type: 1,
   options: [
     {
-      type: 3,
-      name: "solicitud",
-      description: "Describe en español lo que quieres que haga",
-      required: true,
-      max_length: 1000
+      type: 1,
+      name: "instruccion",
+      description: "Pide a RCC Admin que gestione el servidor",
+      options: [
+        {
+          type: 3,
+          name: "solicitud",
+          description: "Describe en español lo que quieres que haga",
+          required: true,
+          max_length: 1000
+        }
+      ]
+    },
+    {
+      type: 1,
+      name: "anuncio",
+      description: "Genera un anuncio con los últimos commits y pide tu aprobación"
     }
   ]
 };
