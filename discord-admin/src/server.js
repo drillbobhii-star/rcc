@@ -660,6 +660,52 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === "POST" && req.url === "/vip/grant") {
+    const expectedSecret = process.env.RCC_VIP_WEBHOOK_SECRET || "";
+    const suppliedSecret = req.headers.authorization?.match(/^Bearer\\s+(.+)$/i)?.[1] || "";
+    const expectedBytes = Buffer.from(expectedSecret, "utf8");
+    const suppliedBytes = Buffer.from(suppliedSecret, "utf8");
+    const secretMatches = expectedBytes.length > 0 &&
+      expectedBytes.length === suppliedBytes.length &&
+      crypto.timingSafeEqual(expectedBytes, suppliedBytes);
+    if (!secretMatches) {
+      jsonResponse(res, 401, { error: "Unauthorized" });
+      return;
+    }
+
+    let rawVipBody;
+    try {
+      rawVipBody = await readRawBody(req);
+    } catch (error) {
+      jsonResponse(res, error.statusCode || 400, { error: error.message });
+      return;
+    }
+
+    try {
+      const payload = JSON.parse(rawVipBody.toString("utf8"));
+      const discordId = typeof payload.discord_id === "string" ? payload.discord_id : "";
+      const guildId = process.env.DISCORD_GUILD_ID || "";
+      const roleId = process.env.DISCORD_VIP_ROLE_ID || "";
+      if (!/^\\d{17,20}$/.test(discordId)) {
+        jsonResponse(res, 400, { error: "Discord user ID inválido." });
+        return;
+      }
+      if (!/^\\d{17,20}$/.test(guildId) || !/^\\d{17,20}$/.test(roleId)) {
+        jsonResponse(res, 503, { error: "Falta configurar DISCORD_GUILD_ID o DISCORD_VIP_ROLE_ID." });
+        return;
+      }
+
+      await discordApi("/guilds/" + guildId + "/members/" + discordId + "/roles/" + roleId, {
+        method: "PUT"
+      });
+      jsonResponse(res, 200, { ok: true, discord_id: discordId, role_id: roleId });
+    } catch (error) {
+      console.error("Error al asignar rol VIP:", error);
+      jsonResponse(res, 502, { error: String(error.message || error).slice(0, 500) });
+    }
+    return;
+  }
+
   if (req.method !== "POST" || req.url !== "/interactions") {
     textResponse(res, 404, "Not found");
     return;
