@@ -189,7 +189,7 @@ async function adminConversationList(env: Env) {
   const [conversations, users, profiles, notes] = await Promise.all([
     rest<Array<Record<string, unknown>>>(env, "rcc_chat_conversations?select=*&order=updated_at.desc"),
     listAuthUsers(env),
-    rest<Array<Record<string, unknown>>>(env, "profiles?select=user_id,display_name,avatar_url,is_banned"),
+    rest<Array<Record<string, unknown>>>(env, "profiles?select=user_id,display_name,avatar_url,discord_id,is_banned"),
     rest<Array<Record<string, unknown>>>(env, "rcc_admin_private_notes?select=user_id,note,updated_at"),
   ]);
   const userMap = new Map(users.map(u => [u.id, u]));
@@ -206,6 +206,7 @@ async function adminConversationList(env: Env) {
       name: String(profile?.display_name || user?.user_metadata?.full_name || user?.email || userId),
       avatar_url: String(profile?.avatar_url || user?.user_metadata?.avatar_url || ""),
       is_banned: profile?.is_banned === true,
+      discord_id: typeof profile?.discord_id === "string" ? profile.discord_id : null,
       admin_note: String(note?.note || ""),
     };
   });
