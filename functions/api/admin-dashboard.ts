@@ -297,6 +297,9 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
 
     if (action === "forceRole") {
       if (!userId) return json({ error: "Selecciona un usuario." }, 400);
+      const membershipQuery = new URLSearchParams({ user_id: "eq." + userId, select: "is_vip", limit: "1" });
+      const memberships = await rest<Array<{ is_vip: boolean }>>(env, "rcc_vip_memberships?" + membershipQuery.toString());
+      if (memberships[0]?.is_vip !== true) return json({ error: "Solo se puede forzar el rol a miembros con VIP activo." }, 409);
       const query = new URLSearchParams({ user_id: "eq." + userId, select: "discord_id", limit: "1" });
       const profiles = await rest<Array<{ discord_id?: string | null }>>(env, "profiles?" + query.toString());
       const discordId = profiles[0]?.discord_id || "";
