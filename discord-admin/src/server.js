@@ -200,10 +200,10 @@ const toolDefinitions = [
       parameters: {
       type: "object",
       properties: {
-        channel_id: { type: "string" },
+        channel_name: { type: "string" },
         new_name: { type: "string" }
       },
-      required: ["channel_id", "new_name"],
+      required: ["channel_name", "new_name"],
       additionalProperties: false
       }
     }
@@ -241,7 +241,6 @@ const toolDefinitions = [
 
 for (const [name, description, properties, required] of [
   ["update_channel_permissions","Configura permisos de un canal para @everyone y un rol nombrado. permissions es un objeto con view_channel y send_messages booleanos.",{channel_name:{type:"string"},role_name:{type:"string"},permissions:{type:"object",properties:{view_channel:{type:"boolean"},send_messages:{type:"boolean"}},required:["view_channel","send_messages"],additionalProperties:false}},["channel_name","role_name","permissions"]],
-  ["rename_channel","Renombra un canal por su nombre actual.",{channel_name:{type:"string"},new_name:{type:"string"}},["channel_name","new_name"]],
   ["create_invite","Crea un enlace de invitación para un canal; max_age en segundos, 0 significa nunca expira.",{channel_name:{type:"string"},max_age:{type:"integer",minimum:0,maximum:604800}},["channel_name","max_age"]],
   ["ban_member","Solicita banear un usuario por ID. Siempre requiere confirmación manual.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},reason:{type:"string"}},["user_id","reason"]],
   ["unban_member","Retira el baneo de un usuario por ID.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"}},["user_id"]],
@@ -277,7 +276,7 @@ const SYSTEM_INSTRUCTIONS = [
   "El dueño puede pedirte crear, renombrar y consultar canales o categorías, y redactar anuncios. Traduce sus instrucciones a las herramientas disponibles sin inventar resultados.",
   "Solo puedes ejecutar las funciones que aparecen en la lista de herramientas. No inventes capacidades ni IDs.",
   "El usuario actual tiene permiso de gestionar el servidor. Aun así, nunca intentes saltarte los límites de Discord.",
-  "Usa la lista de canales incluida en cada solicitud para identificar el canal correcto.",
+  "Usa las listas de canales y roles incluidas en cada solicitud para identificar nombres exactos y evitar confusiones.",
   "No uses menciones @everyone, @here ni menciones de usuarios en anuncios. Las menciones están desactivadas por el servidor.",
   "Solo borrar canales, borrar roles, banear miembros, borrar mensajes y publicar anuncios requieren aprobación manual mediante botones. Las demás herramientas permitidas se ejecutan directamente.",
   "Si la petición es ambigua, pregunta antes de ejecutar una herramienta. Si una función no está disponible, explícalo sin fingir que la realizaste.",
@@ -556,9 +555,12 @@ function actionDescription(actionName, args, channels) {
       ". Se seleccionan al confirmar; se omiten los de 14 días o más.";
   }
   if (actionName === "delete_channel") {
-    const channel = channels.find((item) => item.id === args.channel_id);
-    return "Borrar el canal #" + (channel?.name || args.channel_id);
+    const channel = channels.find(item => item.name.toLowerCase() === safeChannelName(args.channel_name || ""));
+    if (!channel) throw new Error("No encontré el canal que se va a borrar.");
+    return "Borrar el canal #" + channel.name;
   }
+  if (actionName === "delete_role") return "Borrar el rol " + args.role_name;
+  if (actionName === "ban_member") return "Banear al usuario " + args.user_id + " por: " + String(args.reason || "Sin motivo").slice(0,300);
   if (actionName === "send_announcement") {
     const channel = channels.find((item) => item.id === args.channel_id);
     return "Publicar este anuncio en #" + (channel?.name || args.channel_id) + ":\n" + args.content;
