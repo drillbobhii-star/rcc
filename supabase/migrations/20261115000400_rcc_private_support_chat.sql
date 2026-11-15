@@ -14,10 +14,12 @@ security definer
 set search_path = pg_catalog, auth
 as $
 begin
-  if new.is_banned is distinct from old.is_banned
-     and coalesce(auth.role(), '') <> 'service_role' then
-    raise exception 'is_banned can only be changed by the RCC support backend'
-      using errcode = '42501';
+  if coalesce(auth.role(), '') <> 'service_role' then
+    if (tg_op = 'INSERT' and new.is_banned is true)
+       or (tg_op = 'UPDATE' and new.is_banned is distinct from old.is_banned) then
+      raise exception 'is_banned can only be changed by the RCC support backend'
+        using errcode = '42501';
+    end if;
   end if;
   return new;
 end;
@@ -27,7 +29,7 @@ revoke all on function public.rcc_protect_account_ban_flag() from public, anon, 
 
 drop trigger if exists trg_rcc_protect_account_ban_flag on public.profiles;
 create trigger trg_rcc_protect_account_ban_flag
-before update of is_banned on public.profiles
+before insert or update of is_banned on public.profiles
 for each row
 execute function public.rcc_protect_account_ban_flag();
 
