@@ -279,7 +279,10 @@
       }
       await poll();
       pollTimer = setInterval(() => { void poll(); },4000);
-      if ("Notification" in window && Notification.permission === "granted") void enablePush(false);
+      if ("Notification" in window) {
+        if (Notification.permission === "granted") void enablePush(false);
+        else if (Notification.permission === "default") void enablePush(true);
+      }
       client.auth.onAuthStateChange((_event,next) => {
         session = next;
         if (!session?.access_token || session.user?.email?.trim().toLowerCase() !== ADMIN_EMAIL) {
