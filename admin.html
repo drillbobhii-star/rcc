@@ -23,6 +23,8 @@
 .rcc-admin-compose{display:grid;grid-template-columns:1fr auto;gap:9px;padding:13px;border-top:1px solid var(--line)}.rcc-admin-compose textarea{resize:vertical;min-height:48px;max-height:130px;background:#11182a;border:1px solid var(--line);border-radius:11px;color:white;padding:12px;font:14px inherit}.rcc-admin-compose-actions{display:flex;gap:6px;align-items:end}.rcc-admin-note{padding:13px;border-top:1px solid var(--line);background:rgba(7,10,19,.55)}.rcc-admin-note label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.rcc-admin-note textarea{width:100%;min-height:56px;background:#11182a;border:1px solid var(--line);border-radius:10px;color:#fff;padding:10px;font:13px inherit}
 #rccQuickMenu{position:absolute;z-index:5;right:15px;bottom:125px;background:#1b2034;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 15px 40px #0009;display:grid;gap:5px}#rccQuickMenu[hidden]{display:none}#rccQuickMenu button{text-align:left;border:0;border-radius:8px;background:#292f4b;color:#fff;padding:9px;cursor:pointer}
 #rccAdminMessagesPanel{position:relative}@media(max-width:850px){#rccMessagesLayout{grid-template-columns:1fr}.rcc-chat-admin-pane{min-height:560px}#rccConversationList{min-height:170px;max-height:220px;display:flex;overflow:auto}.rcc-conversation{min-width:230px}.admin-stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){#rccAdminShell{padding:14px 10px}.admin-top{align-items:flex-start;flex-direction:column}.admin-actions{width:100%}.admin-actions button{flex:1}.admin-tabs{display:grid;grid-template-columns:repeat(2,1fr)}.admin-tab{padding:11px 8px}.rcc-chat-admin-messages{max-height:none}.rcc-admin-msg{max-width:92%}.rcc-admin-compose{grid-template-columns:1fr}.rcc-admin-compose-actions{justify-content:flex-end}}
+.rcc-chat-inbox-toolbar{display:grid;grid-template-columns:auto minmax(180px,1fr) auto;gap:10px;align-items:center;margin:0 0 13px}.rcc-chat-list-tabs,.rcc-chat-global-actions{display:flex;gap:7px;flex-wrap:wrap}.rcc-chat-list-tabs .active{background:linear-gradient(120deg,#6656c2,#327c95);border-color:#a99cff}.rcc-chat-list-tabs button span{display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:4px;border-radius:20px;background:#ffffff20}.rcc-chat-inbox-toolbar input{min-width:0;height:40px;border:1px solid var(--line);border-radius:11px;background:#11182a;color:#fff;padding:0 12px}.rcc-chat-global-actions{justify-content:flex-end}.rcc-chat-typing{min-height:20px;padding:0 14px 7px;color:var(--cyan);font-size:12px}.rcc-chat-typing:empty{display:none}
+@media(max-width:1050px){.rcc-chat-inbox-toolbar{grid-template-columns:1fr}.rcc-chat-global-actions{justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -47,12 +49,24 @@
 <section id="panel-messages" class="admin-panel">
   <div id="rccAdminMessagesPanel" class="glass-card">
     <div class="card-head"><div><h2>Mensajería privada y soporte VIP</h2><div class="hint">Conversaciones privadas · sincronización cada 4 segundos</div></div><span id="rccChatAdminStatus" class="pill ok">Seguro</span></div>
+    <div class="rcc-chat-inbox-toolbar">
+      <div class="rcc-chat-list-tabs" role="tablist" aria-label="Filtros de conversaciones">
+        <button id="rccActiveChatsTab" class="small-btn" type="button" aria-pressed="false">Usuarios Activos <span id="rccActiveCount">0</span></button>
+        <button id="rccRecentChatsTab" class="small-btn active" type="button" aria-pressed="true">Chats Recientes</button>
+      </div>
+      <input id="rccChatSearch" type="search" placeholder="Buscar chats por nombre o correo…" autocomplete="off">
+      <div class="rcc-chat-global-actions">
+        <button id="rccBroadcast" class="small-btn" type="button">Enviar Anuncio a Todos</button>
+        <button id="rccEnablePush" class="small-btn" type="button">Activar notificaciones</button>
+      </div>
+    </div>
     <div id="rccMessagesLayout">
       <aside id="rccConversationList" aria-label="Conversaciones"><div class="empty-state">Cargando chats…</div></aside>
       <section class="rcc-chat-admin-pane" aria-label="Conversación seleccionada">
         <header class="rcc-chat-admin-head"><div><strong id="rccChatAdminTitle">Selecciona un usuario</strong><div id="rccChatAdminSubtitle" class="hint">Los mensajes privados aparecerán aquí.</div></div><div class="rcc-chat-admin-controls"><button id="rccToggleChat" class="small-btn" disabled>Habilitar chat</button><button id="rccDeleteChat" class="small-btn danger" disabled>Borrar chat</button><button id="rccRestrict" class="small-btn danger" disabled>Restringir acceso</button><button id="rccUnrestrict" class="small-btn" hidden>Quitar restricción</button></div></header>
         <div id="rccAdminChatMessages" class="rcc-chat-admin-messages"><div class="empty-state">Selecciona una conversación para ver sus mensajes.</div></div>
-        <div class="rcc-admin-compose"><textarea id="rccAdminChatInput" placeholder="Escribe un mensaje al usuario…" maxlength="5000" disabled></textarea><div class="rcc-admin-compose-actions"><input id="rccAdminChatFile" type="file" accept="image/*,.pdf,.txt,.csv,.json,.zip,.docx" hidden><button id="rccAdminAttach" class="small-btn" disabled>Adjuntar</button><button id="rccQuickReply" class="small-btn" disabled>Respuestas rápidas ▾</button><button id="rccAdminSend" class="small-btn" disabled>Enviar</button></div></div>
+        <div id="rccChatAdminTyping" class="rcc-chat-typing" aria-live="polite"></div>
+        <div class="rcc-admin-compose"><textarea id="rccAdminChatInput" placeholder="Escribe un mensaje al usuario…" maxlength="5000" disabled></textarea><div class="rcc-admin-compose-actions"><button id="rccQuickReply" class="small-btn" disabled>Respuestas rápidas ▾</button><button id="rccAdminSend" class="small-btn" disabled>Enviar</button></div></div>
         <div id="rccQuickMenu" hidden></div>
         <div class="rcc-admin-note"><label for="rccPrivateNote">Notas internas privadas · solo visible para el Creador</label><textarea id="rccPrivateNote" placeholder="Notas internas sobre este usuario…" maxlength="10000" disabled></textarea><div style="display:flex;justify-content:flex-end;margin-top:7px"><button id="rccSaveNote" class="small-btn" disabled>Guardar nota privada</button></div></div>
       </section>
