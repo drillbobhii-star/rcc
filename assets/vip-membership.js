@@ -44,24 +44,31 @@
         : 'El administrador debe configurar RCC_KOFI_MONTHLY_URL con el enlace de la página de membresías de Ko-fi.';
     }
   }
-  async function refreshStatus() {
-    if (state.loading) return;
+  let statusRequestId = 0;
+
+  async function refreshStatus(sessionOverride) {
+    // Never drop a refresh: auth events can arrive while an earlier query is pending.
+    const requestId = ++statusRequestId;
     state.loading = true;
     try {
-      let headers = {};
-      try {
-        const client = await window.rccSupabaseReady;
-        const { data } = await client.auth.getSession();
-        if (data?.session?.access_token) headers.Authorization = 'Bearer ' + data.session.access_token;
-      } catch {}
       const client = await window.rccSupabaseReady;
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
-      if (sessionError) throw sessionError;
-      const user = sessionData?.session?.user || null;
+      let session;
+      if (arguments.length > 0) {
+        // onAuthStateChange supplies the authoritative session, including null on sign-out.
+        session = sessionOverride;
+      } else {
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+        session = data?.session || null;
+      }
 
-      // Read the signed-in user's VIP entitlement from the membership table itself.
-      // RLS must allow authenticated users to SELECT only their own user_id row.
-      state.isVip = false;
+      const user = session?.user || null;
+      const headers = session?.access_token
+        ? { Authorization: 'Bearer ' + session.access_token }
+        : {};
+
+      // Reset immediately for signed-out accounts; never retain a previous user's VIP flag.
+      let isVip = false;
       if (user?.id) {
         const { data: membership, error: membershipError } = await client
           .from('rcc_vip_memberships')
@@ -69,23 +76,56 @@
           .eq('user_id', user.id)
           .maybeSingle();
         if (membershipError) throw membershipError;
-        state.isVip = membership?.is_vip === true;
+        isVip = membership?.is_vip === true;
       }
 
-      // Keep the server endpoint for admin status and the checkout URL only;
-      // it is no longer the source of truth for the user's VIP entitlement.
       const response = await fetch('/api/vip-membership', { headers, cache: 'no-store' });
       if (!response.ok) throw new Error('No se pudo consultar la configuración de membresía.');
       const result = await response.json();
+
+      // Ignore stale responses if a newer sign-in/sign-out event has already started.
+      if (requestId !== statusRequestId) return;
+      state.isVip = isVip;
       state.isAdmin = result.isAdmin === true;
       state.checkoutUrl = typeof result.checkoutUrl === 'string' && /^https:\/\/(?:www\.)?ko-fi\.com\//.test(result.checkoutUrl) ? result.checkoutUrl : DEFAULT_CHECKOUT_URL;
-    } catch {
+    } catch (error) {
+      if (requestId !== statusRequestId) return;
+      console.error('[RCC VIP] No se pudo actualizar el estado:', error);
       state.isVip = false;
       state.isAdmin = false;
     } finally {
-      state.loading = false;
-      syncCheckout();
-      decorateCards();
+      if (requestId === statusRequestId) {
+        state.loading = false;
+        syncCheckout();
+        decorateCards();
+        if (activeScript) applyModalGate(activeScript);
+      }
+    }
+  }
+
+  async function initializeAuthListener() {
+    try {
+      const client = await window.rccSupabaseReady;
+      // Subscribe before the initial read so sign-in changes cannot be missed.
+      let currentUserId = null;
+      const { data, error } = client.auth.onAuthStateChange((_event, session) => {
+        const nextUserId = session?.user?.id || null;
+        if (nextUserId !== currentUserId) {
+          currentUserId = nextUserId;
+          // Do not briefly expose the previous account's VIP state after an account switch/sign-out.
+          state.isVip = false;
+          decorateCards();
+          if (activeScript) applyModalGate(activeScript);
+        }
+        // Defer Supabase queries outside the auth callback to avoid blocking its internal lock.
+        Promise.resolve().then(() => refreshStatus(session));
+      });
+      if (error) throw error;
+      window.rccVipAuthSubscription = data?.subscription || null;
+      await refreshStatus();
+    } catch (error) {
+      console.error('[RCC VIP] No se pudo inicializar la sesión:', error);
+      await refreshStatus(null);
     }
   }
   function decorateCards() {
@@ -201,5 +241,5 @@
     percentage: VIP_PERCENTAGE,
   };
   syncCheckout();
-  Promise.resolve(window.rccSessionReady).finally(refreshStatus);
+  void initializeAuthListener();
 })();
