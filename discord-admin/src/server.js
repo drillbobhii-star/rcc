@@ -334,6 +334,22 @@ const toolDefinitions = [
   {
     type: "function",
     function: {
+      name: "create_role",
+      description: "Crea un rol nuevo en el servidor. Úsala siempre que el administrador pida crear, añadir o hacer un rol.",
+      parameters: {
+        type: "object",
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 100, description: "Nombre del nuevo rol." },
+          color_hex: { type: ["string", "null"], pattern: "^#[0-9a-fA-F]{6}$", description: "Color hexadecimal #RRGGBB o null para el color predeterminado." }
+        },
+        required: ["name", "color_hex"],
+        additionalProperties: false
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "create_text_channel",
       description: "Crea un canal de texto. parent_id debe ser el ID de una categoría existente o null.",
       parameters: {
@@ -631,6 +647,21 @@ async function executeAction(guildId, actionName, args) {
       ". Administradores y permisos explícitos de otros roles o miembros pueden permitir escribir.";
   }
 
+  if (actionName === "create_role") {
+    const name = String(args.name || "").trim();
+    if (!name || name.length > 100) throw new Error("El nombre del rol debe tener entre 1 y 100 caracteres.");
+    const colorHex = args.color_hex;
+    if (colorHex !== null && colorHex !== undefined && !/^#[0-9a-fA-F]{6}$/.test(colorHex)) {
+      throw new Error("El color debe tener el formato hexadecimal #RRGGBB o ser null.");
+    }
+    const color = colorHex ? Number.parseInt(colorHex.slice(1), 16) : 0;
+    const created = await discordApi("/guilds/" + guildId + "/roles", {
+      method: "POST",
+      body: { name, color, mentionable: false, hoist: false }
+    });
+    return "Hecho, jefe. Rol creado: " + created.name + (colorHex ? " (" + colorHex + ")" : "");
+  }
+
   if (actionName === "create_category") {
     const name = safeChannelName(args.name);
     const created = await discordApi("/guilds/" + guildId + "/channels", {
@@ -755,6 +786,7 @@ async function askGemini(guildId, requestText, attachments = []) {
       "\\n\\nCanales actuales del servidor (usa estos IDs exactos):\\n" + JSON.stringify(channelContext) +
       "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
   }, ...attachmentParts];
+  console.log("[Gemini] Herramientas enviadas (" + toolDefinitions.length + "):\\n" + JSON.stringify(toolDefinitions, null, 2));
   const response = await createGeminiCompletion(client, {
     model: GEMINI_MODEL,
     messages: [
