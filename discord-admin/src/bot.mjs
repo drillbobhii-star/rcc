@@ -5,7 +5,7 @@ import {
   Events, GatewayIntentBits, MessageFlags,
 } from 'discord.js';
 
-const required = ['DISCORD_BOT_TOKEN', 'DISCORD_APPLICATION_ID', 'DISCORD_GUILD_ID', 'DISCORD_OWNER_ID', 'OPENAI_API_KEY'];
+const required = ['DISCORD_BOT_TOKEN', 'DISCORD_APPLICATION_ID', 'DISCORD_GUILD_ID', 'DISCORD_OWNER_ID', 'OPENAI_API_KEY', 'OPENAI_MODEL'];
 const missing = required.filter((key) => !process.env[key]?.trim());
 if (missing.length) {
   console.error('Faltan variables de entorno: ' + missing.join(', '));
