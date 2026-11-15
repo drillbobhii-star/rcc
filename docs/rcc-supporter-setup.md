@@ -7,7 +7,7 @@
 3. En Ko-fi abre **Settings → API / Webhooks** (el nombre puede variar) y crea un webhook para pagos de membresía.
 4. Copia el **Verification Token** que muestra Ko-fi.
 5. Configura la URL del webhook como `https://TU-DOMINIO-RCC/api/kofi-webhook`.
-6. En el mensaje de agradecimiento del tier, añade el enlace `https://TU-DOMINIO-RCC/vip-success.html` para que el comprador complete la vinculación de Discord después del pago.
+6. En la descripción del tier **o** en el mensaje de agradecimiento que Ko-fi muestra después del pago, añade un enlace o botón con esta URL exacta: `https://rcc-3m0.pages.dev/vip-success.html`. Ese enlace lo pulsa el comprador cuando termina el pago para abrir la página de RCC y vincular Discord.\n\n**Importante:** no configures ni dependas de una redirección automática después del pago. Ko-fi puede dejar al comprador en su página de agradecimiento; el acceso a RCC se inicia únicamente cuando pulsa el enlace que tú colocaste allí. La página `vip-success.html` es una página independiente y no necesita recibir parámetros, cookies ni datos de redirección de Ko-fi.
 
 El botón de RCC ya usa `https://ko-fi.com/lubensdrill/tiers` como enlace predeterminado.
 
@@ -49,10 +49,10 @@ El bot y el comprador deben estar dentro del servidor; el bot necesita permiso *
 1. En Supabase abre **Authentication → Sign In / Providers** y activa **Discord**.
 2. Introduce el Client ID y Client Secret de la aplicación OAuth de Discord.
 3. En Discord Developer Portal, añade como OAuth2 Redirect URI la URL de callback que muestra Supabase, normalmente `https://TU-PROYECTO.supabase.co/auth/v1/callback`.
-4. En Supabase **Authentication → URL Configuration**, añade `https://TU-DOMINIO-RCC/vip-success.html` a las Redirect URLs permitidas.
+4. En Supabase **Authentication → URL Configuration**, añade `https://rcc-3m0.pages.dev/vip-success.html` a las Redirect URLs permitidas para que el regreso desde Google/Discord OAuth y la confirmación de correo vuelvan a la página correcta.
 5. Habilita el enlace manual de identidades si tu configuración de Supabase lo requiere.
 
-El usuario debe iniciar sesión primero en su cuenta RCC y después pulsar **Vincular mi Discord**. Si todavía no tiene cuenta, puede crearla desde esta página con el mismo correo de Ko-fi y verificarlo. La página usa Supabase OAuth para enlazar la identidad Discord con esa misma cuenta; el servidor extrae el ID de la identidad verificada, no confía en un ID enviado libremente por el navegador.
+El usuario debe iniciar sesión primero en su cuenta RCC y después pulsar **Vincular mi Discord**. Si todavía no tiene cuenta, puede crearla desde esta página con el mismo correo de Ko-fi y verificarlo. El comprador llega aquí pulsando el enlace manual de la página de agradecimiento de Ko-fi; no se requiere ninguna redirección automática ni que RCC conozca la URL de origen. La página usa Supabase OAuth para enlazar la identidad Discord con esa misma cuenta; el servidor extrae el ID de la identidad verificada, no confía en un ID enviado libremente por el navegador.
 
 ## 6. Flujo automático y separación de permisos
 
