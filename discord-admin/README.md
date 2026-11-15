@@ -4,7 +4,7 @@ Servicio independiente para administrar un servidor Discord desde el proyecto RC
 
 ## Funciones de esta primera versión
 
-- Comando slash `/rcc` para recibir instrucciones en español.
+- Comando slash `/rcc` para instrucciones administrativas, restringido al creador configurado y miembros con permiso Administrator.\n- Comando slash `/hablar` para conversación con RCC sin herramientas ni acciones administrativas.\n- Crear/eliminar roles, asignar roles, crear canales de voz y texto, enviar mensajes, aplicar timeout y expulsar miembros; todas las mutaciones requieren aprobación del solicitante.
 - Google Gemini mediante el endpoint compatible con OpenAI.
 - Crear categorías y canales de texto.
 - Renombrar canales y consultar la estructura del servidor.
@@ -13,7 +13,7 @@ Servicio independiente para administrar un servidor Discord desde el proyecto RC
 - Verificación de firmas Ed25519 de Discord y restricción a un servidor.
 - No requiere Gateway ni Privileged Gateway Intents.
 
-La primera versión todavía no implementa gestión de roles, expulsiones, baneos ni funciones de voz. Tener permisos activados en Discord no implementa automáticamente esas funciones.
+No se implementan baneos ni funciones de voz avanzadas. Discord sigue aplicando jerarquía de roles y permisos del bot.
 
 ## Requisitos
 
@@ -31,7 +31,7 @@ Configura estas variables en Railway > servicio > Variables:
 - `DISCORD_BOT_TOKEN`: token regenerado del bot.
 - `GEMINI_API_KEY`: clave regenerada de Gemini.
 - `GEMINI_MODEL`: por defecto `gemini-3.8-flash`.
-- `DISCORD_GUILD_ID`: ID del servidor autorizado.
+- `DISCORD_GUILD_ID`: ID del servidor autorizado.\n- `DISCORD_OWNER_ID`: ID de usuario Discord del creador; es el ID personal, no el ID del servidor.
 - `REGISTER_COMMANDS_ON_START`: `true`.
 - `PORT`: Railway lo proporciona automáticamente; localmente se usa 3000.
 
@@ -72,9 +72,9 @@ Railway mantiene el servicio como un despliegue persistente, sujeto al estado y 
 
 ## Límites y seguridad
 
-- Solo miembros con permiso Gestionar servidor o Administrador pueden usar el comando.
+- `/rcc` solo admite al usuario configurado en `DISCORD_OWNER_ID` o miembros con permiso `ADMINISTRATOR` real. Los permisos `Manage Server` por sí solos no bastan.\n- `/hablar` es conversacional y no tiene herramientas administrativas.
 - El servidor se limita mediante `DISCORD_GUILD_ID`.
-- El anuncio y el borrado requieren confirmación de la misma persona que solicitó la acción.
+- Todas las acciones que modifican el servidor requieren confirmación de la misma persona que solicitó la acción.\n- La asignación de roles, creación/eliminación de roles, envío de mensajes, timeout y expulsión también requieren confirmación.
 - Las menciones masivas están desactivadas en los mensajes enviados.
 - La IA solo puede llamar herramientas permitidas por el código; no ejecuta código arbitrario.
 - Discord aplica igualmente los permisos efectivos y la jerarquía del rol del bot.
