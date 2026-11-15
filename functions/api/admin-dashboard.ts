@@ -231,9 +231,10 @@ async function loadDashboard(env: Env) {
     };
   });
   const userByEmail = new Map(users.map(user => [user.email.toLowerCase(), user]));
+  const userById = new Map(users.map(user => [user.user_id, user]));
   const payments = events.map(event => {
     const item = eventView(event);
-    const user = item.user_id ? users.find(candidate => candidate.user_id === item.user_id) : userByEmail.get(item.buyer_email.toLowerCase());
+    const user = item.user_id ? userById.get(item.user_id) : userByEmail.get(item.buyer_email.toLowerCase());
     const emailMatches = user && user.email.toLowerCase() === item.buyer_email.toLowerCase();
     const matchedUser = emailMatches ? user : null;
     return { ...item, matched_user_id: matchedUser?.user_id || null, matched_discord_id: matchedUser?.discord_id || null };
