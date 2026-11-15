@@ -117,7 +117,7 @@ function validateGuild(interaction) {
     throw new Error("RCC Admin no está autorizado para administrar este servidor.");
   }
   if (!userIsOwner(interaction) && !userCanManageGuild(interaction)) {
-    throw new Error("Necesitas el permiso Gestionar servidor o Administrador para usar RCC Admin.");
+    throw new Error("¿Intentando administrar sin ser administrador? Buen intento, pero los botones de mando no vienen con el teclado. Usa /hablar para conversar.");
   }
   if (!APPLICATION_ID || !BOT_TOKEN || !PUBLIC_KEY) {
     throw new Error("Falta completar la configuración de Discord en las variables del hosting.");
@@ -237,8 +237,7 @@ const toolDefinitions = [
       additionalProperties: false
       }
     }
-  }
-
+  },
   {type:"function",function:{name:"create_role",description:"Crea un rol. Permisos solo de una lista permitida.",parameters:{type:"object",properties:{name:{type:"string"},color:{type:["string","null"]},permissions:{type:["array","null"],items:{type:"string"}}},required:["name","color","permissions"],additionalProperties:false}}},
   {type:"function",function:{name:"delete_role",description:"Elimina rol por ID.",parameters:{type:"object",properties:{role_id:{type:"string"}},required:["role_id"],additionalProperties:false}}},
   {type:"function",function:{name:"assign_role",description:"Asigna rol a usuario por IDs.",parameters:{type:"object",properties:{user_id:{type:"string"},role_id:{type:"string"}},required:["user_id","role_id"],additionalProperties:false}}},
@@ -355,11 +354,11 @@ function actionDescription(actionName, args, channels) {
     const channel = channels.find((item) => item.id === args.channel_id);
     return "Borrar el canal #" + (channel?.name || args.channel_id);
   }
-  if (actionName === "send_announcement") {
+  if (actionName === "send_announcement" || actionName === "send_message") {
     const channel = channels.find((item) => item.id === args.channel_id);
     return "Enviar mensaje en #" + (channel?.name || args.channel_id) + ":\n" + args.content;
   }
-  return "Ejecutar la acción " + actionName;
+  if(actionName==="create_role") return "Crear rol "+args.name+" con color "+(args.color||"predeterminado");\n  if(actionName==="delete_role") return "Eliminar rol "+args.role_id;\n  if(actionName==="assign_role") return "Asignar rol "+args.role_id+" al usuario "+args.user_id;\n  if(actionName==="timeout_member") return "Aplicar timeout de "+args.duration_minutes+" minutos al usuario "+args.user_id;\n  if(actionName==="kick_member") return "Expulsar al usuario "+args.user_id;\n  if(actionName==="create_voice_channel") return "Crear canal de voz "+args.name;\n  if(actionName==="send_message") return "Enviar mensaje en #"+(channels.find(c=>c.id===args.channel_id)?.name||args.channel_id)+":\\n"+args.content;\n  return "Ejecutar la acción " + actionName;
 }
 
 async function askGemini(guildId, requestText) {
