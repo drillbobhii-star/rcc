@@ -23,6 +23,12 @@ const command = {
           description: "Describe en español lo que quieres que haga",
           required: true,
           max_length: 1000
+        },
+        {
+          type: 11,
+          name: "archivo",
+          description: "Adjunta una imagen, audio, PDF, DOCX, ZIP o archivo de texto (máximo 20 MB)",
+          required: false
         }
       ]
     },
