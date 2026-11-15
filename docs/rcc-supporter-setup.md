@@ -69,7 +69,7 @@ El webhook procesa de forma idempotente los IDs de evento de Ko-fi. Esta impleme
 
 1. Aplica la migración y configura todos los secretos.
 2. Verifica que `https://TU-SERVICIO.up.railway.app/healthz` responde JSON con `{"ok":true}`.
-3. Usa el webhook de prueba de Ko-fi o una suscripción real y revisa los logs de Cloudflare Pages.
+3. Para comprobar la activación, usa un evento de suscripción USD de al menos $1.99 y revisa los logs de Cloudflare Pages. El evento genérico de prueba de Ko-fi puede ignorarse si no cumple ese importe.
 4. Comprueba que el perfil comprador tiene `is_supporter = true` y la fila de `rcc_vip_memberships` tiene `is_vip = true`.
 5. Abre `/vip-success.html`, inicia sesión con ese mismo correo y vincula Discord.
 6. Comprueba que el rol RCC Supporter aparece en el usuario dentro del servidor.
