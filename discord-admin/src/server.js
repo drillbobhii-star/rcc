@@ -550,6 +550,13 @@ async function generateRccAnnouncement(guildId) {
   return { channel, draft: draft.slice(0, 1800), commitCount: Math.min(commits.length, 5) };
 }
 
+// Discord HTTP Interactions mode: callback type 5 is the REST equivalent of
+// discord.js interaction.deferReply(). It must be returned within Discord's
+// 3-second acknowledgement deadline, before any Gemini or Discord API work.
+function deferReply(res) {
+  jsonResponse(res, 200, { type: 5, data: { flags: 64 } });
+}
+
 async function editOriginalResponse(applicationId, token, payload) {
   const response = await fetch(
     "https://discord.com/api/v10/webhooks/" + applicationId + "/" + token + "/messages/@original",
@@ -578,6 +585,7 @@ function startTyping(channelId) {
 }
 
 async function processRccCommand(interaction) {
+  const startedAt = Date.now();
   const options = interaction.data.options || [];
   const subcommand = options.find((item) => item.type === 1);
   const subcommandName = subcommand?.name || "instruccion";
@@ -665,6 +673,7 @@ async function processRccCommand(interaction) {
     }).catch((editError) => console.error("Error al enviar el mensaje de error:", editError));
   } finally {
     stopTyping();
+    console.log("[RCC] /rcc procesado en " + (Date.now() - startedAt) + " ms.");
   }
 }
 
@@ -740,8 +749,14 @@ async function handleInteraction(interaction, res) {
   }
 
   if (interaction.type === 2 && interaction.data?.name === "rcc") {
-    jsonResponse(res, 200, { type: 5, data: { flags: 64 } });
-    void processRccCommand(interaction);
+    // Acknowledge synchronously before starting any asynchronous work.
+    // This is equivalent to interaction.deferReply({ ephemeral: true }) in discord.js.
+    deferReply(res);
+    void processRccCommand(interaction).catch((error) => {
+      // processRccCommand normally handles its own errors; keep a final guard so
+      // an unexpected rejection is visible in Railway logs and never unhandled.
+      console.error("[RCC] Error inesperado procesando /rcc:", error);
+    });
     return;
   }
 
