@@ -709,16 +709,18 @@ async function askGemini(guildId, requestText, attachments = []) {
     timeout: 840000,
     maxRetries: 0
   });
-  const response = await client.chat.completions.create({
+  const attachmentParts = await buildAttachmentContent(attachments);
+  const userContent = [{
+    type:"text",
+    text:"Solicitud del administrador:\\n" + requestText +
+      "\\n\\nCanales actuales del servidor (usa estos IDs exactos):\\n" + JSON.stringify(channelContext) +
+      "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
+  }, ...attachmentParts];
+  const response = await createGeminiCompletion(client, {
     model: GEMINI_MODEL,
     messages: [
       { role: "system", content: SYSTEM_INSTRUCTIONS },
-      {
-        role: "user",
-        content: "Solicitud del administrador:\n" + requestText +
-          "\n\nCanales actuales del servidor (usa estos IDs exactos):\n" +
-          JSON.stringify(channelContext) + "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
-      }
+      { role: "user", content: userContent }
     ],
     tools: toolDefinitions,
     tool_choice: "auto",
@@ -849,7 +851,9 @@ async function processRccCommand(interaction) {
   const subcommandName = subcommand?.name || "instruccion";
   const commandOptions = subcommand?.options || options;
   const option = commandOptions.find((item) => item.name === "solicitud");
+  const attachmentOption = commandOptions.find((item) => item.name === "archivo");
   const requestText = option?.value;
+  const attachments = attachmentOption?.value ? [interaction.data.resolved?.attachments?.[attachmentOption.value]].filter(Boolean) : [];
 
   let stopTyping = () => {};
   try {
