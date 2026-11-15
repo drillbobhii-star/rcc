@@ -82,7 +82,7 @@ async function getOrCreateConversation(env: Env, userId: string) {
 
 async function adminConversationList(env: Env) {
   const [conversations, users, profiles, notes, messages] = await Promise.all([
-    rest<Array<Record<string, unknown>>>(env, "rcc_chat_conversations?select=*&order=updated_at.desc"),
+    rest<Array<Record<string, unknown>>>(env, "rcc_chat_conversations?select=*&order=updated_at.desc&limit=5000"),
     listAuthUsers(env),
     rest<Array<Record<string, unknown>>>(env, "profiles?select=user_id,display_name,avatar_url,discord_id,is_banned"),
     rest<Array<Record<string, unknown>>>(env, "rcc_admin_private_notes?select=user_id,note,updated_at"),
