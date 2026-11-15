@@ -30,7 +30,7 @@
     return result;
   }
   function ensureUi() {
-    if ($( "rccChatWidget" )) return;
+    if ($("rccChatLauncher")) return;
     const style = el("style");
     style.textContent = [
       "#rccChatLauncher{position:fixed;right:22px;bottom:22px;z-index:9500;border:1px solid #ffffff30;border-radius:999px;padding:14px 18px;background:linear-gradient(130deg,#715be0,#2488a5);color:#fff;font:700 14px system-ui;box-shadow:0 12px 38px #0008;cursor:pointer}",
@@ -160,19 +160,20 @@
     try { const form = new FormData(); form.set("action", "typing"); form.set("conversationId", conversationId); await request("", { method:"POST", body:form }); } catch (_) {}
   }
   async function poll() {
-    if (!session || !conversationId) return;
+    if (!session) return;
     try {
       const state = await loadState();
       if (!state) return;
+      if (!conversationId) return;
       if (!enabled) { $("rccChatStatus").textContent = "Chat cerrado por el administrador."; return; }
       const result = await request("?action=messages&conversationId=" + encodeURIComponent(conversationId));
       const messages = result.messages || [];
       if (result.typing?.admin) $("rccChatStatus").textContent = "El Creador está escribiendo…";
       const newestAdmin = [...messages].reverse().find(message => message.sender_role === "admin");
       if (newestAdmin && newestAdmin.id !== lastAdminMessage) {
-        if (lastAdminMessage !== null) {
+        if (lastAdminMessage !== null || !newestAdmin.read_at) {
           notify("Mensaje del Creador");
-          setOpen(true);
+          void setOpen(true);
         }
         lastAdminMessage = newestAdmin.id;
       }
