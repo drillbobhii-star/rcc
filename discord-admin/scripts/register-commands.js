@@ -7,7 +7,7 @@ if (!applicationId || !botToken) {
   process.exit(1);
 }
 
-const command = {
+const commands = [\n{
   name: "rcc",
   description: "Pide a RCC Admin que te ayude a administrar este servidor",
   type: 1,
@@ -32,7 +32,7 @@ const response = await fetch(route, {
     Authorization: "Bot " + botToken,
     "Content-Type": "application/json"
   },
-  body: JSON.stringify([command])
+  body: JSON.stringify(commands)
 });
 
 const responseText = await response.text();
