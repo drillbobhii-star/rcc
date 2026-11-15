@@ -15,7 +15,7 @@ const CFG = {
   token: process.env.DISCORD_BOT_TOKEN.trim(),
   guildId: process.env.DISCORD_GUILD_ID.trim(),
   ownerId: process.env.DISCORD_OWNER_ID.trim(),
-  model: process.env.OPENAI_MODEL?.trim() || 'gpt-6-astra',
+  model: process.env.OPENAI_MODEL?.trim(),
 };
 const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY.trim() });
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
