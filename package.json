@@ -3,10 +3,11 @@
   "version": "1.7.0",
   "description": "",
   "scripts": {
-    "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node tools/check-executor-downloads.mjs && node tools/check-vip-membership.mjs && node tools/check-admin-dashboard.mjs",
+    "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node tools/check-executor-downloads.mjs && node tools/check-vip-membership.mjs && node tools/check-admin-dashboard.mjs && node tools/check-private-chat.mjs",
     "test:static": "node tools/check-static-catalog.cjs",
     "test:vip": "node tools/check-vip-membership.mjs",
-    "test:admin": "node tools/check-admin-dashboard.mjs"
+    "test:admin": "node tools/check-admin-dashboard.mjs",
+    "test:chat": "node tools/check-private-chat.mjs"
   },
   "keywords": [],
   "author": "",
