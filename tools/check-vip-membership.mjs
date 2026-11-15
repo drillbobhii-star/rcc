@@ -37,7 +37,7 @@ assert.match(webhook, /is_supporter: true/);
 assert.match(webhook, /rcc_vip_memberships/);
 assert.match(webhook, /message_id/);
 assert.match(webhook, /grantDiscordRole/);
-assert.match(successPage, /linkIdentity/);\nassert.match(successPage, /Esta página se abre desde el enlace que aparece en la descripción del tier o en el mensaje de agradecimiento/);\nassert.doesNotMatch(successPage, /document\\.referrer/);
+assert.match(successPage, /linkIdentity/);\nassert.match(successPage, /Esta página se abre desde el enlace que aparece en la descripción del tier o en el mensaje de agradecimiento/);\nassert.doesNotMatch(successPage, /document\.referrer/);
 assert.match(successPage, /createAccount/);
 assert.match(webhook, /pending: true/);
 assert.match(api, /pendingQuery/);
