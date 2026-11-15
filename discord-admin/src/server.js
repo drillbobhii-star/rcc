@@ -77,7 +77,7 @@ function discordHeaders() {
 async function discordApi(path, options = {}) {
   const response = await fetch("https://discord.com/api/v10" + path, {
     method: options.method || "GET",
-    headers: discordHeaders(),
+    headers: { ...discordHeaders(), ...(options.reason ? { "X-Audit-Log-Reason": encodeURIComponent(String(options.reason).slice(0, 450)) } : {}) },
     signal: AbortSignal.timeout(15000),
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });
@@ -331,7 +331,7 @@ async function executeAction(guildId, actionName, args) {
   }
   if (actionName === "ban_member") {
     if (!/^\\d{17,20}$/.test(args.user_id)) throw new Error("ID de usuario inválido.");
-    await discordApi("/guilds/"+guildId+"/bans/"+args.user_id,{method:"PUT",body:{delete_message_seconds:0}});
+    await discordApi("/guilds/"+guildId+"/bans/"+args.user_id,{method:"PUT",body:{delete_message_seconds:0},reason:args.reason});
     return "Usuario baneado: "+args.user_id;
   }
   if (actionName === "unban_member") {
