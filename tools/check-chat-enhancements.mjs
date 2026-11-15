@@ -60,8 +60,8 @@ assert.match(dashboardJs, /No se puede forzar el rol: esta cuenta no tiene una m
 
 assert.match(migration, /last_user_seen_at timestamptz/);
 assert.match(pushMigration, /add column if not exists last_user_seen_at timestamptz/i);
-assert.match(pushMigration, /create table if not exists public\\.rcc_chat_push_subscriptions/i);
-assert.match(pushMigration, /revoke all on public\\.rcc_chat_push_subscriptions from anon, authenticated/i);
+assert.match(pushMigration, /create table if not exists public\.rcc_chat_push_subscriptions/i);
+assert.match(pushMigration, /revoke all on public\.rcc_chat_push_subscriptions from anon, authenticated/i);
 assert.match(migration, /rcc_chat_push_subscriptions/);
 assert.match(migration, /revoke all on public\.rcc_chat_push_subscriptions from anon, authenticated/i);
 assert.match(worker, /addEventListener\("push"/);
