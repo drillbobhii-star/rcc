@@ -63,34 +63,65 @@
       }
 
       const user = session?.user || null;
-      const headers = session?.access_token
-        ? { Authorization: 'Bearer ' + session.access_token }
+      const accessToken = session?.access_token || null;
+      const headers = accessToken
+        ? { Authorization: 'Bearer ' + accessToken }
         : {};
+
+      console.groupCollapsed('[RCC VIP][diagnóstico] Comprobación #' + requestId);
+      console.log('Evento / sesión recibida:', arguments.length > 0 ? 'onAuthStateChange' : 'getSession inicial');
+      console.log('Usuario actual en Supabase:', user?.id || null);
+      console.log('Sesión confirmada:', Boolean(session));
+      console.log('Access token disponible:', Boolean(accessToken));
+      console.log('Token enviado a /api/vip-membership:', Boolean(headers.Authorization));
+      console.log('Cliente Supabase listo:', Boolean(client));
+      console.log('Tabla consultada: rcc_vip_memberships; filtro user_id =', user?.id || '(sin usuario)');
 
       // Reset immediately for signed-out accounts; never retain a previous user's VIP flag.
       let isVip = false;
       if (user?.id) {
-        const { data: membership, error: membershipError } = await client
+        const queryResult = await client
           .from('rcc_vip_memberships')
-          .select('is_vip')
+          .select('user_id, is_vip')
           .eq('user_id', user.id)
           .maybeSingle();
-        if (membershipError) throw membershipError;
+        const { data: membership, error: membershipError, status, statusText } = queryResult;
+        console.log('Resultado de la consulta VIP (data):', membership);
+        console.log('Resultado de la consulta VIP (error):', membershipError);
+        console.log('HTTP status consulta VIP:', status, statusText);
+        console.log('¿Se encontró una fila VIP?:', membership !== null);
+        console.log('Valor is_vip recibido:', membership?.is_vip ?? null);
+        if (membershipError) {
+          console.error('[RCC VIP] Fallo consultando rcc_vip_memberships. Revisa RLS, permisos SELECT, URL/anon key y sesión.', membershipError);
+          console.groupEnd();
+          throw membershipError;
+        }
         isVip = membership?.is_vip === true;
+        if (!membership) {
+          console.warn('[RCC VIP] Supabase devolvió cero filas. Comprueba user_id, proyecto/base de datos y política RLS.');
+        }
+      } else {
+        console.warn('[RCC VIP] No hay usuario autenticado; no se consulta membresía.');
       }
 
+      console.log('Estado VIP calculado desde la tabla:', isVip);
       const response = await fetch('/api/vip-membership', { headers, cache: 'no-store' });
+      console.log('Respuesta /api/vip-membership:', response.status, response.statusText);
+      console.log('Token de sesión enviado al endpoint:', Boolean(headers.Authorization));
       if (!response.ok) throw new Error('No se pudo consultar la configuración de membresía.');
       const result = await response.json();
 
       // Ignore stale responses if a newer sign-in/sign-out event has already started.
-      if (requestId !== statusRequestId) return;
+      if (requestId !== statusRequestId) { console.warn('[RCC VIP] Respuesta obsoleta ignorada:', requestId); console.groupEnd(); return; }
       state.isVip = isVip;
       state.isAdmin = result.isAdmin === true;
+      console.log('Estado final de API:', { isAdmin: result.isAdmin, checkoutUrlConfigured: Boolean(result.checkoutUrl) });
+      console.log('Estado VIP aplicado a la página:', state.isVip);
+      console.groupEnd();
       state.checkoutUrl = typeof result.checkoutUrl === 'string' && /^https:\/\/(?:www\.)?ko-fi\.com\//.test(result.checkoutUrl) ? result.checkoutUrl : DEFAULT_CHECKOUT_URL;
     } catch (error) {
       if (requestId !== statusRequestId) return;
-      console.error('[RCC VIP] No se pudo actualizar el estado:', error);
+      console.error('[RCC VIP] No se pudo actualizar el estado:', { message: error?.message, code: error?.code, details: error?.details, hint: error?.hint, status: error?.status }, error);
       state.isVip = false;
       state.isAdmin = false;
     } finally {
