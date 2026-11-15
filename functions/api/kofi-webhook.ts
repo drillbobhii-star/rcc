@@ -154,15 +154,25 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       : (email.split('@')[0] || 'RCC Supporter').slice(0, 80);
 
     const profileUrl = new URL(base + '/rest/v1/profiles');
-    profileUrl.searchParams.set('on_conflict', 'user_id');
+    profileUrl.searchParams.set('user_id', 'eq.' + buyer.id);
     const profileResponse = await fetch(profileUrl, {
-      method: 'POST',
-      headers: { ...serviceHeaders(env), Prefer: 'resolution=merge-duplicates,return=representation' },
-      body: JSON.stringify({ user_id: buyer.id, display_name: displayName, is_supporter: true }),
+      method: 'PATCH',
+      headers: { ...serviceHeaders(env), Prefer: 'return=representation' },
+      body: JSON.stringify({ is_supporter: true }),
       signal: AbortSignal.timeout(12000),
     });
     if (!profileResponse.ok) throw new Error('No se pudo activar is_supporter en el perfil RCC.');
-    const profiles = await profileResponse.json() as Array<{ discord_id?: string | null }>;
+    let profiles = await profileResponse.json() as Array<{ discord_id?: string | null }>;
+    if (profiles.length === 0) {
+      const createProfile = await fetch(base + '/rest/v1/profiles?on_conflict=user_id', {
+        method: 'POST',
+        headers: { ...serviceHeaders(env), Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify({ user_id: buyer.id, display_name: displayName, is_supporter: true }),
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!createProfile.ok) throw new Error('No se pudo crear el perfil RCC del comprador.');
+      profiles = await createProfile.json() as Array<{ discord_id?: string | null }>;
+    }
     const discordId = profiles[0]?.discord_id?.trim() || '';
 
     const membershipUrl = new URL(base + '/rest/v1/rcc_vip_memberships');
