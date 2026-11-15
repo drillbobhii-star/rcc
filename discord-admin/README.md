@@ -15,7 +15,7 @@ Servicio independiente para administrar un servidor Discord desde el proyecto RC
 - Endpoint privado `POST /vip/grant` para asignar el rol RCC Supporter después de un pago verificado o una vinculación OAuth.
 - No requiere Gateway ni Privileged Gateway Intents.
 
-La primera versión todavía no implementa gestión de roles, expulsiones, baneos ni funciones de voz. Tener permisos activados en Discord no implementa automáticamente esas funciones.
+La gestión de roles está limitada al rol RCC Supporter mediante el endpoint privado `/vip/grant`. Todavía no hay gestión arbitraria de roles, expulsiones, baneos ni funciones de voz.
 
 ## Requisitos
 
