@@ -45,54 +45,96 @@
 
   .rcc-vip-admin{margin:20px 0;border-color:#bca5ff}.rcc-vip-admin h2{color:#d7c8ff}.rcc-vip-admin p{line-height:1.55;color:#b8b8ce}.rcc-vip-admin [hidden]{display:none!important}.rcc-vip-admin form{margin:16px 0}.rcc-vip-admin .rcc-vip-toggle{display:flex;align-items:center;gap:10px;color:#e8e8f5;font-size:1rem}.rcc-vip-admin .rcc-vip-toggle input{width:auto;accent-color:#a78bfa}.rcc-vip-admin button{cursor:pointer}
 </style>
+
+<style>
+:root{color-scheme:dark;--bg:#080a12;--panel:rgba(20,24,39,.70);--panel2:rgba(28,34,54,.62);--line:rgba(177,190,255,.13);--muted:#929bb8;--text:#eef1ff;--accent:#9b8cff;--cyan:#7de8ff;--green:#6fe0b0;--red:#ff929e;--amber:#ffd27e}
+body{background:radial-gradient(ellipse at 12% 0%,rgba(105,78,202,.22),transparent 36%),radial-gradient(ellipse at 100% 12%,rgba(38,159,194,.14),transparent 32%),var(--bg);color:var(--text)}
+#rccAdminShell{max-width:1500px;margin:0 auto;padding:24px 22px 40px}
+.admin-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 22px}
+.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:46px;height:46px;border:1px solid rgba(190,176,255,.35);border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(151,125,255,.28),rgba(83,205,239,.10));box-shadow:0 8px 30px #0007;font-size:23px}
+.brand h1{margin:0;text-align:left;font-size:clamp(1.2rem,3vw,1.75rem);color:#fff}.brand p{margin:3px 0 0;color:var(--muted);font-size:.85rem}
+.admin-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.glass-btn,.admin-tab{border:1px solid var(--line);background:rgba(36,42,67,.68);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:650;transition:.2s}
+.glass-btn:hover,.admin-tab:hover{border-color:#a99cff;background:rgba(111,91,190,.25)}
+.glass-btn.primary{background:linear-gradient(120deg,#6e5bd4,#4389ae);border:0}
+#refreshAdmin.loading .refresh-icon{display:inline-block;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.admin-search{position:relative;margin:0 0 18px}.admin-search input{height:52px;padding:0 18px 0 48px;background:rgba(18,22,37,.74);border:1px solid var(--line);border-radius:16px;font-size:1rem;backdrop-filter:blur(18px)}
+.admin-search .search-icon{position:absolute;left:17px;top:17px;color:var(--muted)}
+.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.admin-tab.active{background:linear-gradient(130deg,rgba(129,106,239,.36),rgba(64,170,199,.18));border-color:rgba(170,157,255,.6);color:#fff}
+.admin-panel{display:none}.admin-panel.active{display:block}
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}
+.stat-card,.glass-card{background:var(--panel);border:1px solid var(--line);border-radius:19px;backdrop-filter:blur(22px);box-shadow:0 15px 44px rgba(0,0,0,.24)}
+.stat-card{padding:17px}.stat-card span{color:var(--muted);font-size:.82rem}.stat-card strong{display:block;margin-top:8px;font-size:1.65rem;letter-spacing:-.04em}
+.glass-card{padding:17px;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.card-head h2{font-size:1.05rem;margin:0}.hint{color:var(--muted);font-size:.82rem}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;text-align:left;border-bottom:1px solid rgba(180,190,245,.09);font-size:.86rem;vertical-align:middle}th{color:#aeb6d2;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;background:rgba(10,13,24,.6);position:sticky;top:0}tr:last-child td{border-bottom:0}tbody tr:hover{background:rgba(125,140,205,.07)}
+.user-cell{display:flex;align-items:center;gap:10px;min-width:200px}.user-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#6d5bd0,#258aa7);display:grid;place-items:center;font-weight:800;color:#fff;flex:none}.user-main{min-width:0}.user-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}.user-main small{display:block;color:var(--muted);font-size:.74rem;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.switches{display:flex;gap:12px;flex-wrap:wrap}.switch-label{display:inline-flex;align-items:center;gap:6px;color:#cbd1e8;font-size:.77rem;white-space:nowrap}.switch-label input{width:36px;height:19px;margin:0;accent-color:#9b8cff;cursor:pointer}
+.small-btn{border:1px solid var(--line);background:rgba(37,43,68,.75);color:#f3f3ff;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.78rem;font-weight:700}.small-btn:hover{border-color:var(--accent)}.small-btn.danger{color:#ffadb6;border-color:rgba(255,130,150,.3)}.small-btn:disabled{opacity:.45;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:20px;font-size:.72rem;font-weight:750;border:1px solid var(--line)}.pill.ok{color:var(--green);background:rgba(66,210,149,.09)}.pill.warn{color:var(--amber);background:rgba(250,186,80,.09)}.pill.muted{color:#a9b2ca;background:rgba(170,185,220,.07)}
+#adminStatus{min-height:20px;color:var(--muted);font-size:.84rem;margin:12px 2px 0}#adminStatus.error{color:var(--red)}
+.empty-state{padding:36px;text-align:center;color:var(--muted)}
+#adminBoot{max-width:560px;margin:14vh auto;padding:34px 24px;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;color:var(--text);backdrop-filter:blur(20px)}
+#adminBoot .spinner{width:29px;height:29px;border:3px solid #ffffff25;border-top-color:var(--cyan);border-radius:50%;margin:0 auto 15px;animation:spin 1s linear infinite}
+.legacy-tools{max-width:1200px;margin:15px auto 60px;padding:0 22px;color:var(--muted)}.legacy-tools>summary{cursor:pointer;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(20,24,39,.55);font-size:.86rem}
+@media(max-width:900px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){#rccAdminShell{padding:15px 12px}.admin-top{align-items:flex-start;flex-direction:column}.admin-actions{width:100%}.admin-actions button{flex:1}.admin-stats{gap:8px}.stat-card{padding:12px}.stat-card strong{font-size:1.35rem}.admin-tabs{display:grid;grid-template-columns:repeat(2,1fr)}.admin-tab{padding:11px 8px}}
+</style>
+
 </head>
 <body>
 
+<div id="adminBoot" role="status"><div class="spinner"></div><strong>Verificando sesión de administrador…</strong><p class="hint">RCC Control Center</p></div>
+<main id="rccAdminShell" hidden>
+  <header class="admin-top">
+    <div class="brand"><div class="brand-mark">◈</div><div><h1>RCC Control Center</h1><p>Centro de administración · Acceso restringido</p></div></div>
+    <div class="admin-actions">
+      <span id="adminIdentity" class="pill ok">Administrador</span>
+      <button id="refreshAdmin" class="glass-btn primary"><span class="refresh-icon">↻</span> Actualizar</button>
+      <button id="adminLogout" class="glass-btn">Cerrar sesión</button>
+    </div>
+  </header>
+  <div class="admin-search"><span class="search-icon">⌕</span><input id="globalSearch" type="search" placeholder="Buscar por correo, user_id o discord_id…" autocomplete="off"></div>
+  <nav class="admin-tabs" aria-label="Secciones administrativas">
+    <button class="admin-tab active" data-tab="users">👥 Usuarios</button>
+    <button class="admin-tab" data-tab="payments">💳 Pagos reales</button>
+    <button class="admin-tab" data-tab="discord">🎮 Control de Discord</button>
+    <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
+  </nav>
+  <section id="panel-users" class="admin-panel active">
+    <div class="glass-card">
+      <div class="card-head"><div><h2>Usuarios registrados</h2><div class="hint">Correo desde Supabase Auth · Perfil desde profiles · VIP desde rcc_vip_memberships</div></div><span id="userCount" class="pill muted">0</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Identificadores</th><th>Accesos</th></tr></thead><tbody id="usersBody"><tr><td colspan="3" class="empty-state">Cargando usuarios…</td></tr></tbody></table></div>
+    </div>
+  </section>
+  <section id="panel-payments" class="admin-panel">
+    <div class="glass-card"><div class="card-head"><div><h2>Pagos Ko-fi registrados</h2><div class="hint">Eventos almacenados por el webhook verificado de Ko-fi</div></div><span id="paymentCount" class="pill muted">0</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Comprador</th><th>Pago</th><th>Fecha</th><th>Cuenta RCC</th><th>Acción</th></tr></thead><tbody id="paymentsBody"><tr><td colspan="5" class="empty-state">Cargando pagos…</td></tr></tbody></table></div>
+    </div>
+  </section>
+  <section id="panel-discord" class="admin-panel">
+    <div class="glass-card"><div class="card-head"><div><h2>Cuentas Discord vinculadas</h2><div class="hint">Reintenta la asignación del rol o elimina el vínculo guardado en RCC</div></div><span id="discordCount" class="pill muted">0</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Usuario RCC</th><th>Discord ID</th><th>VIP</th><th>Acciones</th></tr></thead><tbody id="discordBody"><tr><td colspan="4" class="empty-state">Cargando vínculos…</td></tr></tbody></table></div>
+    </div>
+  </section>
+  <section id="panel-stats" class="admin-panel">
+    <div class="admin-stats">
+      <div class="stat-card"><span>Usuarios registrados</span><strong id="statUsers">—</strong></div>
+      <div class="stat-card"><span>VIP activos</span><strong id="statVips">—</strong></div>
+      <div class="stat-card"><span>Discord vinculados</span><strong id="statDiscord">—</strong></div>
+      <div class="stat-card"><span>Ingresos visibles · USD</span><strong id="statRevenue">—</strong></div>
+    </div>
+    <div class="glass-card"><h2>Estado del sistema</h2><p class="hint">Los datos se actualizan automáticamente cada 30 segundos. Los ingresos son la suma de los eventos Ko-fi que devuelve el panel, no un informe contable reconciliado.</p><p id="lastUpdated" class="hint">Aún no actualizado.</p></div>
+  </section>
+  <p id="adminStatus" role="status" aria-live="polite">Conectando con Supabase…</p>
+</main>
+
+
+<details class="legacy-tools"><summary>Herramientas de desarrollo · Generador JSON (sección anterior)</summary>
 <div class="container">
   <p><a href="/" style="color:#b7a9ff">← Volver al catálogo</a></p>
   
-  <!-- SECCIÓN DE LA IA (DeepSeek) -->
-  <div class="ai-section">
-    <div class="ai-header">
-      <h2>🤖 Copiloto IA (DeepSeek)</h2>
-    </div>
-    <div class="chat-box" id="chatBox">
-      <div class="msg ai">¡Hola papu! Soy tu asistente. Pídeme un script (ej: "Hazme un script de Roblox para saltar infinito") y yo lo crearé por ti.</div>
-    </div>
-    <div class="chat-input-wrap">
-      <input type="text" id="chatInput" placeholder="Pídele un script a la IA..." onkeypress="if(event.key === 'Enter') enviarMensaje()">
-      <button onclick="enviarMensaje()">Enviar</button>
-    </div>
-  </div>
-
-  
-  <section class="form-section rcc-vip-admin" id="vipAdminPanel" aria-labelledby="vipAdminHeading">
-    <h2 id="vipAdminHeading">💎 RCC Supporter · Gestión VIP</h2>
-    <p>Activa o retira manualmente el acceso de un miembro. La operación se valida en el servidor y se notifica al webhook de Discord.</p>
-    <form id="vipAdminLogin" autocomplete="on">
-      <label for="vipAdminEmail">Correo del administrador</label>
-      <input type="email" id="vipAdminEmail" autocomplete="username" required>
-      <label for="vipAdminPassword">Contraseña</label>
-      <input type="password" id="vipAdminPassword" autocomplete="current-password" required>
-      <button type="submit" class="btn-generate">Iniciar sesión como administrador</button>
-    </form>
-    <div id="vipAdminConsole" hidden>
-      <p id="vipAdminIdentity" role="status"></p>
-      <button type="button" id="vipAdminLogout" class="editor-tools">Cerrar sesión</button>
-      <form id="vipMemberSearch">
-        <label for="vipMemberEmail">Correo del miembro RCC / Ko-fi</label>
-        <input type="email" id="vipMemberEmail" required placeholder="miembro@ejemplo.com">
-        <button type="submit" class="btn-generate">Buscar miembro</button>
-      </form>
-      <section id="vipMemberResult" hidden aria-live="polite">
-        <p id="vipMemberIdentity"></p>
-        <label class="rcc-vip-toggle"><input type="checkbox" id="vipIsVip"> Es VIP</label>
-        <p id="vipAdminStatus" role="status" aria-live="polite"></p>
-      </section>
-    </div>
-    <p id="vipAdminNotice" role="status" aria-live="polite"></p>
-  </section>
-
   <!-- SECCIÓN DEL FORMULARIO -->
   <div class="form-section">
     <h1>🛠️ Generador JSON</h1>
@@ -356,7 +398,9 @@ window.rccAdminSupabaseReady = Promise.resolve().then(() => {
   });
 });
 </script>
-<script src="assets/admin-vip.js?v=1"></script>
 
+
+</details>
+<script src="assets/admin-dashboard.js?v=1"></script>
 </body>
 </html>
