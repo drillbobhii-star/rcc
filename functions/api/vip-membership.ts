@@ -164,7 +164,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       const identity = user.identities?.find(item => item.provider === 'discord');
       const identityData = identity?.identity_data || {};
       const discordId = [identityData.sub, identityData.user_id, identityData.id]
-        .find(value => typeof value === 'string' && /^\\d{17,20}$/.test(value)) as string | undefined;
+        .find(value => typeof value === 'string' && /^\d{17,20}$/.test(value)) as string | undefined;
       if (!discordId) return reply({ error: 'No encontramos una identidad Discord vinculada. Completa primero el paso de Discord OAuth.' }, 409);
 
       const profileQuery = new URL(base + '/rest/v1/profiles');
