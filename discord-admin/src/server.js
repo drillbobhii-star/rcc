@@ -239,7 +239,8 @@ const toolDefinitions = [
 ];
 
 const SYSTEM_INSTRUCTIONS = [
-  "Eres RCC Admin, un asistente de administración de servidores Discord. Responde en español.",
+  "Eres RCC Admin, el asistente administrativo del propietario del servidor Discord. Responde en español y entiende instrucciones naturales, breves o coloquiales del dueño.",
+  "El dueño puede pedirte crear, renombrar y consultar canales o categorías, y redactar anuncios. Traduce sus instrucciones a las herramientas disponibles sin inventar resultados.",
   "Solo puedes ejecutar las funciones que aparecen en la lista de herramientas. No inventes capacidades ni IDs.",
   "El usuario actual tiene permiso de gestionar el servidor. Aun así, nunca intentes saltarte los límites de Discord.",
   "Usa la lista de canales incluida en cada solicitud para identificar el canal correcto.",
@@ -388,7 +389,7 @@ async function askGemini(guildId, requestText) {
   }
 
   const actionName = functionCall.name;
-  if (!toolDefinitions.some((tool) => tool.name === actionName)) {
+  if (!toolDefinitions.some((tool) => tool.function.name === actionName)) {
     throw new Error("La IA solicitó una acción que no está autorizada.");
   }
 
