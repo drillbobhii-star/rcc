@@ -178,12 +178,18 @@ async function createSignedMessage(env: Env, actor: Actor, conversation: Record<
   return json({ ok: true, message: (await hydrateMessages(env, saved))[0] });
 }
 async function listAuthUsers(env: Env) {
-  const response = await fetch(baseUrl(env) + "/auth/v1/admin/users?page=1&per_page=1000", {
-    headers: serviceHeaders(env), signal: AbortSignal.timeout(15000),
-  });
-  if (!response.ok) throw new Error("No se pudo cargar los usuarios de Auth.");
-  const result = await response.json() as { users?: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }> };
-  return result.users || [];
+  const all: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }> = [];
+  for (let page = 1; page <= 20; page++) {
+    const response = await fetch(baseUrl(env) + "/auth/v1/admin/users?page=" + page + "&per_page=1000", {
+      headers: serviceHeaders(env), signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) throw new Error("No se pudo cargar los usuarios de Auth.");
+    const result = await response.json() as { users?: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }> };
+    const users = result.users || [];
+    all.push(...users);
+    if (users.length < 1000) break;
+  }
+  return all;
 }
 async function adminConversationList(env: Env) {
   const [conversations, users, profiles, notes] = await Promise.all([
@@ -347,7 +353,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (!/^[0-9a-f-]{36}$/i.test(userId) || note.length > 10000) return json({ error: "Nota o usuario inválido." }, 400);
       await rest(env, "rcc_admin_private_notes?on_conflict=user_id", {
         method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-        body: JSON.stringify({ user_id: userId, note }),
+        body: JSON.stringify({ user_id: userId, note, updated_at: new Date().toISOString() }),
       });
       return json({ ok: true });
     }
