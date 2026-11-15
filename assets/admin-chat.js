@@ -115,7 +115,7 @@
     $("rccToggleChat").textContent = selected?.enabled ? "Deshabilitar chat" : "Habilitar chat";
     $("rccChatAdminTitle").textContent = selected ? (selected.name || selected.email || selected.user_id) : "Selecciona un usuario";
     $("rccChatAdminSubtitle").textContent = selected ? (selected.email + " · " + selected.user_id + (selected.discord_id ? " · Discord " + selected.discord_id : "")) : "Los mensajes privados aparecerán aquí.";
-    $("rccPrivateNote").value = selected?.admin_note || "";
+    if (document.activeElement !== $("rccPrivateNote")) $("rccPrivateNote").value = selected?.admin_note || "";
   }
   async function loadConversations() {
     const result = await api("?action=adminList");
@@ -154,6 +154,7 @@
   async function selectConversation(conversation) {
     selected = conversation;
     lastUserMessageId = null;
+    $("rccPrivateNote").value = selected.admin_note || "";
     setControls(); renderList();
     try { await loadMessages(); status("Conversación cargada."); }
     catch(error) { status(error.message,true); }
