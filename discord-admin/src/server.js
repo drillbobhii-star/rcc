@@ -662,7 +662,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "POST" && req.url === "/vip/grant") {
     const expectedSecret = process.env.RCC_VIP_WEBHOOK_SECRET || "";
-    const suppliedSecret = req.headers.authorization?.match(/^Bearer\\s+(.+)$/i)?.[1] || "";
+    const suppliedSecret = req.headers.authorization?.match(/^Bearer\s+(.+)$/i)?.[1] || "";
     const expectedBytes = Buffer.from(expectedSecret, "utf8");
     const suppliedBytes = Buffer.from(suppliedSecret, "utf8");
     const secretMatches = expectedBytes.length > 0 &&
@@ -686,11 +686,11 @@ const server = http.createServer(async (req, res) => {
       const discordId = typeof payload.discord_id === "string" ? payload.discord_id : "";
       const guildId = process.env.DISCORD_GUILD_ID || "";
       const roleId = process.env.DISCORD_VIP_ROLE_ID || "";
-      if (!/^\\d{17,20}$/.test(discordId)) {
+      if (!/^\d{17,20}$/.test(discordId)) {
         jsonResponse(res, 400, { error: "Discord user ID inválido." });
         return;
       }
-      if (!/^\\d{17,20}$/.test(guildId) || !/^\\d{17,20}$/.test(roleId)) {
+      if (!/^\d{17,20}$/.test(guildId) || !/^\d{17,20}$/.test(roleId)) {
         jsonResponse(res, 503, { error: "Falta configurar DISCORD_GUILD_ID o DISCORD_VIP_ROLE_ID." });
         return;
       }
