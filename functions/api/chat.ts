@@ -210,7 +210,7 @@ async function createVapidToken(endpoint: URL, env: Env) {
   const payload = vapidJwsSegment({
     aud: endpoint.origin,
     exp: Math.floor(Date.now() / 1000) + 12 * 60 * 60,
-    sub: env.RCC_WEB_PUSH_SUBJECT || "mailto:drillbobh@gmail.com",
+    sub: env.RCC_WEB_PUSH_SUBJECT || "mailto:drillbobhii@gmail.com",
   });
   const unsigned = header + "." + payload;
   const signature = new Uint8Array(await crypto.subtle.sign(
@@ -313,7 +313,7 @@ async function saveMessage(env: Env, actor: Actor, conversation: Record<string, 
   });
   if (actor.role === "user") {
     const userText = String(conversation.email || actor.email || "Un usuario RCC");
-    await notifyAdminDevices(userText + ": " + content.trim());
+    await notifyAdminDevices("Un usuario ha enviado un nuevo mensaje al soporte RCC.");
   }
   return json({ ok: true, message: saved[0] });
 }
