@@ -52,15 +52,15 @@ El bot y el comprador deben estar dentro del servidor; el bot necesita permiso *
 4. En Supabase **Authentication → URL Configuration**, añade `https://TU-DOMINIO-RCC/vip-success.html` a las Redirect URLs permitidas.
 5. Habilita el enlace manual de identidades si tu configuración de Supabase lo requiere.
 
-El usuario debe iniciar sesión primero en su cuenta RCC y después pulsar **Vincular mi Discord**. La página usa Supabase OAuth para enlazar la identidad Discord con esa misma cuenta; el servidor extrae el ID de la identidad verificada, no confía en un ID enviado libremente por el navegador.
+El usuario debe iniciar sesión primero en su cuenta RCC y después pulsar **Vincular mi Discord**. Si todavía no tiene cuenta, puede crearla desde esta página con el mismo correo de Ko-fi y verificarlo. La página usa Supabase OAuth para enlazar la identidad Discord con esa misma cuenta; el servidor extrae el ID de la identidad verificada, no confía en un ID enviado libremente por el navegador.
 
 ## 6. Flujo automático y separación de permisos
 
 - Ko-fi envía el evento de suscripción a `/api/kofi-webhook`.
 - El webhook valida el Verification Token, comprueba que sea una suscripción de al menos USD $1.99 y obtiene el correo del comprador.
-- Busca ese correo en Supabase Auth, encuentra su perfil y activa tanto `profiles.is_supporter = true` como `rcc_vip_memberships.is_vip = true`. Funciona para cualquier cuenta RCC coincidente; no exige que el comprador sea el creador.
+- Busca ese correo en Supabase Auth, encuentra su perfil y activa tanto `profiles.is_supporter = true` como `rcc_vip_memberships.is_vip = true`. Funciona para cualquier comprador, no exige que sea el creador. Si aún no tiene una cuenta RCC o no ha verificado el correo, el pago queda pendiente y puede reclamarlo después desde la página de éxito usando ese mismo correo.
 - Si el perfil ya tiene `discord_id`, el webhook solicita a Railway que asigne el rol VIP.
-- Si todavía no tiene Discord vinculado, el comprador abre `/vip-success.html`, inicia sesión con la cuenta RCC que usó al comprar y completa Discord OAuth. La API guarda el ID verificado y, si el VIP ya está activo, solicita el rol inmediatamente.
+- Si todavía no tiene Discord vinculado, el comprador abre `/vip-success.html`, inicia sesión o crea/verifica la cuenta RCC con el correo usado al comprar y completa Discord OAuth. La API reclama cualquier pago pendiente de ese correo, guarda el ID verificado y solicita el rol inmediatamente.
 - El correo `drillbobhii@gmail.com` conserva sus poderes de Creador mediante `RCC_ADMIN_EMAIL`. Comprar el tier no convierte a ningún otro usuario en administrador.
 
 El webhook procesa de forma idempotente los IDs de evento de Ko-fi. Esta implementación activa la membresía cuando llega un pago válido; la cancelación/fin de periodo debe retirarse desde el panel admin hasta que se integre un evento de cancelación fiable de Ko-fi.
