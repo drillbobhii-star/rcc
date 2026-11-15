@@ -20,6 +20,7 @@ type KofiPayload = {
 type AuthUser = {
   id: string;
   email?: string;
+  email_confirmed_at?: string | null;
   user_metadata?: Record<string, unknown>;
 };
 
@@ -144,8 +145,32 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     // profiles stores user_id, not email. Resolve the verified Supabase Auth email first,
     // then update that user's profile; this works for every buyer, not only the creator.
     const buyer = await findUserByEmail(base, env, email);
-    if (!buyer) {
-      return reply({ ok: true, matched: false, email, message: 'No existe una cuenta RCC con ese correo; el pago no se asignó a otra persona.' });
+    if (!buyer || !buyer.email_confirmed_at) {
+      // Keep a verified payment pending so a buyer can create/verify their RCC account
+      // later with the same email and claim it from vip-success.html.
+      const pendingResponse = await fetch(base + '/rest/v1/rcc_kofi_events', {
+        method: 'POST',
+        headers: { ...serviceHeaders(env), Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          message_id: messageId,
+          kofi_transaction_id: transactionId || null,
+          user_id: buyer?.id || null,
+          buyer_email: email,
+          amount,
+          currency,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!pendingResponse.ok && pendingResponse.status !== 409) {
+        throw new Error('No se pudo guardar el pago pendiente de Ko-fi.');
+      }
+      return reply({
+        ok: true,
+        matched: false,
+        pending: true,
+        email,
+        message: 'Pago verificado y guardado. El comprador podrá reclamarlo al crear o verificar su cuenta RCC con este mismo correo.',
+      });
     }
 
     const metadataName = buyer.user_metadata?.full_name || buyer.user_metadata?.name;
