@@ -68,7 +68,7 @@ El webhook procesa de forma idempotente los IDs de evento de Ko-fi. Esta impleme
 ## 7. Comprobación
 
 1. Aplica la migración y configura todos los secretos.
-2. Verifica que `https://TU-DOMINIO-RCC/api/healthz` no es necesario: Railway responde `{"ok":true}` en `/healthz`.
+2. Verifica que `https://TU-SERVICIO.up.railway.app/healthz` responde JSON con `{"ok":true}`.
 3. Usa el webhook de prueba de Ko-fi o una suscripción real y revisa los logs de Cloudflare Pages.
 4. Comprueba que el perfil comprador tiene `is_supporter = true` y la fila de `rcc_vip_memberships` tiene `is_vip = true`.
 5. Abre `/vip-success.html`, inicia sesión con ese mismo correo y vincula Discord.
