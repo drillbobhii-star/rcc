@@ -15,10 +15,16 @@ set search_path = pg_catalog, auth
 as $
 begin
   if coalesce(auth.role(), '') <> 'service_role' then
-    if (tg_op = 'INSERT' and new.is_banned is true)
-       or (tg_op = 'UPDATE' and new.is_banned is distinct from old.is_banned) then
-      raise exception 'is_banned can only be changed by the RCC support backend'
-        using errcode = '42501';
+    if tg_op = 'INSERT' then
+      if new.is_banned is true then
+        raise exception 'is_banned can only be changed by the RCC support backend'
+          using errcode = '42501';
+      end if;
+    elsif tg_op = 'UPDATE' then
+      if new.is_banned is distinct from old.is_banned then
+        raise exception 'is_banned can only be changed by the RCC support backend'
+          using errcode = '42501';
+      end if;
     end if;
   end if;
   return new;
