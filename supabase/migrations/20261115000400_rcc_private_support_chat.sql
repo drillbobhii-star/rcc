@@ -12,7 +12,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = pg_catalog, auth
-as $
+as $rcc_ban_guard$
 begin
   if coalesce(auth.role(), '') <> 'service_role' then
     if tg_op = 'INSERT' then
@@ -29,7 +29,7 @@ begin
   end if;
   return new;
 end;
-$;
+$rcc_ban_guard$;
 
 revoke all on function public.rcc_protect_account_ban_flag() from public, anon, authenticated;
 
