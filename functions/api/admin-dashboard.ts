@@ -148,16 +148,28 @@ async function upsertVip(env: Env, userId: string, isVip: boolean, adminId: stri
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify({ user_id: userId, is_vip: isVip, updated_by: adminId }),
   });
+  // Keep the existing catalog/profile entitlement mirror synchronized too.
+  await setProfileFlag(env, userId, "is_supporter", isVip);
 }
 
 async function setProfileFlag(env: Env, userId: string, field: string, value: boolean) {
   if (!["is_creator", "has_banner", "is_supporter"].includes(field)) throw new Error("Campo de perfil no permitido.");
   const query = new URLSearchParams({ user_id: "eq." + userId });
-  await rest(env, "profiles?" + query.toString(), {
+  const updated = await rest<Array<{ user_id: string }>>(env, "profiles?" + query.toString(), {
     method: "PATCH",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({ [field]: value }),
   });
+  if (!updated.length) {
+    if (field !== "is_supporter") {
+      throw new Error("No existe un perfil para actualizar. El usuario debe completar su registro RCC primero.");
+    }
+    await rest(env, "profiles?on_conflict=user_id", {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({ user_id: userId, is_supporter: value }),
+    });
+  }
 }
 
 async function lookupAuthUserByEmail(env: Env, email: string) {
@@ -223,6 +235,10 @@ async function loadDashboard(env: Env) {
       activeVips: users.filter(user => user.is_vip).length,
       linkedDiscord: users.filter(user => user.discord_id).length,
       usdRevenueShown: Math.round(totalRevenue * 100) / 100,
+    },
+    capabilities: {
+      isCreator: profiles.some(p => Object.prototype.hasOwnProperty.call(p, "is_creator")),
+      hasBanner: profiles.some(p => Object.prototype.hasOwnProperty.call(p, "has_banner")),
     },
   };
 }
