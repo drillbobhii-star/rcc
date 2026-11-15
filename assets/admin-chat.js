@@ -1,7 +1,6 @@
 (() => {
   "use strict";
   const ADMIN_EMAIL = "drillbobhii@gmail.com";
-  const MAX_FILE = 10 * 1024 * 1024;
   const QUICK_REPLIES = [
     "¡Hola! Gracias por contactar con el soporte de RCC. ¿En qué puedo ayudarte?",
     "Ya revisé tu cuenta. Dame un momento mientras verifico los detalles.",
@@ -12,24 +11,19 @@
   ];
   const $ = id => document.getElementById(id);
   let client = null, session = null, conversations = [], selected = null;
-  let pollTimer = null, busy = false, savingNote = false, lastUserMessageId = null, typingSentAt = 0;
-  const elements = [
-    "rccConversationList","rccChatAdminTitle","rccChatAdminSubtitle","rccChatAdminMessages",
-    "rccChatAdminStatus","rccToggleChat","rccDeleteChat","rccRestrict","rccUnrestrict",
-    "rccAdminChatInput","rccAdminChatFile","rccAdminAttach","rccQuickReply","rccAdminSend",
-    "rccQuickMenu","rccPrivateNote","rccSaveNote","globalSearch"
-  ];
+  let pollTimer = null, busy = false, savingNote = false, lastUserMessageId = null;
+  let listMode = "recent", typingSentAt = 0;
+
   function status(message, error = false) {
     $("rccChatAdminStatus").textContent = message;
     $("rccChatAdminStatus").className = "pill " + (error ? "warn" : "ok");
   }
   async function api(path = "", options = {}) {
     if (!session?.access_token) throw new Error("La sesión de administrador expiró.");
+    const headers = { Authorization:"Bearer " + session.access_token, ...(options.headers || {}) };
+    if (options.body && typeof options.body === "string") headers["Content-Type"] = "application/json";
     const response = await fetch("/api/chat" + path, {
-      ...options,
-      headers: { Authorization:"Bearer " + session.access_token, ...(options.headers || {}) },
-      cache:"no-store",
-      credentials:"same-origin"
+      ...options, headers, cache:"no-store", credentials:"same-origin"
     });
     const result = await response.json().catch(() => ({}));
     if (response.status === 401 || response.status === 403) {
@@ -48,15 +42,24 @@
     return e;
   }
   function filteredConversations() {
-    const q = ($("globalSearch")?.value || "").trim().toLowerCase();
-    return conversations.filter(c => !q || [c.email,c.name,c.user_id,c.discord_id].join(" ").toLowerCase().includes(q));
+    const q = ($("rccChatSearch").value || "").trim().toLowerCase();
+    return conversations.filter(c => {
+      const matchesMode = listMode === "active" ? c.is_active === true : true;
+      const matchesQuery = !q || [c.email,c.name,c.user_id].join(" ").toLowerCase().includes(q);
+      return matchesMode && matchesQuery;
+    });
   }
   function renderList() {
     const list = $("rccConversationList");
     list.replaceChildren();
+    $("rccActiveCount").textContent = String(conversations.filter(c => c.is_active).length);
+    $("rccActiveChatsTab").classList.toggle("active", listMode === "active");
+    $("rccRecentChatsTab").classList.toggle("active", listMode === "recent");
+    $("rccActiveChatsTab").setAttribute("aria-pressed", String(listMode === "active"));
+    $("rccRecentChatsTab").setAttribute("aria-pressed", String(listMode === "recent"));
     const rows = filteredConversations();
     if (!rows.length) {
-      list.append(node("div","empty-state","No hay conversaciones activas que coincidan con la búsqueda."));
+      list.append(node("div","empty-state",listMode === "active" ? "No hay usuarios activos en este momento." : "No hay chats que coincidan con la búsqueda."));
       return;
     }
     for (const conversation of rows) {
@@ -68,10 +71,21 @@
       copy.style.minWidth = "0";
       copy.append(node("strong","",conversation.name || conversation.email || conversation.user_id));
       copy.append(node("small","",conversation.email || conversation.user_id));
-      const meta = node("small","",conversation.enabled ? (conversation.is_banned ? "Acceso restringido" : "Chat habilitado") : "Chat deshabilitado");
-      meta.style.color = conversation.is_banned ? "#ff929e" : conversation.enabled ? "#6fe0b0" : "#ffd27e";
+      const preview = String(conversation.last_message_preview || (conversation.enabled ? "Conversación abierta" : "Chat cerrado"));
+      const meta = node("small","",preview.slice(0,70));
+      meta.style.color = conversation.is_active ? "#6fe0b0" : "var(--muted)";
       copy.append(meta);
-      button.append(avatar,copy);
+      const indicators = node("div","");
+      indicators.style.marginLeft = "auto";
+      indicators.style.display = "flex";
+      indicators.style.flexDirection = "column";
+      indicators.style.alignItems = "end";
+      if (conversation.is_active) indicators.append(node("small","", "● Activo"));
+      if (Number(conversation.unread_count) > 0) {
+        const unread = node("span","pill ok",String(conversation.unread_count));
+        indicators.append(unread);
+      }
+      button.append(avatar,copy,indicators);
       button.addEventListener("click",() => void selectConversation(conversation));
       list.append(button);
     }
@@ -88,16 +102,6 @@
       const mine = message.sender_role === "admin";
       const bubble = node("article","rcc-admin-msg" + (mine ? " mine" : ""));
       if (message.content) bubble.append(document.createTextNode(message.content));
-      if (message.file_url) {
-        if ((message.file_type || "").startsWith("image/")) {
-          const img = node("img","");
-          img.src = message.file_url; img.alt = message.file_name || "Imagen adjunta"; img.loading = "lazy";
-          bubble.append(img);
-        }
-        const a = node("a","", "📎 " + (message.file_name || "Descargar archivo"));
-        a.href = message.file_url; a.target = "_blank"; a.rel = "noopener noreferrer";
-        bubble.append(a);
-      }
       const readLabel = mine ? (message.read_at ? " · Leído ✓✓" : " · Enviado ✓") : "";
       bubble.append(node("small","",new Date(message.created_at).toLocaleString() + readLabel));
       box.append(bubble);
@@ -107,14 +111,14 @@
   function setControls() {
     const has = !!selected;
     const banned = selected?.is_banned === true;
-    ["rccToggleChat","rccDeleteChat","rccRestrict","rccUnrestrict","rccAdminChatInput","rccAdminAttach","rccQuickReply","rccAdminSend","rccPrivateNote","rccSaveNote"].forEach(id => {
+    ["rccToggleChat","rccDeleteChat","rccRestrict","rccUnrestrict","rccAdminChatInput","rccQuickReply","rccAdminSend","rccPrivateNote","rccSaveNote"].forEach(id => {
       $(id).disabled = !has;
     });
     $("rccRestrict").hidden = banned;
     $("rccUnrestrict").hidden = !banned;
     $("rccToggleChat").textContent = selected?.enabled ? "Deshabilitar chat" : "Habilitar chat";
     $("rccChatAdminTitle").textContent = selected ? (selected.name || selected.email || selected.user_id) : "Selecciona un usuario";
-    $("rccChatAdminSubtitle").textContent = selected ? (selected.email + " · " + selected.user_id + (selected.discord_id ? " · Discord " + selected.discord_id : "")) : "Los mensajes privados aparecerán aquí.";
+    $("rccChatAdminSubtitle").textContent = selected ? (selected.email + " · " + selected.user_id) : "Los mensajes privados aparecerán aquí.";
     if (document.activeElement !== $("rccPrivateNote")) $("rccPrivateNote").value = selected?.admin_note || "";
   }
   async function loadConversations() {
@@ -132,24 +136,23 @@
     if (!selected) return;
     const result = await api("?action=messages&conversationId=" + encodeURIComponent(selected.id));
     renderMessages(result.messages || []);
-    if (result.typing?.user) status("El usuario está escribiendo…");
-    else if (result.enabled === false) status("Chat deshabilitado para el usuario.", true);
+    $("rccChatAdminTyping").textContent = result.typing?.user ? "El usuario está escribiendo…" : "";
     const latest = [...(result.messages || [])].reverse().find(m => m.sender_role === "user");
     if (latest && latest.id !== lastUserMessageId) {
-      if (lastUserMessageId !== null) {
-        try {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (AudioContextClass) {
-            const ctx = new AudioContextClass(), oscillator = ctx.createOscillator(), gain = ctx.createGain();
-            oscillator.frequency.value = 740; gain.gain.value = 0.035;
-            oscillator.connect(gain); gain.connect(ctx.destination);
-            oscillator.start(); oscillator.stop(ctx.currentTime + 0.12);
-            oscillator.onended = () => ctx.close();
-          }
-        } catch (_) {}
-      }
+      if (lastUserMessageId !== null) playIncomingSound();
       lastUserMessageId = latest.id;
     }
+  }
+  function playIncomingSound() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass(), oscillator = ctx.createOscillator(), gain = ctx.createGain();
+      oscillator.frequency.value = 740; gain.gain.value = 0.035;
+      oscillator.connect(gain); gain.connect(ctx.destination);
+      oscillator.start(); oscillator.stop(ctx.currentTime + 0.12);
+      oscillator.onended = () => ctx.close();
+    } catch (_) {}
   }
   async function selectConversation(conversation) {
     selected = conversation;
@@ -159,11 +162,8 @@
     try { await loadMessages(); status("Conversación cargada."); }
     catch(error) { status(error.message,true); }
   }
-  async function formAction(fields, file) {
-    const form = new FormData();
-    Object.entries(fields).forEach(([key,value]) => form.set(key,String(value)));
-    if (file) form.set("file",file,file.name);
-    return api("",{method:"POST",body:form});
+  async function postAction(payload) {
+    return api("", { method:"POST", body:JSON.stringify(payload) });
   }
   async function poll() {
     if (busy || !session) return;
@@ -178,13 +178,11 @@
   async function sendMessage() {
     if (!selected || busy) return;
     const text = $("rccAdminChatInput").value.trim();
-    const file = $("rccAdminChatFile").files?.[0];
-    if (!text && !file) return;
-    if (file && file.size > MAX_FILE) { status("El archivo supera el límite de 10 MB.",true); return; }
+    if (!text) return;
     busy = true; $("rccAdminSend").disabled = true;
     try {
-      await formAction({action:"send",conversationId:selected.id,content:text},file);
-      $("rccAdminChatInput").value = ""; $("rccAdminChatFile").value = "";
+      await postAction({action:"send",conversationId:selected.id,content:text});
+      $("rccAdminChatInput").value = "";
       status("Mensaje enviado.");
       await loadMessages();
       await loadConversations();
@@ -193,7 +191,7 @@
   }
   async function runAdminAction(action, extra = {}) {
     if (!selected) return;
-    const result = await formAction({action,conversationId:selected.id,userId:selected.user_id,...extra});
+    const result = await postAction({action,conversationId:selected.id,userId:selected.user_id,...extra});
     await loadConversations();
     return result;
   }
@@ -216,11 +214,59 @@
     if (!selected || savingNote) return;
     savingNote = true; $("rccSaveNote").disabled = true;
     try {
-      await formAction({action:"saveNote",userId:selected.user_id,note:$("rccPrivateNote").value});
+      await postAction({action:"saveNote",userId:selected.user_id,note:$("rccPrivateNote").value});
       selected.admin_note = $("rccPrivateNote").value;
       status("Nota interna guardada. Solo el Creador puede consultarla.");
     } catch(error) { status(error.message,true); }
     finally { savingNote = false; $("rccSaveNote").disabled = false; }
+  }
+  async function enablePush(promptUser = true) {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      status("Este navegador no admite Web Push. Prueba Chrome, Edge o instala RCC como aplicación compatible.",true);
+      return;
+    }
+    try {
+      if (Notification.permission !== "granted" && promptUser) {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          status("Permiso de notificaciones no concedido.",true);
+          return;
+        }
+      }
+      if (Notification.permission !== "granted") {
+        status("Pulsa Activar notificaciones y permite las notificaciones del navegador.",true);
+        return;
+      }
+      const keyData = await api("?action=pushPublicKey");
+      const registration = await navigator.serviceWorker.register("/sw.js", { scope:"/" });
+      await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        const padding = "=".repeat((4 - keyData.publicKey.length % 4) % 4);
+        const raw = atob((keyData.publicKey + padding).replace(/-/g,"+").replace(/_/g,"/"));
+        const applicationServerKey = Uint8Array.from(raw, c => c.charCodeAt(0));
+        subscription = await registration.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey });
+      }
+      await postAction({action:"savePush",subscription:subscription.toJSON()});
+      $("rccEnablePush").textContent = "Notificaciones activadas ✓";
+      status("Notificaciones Push activadas para este dispositivo.");
+    } catch(error) {
+      status("No se pudieron activar las notificaciones: " + error.message,true);
+    }
+  }
+  async function sendBroadcast() {
+    const message = window.prompt("Escribe el anuncio que recibirán todos los usuarios con el chat habilitado:");
+    if (!message || !message.trim()) return;
+    if (!window.confirm("¿Enviar este mensaje a todos los chats habilitados? Esta acción no se puede deshacer.")) return;
+    try {
+      const result = await postAction({action:"broadcast",content:message.trim(),confirmed:true});
+      status("Anuncio enviado a " + result.delivered + " chats habilitados.");
+      await loadConversations();
+    } catch(error) { status(error.message,true); }
+  }
+  function setListMode(mode) {
+    listMode = mode;
+    renderList();
   }
   async function start() {
     try {
@@ -233,6 +279,7 @@
       }
       await poll();
       pollTimer = setInterval(() => { void poll(); },4000);
+      if (Notification.permission === "granted") void enablePush(false);
       client.auth.onAuthStateChange((_event,next) => {
         session = next;
         if (!session?.access_token || session.user?.email?.trim().toLowerCase() !== ADMIN_EMAIL) {
@@ -249,9 +296,8 @@
   $("rccAdminChatInput").addEventListener("input",() => {
     if (!selected || Date.now() - typingSentAt < 1800) return;
     typingSentAt = Date.now();
-    void formAction({action:"typing",conversationId:selected.id}).catch(() => {});
+    void postAction({action:"typing",conversationId:selected.id}).catch(() => {});
   });
-  $("rccAdminAttach").addEventListener("click",() => $("rccAdminChatFile").click());
   $("rccQuickReply").addEventListener("click",showQuickReplies);
   $("rccSaveNote").addEventListener("click",saveNote);
   $("rccToggleChat").addEventListener("click",async () => {
@@ -273,20 +319,23 @@
   });
   $("rccRestrict").addEventListener("click",async () => {
     if (!selected || !confirm("¿Restringir el acceso de este usuario a toda la web RCC?")) return;
-    try {
-      await runAdminAction("restrictUser");
-      status("Acceso restringido. La web del usuario mostrará el bloqueo en la siguiente comprobación.");
-    } catch(error) { status(error.message,true); }
+    try { await runAdminAction("restrictUser"); status("Acceso restringido."); }
+    catch(error) { status(error.message,true); }
   });
   $("rccUnrestrict").addEventListener("click",async () => {
     if (!selected || !confirm("¿Quitar la restricción de esta cuenta?")) return;
-    try {
-      await runAdminAction("unrestrictUser");
-      status("Restricción retirada.");
-    } catch(error) { status(error.message,true); }
+    try { await runAdminAction("unrestrictUser"); status("Restricción retirada."); }
+    catch(error) { status(error.message,true); }
   });
-  $("globalSearch").addEventListener("input",renderList);
-  document.querySelector('.admin-tab[data-tab="messages"]')?.addEventListener("click",() => { void poll(); });
+  $("rccActiveChatsTab").addEventListener("click",() => setListMode("active"));
+  $("rccRecentChatsTab").addEventListener("click",() => setListMode("recent"));
+  $("rccChatSearch").addEventListener("input",renderList);
+  $("rccBroadcast").addEventListener("click",sendBroadcast);
+  $("rccEnablePush").addEventListener("click",() => enablePush(true));
+  document.querySelector('.admin-tab[data-tab="messages"]')?.addEventListener("click",() => {
+    void poll();
+    if (Notification.permission === "default") void enablePush(true);
+  });
   window.addEventListener("pagehide",() => { if (pollTimer) clearInterval(pollTimer); });
   void start();
 })();
