@@ -27,7 +27,7 @@ assert.match(api, /SUPABASE_SERVICE_ROLE_KEY/);
 assert.match(api, /DISCORD_WEBHOOK_URL/);
 assert.match(migration, /enable row level security/i);
 assert.match(migration, /revoke all on public\.rcc_vip_memberships from anon, authenticated/i);
-assert.match(docs, /RCC_KOFI_MONTHLY_URL/);
+assert.match(docs, /RCC_KOFI_MONTHLY_URL/);\nassert.ok(docs.includes('https://rcc-3m0.pages.dev/vip-success.html'));\nassert.match(docs, /no configures ni dependas de una redirección automática/i);
 assert.ok(docs.includes('https://ko-fi.com/lubensdrill/tiers'));
 assert.match(docs, /no es protección criptográfica/i);
 
@@ -37,7 +37,7 @@ assert.match(webhook, /is_supporter: true/);
 assert.match(webhook, /rcc_vip_memberships/);
 assert.match(webhook, /message_id/);
 assert.match(webhook, /grantDiscordRole/);
-assert.match(successPage, /linkIdentity/);
+assert.match(successPage, /linkIdentity/);\nassert.match(successPage, /Esta página se abre desde el enlace que aparece en la descripción del tier o en el mensaje de agradecimiento/);\nassert.doesNotMatch(successPage, /document\\.referrer/);
 assert.match(successPage, /createAccount/);
 assert.match(webhook, /pending: true/);
 assert.match(api, /pendingQuery/);
