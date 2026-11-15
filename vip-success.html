@@ -141,6 +141,7 @@
       });
       if (error) throw error;
       $('password').value = '';
+      busy = false;
       await renderSession(data.session);
     } catch (error) {
       showStatus(error.message || 'No se pudo iniciar sesión.', 'error');
