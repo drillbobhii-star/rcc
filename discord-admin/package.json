@@ -4,9 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Discord administration assistant for the RCC project",
-  "engines": {
-    "node": ">=20.11.0"
-  },
+  "engines": { "node": ">=20.11.0" },
   "scripts": {
     "start": "node src/server.js",
     "register": "node --env-file=.env scripts/register-commands.js",
