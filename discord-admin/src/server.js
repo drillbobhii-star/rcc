@@ -6,8 +6,9 @@ const PORT = Number(process.env.PORT || 3000);
 const APPLICATION_ID = process.env.DISCORD_APPLICATION_ID;
 const PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/";
 const ALLOWED_GUILD_ID = process.env.DISCORD_GUILD_ID || null;
 const MAX_BODY_BYTES = 1024 * 1024;
 
@@ -149,34 +150,36 @@ function findGuildChannel(channels, id) {
 const toolDefinitions = [
   {
     type: "function",
-    name: "list_channels",
-    description: "Muestra los canales y categorías actuales del servidor.",
-    strict: true,
-    parameters: {
+    function: {
+      name: "list_channels",
+      description: "Muestra los canales y categorías actuales del servidor.",
+      parameters: {
       type: "object",
       properties: {},
       required: [],
       additionalProperties: false
+      }
     }
   },
   {
     type: "function",
-    name: "create_category",
-    description: "Crea una categoría nueva en el servidor.",
-    strict: true,
-    parameters: {
+    function: {
+      name: "create_category",
+      description: "Crea una categoría nueva en el servidor.",
+      parameters: {
       type: "object",
       properties: { name: { type: "string" } },
       required: ["name"],
       additionalProperties: false
+      }
     }
   },
   {
     type: "function",
-    name: "create_text_channel",
-    description: "Crea un canal de texto. parent_id debe ser el ID de una categoría existente o null.",
-    strict: true,
-    parameters: {
+    function: {
+      name: "create_text_channel",
+      description: "Crea un canal de texto. parent_id debe ser el ID de una categoría existente o null.",
+      parameters: {
       type: "object",
       properties: {
         name: { type: "string" },
@@ -185,14 +188,15 @@ const toolDefinitions = [
       },
       required: ["name", "topic", "parent_id"],
       additionalProperties: false
+      }
     }
   },
   {
     type: "function",
-    name: "rename_channel",
-    description: "Cambia el nombre de un canal existente. Usa el ID de la lista de canales proporcionada.",
-    strict: true,
-    parameters: {
+    function: {
+      name: "rename_channel",
+      description: "Cambia el nombre de un canal existente. Usa el ID de la lista de canales proporcionada.",
+      parameters: {
       type: "object",
       properties: {
         channel_id: { type: "string" },
@@ -200,26 +204,28 @@ const toolDefinitions = [
       },
       required: ["channel_id", "new_name"],
       additionalProperties: false
+      }
     }
   },
   {
     type: "function",
-    name: "delete_channel",
-    description: "Solicita borrar un canal existente. El usuario siempre tendrá que confirmar antes de borrarlo.",
-    strict: true,
-    parameters: {
+    function: {
+      name: "delete_channel",
+      description: "Solicita borrar un canal existente. El usuario siempre tendrá que confirmar antes de borrarlo.",
+      parameters: {
       type: "object",
       properties: { channel_id: { type: "string" } },
       required: ["channel_id"],
       additionalProperties: false
+      }
     }
   },
   {
     type: "function",
-    name: "send_announcement",
-    description: "Prepara un anuncio en un canal de texto. Nunca se publica sin la confirmación del usuario.",
-    strict: true,
-    parameters: {
+    function: {
+      name: "send_announcement",
+      description: "Prepara un anuncio en un canal de texto. Nunca se publica sin la confirmación del usuario.",
+      parameters: {
       type: "object",
       properties: {
         channel_id: { type: "string" },
@@ -227,6 +233,7 @@ const toolDefinitions = [
       },
       required: ["channel_id", "content"],
       additionalProperties: false
+      }
     }
   }
 ];
@@ -335,9 +342,9 @@ function actionDescription(actionName, args, channels) {
   return "Ejecutar la acción " + actionName;
 }
 
-async function askOpenAI(guildId, requestText) {
-  if (!OPENAI_API_KEY) {
-    throw new Error("Falta OPENAI_API_KEY. Añade tu clave de OpenAI en las variables del hosting; no la pegues en Discord ni en el código.");
+async function askGemini(guildId, requestText) {
+  if (!GEMINI_API_KEY) {
+    throw new Error("Falta GEMINI_API_KEY. Añade tu clave de Gemini en las variables privadas de Railway; nunca la pegues en Discord ni en GitHub.");
   }
 
   const channels = await getGuildChannels(guildId);
@@ -348,22 +355,29 @@ async function askOpenAI(guildId, requestText) {
     parent_id: channel.parent_id || null
   }));
 
-  const client = new OpenAI({ apiKey: OPENAI_API_KEY });
-  const response = await client.responses.create({
-    model: OPENAI_MODEL,
-    instructions: SYSTEM_INSTRUCTIONS,
-    input: "Solicitud del administrador:\n" + requestText +
-      "\n\nCanales actuales del servidor (usa estos IDs exactos):\n" +
-      JSON.stringify(channelContext)
-  ,
+  const client = new OpenAI({
+    apiKey: GEMINI_API_KEY,
+    baseURL: GEMINI_BASE_URL
+  });
+  const response = await client.chat.completions.create({
+    model: GEMINI_MODEL,
+    messages: [
+      { role: "system", content: SYSTEM_INSTRUCTIONS },
+      {
+        role: "user",
+        content: "Solicitud del administrador:\n" + requestText +
+          "\n\nCanales actuales del servidor (usa estos IDs exactos):\n" +
+          JSON.stringify(channelContext)
+      }
+    ],
     tools: toolDefinitions,
-    tool_choice: "auto",
-    parallel_tool_calls: false
+    tool_choice: "auto"
   });
 
-  const functionCall = (response.output || []).find((item) => item.type === "function_call");
+  const message = response.choices?.[0]?.message;
+  const functionCall = message?.tool_calls?.[0]?.function;
   if (!functionCall) {
-    return { text: response.output_text || "No pude interpretar la solicitud. Prueba explicándola de otra forma." };
+    return { text: message?.content || "No pude interpretar la solicitud. Prueba explicándola de otra forma." };
   }
 
   let args;
@@ -422,7 +436,7 @@ async function processRccCommand(interaction) {
 
   try {
     validateGuild(interaction);
-    const result = await askOpenAI(interaction.guild_id, requestText.trim());
+    const result = await askGemini(interaction.guild_id, requestText.trim());
 
     if (result.confirmation) {
       const pendingId = crypto.randomUUID();
