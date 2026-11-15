@@ -10,7 +10,7 @@
   let session = null;
   let dashboard = { users: [], payments: [], stats: {}, capabilities: {} };
   let activeTab = "users";
-  let busy = false;
+  let refreshing = false;
   let refreshTimer = null;
 
   function setStatus(message, isError = false) {
@@ -261,7 +261,8 @@
   }
 
   async function loadDashboard(silent = false) {
-    if (busy && silent) return;
+    if (refreshing) return;
+    refreshing = true;
     const button = $("refreshAdmin");
     if (!silent) {
       button.classList.add("loading"); button.disabled = true;
@@ -277,6 +278,7 @@
       if (!silent) setStatus(error.message, true);
       else console.warn("[RCC Admin] Auto-actualización fallida:", error.message);
     } finally {
+      refreshing = false;
       if (!silent) { button.classList.remove("loading"); button.disabled = false; }
     }
   }
