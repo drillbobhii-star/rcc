@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = path => readFile(new URL("../" + path, import.meta.url), "utf8");
-const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration, worker, manifest] = await Promise.all([
+const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration, pushMigration, worker, manifest] = await Promise.all([
   read("admin.html"),
   read("assets/admin-chat.js"),
   read("assets/chat-widget.js"),
@@ -10,6 +10,7 @@ const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration
   read("functions/api/admin-dashboard.ts"),
   read("assets/admin-dashboard.js"),
   read("supabase/migrations/20261115000400_rcc_private_support_chat.sql"),
+  read("supabase/migrations/20261115000500_rcc_chat_presence_and_push.sql"),
   read("sw.js"),
   read("site.webmanifest"),
 ]);
