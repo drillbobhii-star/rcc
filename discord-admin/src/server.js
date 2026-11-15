@@ -215,8 +215,8 @@ const toolDefinitions = [
       description: "Solicita borrar un canal existente. El usuario siempre tendrá que confirmar antes de borrarlo.",
       parameters: {
       type: "object",
-      properties: { channel_id: { type: "string" } },
-      required: ["channel_id"],
+      properties: { channel_name: { type: "string" } },
+      required: ["channel_name"],
       additionalProperties: false
       }
     }
@@ -243,7 +243,6 @@ for (const [name, description, properties, required] of [
   ["update_channel_permissions","Configura permisos de un canal para @everyone y un rol nombrado. permissions es un objeto con view_channel y send_messages booleanos.",{channel_name:{type:"string"},role_name:{type:"string"},permissions:{type:"object",properties:{view_channel:{type:"boolean"},send_messages:{type:"boolean"}},required:["view_channel","send_messages"],additionalProperties:false}},["channel_name","role_name","permissions"]],
   ["rename_channel","Renombra un canal por su nombre actual.",{channel_name:{type:"string"},new_name:{type:"string"}},["channel_name","new_name"]],
   ["create_invite","Crea un enlace de invitación para un canal; max_age en segundos, 0 significa nunca expira.",{channel_name:{type:"string"},max_age:{type:"integer",minimum:0,maximum:604800}},["channel_name","max_age"]],
-  ["delete_channel","Solicita borrar un canal. Siempre requiere confirmación manual.",{channel_name:{type:"string"}},["channel_name"]],
   ["ban_member","Solicita banear un usuario por ID. Siempre requiere confirmación manual.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},reason:{type:"string"}},["user_id","reason"]],
   ["unban_member","Retira el baneo de un usuario por ID.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"}},["user_id"]],
   ["set_nickname","Cambia el apodo de un miembro.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},new_nickname:{type:["string","null"],maxLength:32}},["user_id","new_nickname"]],
@@ -280,9 +279,9 @@ const SYSTEM_INSTRUCTIONS = [
   "El usuario actual tiene permiso de gestionar el servidor. Aun así, nunca intentes saltarte los límites de Discord.",
   "Usa la lista de canales incluida en cada solicitud para identificar el canal correcto.",
   "No uses menciones @everyone, @here ni menciones de usuarios en anuncios. Las menciones están desactivadas por el servidor.",
-  "Borrar mensajes, borrar canales y publicar anuncios siempre requieren aprobación manual mediante los botones de confirmación.",
+  "Solo borrar canales, borrar roles, banear miembros, borrar mensajes y publicar anuncios requieren aprobación manual mediante botones. Las demás herramientas permitidas se ejecutan directamente.",
   "Si la petición es ambigua, pregunta antes de ejecutar una herramienta. Si una función no está disponible, explícalo sin fingir que la realizaste.",
-  "No cambies roles ni expulses o banees miembros: esas funciones aún no están implementadas."
+  "Para cambios normales de canales, roles, permisos, apodos, invitaciones y utilidades, ejecuta la herramienta directamente y confirma con 'Hecho, jefe'. Borrar canales, borrar roles y banear siempre requieren confirmación."
 ].join(" ");
 
 async function executeAction(guildId, actionName, args) {
@@ -514,7 +513,8 @@ async function executeAction(guildId, actionName, args) {
   }
 
   if (actionName === "delete_channel") {
-    const channel = findGuildChannel(channels, args.channel_id);
+    const channel = args.channel_name ? channels.find(c => c.name.toLowerCase() === safeChannelName(args.channel_name)) : findGuildChannel(channels, args.channel_id);
+    if (!channel) throw new Error("No encontré el canal solicitado.");
     await discordApi("/channels/" + channel.id, { method: "DELETE" });
     return "Canal eliminado: #" + channel.name;
   }
@@ -542,7 +542,7 @@ async function executeAction(guildId, actionName, args) {
 }
 
 function actionRequiresApproval(actionName) {
-  return ["delete_channel", "send_announcement", "purge_messages"].includes(actionName);
+  return ["delete_channel", "delete_role", "ban_member", "send_announcement", "purge_messages"].includes(actionName);
 }
 
 function actionDescription(actionName, args, channels) {
@@ -572,6 +572,8 @@ async function askGemini(guildId, requestText) {
   }
 
   const channels = await getGuildChannels(guildId);
+  const roles = await discordApi("/guilds/" + guildId + "/roles");
+  const roleContext = roles.map(role => ({id:role.id,name:role.name,permissions:role.permissions}));
   const channelContext = channels.map((channel) => ({
     id: channel.id,
     name: channel.name,
@@ -593,7 +595,7 @@ async function askGemini(guildId, requestText) {
         role: "user",
         content: "Solicitud del administrador:\n" + requestText +
           "\n\nCanales actuales del servidor (usa estos IDs exactos):\n" +
-          JSON.stringify(channelContext)
+          JSON.stringify(channelContext) + "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
       }
     ],
     tools: toolDefinitions,
