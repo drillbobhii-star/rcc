@@ -12,7 +12,7 @@
   ];
   const $ = id => document.getElementById(id);
   let client = null, session = null, conversations = [], selected = null;
-  let pollTimer = null, busy = false, savingNote = false, lastUserMessageId = null;
+  let pollTimer = null, busy = false, savingNote = false, lastUserMessageId = null, typingSentAt = 0;
   const elements = [
     "rccConversationList","rccChatAdminTitle","rccChatAdminSubtitle","rccChatAdminMessages",
     "rccChatAdminStatus","rccToggleChat","rccDeleteChat","rccRestrict","rccUnrestrict",
@@ -49,7 +49,7 @@
   }
   function filteredConversations() {
     const q = ($("globalSearch")?.value || "").trim().toLowerCase();
-    return conversations.filter(c => !q || [c.email,c.name,c.user_id].join(" ").toLowerCase().includes(q));
+    return conversations.filter(c => !q || [c.email,c.name,c.user_id,c.discord_id].join(" ").toLowerCase().includes(q));
   }
   function renderList() {
     const list = $("rccConversationList");
@@ -114,7 +114,7 @@
     $("rccUnrestrict").hidden = !banned;
     $("rccToggleChat").textContent = selected?.enabled ? "Deshabilitar chat" : "Habilitar chat";
     $("rccChatAdminTitle").textContent = selected ? (selected.name || selected.email || selected.user_id) : "Selecciona un usuario";
-    $("rccChatAdminSubtitle").textContent = selected ? (selected.email + " · " + selected.user_id) : "Los mensajes privados aparecerán aquí.";
+    $("rccChatAdminSubtitle").textContent = selected ? (selected.email + " · " + selected.user_id + (selected.discord_id ? " · Discord " + selected.discord_id : "")) : "Los mensajes privados aparecerán aquí.";
     $("rccPrivateNote").value = selected?.admin_note || "";
   }
   async function loadConversations() {
@@ -246,7 +246,8 @@
     if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }
   });
   $("rccAdminChatInput").addEventListener("input",() => {
-    if (!selected) return;
+    if (!selected || Date.now() - typingSentAt < 1800) return;
+    typingSentAt = Date.now();
     void formAction({action:"typing",conversationId:selected.id}).catch(() => {});
   });
   $("rccAdminAttach").addEventListener("click",() => $("rccAdminChatFile").click());
@@ -254,9 +255,10 @@
   $("rccSaveNote").addEventListener("click",saveNote);
   $("rccToggleChat").addEventListener("click",async () => {
     if (!selected) return;
+    const wasEnabled = selected.enabled;
     try {
-      await runAdminAction("setEnabled",{enabled:!selected.enabled});
-      status(selected.enabled ? "Chat deshabilitado." : "Chat habilitado.");
+      await runAdminAction("setEnabled",{enabled:!wasEnabled});
+      status(wasEnabled ? "Chat deshabilitado." : "Chat habilitado.");
       await loadMessages();
     } catch(error) { status(error.message,true); }
   });
