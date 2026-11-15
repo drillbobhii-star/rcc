@@ -4,7 +4,7 @@
   const MAX_FILE = 10 * 1024 * 1024;
   let client = null, session = null, conversationId = null, enabled = true;
   let panel = null, messagesEl = null, input = null, fileInput = null;
-  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0;
+  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null;
   const $ = id => document.getElementById(id);
 
   function el(tag, attrs = {}, text = "") {
@@ -79,7 +79,11 @@
     head.querySelector("button").addEventListener("click", () => setOpen(false));
     attach.addEventListener("click", () => fileInput.click());
     send.addEventListener("click", sendMessage);
-    input.addEventListener("input", () => {\n      if (typingTimer) clearTimeout(typingTimer);\n      typingTimer = setTimeout(() => { void sendTyping(); }, 250);\n    });\n    input.addEventListener("keydown", event => {
+    input.addEventListener("input", () => {
+      if (typingTimer) clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => { void sendTyping(); }, 250);
+    });
+    input.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }
     });
     fileInput.addEventListener("change", () => {
@@ -94,7 +98,20 @@
     clearTimeout(notify.timer);
     notify.timer = setTimeout(() => { toast.hidden = true; }, 5200);
   }
-  function setOpen(open) {
+  async function ensureConversation() {
+    if (conversationId) return;
+    const form = new FormData();
+    form.set("action", "ensureConversation");
+    const result = await request("", { method:"POST", body:form });
+    conversationId = result.id;
+    enabled = result.enabled === true;
+  }
+  async function setOpen(open) {
+    if (open && !enabled) { notify("Chat cerrado por el administrador."); return; }
+    if (open && !conversationId) {
+      try { await ensureConversation(); }
+      catch (error) { notify(error.message); return; }
+    }
     chatVisible = open;
     if (panel) panel.hidden = !open;
     if (open) { input?.focus(); void poll(); }
@@ -130,21 +147,27 @@
     if (state.isBanned) { blockAccount(); return null; }
     conversationId = state.conversation?.id || null;
     enabled = state.conversation?.enabled !== false;
-    $("rccChatLauncher").hidden = !conversationId;
+    $("rccChatLauncher").hidden = false;
     if (!enabled && chatVisible) {
       setOpen(false);
       notify("Chat cerrado por el administrador.");
     }
     return state;
   }
-  async function sendTyping() {\n    if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;\n    typingLastSent = Date.now();\n    try { const form = new FormData(); form.set("action", "typing"); form.set("conversationId", conversationId); await request("", { method:"POST", body:form }); } catch (_) {}\n  }\n  async function poll() {
+  async function sendTyping() {
+    if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;
+    typingLastSent = Date.now();
+    try { const form = new FormData(); form.set("action", "typing"); form.set("conversationId", conversationId); await request("", { method:"POST", body:form }); } catch (_) {}
+  }
+  async function poll() {
     if (!session || !conversationId) return;
     try {
       const state = await loadState();
       if (!state) return;
       if (!enabled) { $("rccChatStatus").textContent = "Chat cerrado por el administrador."; return; }
       const result = await request("?action=messages&conversationId=" + encodeURIComponent(conversationId));
-      const messages = result.messages || [];\n      if (result.typing?.admin) $("rccChatStatus").textContent = "El Creador está escribiendo…";
+      const messages = result.messages || [];
+      if (result.typing?.admin) $("rccChatStatus").textContent = "El Creador está escribiendo…";
       const newestAdmin = [...messages].reverse().find(message => message.sender_role === "admin");
       if (newestAdmin && newestAdmin.id !== lastAdminMessage) {
         if (lastAdminMessage !== null) {
@@ -165,6 +188,7 @@
     const file = fileInput.files?.[0];
     const text = input.value.trim();
     if (!text && !file) return;
+    if (!conversationId) { try { await ensureConversation(); } catch (error) { $("rccChatStatus").textContent = error.message; return; } }
     if (file && file.size > MAX_FILE) { $("rccChatStatus").textContent = "El archivo supera 10 MB."; return; }
     busy = true; $("rccChatSend").disabled = true;
     try {
@@ -184,28 +208,34 @@
       busy = false; $("rccChatSend").disabled = false;
     }
   }
+  async function activateSession(nextSession) {
+    session = nextSession;
+    if (!session || session.user?.email?.toLowerCase() === ADMIN_EMAIL) {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = null; activeUserId = null; conversationId = null;
+      $("rccChatLauncher")?.remove(); panel?.remove(); $("rccChatToast")?.remove();
+      return;
+    }
+    if (activeUserId === session.user.id && $("rccChatLauncher")) return;
+    activeUserId = session.user.id;
+    ensureUi();
+    const state = await loadState();
+    if (!state) return;
+    if (state.conversation?.enabled === false) $("rccChatStatus").textContent = "Chat cerrado por el administrador.";
+    else $("rccChatStatus").textContent = "Soporte RCC · Puedes escribirnos.";
+    await poll();
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(() => { void poll(); }, 4000);
+  }
   async function initialize() {
     try {
       client = await window.rccSupabaseReady;
+      client.auth.onAuthStateChange((_event, nextSession) => {
+        Promise.resolve().then(() => activateSession(nextSession)).catch(error => console.warn("[RCC chat]", error.message));
+      });
       const { data, error } = await client.auth.getSession();
       if (error) throw error;
-      session = data.session;
-      if (!session || session.user?.email?.toLowerCase() === ADMIN_EMAIL) return;
-      ensureUi();
-      const state = await loadState();
-      if (!state) return;
-      if (state.conversation?.enabled === false) $("rccChatStatus").textContent = "Chat cerrado por el administrador.";
-      await poll();
-      pollTimer = setInterval(() => { void poll(); }, 4000);
-      client.auth.onAuthStateChange((_event, nextSession) => {
-        session = nextSession;
-        if (!session) {
-          if (pollTimer) clearInterval(pollTimer);
-          $("rccChatLauncher")?.remove(); panel?.remove();
-          return;
-        }
-        if (session.user?.email?.toLowerCase() !== ADMIN_EMAIL) void loadState().then(poll);
-      });
+      await activateSession(data.session);
     } catch (error) {
       console.warn("[RCC chat] No se pudo iniciar el soporte privado:", error.message);
     }
