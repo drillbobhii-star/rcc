@@ -83,30 +83,48 @@
     if (client) return client;
     const anonKey = document.querySelector('meta[name="supabase-anon-key"]').content.trim();
     if (!anonKey || !window.supabase?.createClient) throw new Error('No se pudo iniciar Supabase.');
-    // Prefer first-party localStorage. If browser privacy settings deny it,
-    // fall back to sessionStorage and finally in-memory storage rather than
-    // throwing during client initialization.
+    // Use same-origin browser storage when available. Some privacy settings
+    // throw even while reading window.localStorage/sessionStorage, so access
+    // each store lazily inside try/catch. Keep an in-memory fallback for the
+    // lifetime of this document when both persistent stores are unavailable.
     const memory = new Map();
+    const storageMode = { value: 'memory' };
+    const stores = [
+      () => window.localStorage,
+      () => window.sessionStorage
+    ];
     const safeStorage = {
       getItem(key) {
-        for (const store of [window.localStorage, window.sessionStorage]) {
+        for (const getStore of stores) {
           try {
-            const value = store.getItem(key);
-            if (value !== null) return value;
-          } catch (_) {}
+            const value = getStore().getItem(key);
+            if (value !== null) {
+              storageMode.value = getStore === stores[0] ? 'localStorage' : 'sessionStorage';
+              return value;
+            }
+          } catch (_) {
+            // Tracking Prevention / storage policy: try the next store.
+          }
         }
         return memory.has(key) ? memory.get(key) : null;
       },
       setItem(key, value) {
         memory.set(key, value);
-        for (const store of [window.localStorage, window.sessionStorage]) {
-          try { store.setItem(key, value); return; } catch (_) {}
+        for (let index = 0; index < stores.length; index += 1) {
+          try {
+            stores[index]().setItem(key, value);
+            storageMode.value = index === 0 ? 'localStorage' : 'sessionStorage';
+            return;
+          } catch (_) {
+            // Continue to sessionStorage, then retain the in-memory copy.
+          }
         }
+        storageMode.value = 'memory';
       },
       removeItem(key) {
         memory.delete(key);
-        for (const store of [window.localStorage, window.sessionStorage]) {
-          try { store.removeItem(key); } catch (_) {}
+        for (const getStore of stores) {
+          try { getStore().removeItem(key); } catch (_) {}
         }
       }
     };
@@ -279,12 +297,18 @@
         await syncDiscordLink(sessionData.session);
         return;
       }
+      showStatus('Abriendo Discord para autorizar la vinculación…');
       const { data: linkData, error } = await sb.auth.linkIdentity({
         provider: 'discord',
-        options: { redirectTo: location.origin + '/vip-success.html' }
+        options: {
+          redirectTo: location.origin + '/vip-success.html',
+          skipBrowserRedirect: true
+        }
       });
       if (error) throw error;
-      if (linkData?.url) location.assign(linkData.url);
+      if (!linkData?.url) throw new Error('Supabase no devolvió el enlace de autorización de Discord.');
+      // Explicit navigation avoids relying on Supabase's implicit browser redirect.
+      window.location.assign(linkData.url);
     } catch (error) { showStatus(error.message || 'No se pudo iniciar Discord OAuth.', 'error'); }
   });
 
