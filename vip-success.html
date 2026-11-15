@@ -29,13 +29,14 @@
 
   <section id="signedOut" hidden>
     <div class="step"><span class="number">1</span><div><strong>Inicia sesión en tu cuenta RCC</strong><p>Usa la cuenta que tiene el mismo correo que escribiste en Ko-fi.</p></div></div>
-    <form id="loginForm">
+    <button id="googleLogin" type="button">Iniciar sesión con Google</button>
+    <button id="emailLoginToggle" class="secondary" type="button" aria-expanded="false" aria-controls="loginForm">Iniciar sesión con Correo</button>
+    <form id="loginForm" hidden>
       <input id="email" type="email" autocomplete="email" placeholder="Correo de tu cuenta RCC" required>
       <input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="Contraseña" required>
-      <button type="submit">Iniciar sesión</button>
+      <button type="submit">Entrar con mi correo</button>
+      <button id="createAccount" class="secondary" type="button">Crear cuenta RCC con este correo</button>
     </form>
-    <button id="createAccount" class="secondary" type="button">Crear cuenta RCC con este correo</button>
-    <button id="googleLogin" class="secondary" type="button">Continuar con Google</button>
   </section>
 
   <section id="signedIn" hidden>
@@ -128,6 +129,18 @@
     if (hasDiscord) await syncDiscordLink(session);
     else showStatus('Sesión lista. Ahora vincula tu cuenta de Discord.');
   }
+
+  $('emailLoginToggle').addEventListener('click', () => {
+    const form = $('loginForm');
+    const willOpen = form.hidden;
+    form.hidden = !willOpen;
+    $('emailLoginToggle').setAttribute('aria-expanded', String(willOpen));
+    if (willOpen) $('email').focus();
+    else {
+      $('email').value = '';
+      $('password').value = '';
+    }
+  });
 
   $('loginForm').addEventListener('submit', async event => {
     event.preventDefault();
