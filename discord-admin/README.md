@@ -1,91 +1,81 @@
 # RCC Admin
 
-Servicio independiente para administrar tu servidor Discord desde el proyecto RCC. Se añade en esta carpeta para no modificar ni interferir con el catálogo RCC existente.
+Servicio independiente para administrar un servidor Discord desde el proyecto RCC. Está dentro de `discord-admin/` para no interferir con el catálogo RCC.
 
-## Qué incluye esta primera versión
+## Funciones de esta primera versión
 
-- Comando slash /rcc para dar instrucciones en español.
-- IA mediante la API de OpenAI.
+- Comando slash `/rcc` para recibir instrucciones en español.
+- Google Gemini mediante el endpoint compatible con OpenAI.
 - Crear categorías y canales de texto.
-- Cambiar el nombre de canales.
-- Consultar los canales existentes.
-- Preparar anuncios y pedir aprobación antes de publicarlos.
-- Pedir aprobación antes de borrar un canal.
-- Verificación de firmas Ed25519 de Discord, límite de tamaño del cuerpo y restricción opcional a un servidor.
-- No necesita Gateway ni Privileged Gateway Intents.
+- Renombrar canales y consultar la estructura del servidor.
+- Publicar anuncios solo después de aprobación manual.
+- Borrar canales solo después de aprobación manual.
+- Verificación de firmas Ed25519 de Discord y restricción a un servidor.
+- No requiere Gateway ni Privileged Gateway Intents.
 
-Las acciones de roles, miembros, moderación y voz todavía no están implementadas. Los permisos concedidos en Discord no crean funciones automáticamente; esas capacidades se añadirán de forma explícita y probada.
+La primera versión todavía no implementa gestión de roles, expulsiones, baneos ni funciones de voz. Tener permisos activados en Discord no implementa automáticamente esas funciones.
 
 ## Requisitos
 
 - Node.js 20.11 o superior.
-- Una aplicación/bot creado en Discord Developer Portal.
-- Una clave de API de OpenAI. La API se factura por separado de una suscripción de ChatGPT.
-- Un servicio Node.js público con HTTPS. Render, Railway u otro hosting compatible sirven.
+- Aplicación y bot de Discord.
+- Clave de Gemini API de Google AI Studio.
+- Servicio Node.js persistente con HTTPS, por ejemplo Railway.
 
-## Variables de entorno
+## Variables privadas
 
-Copia .env.example a .env para desarrollo local y completa:
+Configura estas variables en Railway > servicio > Variables:
 
-- DISCORD_APPLICATION_ID: Application ID de General Information.
-- DISCORD_PUBLIC_KEY: Public Key de General Information.
-- DISCORD_BOT_TOKEN: token privado de la pestaña Bot.
-- OPENAI_API_KEY: clave de OpenAI API.
-- OPENAI_MODEL: modelo de API habilitado en tu cuenta; por defecto gpt-5.5.
-- DISCORD_GUILD_ID: ID del único servidor autorizado. Muy recomendado.
-- REGISTER_COMMANDS_ON_START: pon true para registrar /rcc al iniciar.
-- PORT: puerto HTTP; el hosting normalmente lo asigna.
+- `DISCORD_APPLICATION_ID`: Application ID de Discord.
+- `DISCORD_PUBLIC_KEY`: Public Key de Discord, no es el token.
+- `DISCORD_BOT_TOKEN`: token regenerado del bot.
+- `GEMINI_API_KEY`: clave regenerada de Gemini.
+- `GEMINI_MODEL`: por defecto `gemini-3.8-flash`.
+- `DISCORD_GUILD_ID`: ID del servidor autorizado.
+- `REGISTER_COMMANDS_ON_START`: `true`.
+- `PORT`: Railway lo proporciona automáticamente; localmente se usa 3000.
 
-Nunca subas .env a GitHub, no publiques el token y no lo pegues en el chat. Si el token se expone, restablécelo inmediatamente en Discord Developer Portal.
+No guardes secretos en GitHub, no los incluyas en commits y no los compartas por Discord o chat. Si se exponen, revócalos y genera otros nuevos.
 
-## Ejecución local
+## Cómo funciona Gemini
 
-Desde esta carpeta:
+Se utiliza la librería cliente OpenAI solo como cliente HTTP compatible. El tráfico va al endpoint oficial de compatibilidad de Gemini:
 
-    npm install
-    node --env-file=.env src/server.js
+`https://generativelanguage.googleapis.com/v1beta/openai/`
 
-En Windows PowerShell también puedes usar:
+El servidor usa Chat Completions y llamadas a herramientas (function calling). La clave es `GEMINI_API_KEY`, no se requiere una clave de OpenAI.
 
-    node --env-file=.env src/server.js
+## Despliegue en Railway
 
-El endpoint de comprobación será /healthz y el endpoint de interacciones será /interactions.
+No hace falta Dockerfile ni Procfile para este servicio. Railway detecta Node.js mediante `package.json` y ejecuta el script `start`.
 
-## Despliegue
+1. Crea un proyecto o servicio en Railway y conecta el repositorio GitHub.
+2. Selecciona la rama `feat/rcc-discord-admin` mientras el PR siga sin fusionar.
+3. En Settings, establece Root Directory en `/discord-admin`.
+4. Build Command: déjalo automático o usa `npm install`.
+5. Start Command: `npm start`.
+6. En Variables, añade todas las variables indicadas arriba. No añadas comillas a los valores.
+7. Despliega el servicio. Revisa Deployments > Logs.
+8. En Settings > Networking, genera un dominio público HTTPS.
+9. Abre `https://TU-DOMINIO/healthz`; debe responder JSON con `"ok":true`.
+10. En Discord Developer Portal > General Information, configura Interactions Endpoint URL como `https://TU-DOMINIO/interactions`. Discord validará el endpoint mediante un PING.
+11. Con `REGISTER_COMMANDS_ON_START=true` y el ID del servidor definido, el proceso registra `/rcc` en ese servidor al arrancar.
 
-Crea un servicio web Node.js en tu proveedor de hosting, usando esta carpeta como raíz del servicio:
+Railway mantiene el servicio como un despliegue persistente, sujeto al estado y límites del plan de Railway. No uses un Cron Job para el bot.
 
-- Root directory: discord-admin
-- Build command: npm install
-- Start command: npm start
-- Node: 20.11 o superior
-- Añade todas las variables de entorno anteriores en el panel privado del hosting.
+## Prueba segura
 
-Activa REGISTER_COMMANDS_ON_START=true. Si DISCORD_GUILD_ID está definido, /rcc se registra solo en ese servidor y aparece rápidamente. Si no está definido, el registro será global y puede tardar en propagarse.
+1. Ejecuta `/rcc solicitud: muéstrame los canales`.
+2. Prueba crear una categoría o canal de prueba.
+3. Prueba preparar un anuncio y confirma que no se publique hasta pulsar Confirmar.
+4. Prueba borrar solo un canal de prueba y confirma el diálogo antes de ejecutar.
 
-Cuando el hosting entregue una URL HTTPS, abre Discord Developer Portal > General Information y configura la URL del punto de conexión de interacciones como:
+## Límites y seguridad
 
-    https://TU-SERVICIO.example.com/interactions
-
-Discord enviará un PING para validar el endpoint. El servicio responde al PING y verifica la firma de cada solicitud.
-
-## Prueba
-
-1. Abre la URL /healthz del servicio y comprueba que devuelve ok: true.
-2. Comprueba que Discord acepta la URL de interacciones en General Information.
-3. En el servidor autorizado, ejecuta /rcc.
-4. Prueba primero una petición inocua, por ejemplo: "muéstrame los canales".
-5. Prueba crear una categoría o canal.
-6. Prueba un anuncio: no se publica hasta pulsar Confirmar.
-7. Prueba borrar un canal solo con un canal de prueba: exige Confirmar o Cancelar.
-
-## Seguridad y límites
-
-- Solo usuarios con permiso Gestionar servidor o Administrador pueden invocar las acciones.
-- DISCORD_GUILD_ID limita el servicio a un servidor concreto.
-- Los anuncios y borrados requieren aprobación de la misma persona que pidió la acción.
-- Las menciones masivas están desactivadas en los mensajes que publica el bot.
-- El bot no recibe el contenido general de todos los mensajes: recibe comandos slash e interacciones.
-- Las acciones están en una lista permitida; no ejecuta código arbitrario ni acepta instrucciones para saltarse permisos de Discord.
-- Discord sigue aplicando la jerarquía de roles y los permisos efectivos del bot.
-- Para ejecutar acciones, el bot necesita los permisos concretos correspondientes en el servidor.
+- Solo miembros con permiso Gestionar servidor o Administrador pueden usar el comando.
+- El servidor se limita mediante `DISCORD_GUILD_ID`.
+- El anuncio y el borrado requieren confirmación de la misma persona que solicitó la acción.
+- Las menciones masivas están desactivadas en los mensajes enviados.
+- La IA solo puede llamar herramientas permitidas por el código; no ejecuta código arbitrario.
+- Discord aplica igualmente los permisos efectivos y la jerarquía del rol del bot.
+- El mapa de confirmaciones está en memoria; mantén una sola réplica mientras se usa esta versión inicial.
