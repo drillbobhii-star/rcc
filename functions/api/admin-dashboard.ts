@@ -164,10 +164,20 @@ async function setProfileFlag(env: Env, userId: string, field: string, value: bo
     if (field !== "is_supporter") {
       throw new Error("No existe un perfil para actualizar. El usuario debe completar su registro RCC primero.");
     }
+    const authResponse = await fetch(baseUrl(env) + "/auth/v1/admin/users/" + encodeURIComponent(userId), {
+      headers: serviceHeaders(env),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!authResponse.ok) throw new Error("No se pudo recuperar el usuario para crear su perfil RCC.");
+    const authUser = await authResponse.json() as AuthUser;
+    const metadataName = authUser.user_metadata?.full_name || authUser.user_metadata?.name;
+    const displayName = typeof metadataName === "string" && metadataName.trim()
+      ? metadataName.trim().slice(0, 80)
+      : (authUser.email?.split("@")[0] || "RCC Member").slice(0, 80);
     await rest(env, "profiles?on_conflict=user_id", {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-      body: JSON.stringify({ user_id: userId, is_supporter: value }),
+      body: JSON.stringify({ user_id: userId, display_name: displayName, is_supporter: value }),
     });
   }
 }
