@@ -106,6 +106,39 @@ async function discordApi(path, options = {}) {
   return data;
 }
 
+// VIP role delivery is independent from Gemini/LLM processing.
+async function assignVipRole(discordId) {
+  const guildId = process.env.DISCORD_GUILD_ID || "";
+  const roleId = process.env.DISCORD_VIP_ROLE_ID || "";
+  if (!/^\\d{17,20}$/.test(discordId)) return { ok: false, status: "INVALID_DISCORD_ID", error: "Discord user ID inválido." };
+  if (!/^\\d{17,20}$/.test(guildId)) return { ok: false, status: "CONFIG_ERROR", error: "DISCORD_GUILD_ID no está configurado correctamente." };
+  if (!/^\\d{17,20}$/.test(roleId)) return { ok: false, status: "CONFIG_ERROR", error: "DISCORD_VIP_ROLE_ID no está configurado correctamente." };
+
+  try {
+    await discordApi("/guilds/" + guildId + "/members/" + discordId);
+  } catch (error) {
+    if (String(error.message || "").includes("Discord API 404")) {
+      return { ok: false, status: "NOT_IN_GUILD", discord_id: discordId, invite_url: process.env.DISCORD_INVITE_URL || null };
+    }
+    throw error;
+  }
+
+  const roles = await discordApi("/guilds/" + guildId + "/roles");
+  if (!Array.isArray(roles) || !roles.some(role => role.id === roleId)) {
+    return { ok: false, status: "VIP_ROLE_NOT_FOUND", error: "El rol configurado en DISCORD_VIP_ROLE_ID no existe en el servidor.", role_id: roleId };
+  }
+
+  try {
+    await discordApi("/guilds/" + guildId + "/members/" + discordId + "/roles/" + roleId, { method: "PUT" });
+  } catch (error) {
+    if (String(error.message || "").includes("Discord API 404")) {
+      return { ok: false, status: "VIP_ROLE_NOT_FOUND", error: "Discord no encontró el rol VIP al intentar asignarlo.", role_id: roleId };
+    }
+    throw error;
+  }
+  return { ok: true, status: "ROLE_GRANTED", discord_id: discordId, role_id: roleId };
+}
+
 function userIdOf(interaction) {
   return interaction.member?.user?.id || interaction.user?.id || null;
 }
@@ -1138,37 +1171,20 @@ const server = http.createServer(async (req, res) => {
     try {
       const payload = JSON.parse(rawVipBody.toString("utf8"));
       const discordId = typeof payload.discord_id === "string" ? payload.discord_id : "";
-      const guildId = process.env.DISCORD_GUILD_ID || "";
-      const roleId = process.env.DISCORD_VIP_ROLE_ID || "";
-      if (!/^\d{17,20}$/.test(discordId)) {
-        jsonResponse(res, 400, { error: "Discord user ID inválido." });
+      const result = await assignVipRole(discordId);
+      if (result.status === "NOT_IN_GUILD") {
+        jsonResponse(res, 200, result);
         return;
       }
-      if (!/^\d{17,20}$/.test(guildId) || !/^\d{17,20}$/.test(roleId)) {
-        jsonResponse(res, 503, { error: "Falta configurar DISCORD_GUILD_ID o DISCORD_VIP_ROLE_ID." });
+      if (result.status === "VIP_ROLE_NOT_FOUND" || result.status === "CONFIG_ERROR") {
+        jsonResponse(res, 503, result);
         return;
       }
-
-      // Check membership first so a user outside the guild gets a stable,
-      // machine-readable response instead of a generic Discord API failure.
-      try {
-        await discordApi("/guilds/" + guildId + "/members/" + discordId);
-      } catch (memberError) {
-        if (String(memberError.message || "").includes("Discord API 404")) {
-          jsonResponse(res, 200, {
-            status: "NOT_IN_GUILD",
-            discord_id: discordId,
-            invite_url: process.env.DISCORD_INVITE_URL || null
-          });
-          return;
-        }
-        throw memberError;
+      if (!result.ok) {
+        jsonResponse(res, 400, result);
+        return;
       }
-
-      await discordApi("/guilds/" + guildId + "/members/" + discordId + "/roles/" + roleId, {
-        method: "PUT"
-      });
-      jsonResponse(res, 200, { ok: true, status: "ROLE_GRANTED", discord_id: discordId, role_id: roleId });
+      jsonResponse(res, 200, result);
     } catch (error) {
       console.error("Error al asignar rol VIP:", error);
       jsonResponse(res, 502, { error: String(error.message || error).slice(0, 500) });
