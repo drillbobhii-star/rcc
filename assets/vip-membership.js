@@ -67,15 +67,23 @@
       const user = session?.user || null;
 
       // Reset immediately for signed-out accounts; never retain a previous user's VIP flag.
+      // The RPC derives the user from auth.uid(); no user ID is accepted from the browser.
       let isVip = false;
       if (user?.id) {
-        const { data: membership, error: membershipError } = await client
-          .from('rcc_vip_memberships')
-          .select('is_vip')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        if (membershipError) throw membershipError;
-        isVip = membership?.is_vip === true;
+        const { data: vipResult, error: vipError } = await client.rpc('rcc_is_my_vip');
+        if (vipError) {
+          console.error('[RCC VIP] Falló la RPC rcc_is_my_vip:', {
+            message: vipError.message,
+            code: vipError.code,
+            details: vipError.details,
+            hint: vipError.hint,
+          });
+          throw vipError;
+        }
+        if (typeof vipResult !== 'boolean') {
+          throw new Error('La RPC rcc_is_my_vip no devolvió un booleano.');
+        }
+        isVip = vipResult;
       }
 
       // Ignore stale responses if a newer sign-in/sign-out event has already started.
