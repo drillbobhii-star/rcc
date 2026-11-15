@@ -303,6 +303,10 @@
   }
 
   async function forceRole(user, button) {
+    if (user.is_vip !== true) {
+      setStatus("No se puede forzar el rol: esta cuenta no tiene una membresía VIP activa.", true);
+      return;
+    }
     if (!window.confirm("¿Forzar la asignación del rol VIP a " + user.email + "?")) return;
     button.disabled = true; button.textContent = "Enviando…";
     try {
