@@ -31,9 +31,10 @@
     <div class="step"><span class="number">1</span><div><strong>Inicia sesión en tu cuenta RCC</strong><p>Usa la cuenta que tiene el mismo correo que escribiste en Ko-fi.</p></div></div>
     <form id="loginForm">
       <input id="email" type="email" autocomplete="email" placeholder="Correo de tu cuenta RCC" required>
-      <input id="password" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+      <input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="Contraseña" required>
       <button type="submit">Iniciar sesión</button>
     </form>
+    <button id="createAccount" class="secondary" type="button">Crear cuenta RCC con este correo</button>
     <button id="googleLogin" class="secondary" type="button">Continuar con Google</button>
   </section>
 
@@ -145,6 +146,30 @@
       await renderSession(data.session);
     } catch (error) {
       showStatus(error.message || 'No se pudo iniciar sesión.', 'error');
+    } finally { busy = false; }
+  });
+
+  $('createAccount').addEventListener('click', async () => {
+    if (busy) return;
+    busy = true;
+    showStatus('Creando tu cuenta RCC…');
+    try {
+      const sb = await getClient();
+      const { data, error } = await sb.auth.signUp({
+        email: $('email').value.trim(),
+        password: $('password').value,
+        options: { emailRedirectTo: location.origin + '/vip-success.html' }
+      });
+      if (error) throw error;
+      $('password').value = '';
+      if (data.session) {
+        busy = false;
+        await renderSession(data.session);
+      } else {
+        showStatus('Cuenta creada. Revisa tu correo y confirma la dirección; después volverás aquí para vincular Discord y reclamar el pago.', 'success');
+      }
+    } catch (error) {
+      showStatus(error.message || 'No se pudo crear la cuenta RCC.', 'error');
     } finally { busy = false; }
   });
 
