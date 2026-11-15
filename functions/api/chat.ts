@@ -258,8 +258,14 @@ async function sendPush(env: Env, subscription: PushSubscriptionRow, payload: un
 }
 async function notifyAdminDevices(env: Env, message: string) {
   if (!env.RCC_WEB_PUSH_PUBLIC_KEY || !env.RCC_WEB_PUSH_PRIVATE_KEY) return;
-  const subs = await rest<PushSubscriptionRow[]>(env,
-    "rcc_chat_push_subscriptions?select=id,user_id,endpoint,p256dh,auth");
+  let subs: PushSubscriptionRow[] = [];
+  try {
+    subs = await rest<PushSubscriptionRow[]>(env,
+      "rcc_chat_push_subscriptions?select=id,user_id,endpoint,p256dh,auth");
+  } catch (error) {
+    console.warn("[RCC Web Push] No se pudieron leer las suscripciones; el mensaje se guarda igualmente:", error);
+    return;
+  }
   await Promise.all(subs.map(async sub => {
     try {
       const response = await sendPush(env, sub, {
