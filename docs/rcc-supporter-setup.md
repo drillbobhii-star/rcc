@@ -42,7 +42,7 @@ En el servicio Railway de `discord-admin`, añade:
 - `DISCORD_VIP_ROLE_ID`: ID del rol RCC Supporter.
 - `RCC_VIP_WEBHOOK_SECRET`: el mismo secreto configurado en Cloudflare Pages.
 
-El bot debe estar dentro del servidor, tener permiso **Gestionar roles** y su rol más alto debe estar por encima del rol RCC Supporter. El endpoint privado `POST /vip/grant` valida el secreto compartido antes de pedir a Discord que asigne el rol.
+El bot y el comprador deben estar dentro del servidor; el bot necesita permiso **Gestionar roles** y su rol más alto debe estar por encima del rol RCC Supporter. El endpoint privado `POST /vip/grant` valida el secreto compartido antes de pedir a Discord que asigne el rol.
 
 ## 5. Activar Discord OAuth en Supabase
 
