@@ -38,7 +38,7 @@ The panel reads account email from Supabase Auth (not from `profiles`), VIP from
 ## Private support chat
 
 Apply supabase/migrations/20261115000400_rcc_private_support_chat.sql after deploying the chat code. It:
-- Adds profiles.is_banned (default false).
+- Adds profiles.is_banned (default false) and a database trigger that rejects browser-side attempts to change it; only server-side service_role can restrict/unrestrict accounts.
 - Creates rcc_chat_conversations, rcc_chat_messages, and rcc_admin_private_notes.
 - Enables RLS and removes browser-role table privileges. The Pages Function uses SUPABASE_SERVICE_ROLE_KEY after validating each caller's Supabase JWT.
 - Creates the private chat-files Storage bucket (10 MB maximum). The browser never gets service-role access; uploads and short-lived signed file URLs are mediated by /api/chat.
