@@ -111,7 +111,8 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
   if (origin && origin !== new URL(request.url).origin) return reply({ error: 'Origen no permitido.' }, 403);
 
   const base = (env.SUPABASE_URL || PROJECT_URL).replace(/\/+$/, '');
-  const checkoutUrl = monthlyUrl(env.RCC_KOFI_MONTHLY_URL);
+  const RCC_KOFI_MONTHLY_URL = env.RCC_KOFI_MONTHLY_URL?.trim() || 'https://ko-fi.com/lubensdrill/tiers';
+  const checkoutUrl = monthlyUrl(RCC_KOFI_MONTHLY_URL);
 
   try {
     if (request.method === 'GET') {

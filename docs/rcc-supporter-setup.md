@@ -7,7 +7,7 @@
 3. Enlaza tu servidor de Discord en la configuración de Ko-fi y selecciona el rol que corresponde a este tier.
 4. Copia la URL de tu página de tiers. Normalmente tiene la forma `https://ko-fi.com/TU_USUARIO/tiers`.
 
-El enlace personal no está incluido en el repositorio: configura `RCC_KOFI_MONTHLY_URL` en el entorno del sitio con tu URL real. El botón de RCC permanecerá desactivado mientras no exista una URL Ko-fi válida.
+El sitio ya incluye tu enlace exacto como valor predeterminado: `https://ko-fi.com/lubensdrill/tiers`. La función usa `RCC_KOFI_MONTHLY_URL` si está definida en el entorno de Cloudflare Pages; si no está definida o está vacía, utiliza ese enlace predeterminado. El botón de RCC se habilitará con esta URL.
 
 ## 2. Configurar Cloudflare Pages
 
@@ -17,7 +17,7 @@ Añade estas variables a **Settings → Environment variables** (producción y p
 - `SUPABASE_ANON_KEY`: clave pública anon del proyecto Supabase.
 - `SUPABASE_SERVICE_ROLE_KEY`: service-role key del mismo proyecto (**secreto; nunca en el navegador**).
 - `RCC_ADMIN_EMAIL`: correo exacto de la cuenta autorizada para activar o retirar VIP.
-- `RCC_KOFI_MONTHLY_URL`: URL de tu página Ko-fi Membership Tiers.
+- `RCC_KOFI_MONTHLY_URL` (opcional): URL de tu página Ko-fi Membership Tiers. Valor predeterminado: `https://ko-fi.com/lubensdrill/tiers`.
 - `DISCORD_WEBHOOK_URL`: webhook privado del canal donde quieres recibir los cambios manuales de VIP. El endpoint lo reutiliza para notificar activaciones y retiradas.
 
 La función valida el JWT de Supabase y compara el correo del usuario con `RCC_ADMIN_EMAIL`. Solo el servidor usa `SUPABASE_SERVICE_ROLE_KEY` para leer y modificar membresías.
