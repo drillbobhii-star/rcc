@@ -3,404 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RCC - Panel de Control e IA</title>
+<title>RCC Control Center</title>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: #0a0a12; color: #e8e8f5; padding: 15px; margin: 0; }
-  .container { max-width: 800px; margin: auto; }
-  
-  /* SECCIÓN DE LA IA */
-  .ai-section { background: #12121f; border: 1px solid #7c5cff; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(124,92,255,0.2); }
-  .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #26264a; padding-bottom: 10px; }
-  .ai-header h2 { margin: 0; font-size: 1.2rem; color: #00e5ff; }
-  .chat-box { height: 250px; overflow-y: auto; background: #0d0d18; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-  .msg { padding: 10px; border-radius: 8px; max-width: 85%; font-size: 0.9rem; line-height: 1.4; }
-  .msg.user { background: #7c5cff; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
-  .msg.ai { background: #26264a; color: #e8e8f5; align-self: flex-start; border-bottom-left-radius: 0; }
-  .msg.ai pre { background: #16162a; padding: 8px; border-radius: 5px; overflow-x: auto; color: #00e5ff; font-family: monospace; font-size: 0.8rem; margin: 5px 0; }
-  .btn-use-code { background: #22c55e; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-top: 5px; font-weight: bold; }
-  .chat-input-wrap { display: flex; gap: 10px; }
-  .chat-input-wrap input { flex: 1; padding: 12px; background: #16162a; border: 1px solid #26264a; color: #fff; border-radius: 8px; outline: none; }
-  .chat-input-wrap button { background: #7c5cff; color: #fff; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-  /* SECCIÓN DEL FORMULARIO */
-  .form-section { background: #12121f; padding: 20px; border-radius: 12px; border: 1px solid #26264a; }
-  h1 { color: #7c5cff; text-align: center; font-size: 1.5rem; margin-top: 0;}
-  label { display: block; margin-top: 15px; font-size: 0.9rem; color: #8b8ba8; }
-  input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; background: #16162a; border: 1px solid #26264a; color: #fff; border-radius: 8px; outline: none; font-family: inherit; box-sizing: border-box; }
-  input:focus, select:focus, textarea:focus { border-color: #7c5cff; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  button.btn-generate { width: 100%; padding: 15px; margin-top: 20px; background: linear-gradient(90deg, #16a34a, #22c55e); color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; }
-  button.btn-generate:hover { filter: brightness(1.1); }
-  #resultado { width: 100%; height: 150px; margin-top: 15px; display: none; background: #0d0d18; color: #00e5ff; font-family: monospace; box-sizing: border-box; padding: 10px;}
-  .btn-copy { background: linear-gradient(90deg, #7c5cff, #00e5ff); margin-top: 10px; display: none; width: 100%; padding: 15px; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-  .editor-tools { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0; }
-  .editor-tools button,.file-label { background:#26264a; color:#e8e8f5; border:1px solid #585877; padding:10px 14px; border-radius:8px; cursor:pointer; font:inherit; margin:0; }
-  #feedback { color:#b8e1ce; white-space:pre-line; }
-  #feedback.error { color:#ffb4b4; }
-  #preview { border:1px solid #424263; border-radius:10px; padding:18px; margin-top:18px; }
-  #preview pre { white-space:pre-wrap; overflow-wrap:anywhere; background:#0d0d18; padding:12px; max-height:300px; overflow:auto; }
-  button:focus-visible,.file-label:focus-within { outline:2px solid #b7a9ff; outline-offset:3px; }
-  @media(max-width:520px){ .row { grid-template-columns:1fr; } }
-
-  .rcc-vip-admin{margin:20px 0;border-color:#bca5ff}.rcc-vip-admin h2{color:#d7c8ff}.rcc-vip-admin p{line-height:1.55;color:#b8b8ce}.rcc-vip-admin [hidden]{display:none!important}.rcc-vip-admin form{margin:16px 0}.rcc-vip-admin .rcc-vip-toggle{display:flex;align-items:center;gap:10px;color:#e8e8f5;font-size:1rem}.rcc-vip-admin .rcc-vip-toggle input{width:auto;accent-color:#a78bfa}.rcc-vip-admin button{cursor:pointer}
-</style>
-
-<style>
-:root{color-scheme:dark;--bg:#080a12;--panel:rgba(20,24,39,.70);--panel2:rgba(28,34,54,.62);--line:rgba(177,190,255,.13);--muted:#929bb8;--text:#eef1ff;--accent:#9b8cff;--cyan:#7de8ff;--green:#6fe0b0;--red:#ff929e;--amber:#ffd27e}
-body{background:radial-gradient(ellipse at 12% 0%,rgba(105,78,202,.22),transparent 36%),radial-gradient(ellipse at 100% 12%,rgba(38,159,194,.14),transparent 32%),var(--bg);color:var(--text)}
+:root{color-scheme:dark;--bg:#080a12;--panel:rgba(20,24,39,.78);--line:rgba(177,190,255,.15);--muted:#929bb8;--text:#eef1ff;--accent:#9b8cff;--cyan:#7de8ff;--green:#6fe0b0;--red:#ff929e;--amber:#ffd27e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% 0%,rgba(105,78,202,.22),transparent 36%),radial-gradient(ellipse at 100% 12%,rgba(38,159,194,.14),transparent 32%),var(--bg);color:var(--text);font:14px Inter,system-ui,sans-serif}
 #rccAdminShell{max-width:1500px;margin:0 auto;padding:24px 22px 40px}
-.admin-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 22px}
-.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:46px;height:46px;border:1px solid rgba(190,176,255,.35);border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(151,125,255,.28),rgba(83,205,239,.10));box-shadow:0 8px 30px #0007;font-size:23px}
-.brand h1{margin:0;text-align:left;font-size:clamp(1.2rem,3vw,1.75rem);color:#fff}.brand p{margin:3px 0 0;color:var(--muted);font-size:.85rem}
-.admin-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.glass-btn,.admin-tab{border:1px solid var(--line);background:rgba(36,42,67,.68);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:650;transition:.2s}
-.glass-btn:hover,.admin-tab:hover{border-color:#a99cff;background:rgba(111,91,190,.25)}
-.glass-btn.primary{background:linear-gradient(120deg,#6e5bd4,#4389ae);border:0}
-#refreshAdmin.loading .refresh-icon{display:inline-block;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-.admin-search{position:relative;margin:0 0 18px}.admin-search input{height:52px;padding:0 18px 0 48px;background:rgba(18,22,37,.74);border:1px solid var(--line);border-radius:16px;font-size:1rem;backdrop-filter:blur(18px)}
-.admin-search .search-icon{position:absolute;left:17px;top:17px;color:var(--muted)}
-.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
-.admin-tab.active{background:linear-gradient(130deg,rgba(129,106,239,.36),rgba(64,170,199,.18));border-color:rgba(170,157,255,.6);color:#fff}
-.admin-panel{display:none}.admin-panel.active{display:block}
-.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}
-.stat-card,.glass-card{background:var(--panel);border:1px solid var(--line);border-radius:19px;backdrop-filter:blur(22px);box-shadow:0 15px 44px rgba(0,0,0,.24)}
-.stat-card{padding:17px}.stat-card span{color:var(--muted);font-size:.82rem}.stat-card strong{display:block;margin-top:8px;font-size:1.65rem;letter-spacing:-.04em}
-.glass-card{padding:17px;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.card-head h2{font-size:1.05rem;margin:0}.hint{color:var(--muted);font-size:.82rem}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
-table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;text-align:left;border-bottom:1px solid rgba(180,190,245,.09);font-size:.86rem;vertical-align:middle}th{color:#aeb6d2;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;background:rgba(10,13,24,.6);position:sticky;top:0}tr:last-child td{border-bottom:0}tbody tr:hover{background:rgba(125,140,205,.07)}
-.user-cell{display:flex;align-items:center;gap:10px;min-width:200px}.user-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#6d5bd0,#258aa7);display:grid;place-items:center;font-weight:800;color:#fff;flex:none}.user-main{min-width:0}.user-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}.user-main small{display:block;color:var(--muted);font-size:.74rem;max-width:220px;overflow:hidden;text-overflow:ellipsis}
-.switches{display:flex;gap:12px;flex-wrap:wrap}.switch-label{display:inline-flex;align-items:center;gap:6px;color:#cbd1e8;font-size:.77rem;white-space:nowrap}.switch-label input{width:36px;height:19px;margin:0;accent-color:#9b8cff;cursor:pointer}
-.small-btn{border:1px solid var(--line);background:rgba(37,43,68,.75);color:#f3f3ff;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.78rem;font-weight:700}.small-btn:hover{border-color:var(--accent)}.small-btn.danger{color:#ffadb6;border-color:rgba(255,130,150,.3)}.small-btn:disabled{opacity:.45;cursor:not-allowed}
-.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:20px;font-size:.72rem;font-weight:750;border:1px solid var(--line)}.pill.ok{color:var(--green);background:rgba(66,210,149,.09)}.pill.warn{color:var(--amber);background:rgba(250,186,80,.09)}.pill.muted{color:#a9b2ca;background:rgba(170,185,220,.07)}
-#adminStatus{min-height:20px;color:var(--muted);font-size:.84rem;margin:12px 2px 0}#adminStatus.error{color:var(--red)}
-.empty-state{padding:36px;text-align:center;color:var(--muted)}
-#adminBoot{max-width:560px;margin:14vh auto;padding:34px 24px;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;color:var(--text);backdrop-filter:blur(20px)}
-#adminBoot .spinner{width:29px;height:29px;border:3px solid #ffffff25;border-top-color:var(--cyan);border-radius:50%;margin:0 auto 15px;animation:spin 1s linear infinite}
-.legacy-tools{max-width:1200px;margin:15px auto 60px;padding:0 22px;color:var(--muted)}.legacy-tools>summary{cursor:pointer;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(20,24,39,.55);font-size:.86rem}
-@media(max-width:900px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){#rccAdminShell{padding:15px 12px}.admin-top{align-items:flex-start;flex-direction:column}.admin-actions{width:100%}.admin-actions button{flex:1}.admin-stats{gap:8px}.stat-card{padding:12px}.stat-card strong{font-size:1.35rem}.admin-tabs{display:grid;grid-template-columns:repeat(2,1fr)}.admin-tab{padding:11px 8px}}
+.admin-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 22px}.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:46px;height:46px;border:1px solid rgba(190,176,255,.35);border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(151,125,255,.28),rgba(83,205,239,.10));box-shadow:0 8px 30px #0007;font-size:23px}.brand h1{margin:0;font-size:clamp(1.2rem,3vw,1.75rem);color:#fff}.brand p{margin:3px 0 0;color:var(--muted);font-size:.85rem}
+.admin-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.glass-btn,.admin-tab{border:1px solid var(--line);background:rgba(36,42,67,.68);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:650;transition:.2s}.glass-btn:hover,.admin-tab:hover{border-color:#a99cff;background:rgba(111,91,190,.25)}.glass-btn.primary{background:linear-gradient(120deg,#6e5bd4,#4389ae);border:0}#refreshAdmin.loading .refresh-icon{display:inline-block;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.admin-search{position:relative;margin:0 0 18px}.admin-search input{height:52px;padding:0 18px 0 48px;background:rgba(18,22,37,.74);border:1px solid var(--line);border-radius:16px;font-size:1rem;backdrop-filter:blur(18px);color:#fff;width:100%}.admin-search .search-icon{position:absolute;left:17px;top:17px;color:var(--muted)}
+.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.admin-tab.active{background:linear-gradient(130deg,rgba(129,106,239,.36),rgba(64,170,199,.18));border-color:rgba(170,157,255,.6);color:#fff}.admin-panel{display:none}.admin-panel.active{display:block}
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}.stat-card,.glass-card{background:var(--panel);border:1px solid var(--line);border-radius:19px;backdrop-filter:blur(22px);box-shadow:0 15px 44px rgba(0,0,0,.24)}.stat-card{padding:17px}.stat-card span{color:var(--muted);font-size:.82rem}.stat-card strong{display:block;margin-top:8px;font-size:1.65rem;letter-spacing:-.04em}.glass-card{padding:17px;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.card-head h2{font-size:1.05rem;margin:0}.hint{color:var(--muted);font-size:.82rem}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;text-align:left;border-bottom:1px solid rgba(180,190,245,.09);font-size:.86rem;vertical-align:middle}th{color:#aeb6d2;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;background:rgba(10,13,24,.6);position:sticky;top:0}tr:last-child td{border-bottom:0}tbody tr:hover{background:rgba(125,140,205,.07)}
+.user-cell{display:flex;align-items:center;gap:10px;min-width:200px}.user-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#6d5bd0,#258aa7);display:grid;place-items:center;font-weight:800;color:#fff;flex:none}.user-main{min-width:0}.user-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}.user-main small{display:block;color:var(--muted);font-size:.74rem;max-width:220px;overflow:hidden;text-overflow:ellipsis}.switches{display:flex;gap:12px;flex-wrap:wrap}.switch-label{display:inline-flex;align-items:center;gap:6px;color:#cbd1e8;font-size:.77rem;white-space:nowrap}.switch-label input{width:36px;height:19px;margin:0;accent-color:#9b8cff;cursor:pointer}.small-btn{border:1px solid var(--line);background:rgba(37,43,68,.75);color:#f3f3ff;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.78rem;font-weight:700}.small-btn:hover{border-color:var(--accent)}.small-btn.danger{color:#ffadb6;border-color:rgba(255,130,150,.3)}.small-btn:disabled{opacity:.45;cursor:not-allowed}.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:20px;font-size:.72rem;font-weight:750;border:1px solid var(--line)}.pill.ok{color:var(--green);background:rgba(66,210,149,.09)}.pill.warn{color:var(--amber);background:rgba(250,186,80,.09)}.pill.muted{color:#a9b2ca;background:rgba(170,185,220,.07)}#adminStatus{min-height:20px;color:var(--muted);font-size:.84rem;margin:12px 2px 0}#adminStatus.error{color:var(--red)}.empty-state{padding:36px;text-align:center;color:var(--muted)}
+#adminBoot{max-width:560px;margin:14vh auto;padding:34px 24px;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;color:var(--text);backdrop-filter:blur(20px)}#adminBoot .spinner{width:29px;height:29px;border:3px solid #ffffff25;border-top-color:var(--cyan);border-radius:50%;margin:0 auto 15px;animation:spin 1s linear infinite}
+#rccMessagesLayout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;min-height:650px}#rccConversationList{min-height:600px;max-height:calc(100vh - 250px);overflow:auto;background:rgba(15,19,33,.8);border:1px solid var(--line);border-radius:17px;padding:8px}
+.rcc-conversation{display:flex;width:100%;align-items:center;gap:10px;text-align:left;border:1px solid transparent;background:transparent;color:var(--text);padding:12px;border-radius:13px;cursor:pointer}.rcc-conversation:hover,.rcc-conversation.active{background:rgba(122,104,216,.18);border-color:#9e91ff40}.rcc-conversation strong,.rcc-conversation small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rcc-conversation small{color:var(--muted);font-size:11px;margin-top:4px}.rcc-chat-admin-pane{display:flex;flex-direction:column;min-height:600px;min-width:0;background:rgba(15,19,33,.8);border:1px solid var(--line);border-radius:17px;overflow:hidden}
+.rcc-chat-admin-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.rcc-chat-admin-controls{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.rcc-chat-admin-messages{flex:1;min-height:300px;max-height:calc(100vh - 410px);overflow:auto;padding:17px;display:flex;flex-direction:column;gap:10px;background:radial-gradient(circle at top,rgba(103,87,183,.10),transparent 62%)}
+.rcc-admin-msg{align-self:flex-start;max-width:78%;padding:10px 13px;border-radius:14px;background:#242b43;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}.rcc-admin-msg.mine{align-self:flex-end;background:#5f4eae}.rcc-admin-msg small{display:block;color:#c1c8e5;font-size:10px;margin-top:5px}.rcc-admin-msg img{display:block;max-height:240px;max-width:100%;border-radius:10px;margin-top:8px}.rcc-admin-msg a{color:#a5eaff}
+.rcc-admin-compose{display:grid;grid-template-columns:1fr auto;gap:9px;padding:13px;border-top:1px solid var(--line)}.rcc-admin-compose textarea{resize:vertical;min-height:48px;max-height:130px;background:#11182a;border:1px solid var(--line);border-radius:11px;color:white;padding:12px;font:14px inherit}.rcc-admin-compose-actions{display:flex;gap:6px;align-items:end}.rcc-admin-note{padding:13px;border-top:1px solid var(--line);background:rgba(7,10,19,.55)}.rcc-admin-note label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.rcc-admin-note textarea{width:100%;min-height:56px;background:#11182a;border:1px solid var(--line);border-radius:10px;color:#fff;padding:10px;font:13px inherit}
+#rccQuickMenu{position:absolute;z-index:5;right:15px;bottom:125px;background:#1b2034;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 15px 40px #0009;display:grid;gap:5px}#rccQuickMenu[hidden]{display:none}#rccQuickMenu button{text-align:left;border:0;border-radius:8px;background:#292f4b;color:#fff;padding:9px;cursor:pointer}
+#rccAdminMessagesPanel{position:relative}@media(max-width:850px){#rccMessagesLayout{grid-template-columns:1fr}.rcc-chat-admin-pane{min-height:560px}#rccConversationList{min-height:170px;max-height:220px;display:flex;overflow:auto}.rcc-conversation{min-width:230px}.admin-stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){#rccAdminShell{padding:14px 10px}.admin-top{align-items:flex-start;flex-direction:column}.admin-actions{width:100%}.admin-actions button{flex:1}.admin-tabs{display:grid;grid-template-columns:repeat(2,1fr)}.admin-tab{padding:11px 8px}.rcc-chat-admin-messages{max-height:none}.rcc-admin-msg{max-width:92%}.rcc-admin-compose{grid-template-columns:1fr}.rcc-admin-compose-actions{justify-content:flex-end}}
 </style>
-
 </head>
 <body>
-
 <div id="adminBoot" role="status"><div class="spinner"></div><strong>Verificando sesión de administrador…</strong><p class="hint">RCC Control Center</p></div>
 <main id="rccAdminShell" hidden>
-  <header class="admin-top">
-    <div class="brand"><div class="brand-mark">◈</div><div><h1>RCC Control Center</h1><p>Centro de administración · Acceso restringido</p></div></div>
-    <div class="admin-actions">
-      <span id="adminIdentity" class="pill ok">Administrador</span>
-      <button id="refreshAdmin" class="glass-btn primary"><span class="refresh-icon">↻</span> Actualizar</button>
-      <button id="adminLogout" class="glass-btn">Cerrar sesión</button>
+<header class="admin-top">
+  <div class="brand"><div class="brand-mark">◈</div><div><h1>RCC Control Center</h1><p>Centro de administración · Acceso restringido</p></div></div>
+  <div class="admin-actions"><span id="adminIdentity" class="pill ok">Administrador</span><button id="refreshAdmin" class="glass-btn primary"><span class="refresh-icon">↻</span> Actualizar</button><button id="adminLogout" class="glass-btn">Cerrar sesión</button></div>
+</header>
+<div class="admin-search"><span class="search-icon">⌕</span><input id="globalSearch" type="search" placeholder="Buscar por correo, user_id o discord_id…" autocomplete="off"></div>
+<nav class="admin-tabs" aria-label="Secciones administrativas">
+<button class="admin-tab active" data-tab="users">👥 Usuarios</button>
+<button class="admin-tab" data-tab="payments">💳 Pagos reales</button>
+<button class="admin-tab" data-tab="discord">🎮 Discord</button>
+<button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
+<button class="admin-tab" data-tab="messages">✉ Mensajes</button>
+</nav>
+<section id="panel-users" class="admin-panel active"><div class="glass-card"><div class="card-head"><div><h2>Usuarios registrados</h2><div class="hint">Correo desde Auth · Perfil desde profiles · VIP desde rcc_vip_memberships</div></div><span id="userCount" class="pill muted">0</span></div><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Identificadores</th><th>Accesos</th></tr></thead><tbody id="usersBody"><tr><td colspan="3" class="empty-state">Cargando…</td></tr></tbody></table></div></div></section>
+<section id="panel-payments" class="admin-panel"><div class="glass-card"><div class="card-head"><div><h2>Pagos Ko-fi registrados</h2><div class="hint">Eventos almacenados por el webhook de Ko-fi</div></div><span id="paymentCount" class="pill muted">0</span></div><div class="table-wrap"><table><thead><tr><th>Comprador</th><th>Pago</th><th>Fecha</th><th>Cuenta RCC</th><th>Acción</th></tr></thead><tbody id="paymentsBody"></tbody></table></div></div></section>
+<section id="panel-discord" class="admin-panel"><div class="glass-card"><div class="card-head"><div><h2>Cuentas Discord vinculadas</h2><div class="hint">Reintentos del rol y desvinculación del perfil</div></div><span id="discordCount" class="pill muted">0</span></div><div class="table-wrap"><table><thead><tr><th>Usuario RCC</th><th>Discord ID</th><th>VIP</th><th>Acciones</th></tr></thead><tbody id="discordBody"></tbody></table></div></div></section>
+<section id="panel-stats" class="admin-panel"><div class="admin-stats"><div class="stat-card"><span>Usuarios registrados</span><strong id="statUsers">—</strong></div><div class="stat-card"><span>VIP activos</span><strong id="statVips">—</strong></div><div class="stat-card"><span>Discord vinculados</span><strong id="statDiscord">—</strong></div><div class="stat-card"><span>Ingresos visibles · USD</span><strong id="statRevenue">—</strong></div></div><div class="glass-card"><h2>Estado del sistema</h2><p class="hint">Datos sincronizados cada 30 segundos. Los ingresos representan eventos cargados, no MRR contable.</p><p id="lastUpdated" class="hint">Aún no actualizado.</p></div></section>
+<section id="panel-messages" class="admin-panel">
+  <div id="rccAdminMessagesPanel" class="glass-card">
+    <div class="card-head"><div><h2>Mensajería privada y soporte VIP</h2><div class="hint">Conversaciones privadas · sincronización cada 4 segundos</div></div><span id="rccChatAdminStatus" class="pill ok">Seguro</span></div>
+    <div id="rccMessagesLayout">
+      <aside id="rccConversationList" aria-label="Conversaciones"><div class="empty-state">Cargando chats…</div></aside>
+      <section class="rcc-chat-admin-pane" aria-label="Conversación seleccionada">
+        <header class="rcc-chat-admin-head"><div><strong id="rccChatAdminTitle">Selecciona un usuario</strong><div id="rccChatAdminSubtitle" class="hint">Los mensajes privados aparecerán aquí.</div></div><div class="rcc-chat-admin-controls"><button id="rccToggleChat" class="small-btn" disabled>Habilitar chat</button><button id="rccDeleteChat" class="small-btn danger" disabled>Borrar chat</button><button id="rccRestrict" class="small-btn danger" disabled>Restringir acceso</button><button id="rccUnrestrict" class="small-btn" hidden>Quitar restricción</button></div></header>
+        <div id="rccAdminChatMessages" class="rcc-chat-admin-messages"><div class="empty-state">Selecciona una conversación para ver sus mensajes.</div></div>
+        <div class="rcc-admin-compose"><textarea id="rccAdminChatInput" placeholder="Escribe un mensaje al usuario…" maxlength="5000" disabled></textarea><div class="rcc-admin-compose-actions"><input id="rccAdminChatFile" type="file" accept="image/*,.pdf,.txt,.csv,.json,.zip,.docx" hidden><button id="rccAdminAttach" class="small-btn" disabled>Adjuntar</button><button id="rccQuickReply" class="small-btn" disabled>Respuestas rápidas ▾</button><button id="rccAdminSend" class="small-btn" disabled>Enviar</button></div></div>
+        <div id="rccQuickMenu" hidden></div>
+        <div class="rcc-admin-note"><label for="rccPrivateNote">Notas internas privadas · solo visible para el Creador</label><textarea id="rccPrivateNote" placeholder="Notas internas sobre este usuario…" maxlength="10000" disabled></textarea><div style="display:flex;justify-content:flex-end;margin-top:7px"><button id="rccSaveNote" class="small-btn" disabled>Guardar nota privada</button></div></div>
+      </section>
     </div>
-  </header>
-  <div class="admin-search"><span class="search-icon">⌕</span><input id="globalSearch" type="search" placeholder="Buscar por correo, user_id o discord_id…" autocomplete="off"></div>
-  <nav class="admin-tabs" aria-label="Secciones administrativas">
-    <button class="admin-tab active" data-tab="users">👥 Usuarios</button>
-    <button class="admin-tab" data-tab="payments">💳 Pagos reales</button>
-    <button class="admin-tab" data-tab="discord">🎮 Control de Discord</button>
-    <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
-  </nav>
-  <section id="panel-users" class="admin-panel active">
-    <div class="glass-card">
-      <div class="card-head"><div><h2>Usuarios registrados</h2><div class="hint">Correo desde Supabase Auth · VIP desde rcc_vip_memberships · Creator/Banner se habilitan al aplicar la migración incluida</div></div><span id="userCount" class="pill muted">0</span></div>
-      <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Identificadores</th><th>Accesos</th></tr></thead><tbody id="usersBody"><tr><td colspan="3" class="empty-state">Cargando usuarios…</td></tr></tbody></table></div>
-    </div>
-  </section>
-  <section id="panel-payments" class="admin-panel">
-    <div class="glass-card"><div class="card-head"><div><h2>Pagos Ko-fi registrados</h2><div class="hint">Eventos almacenados por el webhook verificado de Ko-fi</div></div><span id="paymentCount" class="pill muted">0</span></div>
-      <div class="table-wrap"><table><thead><tr><th>Comprador</th><th>Pago</th><th>Fecha</th><th>Cuenta RCC</th><th>Acción</th></tr></thead><tbody id="paymentsBody"><tr><td colspan="5" class="empty-state">Cargando pagos…</td></tr></tbody></table></div>
-    </div>
-  </section>
-  <section id="panel-discord" class="admin-panel">
-    <div class="glass-card"><div class="card-head"><div><h2>Cuentas Discord vinculadas</h2><div class="hint">Reintenta la asignación del rol o elimina el vínculo guardado en RCC</div></div><span id="discordCount" class="pill muted">0</span></div>
-      <div class="table-wrap"><table><thead><tr><th>Usuario RCC</th><th>Discord ID</th><th>VIP</th><th>Acciones</th></tr></thead><tbody id="discordBody"><tr><td colspan="4" class="empty-state">Cargando vínculos…</td></tr></tbody></table></div>
-    </div>
-  </section>
-  <section id="panel-stats" class="admin-panel">
-    <div class="admin-stats">
-      <div class="stat-card"><span>Usuarios registrados</span><strong id="statUsers">—</strong></div>
-      <div class="stat-card"><span>VIP activos</span><strong id="statVips">—</strong></div>
-      <div class="stat-card"><span>Discord vinculados</span><strong id="statDiscord">—</strong></div>
-      <div class="stat-card"><span>Ingresos visibles · USD</span><strong id="statRevenue">—</strong></div>
-    </div>
-    <div class="glass-card"><h2>Estado del sistema</h2><p class="hint">Los datos se actualizan automáticamente cada 30 segundos. Los ingresos son la suma de los eventos Ko-fi que devuelve el panel, no un informe contable reconciliado.</p><p id="lastUpdated" class="hint">Aún no actualizado.</p></div>
-  </section>
-  <p id="adminStatus" role="status" aria-live="polite">Conectando con Supabase…</p>
-</main>
-
-
-<details class="legacy-tools"><summary>Herramientas de desarrollo · Generador JSON (sección anterior)</summary>
-<div class="container">
-  <p><a href="/" style="color:#b7a9ff">← Volver al catálogo</a></p>
-  
-  <!-- SECCIÓN DEL FORMULARIO -->
-  <div class="form-section">
-    <h1>🛠️ Generador JSON</h1>
-    <p style="text-align:center; color:#8b8ba8; font-size:0.9rem;">Revisa los datos generados y copia el JSON.</p>
-
-    <label>Nombre del Script</label>
-    <input type="text" id="fName" placeholder="Ej: AutoFarm Pro">
-
-    <label>Descripción corta</label>
-    <textarea id="fDesc" rows="2" placeholder="¿Qué hace este script?"></textarea>
-
-    <div class="row">
-      <div>
-        <label>Plataforma</label>
-        <select id="fPlatform">
-          <option value="roblox">Roblox</option>
-          <option value="fivem">FiveM</option>
-          <option value="gameguardian">GameGuardian</option>
-          <option value="autotouch">AutoTouch</option>
-          <option value="universal">Universal</option>
-        </select>
-      </div>
-      <div>
-        <label>Dispositivo</label>
-        <select id="fDevice">
-          <option value="pc">PC</option>
-          <option value="mobile">Móvil</option>
-          <option value="both">Ambos</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Ejecutores (separados por coma)</label>
-        <input type="text" id="fExec" placeholder="Solara, Wave">
-      </div>
-      <div>
-        <label>Tags (separados por coma)</label>
-        <input type="text" id="fTags" placeholder="Farm, Auto">
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Versión</label>
-        <input type="text" id="fVersion" value="1.0">
-      </div>
-      <div>
-        <label>ID</label>
-        <input type="text" id="fId" readonly style="color:#8b8ba8;">
-      </div>
-    </div>
-
-    <label for="fType">Tipo de script</label>
-    <select id="fType"><option value="source">Código fuente</option><option value="loadstring">Loadstring</option></select>
-    <label for="fEnvironment">Entorno requerido</label>
-    <select id="fEnvironment"><option value="legacy">Sin especificar</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente (LocalScript)</option><option value="server">Roblox servidor (Script)</option></select>
-    <label for="fRequirements">Requisitos y ubicación</label>
-    <textarea id="fRequirements" rows="2" placeholder="Bibliotecas necesarias o ubicación del Script / LocalScript"></textarea>
-    <p style="color:#8b8ba8;font-size:.85rem">Un ejecutor listado no equivale a una prueba. Los JSON exportados desde este editor quedan sin verificar. <a href="compatibilidad.html" style="color:#b7a9ff">Consultar compatibilidad</a></p>
-    <label>Código Lua</label>
-    <textarea id="fCode" rows="6" placeholder="-- El código aparecerá aquí"></textarea>
-
-    <div class="editor-tools">
-      <button onclick="previewScript()">Vista previa</button>
-      <label class="file-label">Importar JSON<input type="file" id="importJson" accept=".json,application/json" style="width:180px"></label>
-      <button onclick="exportJSON()">Descargar JSON</button>
-    </div>
-    <p id="feedback" role="status" aria-live="polite"></p>
-    <section id="preview" hidden aria-label="Vista previa del script"></section>
-    <p style="color:#8b8ba8;font-size:.85rem">La vista previa muestra el código sin ejecutarlo. Descarga o copia el JSON y añádelo al catálogo para publicarlo.</p>
-    <button class="btn-generate" onclick="generarJSON()">Generar Código JSON</button>
-    <textarea id="resultado" readonly></textarea>
-    <button class="btn-copy" id="btnCopy" onclick="copiarJSON()">📋 Copiar JSON para GitHub</button>
   </div>
-</div>
-
-<script>
-  document.querySelectorAll('label').forEach(label=>{
-    const field=label.nextElementSibling;
-    if(field?.id) label.htmlFor=field.id;
-  });
-  // Generar ID
-  document.getElementById('fId').value = Math.random().toString(36).substring(2, 9);
-
-  // --- LÓGICA DE LA IA (Simulada por ahora) ---
-  function enviarMensaje() {
-    const input = document.getElementById('chatInput');
-    const texto = input.value.trim();
-    if(!texto) return;
-
-    const chatBox = document.getElementById('chatBox');
-    
-    // Agregar mensaje del usuario
-    const message = document.createElement('div'); message.className='msg user'; message.textContent=texto; chatBox.appendChild(message);
-    input.value = '';
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // Simular que la IA está escribiendo...
-    setTimeout(() => {
-      // Aquí simulamos la respuesta de DeepSeek
-      const respuestaIA = `¡Claro! Aquí tienes un script de ejemplo para tu petición:<br><br>
-      <pre><code>-- Script generado por DeepSeek\nprint("¡Hola desde el script generado!")\n-- Función de prueba\nwhile true do wait(1) end</code></pre>
-      <button class="btn-use-code" onclick="usarCodigoIA()">⬇️ Usar este código</button>`;
-      
-      chatBox.innerHTML += `<div class="msg ai">${respuestaIA}</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }, 1000);
-  }
-
-  function usarCodigoIA() {
-    // Autocompletar el formulario con datos de prueba
-    document.getElementById('fName').value = "Script Generado por IA";
-    document.getElementById('fDesc').value = "Este script fue creado usando el copiloto de DeepSeek.";
-    document.getElementById('fCode').value = `-- Script generado por DeepSeek\nprint("¡Hola desde el script generado!")\n-- Función de prueba\nwhile true do wait(1) end`;
-    document.getElementById('fExec').value = "Solara, Wave";
-    document.getElementById('fTags').value = "IA, Auto";
-    alert("✅ ¡Código insertado en el formulario! Revisa abajo.");
-  }
-
-  // --- LÓGICA DEL GENERADOR JSON ---
-  function generarJSON() {
-    const name = document.getElementById('fName').value.trim();
-    const desc = document.getElementById('fDesc').value.trim();
-    const code = document.getElementById('fCode').value.trim();
-    
-    if(!name || !code) {
-      feedback('Completa el nombre y el código Lua.',true);
-      document.getElementById(!name?'fName':'fCode').focus(); return null;
-    }
-    if(document.getElementById('fType').value==='loadstring' && !/\bloadstring\s*\(/.test(code)) {
-      feedback('El tipo Loadstring requiere una llamada a loadstring().',true); return null;
-    }
-
-    const execString = document.getElementById('fExec').value;
-    const execArray = execString ? [...new Set(execString.split(',').map(s => s.trim()).filter(Boolean))] : [];
-    const tagsString = document.getElementById('fTags').value;
-    const tagsArray = tagsString ? [...new Set(tagsString.split(',').map(s => s.trim()).filter(Boolean))] : [];
-
-    const environment=document.getElementById('fEnvironment').value;
-    const platform=document.getElementById('fPlatform').value;
-    if((environment==='lua' && platform!=='universal') || (['client','server'].includes(environment) && platform!=='roblox')) {
-      feedback('El entorno Lua estándar requiere la plataforma Universal; cliente o servidor requieren Roblox.',true); return null;
-    }
-    const context={lua:'Intérprete Lua con bibliotecas estándar',client:'LocalScript en StarterPlayer > StarterPlayerScripts',server:'Script en ServerScriptService de tu experiencia',legacy:'Sin especificar'}[environment];
-    if(environment==='server' && execArray.some(name=>name!=='Roblox Studio (servidor)')) {
-      feedback('El código servidor no se ejecuta con un ejecutor cliente. Usa Roblox Studio (servidor) como entorno.',true); return null;
-    }
-    const scriptObj = {
-      id: document.getElementById('fId').value,
-      name: name,
-      description: desc,
-      level: "free",
-      type: document.getElementById('fType').value,
-      device: document.getElementById('fDevice').value,
-      platform: document.getElementById('fPlatform').value,
-      executors: execArray,
-      tags: tagsArray,
-      version: document.getElementById('fVersion').value || "1.0",
-      created_at: importedDate || new Date().toISOString().slice(0, 10),
-      code: code,
-      compatibility: {
-        environment,
-        runtime: environment==='lua'?'Lua 5.1+':(['client','server'].includes(environment)?'Luau / Roblox':'Sin especificar'),
-        context,
-        requirements: document.getElementById('fRequirements').value.trim() || 'Revisar requisitos antes de ejecutar.',
-        verification: 'unverified',
-        executor_status: environment==='server'?'not-applicable':'unverified',
-        mobile_status: 'Sin prueba registrada en Android ni iOS.',
-        sources: importedCompatibility?.sources || []
-      }
-    };
-
-    const jsonString = JSON.stringify(scriptObj, null, 2);
-    const resBox = document.getElementById('resultado');
-    
-    resBox.value = jsonString;
-    resBox.style.display = 'block';
-    document.getElementById('btnCopy').style.display = 'block';
-    feedback('JSON validado. Listo para copiar o descargar.');
-    return scriptObj;
-  }
-
-  let importedDate = null;
-  let importedCompatibility = null;
-  function feedback(message,error=false){
-    const el=document.getElementById('feedback'); el.textContent=message; el.classList.toggle('error',error);
-  }
-  async function copiarJSON() {
-    const obj=generarJSON(); if(!obj) return;
-    try { await navigator.clipboard.writeText(JSON.stringify(obj,null,2)); feedback('JSON copiado.'); }
-    catch { feedback('No se pudo copiar. Selecciona el JSON y cópialo manualmente.',true); }
-  }
-  function previewScript(){
-    const obj=generarJSON(); if(!obj) return;
-    const panel=document.getElementById('preview'); panel.replaceChildren(); panel.hidden=false;
-    const title=document.createElement('h2'); title.textContent=obj.name;
-    const meta=document.createElement('p'); meta.textContent=`${obj.platform} · ${obj.device} · ${obj.type} · v${obj.version}`;
-    const desc=document.createElement('p'); desc.textContent=obj.description;
-    const tags=document.createElement('p'); tags.textContent=[...obj.tags,...obj.executors].join(' · ');
-    const code=document.createElement('pre'); code.textContent=obj.code;
-    panel.append(title,meta,desc,tags,code);
-  }
-  function exportJSON(){
-    const obj=generarJSON(); if(!obj) return;
-    const url=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));
-    const a=document.createElement('a'); a.href=url; a.download=obj.id.replace(/[^a-z0-9_-]/gi,'_')+'.json'; a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),1000); feedback('JSON descargado.');
-  }
-  document.getElementById('importJson').addEventListener('change',async e=>{
-    const input=e.currentTarget;
-    const file=input.files[0]; if(!file) return;
-    try {
-      if(file.size>2000000) throw new Error('El archivo supera el límite de 2 MB.');
-      const obj=JSON.parse(await file.text());
-      if(!obj || Array.isArray(obj) || typeof obj!=='object') throw new Error('Importa un único objeto de script, no el catálogo completo.');
-      for(const key of ['name','code']) if(typeof obj[key]!=='string' || !obj[key].trim()) throw new Error('El JSON necesita nombre y código válidos.');
-      for(const key of ['description','id','version','created_at']) if(obj[key]!==undefined && typeof obj[key]!=='string') throw new Error('Campo inválido: '+key);
-      for(const key of ['tags','executors']) if(obj[key]!==undefined && (!Array.isArray(obj[key]) || obj[key].some(v=>typeof v!=='string'))) throw new Error('Lista inválida: '+key);
-      for(const [key,id] of [['platform','fPlatform'],['device','fDevice'],['type','fType']]) {
-        if(obj[key]!==undefined && ![...document.getElementById(id).options].some(o=>o.value===obj[key])) throw new Error('Valor no reconocido: '+key);
-      }
-      if(obj.created_at && (!/^\d{4}-\d{2}-\d{2}$/.test(obj.created_at) || !Number.isFinite(Date.parse(obj.created_at)))) throw new Error('Fecha no válida.');
-      if(obj.compatibility!==undefined) {
-        const c=obj.compatibility;
-        if(!c || typeof c!=='object' || Array.isArray(c)) throw new Error('Compatibilidad inválida.');
-        if(c.environment!==undefined && !['lua','client','server','legacy'].includes(c.environment)) throw new Error('Entorno inválido.');
-        if(c.requirements!==undefined && typeof c.requirements!=='string') throw new Error('Requisitos inválidos.');
-        if(c.sources!==undefined && (!Array.isArray(c.sources) || c.sources.some(s=>typeof s!=='string' || !/^https:\/\//.test(s)))) throw new Error('Fuentes inválidas.');
-      }
-      const mapping={name:'fName',description:'fDesc',code:'fCode',version:'fVersion',platform:'fPlatform',device:'fDevice',type:'fType',id:'fId'};
-      const defaults={description:'',version:'1.0',platform:'roblox',device:'both',type:'source',id:crypto.randomUUID()};
-      for(const [key,id] of Object.entries(mapping)) document.getElementById(id).value=obj[key] ?? defaults[key];
-      document.getElementById('fTags').value=(obj.tags||[]).join(', ');
-      document.getElementById('fExec').value=(obj.executors||[]).join(', ');
-      importedDate=obj.created_at || null;
-      importedCompatibility=obj.compatibility || null;
-      document.getElementById('fEnvironment').value=obj.compatibility?.environment || 'legacy';
-      document.getElementById('fRequirements').value=obj.compatibility?.requirements || '';
-      document.getElementById('preview').hidden=true;
-      document.getElementById('resultado').style.display='none'; document.getElementById('btnCopy').style.display='none';
-      feedback('Script importado. Revisa los datos antes de exportarlo.');
-    } catch(err) { feedback('No se pudo importar: '+err.message,true); }
-    input.value='';
-  });
-  document.querySelector('.form-section').addEventListener('input',()=>{
-    document.getElementById('resultado').style.display='none'; document.getElementById('btnCopy').style.display='none';
-    document.getElementById('preview').hidden=true; feedback('Hay cambios pendientes de validar.');
-  });
-</script>
-
-
+</section>
+<p id="adminStatus" role="status" aria-live="polite"></p>
+</main>
 <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtpb0JYKlDM8U">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.js"></script>
 <script>
 window.rccAdminSupabaseReady = Promise.resolve().then(() => {
-  if (!window.supabase?.createClient) throw new Error('No se pudo cargar Supabase.');
-  return window.supabase.createClient('https://cbkrpyfkteomcukdisdw.supabase.co', document.querySelector('meta[name="supabase-anon-key"]').content.trim(), {
-    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  const anonKey = document.querySelector('meta[name="supabase-anon-key"]').content.trim();
+  if (!anonKey || !window.supabase?.createClient) throw new Error("Supabase no está disponible.");
+  return window.supabase.createClient("https://cbkrpyfkteomcukdisdw.supabase.co", anonKey, {
+    auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
   });
 });
+window.rccAdminSupabaseReady.catch(() => {});
 </script>
-
-
-</details>
-<script src="assets/admin-dashboard.js?v=1"></script>
+<script src="assets/admin-dashboard.js?v=2"></script>
+<script src="assets/admin-chat.js?v=1"></script>
 </body>
 </html>
