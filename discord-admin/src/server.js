@@ -77,7 +77,7 @@ function discordHeaders() {
 async function discordApi(path, options = {}) {
   const response = await fetch("https://discord.com/api/v10" + path, {
     method: options.method || "GET",
-    headers: discordHeaders(),
+    headers: { ...discordHeaders(), ...(options.reason ? { "X-Audit-Log-Reason": encodeURIComponent(String(options.reason).slice(0, 450)) } : {}) },
     signal: AbortSignal.timeout(15000),
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });
@@ -200,10 +200,10 @@ const toolDefinitions = [
       parameters: {
       type: "object",
       properties: {
-        channel_id: { type: "string" },
+        channel_name: { type: "string" },
         new_name: { type: "string" }
       },
-      required: ["channel_id", "new_name"],
+      required: ["channel_name", "new_name"],
       additionalProperties: false
       }
     }
@@ -215,8 +215,8 @@ const toolDefinitions = [
       description: "Solicita borrar un canal existente. El usuario siempre tendrá que confirmar antes de borrarlo.",
       parameters: {
       type: "object",
-      properties: { channel_id: { type: "string" } },
-      required: ["channel_id"],
+      properties: { channel_name: { type: "string" } },
+      required: ["channel_name"],
       additionalProperties: false
       }
     }
@@ -240,6 +240,22 @@ const toolDefinitions = [
 ];
 
 for (const [name, description, properties, required] of [
+  ["update_channel_permissions","Configura permisos de un canal para @everyone y un rol nombrado. permissions es un objeto con view_channel y send_messages booleanos.",{channel_name:{type:"string"},role_name:{type:"string"},permissions:{type:"object",properties:{view_channel:{type:"boolean"},send_messages:{type:"boolean"}},required:["view_channel","send_messages"],additionalProperties:false}},["channel_name","role_name","permissions"]],
+  ["create_invite","Crea un enlace de invitación para un canal; max_age en segundos, 0 significa nunca expira.",{channel_name:{type:"string"},max_age:{type:"integer",minimum:0,maximum:604800}},["channel_name","max_age"]],
+  ["ban_member","Solicita banear un usuario por ID. Siempre requiere confirmación manual.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},reason:{type:"string"}},["user_id","reason"]],
+  ["unban_member","Retira el baneo de un usuario por ID.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"}},["user_id"]],
+  ["set_nickname","Cambia el apodo de un miembro.",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},new_nickname:{type:["string","null"],maxLength:32}},["user_id","new_nickname"]],
+  ["timeout_member","Aplica timeout de 1 a 40320 minutos (28 días).",{user_id:{type:"string",pattern:"^[0-9]{17,20}$"},minutes:{type:"integer",minimum:1,maximum:40320},reason:{type:"string"}},["user_id","minutes","reason"]],
+  ["update_role_color","Cambia el color de un rol usando HEX #RRGGBB.",{role_name:{type:"string"},color_hex:{type:"string",pattern:"^#[0-9a-fA-F]{6}$"}},["role_name","color_hex"]],
+  ["update_role_permissions","Reemplaza los permisos de un rol por la lista indicada. Usa nombres de permisos Discord.",{role_name:{type:"string"},permissions:{type:"array",items:{type:"string"},maxItems:40}},["role_name","permissions"]],
+  ["delete_role","Solicita borrar un rol. Siempre requiere confirmación manual.",{role_name:{type:"string"}},["role_name"]],
+  ["pin_message","Fija un mensaje existente por ID en un canal.",{channel_name:{type:"string"},message_id:{type:"string",pattern:"^[0-9]{17,20}$"}},["channel_name","message_id"]],
+  ["create_emoji","Crea un emoji del servidor desde una URL HTTPS de imagen.",{emoji_name:{type:"string",pattern:"^[a-zA-Z0-9_]{2,32}$"},image_url:{type:"string"}},["emoji_name","image_url"]]
+]) {
+  toolDefinitions.push({ type:"function", function:{ name, description, parameters:{ type:"object", properties, required, additionalProperties:false } } });
+}
+
+for (const [name, description, properties, required] of [
   ["purge_messages", "Borra de 1 a 100 mensajes recientes (menores de 14 días), previa confirmación.",
     { channel_id: { type: "string" }, count: { type: "integer", minimum: 1, maximum: 100 } }, ["channel_id", "count"]],
   ["lock_channel", "Impide enviar mensajes a @everyone en un canal de texto; otros permisos explícitos pueden permitir escribir.",
@@ -260,15 +276,131 @@ const SYSTEM_INSTRUCTIONS = [
   "El dueño puede pedirte crear, renombrar y consultar canales o categorías, y redactar anuncios. Traduce sus instrucciones a las herramientas disponibles sin inventar resultados.",
   "Solo puedes ejecutar las funciones que aparecen en la lista de herramientas. No inventes capacidades ni IDs.",
   "El usuario actual tiene permiso de gestionar el servidor. Aun así, nunca intentes saltarte los límites de Discord.",
-  "Usa la lista de canales incluida en cada solicitud para identificar el canal correcto.",
+  "Usa las listas de canales y roles incluidas en cada solicitud para identificar nombres exactos y evitar confusiones.",
   "No uses menciones @everyone, @here ni menciones de usuarios en anuncios. Las menciones están desactivadas por el servidor.",
-  "Borrar mensajes, borrar canales y publicar anuncios siempre requieren aprobación manual mediante los botones de confirmación.",
+  "Solo borrar canales, borrar roles, banear miembros, borrar mensajes y publicar anuncios requieren aprobación manual mediante botones. Las demás herramientas permitidas se ejecutan directamente.",
   "Si la petición es ambigua, pregunta antes de ejecutar una herramienta. Si una función no está disponible, explícalo sin fingir que la realizaste.",
-  "No cambies roles ni expulses o banees miembros: esas funciones aún no están implementadas."
+  "Para cambios normales de canales, roles, permisos, apodos, invitaciones y utilidades, ejecuta la herramienta directamente y confirma con 'Hecho, jefe'. Borrar canales, borrar roles y banear siempre requieren confirmación."
 ].join(" ");
 
 async function executeAction(guildId, actionName, args) {
   const channels = await getGuildChannels(guildId);
+
+  const roles = await discordApi("/guilds/" + guildId + "/roles");
+  const findChannelByName = (name) => {
+    const normalized = safeChannelName(name);
+    const matches = channels.filter(c => c.name.toLowerCase() === normalized);
+    if (matches.length !== 1) throw new Error(matches.length ? "Hay varios canales con ese nombre; usa un nombre único." : "No encontré el canal #" + normalized + ".");
+    return matches[0];
+  };
+  const findRoleByName = (name) => {
+    if (typeof name !== "string" || !name.trim()) throw new Error("Nombre de rol inválido.");
+    const matches = roles.filter(r => r.name.toLowerCase() === name.trim().toLowerCase());
+    if (matches.length !== 1) throw new Error(matches.length ? "Hay varios roles con ese nombre." : "No encontré el rol " + name + ".");
+    return matches[0];
+  };
+  const overwritePermission = async (channelId, targetId, type, allow, deny) =>
+    discordApi("/channels/" + channelId + "/permissions/" + targetId, {
+      method:"PUT", body:{type,allow:allow.toString(),deny:deny.toString()}
+    });
+
+  if (actionName === "update_channel_permissions") {
+    const channel = findChannelByName(args.channel_name);
+    const role = findRoleByName(args.role_name);
+    if (![0,5].includes(channel.type)) throw new Error("La Zona VIP debe ser un canal de texto o anuncios.");
+    const VIEW_CHANNEL = 1n << 10n, SEND_MESSAGES = 1n << 11n;
+    const everyoneAllow = 0n, everyoneDeny = VIEW_CHANNEL | SEND_MESSAGES;
+    const vipAllow = (args.permissions.view_channel ? VIEW_CHANNEL : 0n) |
+      (args.permissions.send_messages ? SEND_MESSAGES : 0n);
+    const vipDeny = (args.permissions.view_channel ? 0n : VIEW_CHANNEL) |
+      (args.permissions.send_messages ? 0n : SEND_MESSAGES);
+    await overwritePermission(channel.id, guildId, 0, everyoneAllow, everyoneDeny);
+    await overwritePermission(channel.id, role.id, 0, vipAllow, vipDeny);
+    return "Hecho, jefe. #"+channel.name+" ahora deniega acceso a @everyone y aplica los permisos indicados al rol "+role.name+".";
+  }
+
+  if (actionName === "rename_channel" && args.channel_name) {
+    const channel = findChannelByName(args.channel_name);
+    const updated = await discordApi("/channels/"+channel.id,{method:"PATCH",body:{name:safeChannelName(args.new_name)}});
+    return "Hecho, jefe. Canal renombrado a #"+updated.name;
+  }
+  if (actionName === "create_invite") {
+    const channel = findChannelByName(args.channel_name);
+    const invite = await discordApi("/channels/"+channel.id+"/invites",{method:"POST",body:{max_age:args.max_age,max_uses:0,temporary:false,unique:true}});
+    return "Hecho, jefe. Invitación: https://discord.gg/"+invite.code;
+  }
+  if (actionName === "ban_member") {
+    if (!/^\\d{17,20}$/.test(args.user_id)) throw new Error("ID de usuario inválido.");
+    await discordApi("/guilds/"+guildId+"/bans/"+args.user_id,{method:"PUT",body:{delete_message_seconds:0},reason:args.reason});
+    return "Usuario baneado: "+args.user_id;
+  }
+  if (actionName === "unban_member") {
+    if (!/^\\d{17,20}$/.test(args.user_id)) throw new Error("ID de usuario inválido.");
+    await discordApi("/guilds/"+guildId+"/bans/"+args.user_id,{method:"DELETE"});
+    return "Hecho, jefe. Baneo retirado para "+args.user_id;
+  }
+  if (actionName === "set_nickname") {
+    const nick = args.new_nickname === null ? null : String(args.new_nickname).trim();
+    if (nick !== null && (!nick || nick.length > 32)) throw new Error("El apodo debe tener entre 1 y 32 caracteres.");
+    await discordApi("/guilds/"+guildId+"/members/"+args.user_id,{method:"PATCH",body:{nick}});
+    return "Hecho, jefe. Apodo actualizado.";
+  }
+  if (actionName === "timeout_member") {
+    const until = new Date(Date.now()+args.minutes*60000).toISOString();
+    await discordApi("/guilds/"+guildId+"/members/"+args.user_id,{method:"PATCH",body:{communication_disabled_until:until}});
+    return "Hecho, jefe. Timeout aplicado durante "+args.minutes+" minutos.";
+  }
+  if (actionName === "update_role_color") {
+    const role = findRoleByName(args.role_name);
+    const color = Number.parseInt(args.color_hex.slice(1),16);
+    await discordApi("/guilds/"+guildId+"/roles/"+role.id,{method:"PATCH",body:{color}});
+    return "Hecho, jefe. Color actualizado para "+role.name+".";
+  }
+  if (actionName === "update_role_permissions") {
+    const role = findRoleByName(args.role_name);
+    const bits = {
+      create_instant_invite:1n<<0n, kick_members:1n<<1n, ban_members:1n<<2n,
+      administrator:1n<<3n, manage_channels:1n<<4n, manage_guild:1n<<5n,
+      add_reactions:1n<<6n, view_audit_log:1n<<7n, priority_speaker:1n<<8n,
+      stream:1n<<9n, view_channel:1n<<10n, send_messages:1n<<11n,
+      manage_messages:1n<<13n, embed_links:1n<<14n, attach_files:1n<<15n,
+      read_message_history:1n<<16n, mention_everyone:1n<<17n, connect:1n<<20n,
+      speak:1n<<21n, mute_members:1n<<22n, deafen_members:1n<<23n,
+      move_members:1n<<24n, manage_roles:1n<<28n, manage_webhooks:1n<<29n,
+      manage_emojis_and_stickers:1n<<30n, moderate_members:1n<<40n
+    };
+    let permissionBits=0n;
+    for (const permission of args.permissions) {
+      if (!Object.prototype.hasOwnProperty.call(bits,permission)) throw new Error("Permiso no reconocido: "+permission);
+      permissionBits |= bits[permission];
+    }
+    await discordApi("/guilds/"+guildId+"/roles/"+role.id,{method:"PATCH",body:{permissions:permissionBits.toString()}});
+    return "Hecho, jefe. Permisos actualizados para "+role.name+".";
+  }
+  if (actionName === "delete_role") {
+    const role = findRoleByName(args.role_name);
+    await discordApi("/guilds/"+guildId+"/roles/"+role.id,{method:"DELETE"});
+    return "Rol eliminado: "+role.name;
+  }
+  if (actionName === "pin_message") {
+    const channel = findChannelByName(args.channel_name);
+    await discordApi("/channels/"+channel.id+"/pins/"+args.message_id,{method:"PUT"});
+    return "Hecho, jefe. Mensaje fijado en #"+channel.name+".";
+  }
+  if (actionName === "create_emoji") {
+    const parsed = new URL(args.image_url);
+    if (parsed.protocol !== "https:") throw new Error("La imagen debe usar HTTPS.");
+    const imageResponse = await fetch(parsed,{signal:AbortSignal.timeout(10000),redirect:"error"});
+    if (!imageResponse.ok) throw new Error("No se pudo descargar la imagen del emoji.");
+    const type = imageResponse.headers.get("content-type")?.split(";")[0];
+    if (!["image/png","image/jpeg","image/gif","image/webp"].includes(type)) throw new Error("Formato de imagen no compatible.");
+    const imageBytes = Buffer.from(await imageResponse.arrayBuffer());
+    if (!imageBytes.length || imageBytes.length > 256*1024) throw new Error("La imagen debe pesar como máximo 256 KB.");
+    const mime = type === "image/jpeg" ? "image/jpeg" : type;
+    const dataUri = "data:"+mime+";base64,"+imageBytes.toString("base64");
+    const emoji = await discordApi("/guilds/"+guildId+"/emojis",{method:"POST",body:{name:args.emoji_name,image:dataUri}});
+    return "Hecho, jefe. Emoji creado: <:"+emoji.name+":"+emoji.id+">";
+  }
 
   if (actionName === "list_channels") {
     return channels.map((channel) => ({
@@ -380,7 +512,8 @@ async function executeAction(guildId, actionName, args) {
   }
 
   if (actionName === "delete_channel") {
-    const channel = findGuildChannel(channels, args.channel_id);
+    const channel = args.channel_name ? channels.find(c => c.name.toLowerCase() === safeChannelName(args.channel_name)) : findGuildChannel(channels, args.channel_id);
+    if (!channel) throw new Error("No encontré el canal solicitado.");
     await discordApi("/channels/" + channel.id, { method: "DELETE" });
     return "Canal eliminado: #" + channel.name;
   }
@@ -408,7 +541,7 @@ async function executeAction(guildId, actionName, args) {
 }
 
 function actionRequiresApproval(actionName) {
-  return ["delete_channel", "send_announcement", "purge_messages"].includes(actionName);
+  return ["delete_channel", "delete_role", "ban_member", "send_announcement", "purge_messages"].includes(actionName);
 }
 
 function actionDescription(actionName, args, channels) {
@@ -422,9 +555,12 @@ function actionDescription(actionName, args, channels) {
       ". Se seleccionan al confirmar; se omiten los de 14 días o más.";
   }
   if (actionName === "delete_channel") {
-    const channel = channels.find((item) => item.id === args.channel_id);
-    return "Borrar el canal #" + (channel?.name || args.channel_id);
+    const channel = channels.find(item => item.name.toLowerCase() === safeChannelName(args.channel_name || ""));
+    if (!channel) throw new Error("No encontré el canal que se va a borrar.");
+    return "Borrar el canal #" + channel.name;
   }
+  if (actionName === "delete_role") return "Borrar el rol " + args.role_name;
+  if (actionName === "ban_member") return "Banear al usuario " + args.user_id + " por: " + String(args.reason || "Sin motivo").slice(0,300);
   if (actionName === "send_announcement") {
     const channel = channels.find((item) => item.id === args.channel_id);
     return "Publicar este anuncio en #" + (channel?.name || args.channel_id) + ":\n" + args.content;
@@ -438,6 +574,8 @@ async function askGemini(guildId, requestText) {
   }
 
   const channels = await getGuildChannels(guildId);
+  const roles = await discordApi("/guilds/" + guildId + "/roles");
+  const roleContext = roles.map(role => ({id:role.id,name:role.name,permissions:role.permissions}));
   const channelContext = channels.map((channel) => ({
     id: channel.id,
     name: channel.name,
@@ -459,7 +597,7 @@ async function askGemini(guildId, requestText) {
         role: "user",
         content: "Solicitud del administrador:\n" + requestText +
           "\n\nCanales actuales del servidor (usa estos IDs exactos):\n" +
-          JSON.stringify(channelContext)
+          JSON.stringify(channelContext) + "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
       }
     ],
     tools: toolDefinitions,
