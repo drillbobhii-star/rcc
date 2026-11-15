@@ -95,6 +95,7 @@
     ];
     const safeStorage = {
       getItem(key) {
+        if (memory.has(key)) return memory.get(key);
         for (const getStore of stores) {
           try {
             const value = getStore().getItem(key);
