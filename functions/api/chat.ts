@@ -363,7 +363,9 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       const action = url.searchParams.get("action") || "state";
       if (action === "pushPublicKey") {
         if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
-        if (!env.RCC_WEB_PUSH_PUBLIC_KEY) return json({ error: "Falta RCC_WEB_PUSH_PUBLIC_KEY en Cloudflare Pages." }, 503);
+        if (!env.RCC_WEB_PUSH_PUBLIC_KEY || !env.RCC_WEB_PUSH_PRIVATE_KEY) {
+          return json({ error: "Configura RCC_WEB_PUSH_PUBLIC_KEY y RCC_WEB_PUSH_PRIVATE_KEY en Cloudflare Pages." }, 503);
+        }
         return json({ publicKey: env.RCC_WEB_PUSH_PUBLIC_KEY });
       }
       if (action === "adminList") {
