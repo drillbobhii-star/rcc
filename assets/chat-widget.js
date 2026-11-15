@@ -168,7 +168,7 @@
       if (!enabled) { $("rccChatStatus").textContent = "Chat cerrado por el administrador."; return; }
       const result = await request("?action=messages&conversationId=" + encodeURIComponent(conversationId));
       const messages = result.messages || [];
-      if (result.typing?.admin) $("rccChatStatus").textContent = "El Creador está escribiendo…";
+
       const newestAdmin = [...messages].reverse().find(message => message.sender_role === "admin");
       if (newestAdmin && newestAdmin.id !== lastAdminMessage) {
         if (lastAdminMessage !== null || !newestAdmin.read_at) {
@@ -178,7 +178,7 @@
         lastAdminMessage = newestAdmin.id;
       }
       renderMessages(messages);
-      $("rccChatStatus").textContent = "Soporte RCC · " + (messages.length ? "Mensajes protegidos" : "Cuéntanos cómo podemos ayudarte");
+      $("rccChatStatus").textContent = result.typing?.admin ? "El Creador está escribiendo…" : "Soporte RCC · " + (messages.length ? "Mensajes protegidos" : "Cuéntanos cómo podemos ayudarte");
     } catch (error) {
       if (/restringida/i.test(error.message)) blockAccount();
       else console.warn("[RCC chat]", error.message);
