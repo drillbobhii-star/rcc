@@ -162,14 +162,21 @@
   $('linkDiscord').addEventListener('click', async () => {
     try {
       const sb = await getClient();
-      const { data } = await sb.auth.getSession();
-      if (!data.session) throw new Error('Inicia sesión en RCC primero.');
-      const { data, error } = await sb.auth.linkIdentity({
+      const { data: sessionData } = await sb.auth.getSession();
+      if (!sessionData.session) throw new Error('Inicia sesión en RCC primero.');
+      const { data: userData, error: userError } = await sb.auth.getUser();
+      if (userError) throw userError;
+      const alreadyLinked = userData.user?.identities?.some(identity => identity.provider === 'discord');
+      if (alreadyLinked) {
+        await syncDiscordLink(sessionData.session);
+        return;
+      }
+      const { data: linkData, error } = await sb.auth.linkIdentity({
         provider: 'discord',
         options: { redirectTo: location.origin + '/vip-success.html' }
       });
       if (error) throw error;
-      if (data?.url) location.assign(data.url);
+      if (linkData?.url) location.assign(linkData.url);
     } catch (error) { showStatus(error.message || 'No se pudo iniciar Discord OAuth.', 'error'); }
   });
 
