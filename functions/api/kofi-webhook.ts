@@ -4,6 +4,7 @@ type Env = {
   KOFI_VERIFICATION_TOKEN?: string;
   RCC_VIP_API_URL?: string;
   RCC_VIP_WEBHOOK_SECRET?: string;
+  DISCORD_WEBHOOK_URL?: string;
 };
 
 type KofiPayload = {
@@ -38,6 +39,46 @@ function serviceHeaders(env: Env) {
     Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY,
     'Content-Type': 'application/json',
   };
+}
+
+
+function escapeDiscordText(value: string) {
+  return value.replace(/([\\\\*_~`|>])/g, '\\\\$1').replace(/@/g, '@\\u200b');
+}
+
+async function sendDiscordAlert(env: Env, title: string, description: string, color: number) {
+  if (!env.DISCORD_WEBHOOK_URL) {
+    console.warn('[Ko-fi webhook] DISCORD_WEBHOOK_URL no configurada; alerta no enviada:', title, description);
+    return;
+  }
+  try {
+    const url = new URL(env.DISCORD_WEBHOOK_URL);
+    if (url.protocol !== 'https:' || !/(^|\\.)discord(?:app)?\\.com$/i.test(url.hostname)) {
+      throw new Error('DISCORD_WEBHOOK_URL debe ser un webhook HTTPS de Discord.');
+    }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title,
+          description,
+          color,
+          timestamp: new Date().toISOString(),
+          footer: { text: 'RCC · Ko-fi webhook' },
+        }],
+        allowed_mentions: { parse: [] },
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) {
+      const detail = (await response.text()).slice(0, 500);
+      console.error('[Ko-fi webhook] Discord rechazó la alerta:', response.status, detail);
+    }
+  } catch (error) {
+    // Alert delivery must never roll back or interrupt a verified payment.
+    console.error('[Ko-fi webhook] Falló el envío de alerta a Discord:', error);
+  }
 }
 
 function safeEqual(left: string, right: string) {
@@ -121,6 +162,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     const payload = await parseKofiPayload(request);
     if (typeof payload.verification_token !== 'string' ||
         !safeEqual(payload.verification_token, env.KOFI_VERIFICATION_TOKEN)) {
+      console.warn('[Ko-fi webhook] Token de verificación inválido; posible petición falsificada.', { timestamp: new Date().toISOString(), messageId: typeof payload.message_id === 'string' ? payload.message_id.slice(0, 120) : null });
       return reply({ error: 'Token de verificación de Ko-fi incorrecto.' }, 401);
     }
 
@@ -164,6 +206,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (!pendingResponse.ok && pendingResponse.status !== 409) {
         throw new Error('No se pudo guardar el pago pendiente de Ko-fi.');
       }
+      await sendDiscordAlert(env, '⚠️ Pago recibido: usuario no encontrado', 'Pago recibido de **' + escapeDiscordText(email) + '**, pero no está registrado en RCC o aún no ha confirmado su correo. El pago quedó guardado como pendiente.', 0xF1C40F);
       return reply({
         ok: true,
         matched: false,
@@ -210,7 +253,33 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     });
     if (!membershipResponse.ok) throw new Error('No se pudo activar la membresía VIP de RCC.');
 
-    const roleGranted = discordId ? await grantDiscordRole(env, discordId) : false;
+    let roleGranted = false;
+    if (discordId) {
+      try {
+        roleGranted = await grantDiscordRole(env, discordId);
+      } catch (roleError) {
+        const reason = roleError instanceof Error ? roleError.message : String(roleError);
+        console.error('[Ko-fi webhook] VIP web activado, pero falló el rol de Discord:', {
+          email, userId: buyer.id, discordId, error: reason, timestamp: new Date().toISOString(),
+        });
+        await sendDiscordAlert(
+          env,
+          '⚠️ Falló la asignación del rol VIP en Discord',
+          'El usuario **' + escapeDiscordText(email) + '** es VIP en la web, pero falló el rol en Discord.\\n' +
+            '**Discord ID:** `' + escapeDiscordText(discordId) + '`\\n' +
+            '**Error:** ' + escapeDiscordText(reason),
+          0xE67E22,
+        );
+      }
+    } else {
+      console.warn('[Ko-fi webhook] Pago VIP procesado, pero el perfil no tiene discord_id:', { email, userId: buyer.id });
+      await sendDiscordAlert(
+        env,
+        '⚠️ VIP web sin cuenta Discord vinculada',
+        'El usuario **' + escapeDiscordText(email) + '** es VIP en la web, pero su perfil no tiene Discord ID para asignarle el rol.',
+        0xE67E22,
+      );
+    }
 
     const eventResponse = await fetch(base + '/rest/v1/rcc_kofi_events', {
       method: 'POST',
