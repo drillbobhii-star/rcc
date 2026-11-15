@@ -154,7 +154,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         body: JSON.stringify({
           message_id: messageId,
           kofi_transaction_id: transactionId || null,
-          user_id: buyer?.id || null,
+          user_id: null,
           buyer_email: email,
           amount,
           currency,
