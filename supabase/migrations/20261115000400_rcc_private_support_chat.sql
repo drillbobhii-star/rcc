@@ -78,5 +78,16 @@ on conflict (id) do update set
   file_size_limit = 10485760,
   allowed_mime_types = excluded.allowed_mime_types;
 
+-- A restrictive policy prevents any broader permissive Storage policy in the
+-- project from accidentally exposing this private chat bucket to browser roles.
+drop policy if exists rcc_chat_files_server_only on storage.objects;
+create policy rcc_chat_files_server_only
+  on storage.objects
+  as restrictive
+  for all
+  to anon, authenticated
+  using (bucket_id <> 'chat-files')
+  with check (bucket_id <> 'chat-files');
+
 -- No anon/authenticated bucket policies are created. Backend service-role
 -- operations issue short-lived signed URLs only to the conversation parties.
