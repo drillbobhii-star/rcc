@@ -146,7 +146,7 @@ async function upsertVip(env: Env, userId: string, isVip: boolean, adminId: stri
   await rest(env, "rcc_vip_memberships?on_conflict=user_id", {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ user_id: userId, is_vip: isVip, updated_by: adminId }),
+    body: JSON.stringify({ user_id: userId, is_vip: isVip }),
   });
   // Keep the existing catalog/profile entitlement mirror synchronized too.
   await setProfileFlag(env, userId, "is_supporter", isVip);
