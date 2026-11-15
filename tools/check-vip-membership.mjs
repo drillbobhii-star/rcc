@@ -18,11 +18,13 @@ assert.match(vip, /VIP_PERCENTAGE = 35/);
 assert.match(vip, /rcc-vip-code-locked/);
 assert.match(admin, /Es VIP/);
 assert.match(api, /RCC_ADMIN_EMAIL/);
+assert.ok(api.includes("const RCC_KOFI_MONTHLY_URL = env.RCC_KOFI_MONTHLY_URL?.trim() || 'https://ko-fi.com/lubensdrill/tiers';"));
 assert.match(api, /SUPABASE_SERVICE_ROLE_KEY/);
 assert.match(api, /DISCORD_WEBHOOK_URL/);
 assert.match(migration, /enable row level security/i);
 assert.match(migration, /revoke all on public\.rcc_vip_memberships from anon, authenticated/i);
 assert.match(docs, /RCC_KOFI_MONTHLY_URL/);
+assert.ok(docs.includes('https://ko-fi.com/lubensdrill/tiers'));
 assert.match(docs, /no una protección fuerte/i);
 
 console.log('RCC Supporter VIP checks passed.');
