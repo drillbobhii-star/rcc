@@ -175,7 +175,10 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         body: JSON.stringify({ discord_id: discordId }),
         signal: AbortSignal.timeout(10000),
       });
-      if (!profileUpdate.ok) return reply({ error: 'No se pudo guardar tu Discord en el perfil RCC.' }, 502);
+      if (!profileUpdate.ok) {
+        if (profileUpdate.status === 409) return reply({ error: 'Esa cuenta de Discord ya está vinculada a otro perfil RCC.' }, 409);
+        return reply({ error: 'No se pudo guardar tu Discord en el perfil RCC.' }, 502);
+      }
       const updatedProfiles = await profileUpdate.json() as Array<{ user_id: string }>;
 
       if (updatedProfiles.length === 0) {
