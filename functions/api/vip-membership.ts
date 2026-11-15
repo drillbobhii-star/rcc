@@ -5,9 +5,16 @@ type Env = {
   RCC_ADMIN_EMAIL?: string;
   RCC_KOFI_MONTHLY_URL?: string;
   DISCORD_WEBHOOK_URL?: string;
+  RCC_VIP_API_URL?: string;
+  RCC_VIP_WEBHOOK_SECRET?: string;
 };
 
-type AuthUser = { id: string; email?: string };
+type AuthUser = {
+  id: string;
+  email?: string;
+  identities?: Array<{ provider?: string; identity_data?: Record<string, unknown> }>;
+  user_metadata?: Record<string, unknown>;
+};
 
 const PROJECT_URL = 'https://cbkrpyfkteomcukdisdw.supabase.co';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -77,6 +84,23 @@ async function findUserByEmail(base: string, env: Env, email: string): Promise<A
   return null;
 }
 
+async function grantDiscordRole(env: Env, discordId: string) {
+  if (!env.RCC_VIP_API_URL || !env.RCC_VIP_WEBHOOK_SECRET) return false;
+  const endpoint = new URL(env.RCC_VIP_API_URL);
+  if (endpoint.protocol !== 'https:') throw new Error('RCC_VIP_API_URL debe usar HTTPS.');
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + env.RCC_VIP_WEBHOOK_SECRET,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ discord_id: discordId }),
+    signal: AbortSignal.timeout(12000),
+  });
+  if (!response.ok) throw new Error('Railway no pudo asignar el rol VIP de Discord (HTTP ' + response.status + ').');
+  return true;
+}
+
 async function notifyDiscord(env: Env, email: string, isVip: boolean, adminEmail: string) {
   const webhook = env.DISCORD_WEBHOOK_URL;
   if (!webhook || !/^https:\/\/discord\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+$/.test(webhook)) return false;
@@ -133,12 +157,60 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     if (Number(request.headers.get('content-length')) > 2048) return reply({ error: 'Solicitud demasiado grande.' }, 413);
     const user = await authUser(request, env);
     if (!user) return reply({ error: 'Inicia sesión para continuar.' }, 401);
+    if (!env.SUPABASE_SERVICE_ROLE_KEY) return reply({ error: 'Falta configurar SUPABASE_SERVICE_ROLE_KEY.' }, 503);
+    const body = await request.json() as { action?: unknown; email?: unknown; userId?: unknown; isVip?: unknown };
+
+    if (body.action === 'linkDiscord') {
+      const identity = user.identities?.find(item => item.provider === 'discord');
+      const identityData = identity?.identity_data || {};
+      const discordId = [identityData.sub, identityData.user_id, identityData.id]
+        .find(value => typeof value === 'string' && /^\\d{17,20}$/.test(value)) as string | undefined;
+      if (!discordId) return reply({ error: 'No encontramos una identidad Discord vinculada. Completa primero el paso de Discord OAuth.' }, 409);
+
+      const profileQuery = new URL(base + '/rest/v1/profiles');
+      profileQuery.searchParams.set('user_id', 'eq.' + user.id);
+      const profileUpdate = await fetch(profileQuery, {
+        method: 'PATCH',
+        headers: { ...serviceHeaders(env), Prefer: 'return=representation' },
+        body: JSON.stringify({ discord_id: discordId }),
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!profileUpdate.ok) return reply({ error: 'No se pudo guardar tu Discord en el perfil RCC.' }, 502);
+      const updatedProfiles = await profileUpdate.json() as Array<{ user_id: string }>;
+
+      if (updatedProfiles.length === 0) {
+        const metadataName = user.user_metadata?.full_name || user.user_metadata?.name;
+        const displayName = (typeof metadataName === 'string' && metadataName.trim())
+          ? metadataName.trim().slice(0, 80)
+          : (user.email?.split('@')[0] || 'RCC Member').slice(0, 80);
+        const profileInsert = await fetch(base + '/rest/v1/profiles?on_conflict=user_id', {
+          method: 'POST',
+          headers: { ...serviceHeaders(env), Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify({ user_id: user.id, display_name: displayName, discord_id: discordId }),
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!profileInsert.ok) {
+          if (profileInsert.status === 409) return reply({ error: 'Esa cuenta de Discord ya está vinculada a otro perfil RCC.' }, 409);
+          return reply({ error: 'No se pudo crear el perfil con tu Discord vinculado.' }, 502);
+        }
+      }
+
+      const isVip = await readMembership(base, env, user.id);
+      let roleGranted = false;
+      if (isVip) {
+        try {
+          roleGranted = await grantDiscordRole(env, discordId);
+        } catch (error) {
+          return reply({ error: error instanceof Error ? error.message : 'Discord no pudo asignar el rol VIP.', discordLinked: true, isVip: true }, 502);
+        }
+      }
+      return reply({ ok: true, discordLinked: true, discordId, isVip, roleGranted });
+    }
+
     const adminEmail = env.RCC_ADMIN_EMAIL?.trim().toLowerCase();
     if (!adminEmail) return reply({ error: 'Falta configurar RCC_ADMIN_EMAIL.' }, 503);
     if (user.email?.toLowerCase() !== adminEmail) return reply({ error: 'No tienes permisos de administrador.' }, 403);
-    if (!env.SUPABASE_SERVICE_ROLE_KEY) return reply({ error: 'Falta configurar SUPABASE_SERVICE_ROLE_KEY.' }, 503);
 
-    const body = await request.json() as { action?: unknown; email?: unknown; userId?: unknown; isVip?: unknown };
     if (body.action === 'lookup') {
       const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
       const member = await findUserByEmail(base, env, email);
