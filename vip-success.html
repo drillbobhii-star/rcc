@@ -120,7 +120,10 @@
       return;
     }
     $('identity').textContent = session.user?.email || 'Cuenta RCC autenticada';
-    const hasDiscord = session.user?.identities?.some(identity => identity.provider === 'discord');
+    const sb = await getClient();
+    const { data: userData, error } = await sb.auth.getUser();
+    if (error) throw error;
+    const hasDiscord = userData.user?.identities?.some(identity => identity.provider === 'discord');
     if (hasDiscord) await syncDiscordLink(session);
     else showStatus('Sesión lista. Ahora vincula tu cuenta de Discord.');
   }
@@ -160,11 +163,12 @@
       const sb = await getClient();
       const { data } = await sb.auth.getSession();
       if (!data.session) throw new Error('Inicia sesión en RCC primero.');
-      const { error } = await sb.auth.linkIdentity({
+      const { data, error } = await sb.auth.linkIdentity({
         provider: 'discord',
         options: { redirectTo: location.origin + '/vip-success.html' }
       });
       if (error) throw error;
+      if (data?.url) location.assign(data.url);
     } catch (error) { showStatus(error.message || 'No se pudo iniciar Discord OAuth.', 'error'); }
   });
 
