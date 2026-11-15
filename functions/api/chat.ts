@@ -246,12 +246,23 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (actor.role === "admin") return json({ role: "admin", conversations: await adminConversationList(env) });
       const state = await profileState(env, actor.id);
       if (state.isBanned) return json({ role: "user", isBanned: true });
-      const conversation = await getOrCreateConversation(env, actor.id);
-      return json({ role: "user", isBanned: false, conversation: { id: conversation.id, enabled: conversation.enabled === true } });
+      const q = new URLSearchParams({ user_id: "eq." + actor.id, select: "id,enabled", limit: "1" });
+      const rows = await rest<Array<{ id: string; enabled: boolean }>>(env, "rcc_chat_conversations?" + q.toString());
+      const conversation = rows[0] || null;
+      return json({ role: "user", isBanned: false, conversation: conversation ? { id: conversation.id, enabled: conversation.enabled === true } : null });
     }
 
     const form = await readForm(request);
     const { action, content, file, note, userId, conversationId } = form;
+
+    if (action === "ensureConversation") {
+      if (actor.role === "admin") return json({ error: "El administrador no abre conversaciones de usuario desde este flujo." }, 403);
+      const state = await profileState(env, actor.id);
+      if (state.isBanned) return json({ error: "Tu cuenta ha sido restringida." }, 403);
+      const conversation = await getOrCreateConversation(env, actor.id);
+      if (conversation.enabled !== true) return json({ error: "Chat cerrado por el administrador." }, 423);
+      return json({ id: conversation.id, enabled: true });
+    }
 
     if (action === "send") {
       let conversation: Record<string, unknown> | undefined;
@@ -300,6 +311,15 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     }
     if (action === "deleteChat") {
       if (!/^[0-9a-f-]{36}$/i.test(conversationId)) return json({ error: "Conversación inválida." }, 400);
+      const fileRows = await rest<Array<{ file_path?: string }>>(env, "rcc_chat_messages?conversation_id=eq." + encodeURIComponent(conversationId) + "&select=file_path");
+      for (const file of fileRows) {
+        if (!file.file_path) continue;
+        try {
+          await fetch(baseUrl(env) + "/storage/v1/object/chat-files/" + file.file_path.split("/").map(encodeURIComponent).join("/"), {
+            method: "DELETE", headers: serviceHeaders(env), signal: AbortSignal.timeout(10000)
+          });
+        } catch (error) { console.warn("[RCC chat] No se pudo eliminar un adjunto antiguo:", error); }
+      }
       await rest(env, "rcc_chat_messages?conversation_id=eq." + encodeURIComponent(conversationId), { method: "DELETE", headers: { Prefer: "return=minimal" } });
       await rest(env, "rcc_chat_conversations?id=eq." + encodeURIComponent(conversationId), {
         method: "PATCH", headers: { Prefer: "return=minimal" },
