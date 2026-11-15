@@ -50,6 +50,9 @@ create table if not exists public.rcc_chat_conversations (
   user_typing_until timestamptz
 );
 
+alter table public.rcc_chat_conversations
+  add column if not exists last_user_seen_at timestamptz;
+
 create index if not exists rcc_chat_conversations_updated_idx
   on public.rcc_chat_conversations (updated_at desc);
 
