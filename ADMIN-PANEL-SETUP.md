@@ -37,16 +37,35 @@ The panel reads account email from Supabase Auth (not from `profiles`), VIP from
 
 ## Private support chat
 
-Apply supabase/migrations/20261115000400_rcc_private_support_chat.sql after deploying the chat code. It:
+Apply supabase/migrations/20261115000400_rcc_private_support_chat.sql after deploying the chat code. Then apply supabase/migrations/20261115000500_rcc_chat_presence_and_push.sql (the follow-up migration for installations that already applied 00400). The first migration:
 - Adds profiles.is_banned (default false) and a database trigger that rejects browser-side attempts to change it; only server-side service_role can restrict/unrestrict accounts.
 - Creates rcc_chat_conversations, rcc_chat_messages, and rcc_admin_private_notes.
 - Enables RLS and removes browser-role table privileges. The Pages Function uses SUPABASE_SERVICE_ROLE_KEY after validating each caller's Supabase JWT.
-- Creates the private chat-files Storage bucket (10 MB maximum). The browser never gets service-role access; uploads and short-lived signed file URLs are mediated by /api/chat.
+- Keeps the legacy chat-files bucket private, but the current chat is text-only and no longer uploads or serves attachments.
 
-No new environment variable is required beyond the existing SUPABASE_URL, SUPABASE_ANON_KEY, and server-only SUPABASE_SERVICE_ROLE_KEY.
+For chat and admin API access, configure SUPABASE_URL, SUPABASE_ANON_KEY, and server-only SUPABASE_SERVICE_ROLE_KEY. Add the VAPID variables described below to enable native Web Push.
 
 The admin chat is restricted to the exact allowlisted account drillbobhii@gmail.com on both the client and functions/api/chat.ts. Internal notes live in rcc_admin_private_notes, not profiles.bio, so they are never included in public profile reads.
 
 The user-side widget is loaded on index.html. For authenticated, non-admin users it polls /api/chat every 4 seconds. The same endpoint powers the admin inbox. Restricting an account sets profiles.is_banned; the main page checks that status on load and during polling and overlays the page with the account-restriction message.
 
-Attachments are limited to 10 MB and accepted only for supported image, PDF, text/CSV, JSON, ZIP, and DOCX MIME types. Files are private in Storage and signed URLs expire after one hour. Read receipts are recorded in read_at; typing state expires after a few seconds.
+The current chat is text-only. Both user and admin interfaces have no file/photo upload controls, and the API accepts JSON messages only.
+
+The admin inbox provides **Usuarios Activos** (presence within the last 90 seconds), **Chats Recientes** (ordered by latest message time), and a chat search by name/email. The creator can send an announcement to all enabled, non-banned conversations. Both sides show typing state; messages retain read receipts in read_at.
+
+## Admin Web Push
+
+The second migration adds last_user_seen_at and rcc_chat_push_subscriptions (it is idempotent and safe after the original chat migration). The admin page offers **Activar notificaciones**. Clicking it asks for browser permission, registers /sw.js, creates a Push API subscription and stores the endpoint/keys through the authenticated /api/chat function. The backend sends encrypted Web Push notifications to subscribed admin devices when a user sends a new message. Push alerts use a generic body so the private message contents are not shown on a device lock screen.
+
+Generate one VAPID key pair and keep it stable (regenerating it invalidates existing device subscriptions):
+
+```bash
+npx web-push generate-vapid-keys --json
+```
+
+Add these Cloudflare Pages server-side variables:
+- RCC_WEB_PUSH_PUBLIC_KEY = generated public key (normal variable).
+- RCC_WEB_PUSH_PRIVATE_KEY = generated private key (encrypted Secret).
+- RCC_WEB_PUSH_SUBJECT = mailto:drillbobhii@gmail.com (or a contact address you control).
+
+For mobile Push, use a browser that supports the Push API and grant notification permission. On iPhone/iPad, install the site as a Home Screen web app on a supported iOS version before enabling Web Push; ordinary Safari tabs do not receive iOS Web Push.
