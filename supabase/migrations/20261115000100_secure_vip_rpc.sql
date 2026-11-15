@@ -56,7 +56,7 @@ $$;
 drop trigger if exists trg_rcc_vip_memberships_updated_at
   on public.rcc_vip_memberships;
 
-create trigger trg_rcc_vip_memberships_updated_at
+revoke all on function public.rcc_set_vip_membership_updated_at() from public, anon, authenticated;\n\ncreate trigger trg_rcc_vip_memberships_updated_at
 before update on public.rcc_vip_memberships
 for each row
 execute function public.rcc_set_vip_membership_updated_at();
