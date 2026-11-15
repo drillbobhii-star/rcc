@@ -184,8 +184,9 @@
     const body = $("paymentsBody");
     body.replaceChildren();
     const query = filterText();
+    const usersById = new Map(dashboard.users.map(user => [user.user_id, user]));
     const rows = dashboard.payments.filter(item => {
-      const linked = dashboard.users.find(user => user.user_id === item.matched_user_id);
+      const linked = usersById.get(item.matched_user_id);
       return !query || [item.buyer_email, item.message_id, item.kofi_transaction_id, item.user_id, item.matched_discord_id, linked?.user_id].join(" ").toLowerCase().includes(query);
     });
     $("paymentCount").textContent = rows.length + " / " + dashboard.payments.length;
