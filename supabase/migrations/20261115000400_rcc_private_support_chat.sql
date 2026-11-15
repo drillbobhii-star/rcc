@@ -35,7 +35,7 @@ revoke all on function public.rcc_protect_account_ban_flag() from public, anon, 
 
 drop trigger if exists trg_rcc_protect_account_ban_flag on public.profiles;
 create trigger trg_rcc_protect_account_ban_flag
-before insert or update of is_banned on public.profiles
+before insert or update on public.profiles
 for each row
 execute function public.rcc_protect_account_ban_flag();
 
