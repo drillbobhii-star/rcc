@@ -431,6 +431,7 @@ window.rccSupabaseReady.catch(() => {});
 </script>
 <script src="assets/member-access.js?v=4.0"></script>
 <link rel="stylesheet" href="assets/community.css">
+<link rel="stylesheet" href="assets/vip-membership.css?v=1">
 <link rel="stylesheet" href="assets/social-refresh.css">
 <style>
 .auth-controls [hidden]{display:none!important}.auth-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.auth-email{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem;color:var(--muted)}
@@ -543,6 +544,7 @@ window.rccSupabaseReady.catch(() => {});
         <a class="roblox-follow" href="https://www.roblox.com/share?code=86b2c3c1d4ef024fafa196db62dac9a6&amp;type=Profile&amp;source=ProfileShare&amp;stamp=1793551063604" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 1 31 8 24 31 1 24Zm5 10-2 8 8 2 2-8Z"/></svg>Seguime en Roblox<span aria-hidden="true">↗</span></a>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
         <div class="auth-controls"><button type="button" id="authEmail" class="btn btn-ghost auth-email" aria-label="Editar tu perfil" hidden></button><button class="btn btn-ghost" id="loginBtn" type="button" aria-haspopup="dialog" aria-controls="authModal" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
+        <button type="button" class="btn btn-supporter" id="rccSupportButton">Apoyar a RCC 💎</button>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -553,6 +555,7 @@ window.rccSupabaseReady.catch(() => {});
         <button id="trendingTab" type="button" aria-pressed="false">Tendencia</button><button id="updatesTab" type="button" aria-pressed="false">Novedades</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
+        <button id="vipTab" type="button" aria-pressed="false">💎 Zona VIP</button>
         <a class="help-link" href="#analysis">Sección de prueba ↗</a>
         <a class="help-link" href="#obfuscator">Generador de ofuscador ↗</a>
         <a class="help-link" href="soporte.html">Centro de ayuda ↗</a>
@@ -928,6 +931,7 @@ function render(reset = true){
   const q = normalize(searchInput.value.trim());
   
   let list = [...scripts];
+  if(catalogSection==='vip')list=list.filter(s=>window.RCCVIP?.isVipScript?.(s));
   const reviewFilter=document.getElementById('reviewFilter').value;
   if(reviewFilter!=='all')list=list.filter(s=>(s.review?.status||'pending')===reviewFilter);
   if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7'||s.review?.updateAvailable||s.review?.status==='patched'||s.tags?.includes('Nueva incorporación'));
@@ -945,6 +949,7 @@ function render(reset = true){
     document.getElementById('heroTitle').textContent='JavaScript para la web';
     document.getElementById('heroSubtitle').textContent='HTML, CSS y JavaScript en un archivo. Copia, descarga y empieza a crear tu página.';
   }
+  if(catalogSection==='vip'){document.getElementById('heroTitle').textContent='Zona VIP';document.getElementById('heroSubtitle').textContent='Una selección exclusiva para RCC Supporter. Desbloquea el acceso mensual para ver, copiar y descargar estos códigos.';}
   if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza aquí.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';}
   if (showFavorites) list = list.filter(s => favoriteIds.has(s.id));
   if (showRecent) {
@@ -971,7 +976,7 @@ function render(reset = true){
     document.getElementById('resultCount').append(' ',retry);
   }
   window.dispatchEvent(new CustomEvent('rcc:results', {detail:{count:list.length, query:searchInput.value.trim()}}));
-  const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
+  const sectionScripts=catalogSection==='vip'?scripts.filter(s=>window.RCCVIP?.isVipScript?.(s)):catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
   document.getElementById('statTotal').textContent = sectionScripts.length;
   document.getElementById('statPC').textContent = sectionScripts.filter(s=>s.device==='pc'||s.device==='both').length;
   document.getElementById('statMobile').textContent = sectionScripts.filter(s=>s.device==='mobile'||s.device==='both').length;
@@ -1005,6 +1010,7 @@ function render(reset = true){
     const plat = PLATFORMS.find(p=>p.id===s.platform);
     const card = document.createElement('div');
     card.className = 'card';
+    card.dataset.scriptId = String(s.id);
     card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label','Ver '+s.name);
     card.onkeydown = e=>{ if(e.target!==card) return; if(e.key==='Enter' || e.key===' '){e.preventDefault(); openScript(s);} };
     
@@ -1230,7 +1236,7 @@ modal.addEventListener('keydown',e=>{
 });
 function selectSection(section, options={}){
   clearCatalogFilters();
-  catalogSection=['all','games','web'].includes(section)?section:'all';
+  catalogSection=['all','games','web','vip'].includes(section)?section:'all';
   releaseView=options.view || '';
   showRecent=options.recent===true;showFavorites=options.favorites===true;
   filterDevice=options.device || 'all';filterPlatform=options.platform || 'all';
@@ -1238,7 +1244,7 @@ function selectSection(section, options={}){
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev===filterDevice));
   document.getElementById('recentBtn').classList.toggle('active',showRecent);
   document.getElementById('favoritesBtn').setAttribute('aria-pressed',String(showFavorites));
-  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
+  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['vipTab',catalogSection==='vip'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
   document.body.classList.toggle('games-mode',catalogSection==='games');
   document.body.classList.toggle('web-mode',catalogSection==='web');
   document.getElementById('gameTools').hidden=catalogSection!=='games';
@@ -1284,6 +1290,7 @@ window.RCCNavigation = {
 };
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
 document.getElementById('webTab').onclick=()=>selectSection('web');
+document.getElementById('vipTab').onclick=()=>selectSection('vip');
 document.getElementById('webNav').onclick=()=>selectSection('web');
 document.getElementById('gamesTab').onclick=()=>selectSection('games');
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
@@ -1615,6 +1622,25 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 <script src="assets/trends-config.js"></script>
 <script src="assets/release17.js"></script>
 <script src="assets/code-compare.js"></script>
+
+<div class="modal rcc-subscribe-modal" id="rccSubscribeModal" role="dialog" aria-modal="true" aria-labelledby="rccSubscribeTitle" aria-describedby="rccSubscribeDescription">
+  <div class="modal-box rcc-subscribe-box">
+    <button type="button" class="close" id="rccSubscribeClose" aria-label="Cerrar">×</button>
+    <span class="rcc-subscribe-eyebrow">RCC SUPPORTER · MEMBRESÍA MENSUAL</span>
+    <h2 id="rccSubscribeTitle">Únete a RCC Supporter por solo $1.99 USD / mes</h2>
+    <p id="rccSubscribeDescription">Cancela cuando quieras. Al suscribirte, desbloqueas más de 5,000 scripts exclusivos, insignia, rol en Discord y cero esperas</p>
+    <ul class="rcc-subscribe-benefits">
+      <li>Acceso a la Zona VIP del catálogo</li>
+      <li>Insignia RCC Supporter mientras tu acceso esté activo</li>
+      <li>Rol de Discord al conectar tu membresía de Ko-fi</li>
+    </ul>
+    <button type="button" id="rccKofiButton" class="rcc-kofi-button" disabled>Preparando enlace de Ko-fi…</button>
+    <p id="rccCheckoutStatus" class="rcc-checkout-status" role="status" aria-live="polite">El enlace mensual se habilitará cuando se configure RCC_KOFI_MONTHLY_URL.</p>
+    <p class="rcc-subscribe-footnote">Usa el mismo correo en RCC y Ko-fi para que el administrador pueda activar tu membresía.</p>
+  </div>
+</div>
+
+<script src="assets/vip-membership.js?v=1"></script>
 </body>
 </html>
 
