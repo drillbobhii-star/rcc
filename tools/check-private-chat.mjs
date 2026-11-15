@@ -12,6 +12,8 @@ const [migration, api, userWidget, adminWidget, index, adminHtml] = await Promis
 ]);
 
 assert.match(migration, /profiles\s+add column if not exists is_banned/i);
+assert.match(migration, /trg_rcc_protect_account_ban_flag/);
+assert.match(migration, /auth\.role\(\).*service_role/);
 assert.match(migration, /create table if not exists public\.rcc_chat_conversations/i);
 assert.match(migration, /create table if not exists public\.rcc_chat_messages/i);
 assert.match(migration, /create table if not exists public\.rcc_admin_private_notes/i);
