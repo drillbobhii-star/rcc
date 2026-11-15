@@ -107,7 +107,16 @@
     try {
       const client = await window.rccSupabaseReady;
       // Subscribe before the initial read so sign-in changes cannot be missed.
+      let currentUserId = null;
       const { data, error } = client.auth.onAuthStateChange((_event, session) => {
+        const nextUserId = session?.user?.id || null;
+        if (nextUserId !== currentUserId) {
+          currentUserId = nextUserId;
+          // Do not briefly expose the previous account's VIP state after an account switch/sign-out.
+          state.isVip = false;
+          decorateCards();
+          if (activeScript) applyModalGate(activeScript);
+        }
         // Defer Supabase queries outside the auth callback to avoid blocking its internal lock.
         Promise.resolve().then(() => refreshStatus(session));
       });
