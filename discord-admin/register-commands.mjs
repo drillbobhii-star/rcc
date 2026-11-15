@@ -10,12 +10,18 @@ if (missing.length) {
 
 const command = new SlashCommandBuilder()
   .setName('rcc')
-  .setDescription('Pídele a RCC Admin que gestione este servidor.')
-  .addStringOption((option) => option
+  .setDescription('Herramientas de administración y comunidad de RCC.')
+  .addSubcommand((subcommand) => subcommand
     .setName('instruccion')
-    .setDescription('Qué quieres que haga RCC Admin.')
-    .setRequired(true)
-    .setMaxLength(1200));
+    .setDescription('Pídele a RCC Admin que gestione este servidor.')
+    .addStringOption((option) => option
+      .setName('texto')
+      .setDescription('Qué quieres que haga RCC Admin.')
+      .setRequired(true)
+      .setMaxLength(1200)))
+  .addSubcommand((subcommand) => subcommand
+    .setName('anuncio')
+    .setDescription('Genera un anuncio con los últimos commits y pide tu aprobación.'));
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
