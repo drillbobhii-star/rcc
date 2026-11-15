@@ -4,7 +4,8 @@ Servicio independiente para administrar un servidor Discord desde el proyecto RC
 
 ## Funciones de esta primera versión
 
-- Comando slash `/rcc` para recibir instrucciones en español.
+- Comando slash `/rcc instruccion` para recibir instrucciones en español.
+- Comando slash `/rcc anuncio`: lee los últimos cinco commits, genera un borrador con Gemini y muestra los botones **Publicar** y **Cancelar**. No publica nada sin tu aprobación.
 - Google Gemini mediante el endpoint compatible con OpenAI.
 - Crear categorías y canales de texto.
 - Renombrar canales y consultar la estructura del servidor.
@@ -32,6 +33,7 @@ Configura estas variables en Railway > servicio > Variables:
 - `GEMINI_API_KEY`: clave regenerada de Gemini.
 - `GEMINI_MODEL`: por defecto `gemini-3.8-flash`.
 - `DISCORD_GUILD_ID`: ID del servidor autorizado.
+- `DISCORD_ANNOUNCEMENT_CHANNEL_ID`: ID del canal donde se publican los anuncios aprobados (opcional; si se omite, detecta un canal llamado `anuncios`, `anuncio`, `announcements` o `announcement`).
 - `REGISTER_COMMANDS_ON_START`: `true`.
 - `PORT`: Railway lo proporciona automáticamente; localmente se usa 3000.
 
@@ -65,9 +67,9 @@ Railway mantiene el servicio como un despliegue persistente, sujeto al estado y 
 
 ## Prueba segura
 
-1. Ejecuta `/rcc solicitud: muéstrame los canales`.
-2. Prueba crear una categoría o canal de prueba.
-3. Prueba preparar un anuncio y confirma que no se publique hasta pulsar Confirmar.
+1. Ejecuta `/rcc instruccion solicitud: muéstrame los canales`.
+2. Ejecuta `/rcc anuncio`, revisa el borrador y prueba **Cancelar** y luego **Publicar**.
+3. Prueba crear una categoría o canal de prueba.
 4. Prueba borrar solo un canal de prueba y confirma el diálogo antes de ejecutar.
 
 ## Límites y seguridad
