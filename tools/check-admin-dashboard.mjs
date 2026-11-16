@@ -18,6 +18,18 @@ assert.match(client, /user\.email, user\.user_id, user\.discord_id/);
 assert.match(client, /approvePayment/);
 assert.match(client, /forceRole/);
 assert.match(client, /unlinkDiscord/);
+assert.match(client, /function bindUserLongPress\(row, user\)/);
+assert.match(client, /async function chatAdminApi\(action, payload = null\)/);
+assert.match(client, /action === "setGlobalChat"/);
+assert.match(client, /action === "broadcast"/);
+assert.match(client, /action === "restrictUser"/);
+assert.match(client, /action === "unrestrictUser"/);
+assert.match(client, /action === "setEnabled"/);
+assert.match(client, /action === "deleteChat"/);
+assert.match(client, /Enviar mensaje privado/);
+assert.match(client, /Eliminar mensajes de esta conversación/);
+assert.match(client, /isProtectedAccount/);
+
 assert.doesNotMatch(html + client, /SUPABASE_SERVICE_ROLE_KEY|RCC_VIP_WEBHOOK_SECRET/);
 assert.match(api, /const ADMIN_EMAIL = "drillbobhii@gmail\.com"/);
 assert.match(api, /user\.email\?\.trim\(\)\.toLowerCase\(\) !== ADMIN_EMAIL/);
