@@ -68,7 +68,8 @@
     const pushButton=el("button",{id:"rccChatPushEnable",type:"button"},"Activar notificaciones en este dispositivo");pushButton.addEventListener("click",enableUserPush);
     panel.append(head,messagesEl,composer,pushButton,status);
     const toast = el("div", { id:"rccChatToast", hidden:true, role:"alert" });
-    document.head.append(style); document.body.append(launcher, panel, toast);
+    const globalOverlay=el("div",{id:"rccGlobalChatOverlay",hidden:true,role:"status"});const overlayCard=el("div");overlayCard.append(el("div",{},"✉"),el("div",{},"Creador desactivó el chat"),el("span",{},"La mensajería está temporalmente pausada para todos."));globalOverlay.append(overlayCard);
+    document.head.append(style); document.body.append(launcher,panel,toast,globalOverlay);
     launcher.addEventListener("click", () => setOpen(true));
     head.querySelector("button").addEventListener("click", () => setOpen(false));
     send.addEventListener("click", sendMessage);
