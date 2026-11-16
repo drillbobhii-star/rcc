@@ -67,3 +67,17 @@
 .auth-email span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @keyframes rccProfileExpand{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.rcc-instagram-editor,.rcc-profile-customization{animation:none;transition:none}}
+
+/* RCC profile customization: gallery, animated wallpaper and VIP banner */
+.rcc-instagram-editor{background-size:cover;background-position:center;background-repeat:no-repeat}
+.rcc-background-preview{min-height:105px;border-radius:13px;background-size:cover;background-position:center;border:1px solid #ffffff24}
+.vip-banner-settings{border:1px solid #e9bd6577;border-radius:14px;padding:12px;display:grid;gap:12px;background:linear-gradient(135deg,#2b2418aa,#111827aa)}
+.vip-banner-settings legend{color:#f8d989;font-weight:800;padding:0 7px}
+.vip-banner-settings label{display:grid;gap:7px}
+.vip-banner-settings select{width:100%;padding:10px;border-radius:10px;background:#161d2b;color:inherit;border:1px solid #e9bd6577}
+.vip-banner-settings[hidden]{display:none!important}
+.rcc-profile-dialog{width:min(680px,calc(100% - 24px));max-width:680px;background-size:cover;background-position:center;background-repeat:no-repeat}
+.rcc-profile-banner{width:100%;background-size:cover;background-repeat:no-repeat;transition:height .2s ease}
+.rcc-profile-content{position:relative;z-index:1}
+@media(max-width:560px){.rcc-profile-dialog{width:calc(100% - 16px);padding:18px}.rcc-profile-banner{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.rcc-profile-banner{transition:none}}
