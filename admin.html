@@ -30,6 +30,9 @@
 #rccAdminMessagesPanel{position:relative}@media(max-width:850px){#rccMessagesLayout{grid-template-columns:1fr}.rcc-chat-admin-pane{min-height:560px}#rccConversationList{min-height:170px;max-height:220px;display:flex;overflow:auto}.rcc-conversation{min-width:230px}.admin-stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){#rccAdminShell{padding:14px 10px}.admin-top{align-items:flex-start;flex-direction:column}.admin-actions{width:100%}.admin-actions button{flex:1}.admin-tabs{display:grid;grid-template-columns:repeat(2,1fr)}.admin-tab{padding:11px 8px}.rcc-chat-admin-messages{max-height:none}.rcc-admin-msg{max-width:92%}.rcc-admin-compose{grid-template-columns:1fr}.rcc-admin-compose-actions{justify-content:flex-end}}
 .rcc-chat-inbox-toolbar{display:grid;grid-template-columns:auto minmax(180px,1fr) auto;gap:10px;align-items:center;margin:0 0 13px}.rcc-chat-list-tabs,.rcc-chat-global-actions{display:flex;gap:7px;flex-wrap:wrap}.rcc-chat-list-tabs .active{background:linear-gradient(120deg,#6656c2,#327c95);border-color:#a99cff}.rcc-chat-list-tabs button span{display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:4px;border-radius:20px;background:#ffffff20}.rcc-chat-inbox-toolbar input{min-width:0;height:40px;border:1px solid var(--line);border-radius:11px;background:#11182a;color:#fff;padding:0 12px}.rcc-chat-global-actions{justify-content:flex-end}.rcc-chat-typing{min-height:20px;padding:0 14px 7px;color:var(--cyan);font-size:12px}.rcc-chat-typing:empty{display:none}
 @media(max-width:1050px){.rcc-chat-inbox-toolbar{grid-template-columns:1fr}.rcc-chat-global-actions{justify-content:flex-start}}
+
+.rcc-chat-error{margin:12px 0;padding:13px 14px;border:1px solid #ff5c6c;border-left:5px solid #ff394f;border-radius:12px;background:rgba(120,18,32,.22);color:#ffdce0;font-size:13px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.rcc-chat-error[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -54,6 +57,7 @@
 <section id="panel-messages" class="admin-panel">
   <div id="rccAdminMessagesPanel" class="glass-card">
     <div class="card-head"><div><h2>Mensajería privada y soporte VIP</h2><div class="hint">Conversaciones privadas · sincronización cada 4 segundos</div></div><span id="rccChatAdminStatus" class="pill ok">Seguro</span></div>
+    <div id="rccChatAdminError" class="rcc-chat-error" role="alert" aria-live="assertive" hidden></div>
     <div class="rcc-chat-inbox-toolbar">
       <div class="rcc-chat-list-tabs" role="tablist" aria-label="Filtros de conversaciones">
         <button id="rccActiveChatsTab" class="small-btn" type="button" aria-pressed="false">Usuarios Activos <span id="rccActiveCount">0</span></button>
