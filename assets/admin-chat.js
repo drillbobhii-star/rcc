@@ -239,6 +239,32 @@
       $("rccAdminChatInput").focus();
     } catch (error) { status(error.message, true); }
   }
+  window.addEventListener("rcc:admin-open-user-chat", event => {
+    void openConversationForUser(event.detail?.userId);
+  });
+  window.addEventListener("rcc:admin-chat-updated", event => {
+    void (async () => {
+      await loadConversations();
+      const userId = event.detail?.userId;
+      if (userId && selected?.user_id === userId) await loadMessages();
+    })().catch(error => status(error.message, true));
+  });
+
+  async function openConversationForUser(userId) {
+    if (!session?.access_token || !userId) return;
+    try {
+      let conversation = conversations.find(item => item.user_id === userId);
+      if (!conversation) {
+        await postAction({ action: "adminEnsureConversation", userId });
+        await loadConversations();
+        conversation = conversations.find(item => item.user_id === userId);
+      }
+      if (!conversation) throw new Error("No se pudo abrir la conversación.");
+      document.querySelector('.admin-tab[data-tab="messages"]')?.click();
+      await selectConversation(conversation);
+      $("rccAdminChatInput").focus();
+    } catch (error) { status(error.message, true); }
+  }
 
   window.addEventListener("rcc:admin-open-user-chat", event => {
     void openConversationForUser(event.detail?.userId);
