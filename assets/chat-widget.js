@@ -205,13 +205,17 @@
     session = nextSession;
     if (!session || session.user?.email?.toLowerCase() === ADMIN_EMAIL) {
       if (pollTimer) clearInterval(pollTimer);
-      pollTimer = null; activeUserId = null; conversationId = null;
+      if (presenceTimer) clearInterval(presenceTimer);
+      pollTimer = null; presenceTimer = null; activeUserId = null; conversationId = null;
       $("rccChatLauncher")?.remove(); panel?.remove(); $("rccChatToast")?.remove();
       return;
     }
     if (activeUserId === session.user.id && $("rccChatLauncher")) return;
     activeUserId = session.user.id;
     ensureUi();
+    await heartbeat();
+    if (presenceTimer) clearInterval(presenceTimer);
+    presenceTimer = setInterval(() => { void heartbeat(); }, 25000);
     const state = await loadState();
     if (!state) return;
     $("rccChatStatus").textContent = state.conversation?.enabled === false
