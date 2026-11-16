@@ -109,16 +109,21 @@ const APP_VERSION = '3.0';
   let profileOwner=null;
   document.getElementById('authEmail').onclick=async()=>{
     if(!currentUser) return;
-    profileOwner=currentUser.id; profile.form.reset(); profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
+    profileOwner=currentUser.id; profile.form.reset(); selectedAvatarFile=selectedBackgroundFile=selectedBannerFile=null; profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
     try {
       const sb = await window.rccSupabaseReady;
       const { data, error } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle();
       if(error) throw error;
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
+      isProfileVip=await checkProfileVip(sb);
       name.value = data?.display_name || '';
       updateProfilePreview();
       avatar.value = data?.avatar_url || '';
       currentBannerUrl=data?.banner_url||'';bannerPreview.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';updateProfilePreview();
+      currentBackgroundUrl=data?.profile_background_url||'';currentBackgroundType=data?.profile_background_type||'image';backgroundPreview.style.backgroundImage=currentBackgroundUrl?'url("'+currentBackgroundUrl+'")':'';
+      profileHero.style.backgroundImage=currentBackgroundUrl?'linear-gradient(0deg,rgba(8,12,20,.55),rgba(8,12,20,.25)),url("'+currentBackgroundUrl+'")':'';
+      bannerHeight.value=String(data?.banner_height||220);bannerPosition.value=data?.banner_position||'center';
+      vipBannerSettings.hidden=!isProfileVip;bannerUpload.parentElement.hidden=!isProfileVip;bannerPreview.hidden=!isProfileVip;
       robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
       bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';
       const isCreator=(currentUser?.email||'').trim().toLowerCase()===creatorEmail;creatorEffects.hidden=!isCreator;
@@ -174,11 +179,19 @@ const APP_VERSION = '3.0';
       }
       if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
       const sb = await window.rccSupabaseReady;
+      if(selectedAvatarFile){validateImageFile(selectedAvatarFile,5*1024*1024,'Foto');profile.status.textContent='Subiendo foto…';avatarUrl=await uploadProfileImage(sb,selectedAvatarFile,'avatars');}
+      if(selectedBackgroundFile){validateImageFile(selectedBackgroundFile,12*1024*1024,'Fondo');profile.status.textContent='Subiendo fondo…';currentBackgroundUrl=await uploadProfileImage(sb,selectedBackgroundFile,'backgrounds');currentBackgroundType=selectedBackgroundFile.type==='image/gif'?'gif':'image';}
+      if(selectedBannerFile){if(!isProfileVip)throw new Error('El banner ampliado y personalizable es exclusivo VIP.');validateImageFile(selectedBannerFile,10*1024*1024,'Banner');profile.status.textContent='Subiendo banner VIP…';currentBannerUrl=await uploadProfileImage(sb,selectedBannerFile,'banners');}
+      if(currentUser?.id!==profileOwner)throw new Error('La sesión cambió. Abre tu perfil de nuevo.');
       const { error } = await sb.from('profiles').upsert({
         user_id: currentUser.id,
         display_name: name.value.trim(),
         avatar_url: avatarUrl,
         banner_url: currentBannerUrl,
+        profile_background_url: currentBackgroundUrl,
+        profile_background_type: currentBackgroundType,
+        banner_height: isProfileVip ? Number(bannerHeight.value) : 180,
+        banner_position: isProfileVip ? bannerPosition.value : 'center',
         roblox_username: robloxUsername.value.trim(),
         roblox_id: currentRobloxId,
         show_roblox: !!showRoblox.checked,
@@ -189,22 +202,10 @@ const APP_VERSION = '3.0';
         text_color: color.value
       });
       if(error) throw error;
-      const bannerFile=bannerUpload.files?.[0];
-      if(bannerFile){
-        profile.status.textContent='Subiendo banner…';
-        const ext=({ 'image/jpeg':'jpg','image/png':'png','image/webp':'webp' })[bannerFile.type];
-        const sb2=await window.rccSupabaseReady;
-        const path=currentUser.id+'/banners/'+crypto.randomUUID()+'.'+ext;
-        const {data:uploaded,error:uploadError}=await sb2.storage.from('profile-media').upload(path,bannerFile,{upsert:false,contentType:bannerFile.type,cacheControl:'3600'});
-        if(uploadError)throw uploadError;
-        const {data:publicData}=sb2.storage.from('profile-media').getPublicUrl(uploaded.path);
-        currentBannerUrl=publicData.publicUrl;
-        const {error:updateError}=await sb2.from('profiles').update({banner_url:currentBannerUrl}).eq('user_id',currentUser.id);
-        if(updateError)throw updateError;
-        bannerUpload.value='';
-      }
+      avatarUpload.value='';backgroundUpload.value='';bannerUpload.value='';selectedAvatarFile=selectedBackgroundFile=selectedBannerFile=null;
       window.rccHasRobloxLink=!!(username||robloxUsername.value.trim());
       updateProfilePreview();
+      avatar.value=avatarUrl;profileAvatar.src=avatarUrl;
       if(profileNavButton){const navName=profileNavButton.querySelector('span');if(navName)navName.textContent=name.value.trim()||'Mi perfil';const navAvatar=profileNavButton.querySelector('img');if(navAvatar)navAvatar.src=avatarUrl;}
       profile.status.textContent=robloxWarning || 'Perfil guardado.';
       if(section?.isConnected) loadComments(section, scriptId);
@@ -227,7 +228,10 @@ const APP_VERSION = '3.0';
     publicRoblox.removeAttribute('href');publicRoblox.removeAttribute('target');publicRoblox.removeAttribute('rel');
     if(profileData.show_roblox && /^\\d+$/.test(String(profileData.roblox_id||''))){publicRoblox.textContent='@'+(profileData.roblox_username||'Roblox')+' · ID '+profileData.roblox_id+' ↗';publicRoblox.href='https://www.roblox.com/users/'+profileData.roblox_id+'/profile';publicRoblox.target='_blank';publicRoblox.rel='noopener noreferrer';}
     else publicRoblox.textContent=profileData.roblox_username?'Cuenta de Roblox privada':'Cuenta de Roblox no vinculada';
-    publicBanner.style.backgroundImage=profileData.banner_url?'url("'+profileData.banner_url.replace(/["\\\\]/g,'')+'")':'';
+    publicBanner.style.backgroundImage=profileData.banner_url?'url("'+String(profileData.banner_url).replace(/["\\\\]/g,'')+'")':'';
+    publicBanner.style.height=(Number(profileData.banner_height)>=180&&Number(profileData.banner_height)<=300?Number(profileData.banner_height):180)+'px';
+    publicBanner.style.backgroundPosition=['center','top','bottom'].includes(profileData.banner_position)?profileData.banner_position:'center';
+    publicProfile.d.style.backgroundImage=profileData.profile_background_url?'linear-gradient(180deg,rgba(9,13,22,.86),rgba(9,13,22,.94)),url("'+String(profileData.profile_background_url).replace(/["\\\\]/g,'')+'")':'';
     publicBanner.classList.toggle('creator',isCreator);publicFounder.hidden=!isCreator;
     publicName.dataset.effect=isCreator?(profileData.name_effect||'none'):'none';publicBanner.dataset.effect=isCreator?(profileData.banner_effect||'none'):'none';
     publicProfile.d.querySelector('h2').textContent=isCreator?'Perfil del creador RCC':'Perfil de la comunidad';
@@ -275,7 +279,7 @@ const APP_VERSION = '3.0';
       const userIds = [...new Set(comments.map(c => c.user_id))];
       let profiles = {};
       if(userIds.length > 0) {
-        const { data: profs } = await sb.from('profiles').select('user_id,display_name,avatar_url,banner_url,roblox_username,roblox_id,show_roblox,bio,name_effect,banner_effect,is_creator,text_color').in('user_id', userIds);
+        const { data: profs } = await sb.from('profiles').select('user_id,display_name,avatar_url,banner_url,profile_background_url,profile_background_type,banner_height,banner_position,roblox_username,roblox_id,show_roblox,bio,name_effect,banner_effect,is_creator,text_color').in('user_id', userIds);
         if(profs) profs.forEach(p => profiles[p.user_id] = p);
       }
 
