@@ -17,6 +17,13 @@
   function status(message, error = false) {
     $("rccChatAdminStatus").textContent = message;
     $("rccChatAdminStatus").className = "pill " + (error ? "warn" : "ok");
+    if (error) {
+      const panel = $("rccChatAdminError");
+      if (panel) {
+        panel.textContent = message;
+        panel.hidden = false;
+      }
+    }
   }
   function errorMessage(error) {
     return String(error?.message || error || "Error desconocido");
