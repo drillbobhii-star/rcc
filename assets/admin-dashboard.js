@@ -126,6 +126,117 @@
     return wrap;
   }
 
+  let userQuickMenu = null;
+  let userHoldTimer = null;
+  let userHoldTriggered = false;
+
+  function closeUserQuickMenu() {
+    if (userQuickMenu) userQuickMenu.hidden = true;
+  }
+
+  function openUserQuickMenu(user) {
+    if (!userQuickMenu) {
+      userQuickMenu = document.createElement("div");
+      userQuickMenu.className = "rcc-user-quick-menu";
+      userQuickMenu.hidden = true;
+      userQuickMenu.setAttribute("role", "presentation");
+      userQuickMenu.addEventListener("click", event => {
+        if (event.target === userQuickMenu) closeUserQuickMenu();
+      });
+      const card = document.createElement("section");
+      card.className = "rcc-user-quick-card";
+      card.setAttribute("role", "dialog");
+      card.setAttribute("aria-modal", "true");
+      card.setAttribute("aria-label", "Acciones del usuario");
+      userQuickMenu.append(card);
+      document.body.append(userQuickMenu);
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeUserQuickMenu();
+      });
+    }
+    const card = userQuickMenu.firstElementChild;
+    card.replaceChildren();
+    const head = document.createElement("div");
+    head.className = "rcc-user-quick-head";
+    const title = document.createElement("h3");
+    title.textContent = "Acciones · " + (user.name || user.email || user.user_id);
+    const close = document.createElement("button");
+    close.type = "button"; close.className = "small-btn"; close.textContent = "Cerrar";
+    close.addEventListener("click", closeUserQuickMenu);
+    head.append(title, close); card.append(head);
+
+    const access = document.createElement("div");
+    access.className = "rcc-user-quick-section";
+    const accessTitle = document.createElement("strong");
+    accessTitle.textContent = "Permisos y distintivos";
+    const switches = document.createElement("div");
+    switches.className = "switches";
+    switches.style.marginTop = "10px";
+    switches.append(
+      renderSwitch(user, "is_vip", "VIP"),
+      renderSwitch(user, "is_creator", "Creator", !dashboard.capabilities.isCreator),
+      renderSwitch(user, "has_banner", "Banner", !dashboard.capabilities.hasBanner)
+    );
+    access.append(accessTitle, switches);
+    card.append(access);
+
+    const discord = document.createElement("div");
+    discord.className = "rcc-user-quick-section";
+    const discordTitle = document.createElement("strong");
+    discordTitle.textContent = "Discord";
+    const discordInfo = document.createElement("p");
+    discordInfo.className = "rcc-user-quick-hint";
+    discordInfo.textContent = user.discord_id ? "Vinculado: " + user.discord_id : "Esta cuenta no tiene Discord vinculado.";
+    const discordActions = document.createElement("div");
+    discordActions.className = "rcc-user-quick-actions";
+    if (user.discord_id) {
+      const unlink = document.createElement("button");
+      unlink.type = "button"; unlink.className = "small-btn danger"; unlink.textContent = "Desvincular Discord";
+      unlink.addEventListener("click", async () => { await unlinkDiscord(user, unlink); closeUserQuickMenu(); });
+      discordActions.append(unlink);
+    }
+    if (user.is_vip && user.discord_id) {
+      const force = document.createElement("button");
+      force.type = "button"; force.className = "small-btn"; force.textContent = "Forzar rol VIP";
+      force.addEventListener("click", async () => { await forceRole(user, force); closeUserQuickMenu(); });
+      discordActions.append(force);
+    }
+    discord.append(discordTitle, discordInfo, discordActions);
+    card.append(discord);
+
+    const identity = document.createElement("div");
+    identity.className = "rcc-user-quick-section";
+    const identityText = document.createElement("p");
+    identityText.className = "rcc-user-quick-hint";
+    identityText.textContent = "User ID: " + user.user_id + (user.created_at ? " · Registrado: " + new Date(user.created_at).toLocaleString() : "");
+    identity.append(identityText); card.append(identity);
+    userQuickMenu.hidden = false;
+    close.focus();
+  }
+
+  function bindUserLongPress(row, user) {
+    row.classList.add("user-quick-hold");
+    const cancel = () => {
+      if (userHoldTimer) clearTimeout(userHoldTimer);
+      userHoldTimer = null;
+    };
+    row.addEventListener("pointerdown", event => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      userHoldTriggered = false;
+      cancel();
+      userHoldTimer = setTimeout(() => {
+        userHoldTriggered = true;
+        openUserQuickMenu(user);
+      }, 550);
+    });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(name => row.addEventListener(name, cancel));
+    row.addEventListener("contextmenu", event => {
+      event.preventDefault();
+      cancel();
+      openUserQuickMenu(user);
+    });
+  }
+
   function renderUsers() {
     const body = $("usersBody");
     body.replaceChildren();
@@ -167,6 +278,7 @@
       );
       flags.append(group);
       tr.append(userCell, ids, flags);
+      bindUserLongPress(tr, user);
       fragment.append(tr);
     }
     body.append(fragment);
