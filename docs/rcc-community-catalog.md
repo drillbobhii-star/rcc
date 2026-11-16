@@ -23,7 +23,7 @@ La clave nunca se expone en el navegador ni se guarda en el repositorio.
 
 ## Límites y confianza
 
-- ScriptBlox: se solicitan publicaciones gratuitas y no parcheadas.
+- ScriptBlox: se consultan por separado publicaciones gratuitas parcheadas y no parcheadas; ninguna se elimina del feed. Las parcheadas llevan una etiqueta y confirmación antes de abrir el enlace.
 - Rscripts: se consultan listados públicos, gratuitos y filtrados por su API.
 - El estado `verified` corresponde a la plataforma de origen, no a una verificación de RCC.
 - RCC no afirma que un script externo funcione ni lo ejecuta.
