@@ -105,7 +105,7 @@
     message.disabled=!p.is_creator || !creatorMessagesEnabled;
     message.title=!p.is_creator?"Disponible próximamente":(!creatorMessagesEnabled?"El creador ha desactivado temporalmente la recepción de mensajes.":"Abrir soporte RCC");
     message.addEventListener("click",()=>{const launcher=$("rccChatLauncher");if(launcher)launcher.click();else setStatus("El chat de soporte no está disponible en este momento.",true);});
-    actions.append(message);
+    actions.append(message);\n    if(p.is_creator && !creatorMessagesEnabled){const disabledNote=document.createElement("p");disabledNote.className="rcc-social-muted";disabledNote.textContent="El creador ha desactivado temporalmente la recepción de mensajes.";disabledNote.style.flexBasis="100%";actions.append(disabledNote);}
     head.append(avatar,identity,actions);
     const bio=document.createElement("p");bio.className="rcc-social-muted";bio.style.marginTop="12px";bio.textContent=p.bio||"Este usuario todavía no ha añadido una biografía.";
     const stats=document.createElement("div");stats.className="rcc-social-stats";
