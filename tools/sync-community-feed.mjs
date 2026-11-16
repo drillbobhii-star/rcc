@@ -119,7 +119,7 @@ const mergedNewest = unique(newest).sort((a, b) => (b.createdAt || '').localeCom
 const mergedTrending = unique(trending).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 300);
 const payload = {
   schema: 'rcc-community-feed-v1',
-  updatedAt: new Date().toISOString(),
+  updatedAt: unchanged ? old.updatedAt : new Date().toISOString(),
   counts: { newest: mergedNewest.length, trending: mergedTrending.length, importedMetadata: mergedNewest.length },
   sources,
   notice: 'Descubrimientos externos: RCC muestra metadatos y enlaces originales. No aloja ni ejecuta el código de terceros.',
