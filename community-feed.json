@@ -1,0 +1,79 @@
+{
+  "schema": "rcc-community-feed-v1",
+  "updatedAt": null,
+  "counts": {
+    "newest": 0,
+    "trending": 0,
+    "importedMetadata": 0
+  },
+  "sources": {
+    "ScriptBlox": {
+      "ok": false,
+      "reason": "Primera sincronización pendiente"
+    },
+    "Rscripts": {
+      "ok": false,
+      "reason": "Configura RSCRIPTS_API_KEY para activar esta fuente"
+    }
+  },
+  "news": [
+    {
+      "id": "fivem:r-antihitbox:2026-11-14",
+      "kind": "news",
+      "source": "R-Scripts · FiveM",
+      "title": "r_antihitbox — reconstruido desde cero",
+      "game": "FiveM · ESX / QBCore / QBX",
+      "creator": "R-Scripts",
+      "createdAt": "2026-11-14T12:00:00.000Z",
+      "description": "La comprobación ahora se ejecuta en el servidor; incorpora alertas y opciones de sanción.",
+      "url": "https://www.r-scripts.net/changelog"
+    },
+    {
+      "id": "fivem:r-store:2.2.0",
+      "kind": "news",
+      "source": "R-Scripts · FiveM",
+      "title": "r_store v2.2.0 — compra y venta de créditos",
+      "game": "FiveM · ESX / QBCore / QBX",
+      "creator": "R-Scripts",
+      "createdAt": "2026-11-12T12:00:00.000Z",
+      "description": "Permite comprar créditos con dinero del juego y habilitar su conversión de vuelta.",
+      "url": "https://www.r-scripts.net/changelog"
+    },
+    {
+      "id": "fivem:r-casino:2.1.0",
+      "kind": "news",
+      "source": "R-Scripts · FiveM",
+      "title": "r_casino v2.1.0 — intercambio de monedas",
+      "game": "FiveM · ESX / QBCore / QBX",
+      "creator": "R-Scripts",
+      "createdAt": "2026-11-12T12:00:00.000Z",
+      "description": "Añade compra de monedas del casino con dinero del juego y opción de retiro.",
+      "url": "https://www.r-scripts.net/changelog"
+    },
+    {
+      "id": "fivem:r-slasher:1.0.3",
+      "kind": "news",
+      "source": "R-Scripts · FiveM",
+      "title": "r_slasher v1.0.3 — ajustes de lobbies y rondas",
+      "game": "FiveM · ESX / QBCore / QBX",
+      "creator": "R-Scripts",
+      "createdAt": "2026-11-11T12:00:00.000Z",
+      "description": "Mejoras en los puntos de entrada a partidas, rondas y cierre de interfaz.",
+      "url": "https://www.r-scripts.net/changelog"
+    },
+    {
+      "id": "fivem:r-storage:release",
+      "kind": "news",
+      "source": "R-Scripts · FiveM",
+      "title": "r_storage — nuevo recurso de robos de almacenes",
+      "game": "FiveM · GTA V",
+      "creator": "R-Scripts",
+      "createdAt": "2026-11-09T12:00:00.000Z",
+      "description": "Nuevo recurso gratuito de robos con herramientas, cajas, ruido y aviso policial.",
+      "url": "https://www.r-scripts.net/changelog"
+    }
+  ],
+  "notice": "Descubrimientos externos: RCC muestra metadatos y enlaces originales. No aloja ni ejecuta el código de terceros.",
+  "newest": [],
+  "trending": []
+}

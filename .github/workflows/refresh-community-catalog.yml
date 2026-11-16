@@ -1,0 +1,43 @@
+name: Refresh RCC community catalog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rcc-community-catalog-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Refresh external metadata
+        run: node tools/sync-community-feed.mjs
+        env:
+          RCC_COMMUNITY_PAGES: "50"
+          RSCRIPTS_API_KEY: ${{ secrets.RSCRIPTS_API_KEY }}
+      - name: Validate feed JSON
+        run: node -e "const f=require('./community-feed.json'); if(f.schema!=='rcc-community-feed-v1'||!Array.isArray(f.newest)||!Array.isArray(f.trending)) process.exit(1)"
+      - name: Commit refreshed feed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add community-feed.json
+          if git diff --cached --quiet; then
+            echo "No catalog changes."
+          else
+            git commit -m "chore: refresh RCC community scripts and trends"
+            git push
+          fi
