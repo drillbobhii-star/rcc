@@ -422,6 +422,8 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
           "rcc_chat_conversations?id=eq." + encodeURIComponent(conversationId) + "&select=*&limit=1");
         conversation = rows[0];
       } else {
+        const globalSettings=await rest<Array<{chat_enabled:boolean}>>(env,"rcc_chat_settings?select=chat_enabled&singleton=eq.true&limit=1").catch(()=>[{chat_enabled:true}]);
+        if(globalSettings[0]?.chat_enabled===false)return json({error:"El Creador desactivó el chat para todos."},423);
         const banned = await profileState(env, actor.id);
         if (banned.isBanned) return json({ error: "Tu cuenta ha sido restringida." }, 403);
         const rows = await rest<Array<Record<string, unknown>>>(env,
