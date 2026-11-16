@@ -12,7 +12,7 @@
   const $ = id => document.getElementById(id);
   let client = null, session = null, conversations = [], selected = null;
   let pollTimer = null, busy = false, savingNote = false, lastUserMessageId = null;
-  let listMode = "recent", typingSentAt = 0;
+  let listMode = "recent", typingSentAt = 0, globalChatEnabled = true;
 
   function status(message, error = false) {
     $("rccChatAdminStatus").textContent = message;
@@ -124,6 +124,8 @@
   async function loadConversations() {
     const result = await api("?action=adminList");
     conversations = result.conversations || [];
+    globalChatEnabled = result.globalChatEnabled !== false;
+    $("rccGlobalChatToggle").textContent = globalChatEnabled ? "Desactivar chat para todos" : "Activar chat para todos";
     if (selected) {
       const fresh = conversations.find(c => c.id === selected.id);
       if (fresh) selected = fresh;
@@ -131,6 +133,8 @@
     }
     renderList();
     setControls();
+    const preview=$("rccMainMessagePreviewBody");
+    if(preview){preview.replaceChildren();const latest=conversations[0];if(latest){const btn=node("button","small-btn",(latest.name||latest.email||"Usuario RCC")+" · "+(latest.last_message_preview||"Sin mensajes"));btn.style.width="100%";btn.addEventListener("click",()=>{document.querySelector('.admin-tab[data-tab="messages"]')?.click();void selectConversation(latest);});preview.append(btn);}else preview.textContent="Todavía no hay conversaciones.";}
   }
   async function loadMessages() {
     if (!selected) return;
@@ -254,6 +258,7 @@
       status("No se pudieron activar las notificaciones: " + error.message,true);
     }
   }
+  async function toggleGlobalChat(){const next=!globalChatEnabled;if(!confirm(next?"¿Activar el chat para todos?":"¿Desactivar el chat para TODOS? Las ventanas abiertas se cerrarán."))return;try{const r=await postAction({action:"setGlobalChat",enabled:next});globalChatEnabled=r.enabled;await poll();status(globalChatEnabled?"Chat global activado.":"Chat desactivado para todos.");}catch(e){status(e.message,true);}}
   async function sendBroadcast() {
     const message = window.prompt("Escribe el anuncio que recibirán todos los usuarios con el chat habilitado:");
     if (!message || !message.trim()) return;
@@ -334,6 +339,8 @@
   $("rccRecentChatsTab").addEventListener("click",() => setListMode("recent"));
   $("rccChatSearch").addEventListener("input",renderList);
   $("rccBroadcast").addEventListener("click",sendBroadcast);
+  $("rccGlobalChatToggle").addEventListener("click",toggleGlobalChat);
+  $("rccOpenFullMessages")?.addEventListener("click",()=>document.querySelector('.admin-tab[data-tab="messages"]')?.click());
   $("rccEnablePush").addEventListener("click",() => enablePush(true));
   document.querySelector('.admin-tab[data-tab="messages"]')?.addEventListener("click",() => {
     void poll();
