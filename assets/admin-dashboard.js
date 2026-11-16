@@ -245,7 +245,8 @@
     access.append(switches);
 
     const moderation = quickSection(card, "Moderación de cuenta", user.is_banned ? "Esta cuenta está restringida." : "La cuenta puede utilizar las funciones disponibles.");
-    quickActionButton(moderation, user.is_banned ? "Reactivar cuenta" : "Suspender usuario", async () => {
+    const isProtectedAccount = String(user.email || "").trim().toLowerCase() === ADMIN_EMAIL;
+    if (!isProtectedAccount) quickActionButton(moderation, user.is_banned ? "Reactivar cuenta" : "Suspender usuario", async () => {
       const action = user.is_banned ? "unrestrictUser" : "restrictUser";
       const verb = user.is_banned ? "reactivar" : "suspender";
       if (!window.confirm("¿Confirmas " + verb + " a " + (user.email || user.user_id) + "?")) return;
@@ -323,7 +324,8 @@
       const state = await chatAdminApi("adminList");
       globalStatus.textContent = state.globalChatEnabled === false ? "Chat global: DESACTIVADO" : "Chat global: ACTIVADO";
       const conversation = (state.conversations || []).find(item => item.user_id === user.user_id);
-      userChatActions.firstElementChild.nextElementSibling.textContent = conversation
+      const userChatHint = userChatActions.parentElement.querySelector(".rcc-user-quick-hint");
+      if (userChatHint) userChatHint.textContent = conversation
         ? (conversation.enabled === false ? "La conversación está deshabilitada." : "La conversación está habilitada.")
         : "Este usuario todavía no tiene una conversación.";
       userChatActions.replaceChildren();
