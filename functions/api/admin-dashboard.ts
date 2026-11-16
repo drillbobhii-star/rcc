@@ -214,7 +214,7 @@ async function loadDashboard(env: Env) {
     pagedRest<Record<string, unknown>>(env, "rcc_kofi_events?select=*&order=message_id.desc", 5),
   ]);
   const profileMap = new Map(profiles.map(p => [String(p.user_id), p]));
-  const vipMap = new Map(memberships.map(m => [m.user_id, m.is_vip === true]));
+  const vipMap = new Map(memberships.map(m => [m.user_id, m.is_vip === true]));\n  const chatMap = new Map(conversations.map(c => [c.user_id, c.enabled === true]));
   const users = authUsers.map(user => {
     const profile = profileMap.get(user.id);
     return {
@@ -228,7 +228,7 @@ async function loadDashboard(env: Env) {
       is_creator: profile?.is_creator === true,
       has_banner: profile?.has_banner === true,
       is_supporter: profile?.is_supporter === true,
-      is_banned: profile?.is_banned === true,
+      is_banned: profile?.is_banned === true,\n      chat_enabled: chatMap.get(user.id) !== false,
     };
   });
   const userByEmail = new Map(users.map(user => [user.email.toLowerCase(), user]));
