@@ -56,7 +56,7 @@ const APP_VERSION = '3.0';
   const updateProfilePreview=()=>{
     profileHeroName.textContent=name.value.trim()||'Tu espacio en RCC';
     profileHeroBio.textContent=bio.value.trim()||'Tu biografía aparecerá aquí.';
-    profileAvatar.src=avatar.value.trim()||'/assets/default-avatar.svg';
+    profileAvatar.src=selectedAvatarPreviewUrl||avatar.value.trim()||'/assets/default-avatar.svg';
     profileCover.style.backgroundImage=currentBannerUrl?'url("'+currentBannerUrl+'")':'';
     profileHero.style.setProperty('--profile-preview-color',color.value||'#dce6f5');
   };
@@ -80,12 +80,12 @@ const APP_VERSION = '3.0';
   const bannerPreview=el('div',null,'profile-banner-preview');
   bannerUpload.parentElement.after(bannerPreview);
   let currentBannerUrl='',currentBackgroundUrl='',currentBackgroundType='image',currentRobloxId='',isProfileVip=false;
-  let selectedAvatarFile=null,selectedBackgroundFile=null,selectedBannerFile=null;
+  let selectedAvatarFile=null,selectedBackgroundFile=null,selectedBannerFile=null,selectedAvatarPreviewUrl='';
   const allowedImageTypes=new Set(['image/png','image/jpeg','image/webp','image/gif','image/avif']);
   function validateImageFile(file,maxBytes,label){if(!file)return;if(!allowedImageTypes.has(file.type))throw new Error(label+': usa PNG, JPG, WEBP, GIF o AVIF.');if(file.size>maxBytes)throw new Error(label+': máximo '+Math.round(maxBytes/1024/1024)+' MB.');}
   async function uploadProfileImage(sb,file,folder){const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','image/avif':'avif'})[file.type];const path=currentUser.id+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;const {data,error}=await sb.storage.from('profile-media').upload(path,file,{upsert:false,contentType:file.type,cacheControl:'3600'});if(error)throw error;return sb.storage.from('profile-media').getPublicUrl(data.path).data.publicUrl;}
   async function checkProfileVip(sb){try{const {data}=await sb.auth.getSession();const token=data?.session?.access_token;if(!token)return false;const response=await fetch('/api/vip-membership',{headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});if(!response.ok)return false;return (await response.json()).isVip===true;}catch{return false;}}
-  avatarUpload.addEventListener('change',()=>{selectedAvatarFile=avatarUpload.files?.[0]||null;if(!selectedAvatarFile)return;try{validateImageFile(selectedAvatarFile,5*1024*1024,'Foto');profileAvatar.src=URL.createObjectURL(selectedAvatarFile);profile.status.textContent='Foto seleccionada. Guarda para aplicarla.';}catch(error){avatarUpload.value='';selectedAvatarFile=null;profile.status.textContent=error.message;}});
+  avatarUpload.addEventListener('change',()=>{selectedAvatarFile=avatarUpload.files?.[0]||null;if(selectedAvatarPreviewUrl)URL.revokeObjectURL(selectedAvatarPreviewUrl);selectedAvatarPreviewUrl='';if(!selectedAvatarFile)return;try{validateImageFile(selectedAvatarFile,5*1024*1024,'Foto');selectedAvatarPreviewUrl=URL.createObjectURL(selectedAvatarFile);updateProfilePreview();profile.status.textContent='Foto seleccionada. Guarda para aplicarla.';}catch(error){avatarUpload.value='';selectedAvatarFile=null;profile.status.textContent=error.message;}});
   backgroundUpload.addEventListener('change',()=>{selectedBackgroundFile=backgroundUpload.files?.[0]||null;if(!selectedBackgroundFile)return;try{validateImageFile(selectedBackgroundFile,12*1024*1024,'Fondo');const local=URL.createObjectURL(selectedBackgroundFile);backgroundPreview.style.backgroundImage='url("'+local+'")';profileHero.style.backgroundImage='linear-gradient(0deg,rgba(8,12,20,.55),rgba(8,12,20,.25)),url("'+local+'")';profile.status.textContent='Fondo seleccionado. Guarda para aplicarlo.';}catch(error){backgroundUpload.value='';selectedBackgroundFile=null;profile.status.textContent=error.message;}});
   bannerUpload.addEventListener('change',()=>{selectedBannerFile=bannerUpload.files?.[0]||null;if(!selectedBannerFile)return;try{validateImageFile(selectedBannerFile,10*1024*1024,'Banner');const local=URL.createObjectURL(selectedBannerFile);bannerPreview.style.backgroundImage='url("'+local+'")';profileCover.style.backgroundImage='url("'+local+'")';}catch(error){bannerUpload.value='';selectedBannerFile=null;profile.status.textContent=error.message;}});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
@@ -109,7 +109,7 @@ const APP_VERSION = '3.0';
   let profileOwner=null;
   document.getElementById('authEmail').onclick=async()=>{
     if(!currentUser) return;
-    profileOwner=currentUser.id; profile.form.reset(); selectedAvatarFile=selectedBackgroundFile=selectedBannerFile=null; profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
+    profileOwner=currentUser.id; profile.form.reset(); selectedAvatarFile=selectedBackgroundFile=selectedBannerFile=null;if(selectedAvatarPreviewUrl)URL.revokeObjectURL(selectedAvatarPreviewUrl);selectedAvatarPreviewUrl=''; profile.status.textContent='Cargando perfil…'; saveProfile.disabled=true; profile.d.showModal();
     try {
       const sb = await window.rccSupabaseReady;
       const { data, error } = await sb.from('profiles').select('*').eq('user_id', currentUser.id).maybeSingle();
@@ -202,7 +202,7 @@ const APP_VERSION = '3.0';
         text_color: color.value
       });
       if(error) throw error;
-      avatarUpload.value='';backgroundUpload.value='';bannerUpload.value='';selectedAvatarFile=selectedBackgroundFile=selectedBannerFile=null;
+      avatarUpload.value='';backgroundUpload.value='';bannerUpload.value='';selectedAvatarFile=selectedBackgroundFile=selectedBannerFile=null;if(selectedAvatarPreviewUrl)URL.revokeObjectURL(selectedAvatarPreviewUrl);selectedAvatarPreviewUrl='';
       window.rccHasRobloxLink=!!(username||robloxUsername.value.trim());
       updateProfilePreview();
       avatar.value=avatarUrl;profileAvatar.src=avatarUrl;
