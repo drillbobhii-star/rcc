@@ -1,3 +1,4 @@
+import { sendRccWebPush } from "../_shared/rcc-web-push";
 type Env = {
   SUPABASE_URL?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
@@ -5,6 +6,9 @@ type Env = {
   RCC_VIP_API_URL?: string;
   RCC_VIP_WEBHOOK_SECRET?: string;
   DISCORD_WEBHOOK_URL?: string;
+  RCC_WEB_PUSH_PUBLIC_KEY?: string;
+  RCC_WEB_PUSH_PRIVATE_KEY?: string;
+  RCC_WEB_PUSH_SUBJECT?: string;
 };
 
 type KofiPayload = {
@@ -206,6 +210,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (!pendingResponse.ok && pendingResponse.status !== 409) {
         throw new Error('No se pudo guardar el pago pendiente de Ko-fi.');
       }
+      await notifyRccCreator(env,"RCC · Pago recibido","Pago de "+email+" · "+amount.toFixed(2)+" "+currency+" (pendiente de vincular).");
       await sendDiscordAlert(env, '⚠️ Pago recibido: usuario no encontrado', 'Pago recibido de **' + escapeDiscordText(email) + '**, pero no está registrado en RCC o aún no ha confirmado su correo. El pago quedó guardado como pendiente.', 0xF1C40F);
       return reply({
         ok: true,
@@ -253,6 +258,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     });
     if (!membershipResponse.ok) throw new Error('No se pudo activar la membresía VIP de RCC.');
 
+    await notifyRccCreator(env,"RCC · Nuevo pago confirmado","Pago VIP de "+email+" · "+amount.toFixed(2)+" USD.");
     let roleGranted = false;
     if (discordId) {
       try {
