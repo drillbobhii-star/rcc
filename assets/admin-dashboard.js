@@ -134,7 +134,71 @@
     if (userQuickMenu) userQuickMenu.hidden = true;
   }
 
-  function openUserQuickMenu(user) {
+  async function chatAdminApi(action, payload = null) {
+    if (!session?.access_token) throw new Error("La sesión de administrador expiró.");
+    const isGet = payload === null;
+    const response = await fetch("/api/chat" + (isGet ? "?action=" + encodeURIComponent(action) : ""), {
+      method: isGet ? "GET" : "POST",
+      headers: {
+        Authorization: "Bearer " + session.access_token,
+        ...(isGet ? {} : { "Content-Type": "application/json" })
+      },
+      body: isGet ? undefined : JSON.stringify({ action, ...payload }),
+      cache: "no-store",
+      credentials: "same-origin"
+    });
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; }
+    catch (_) { data = { error: raw.slice(0, 400) }; }
+    if (!response.ok) throw new Error(data.error || "No se pudo completar la acción de mensajería.");
+    return data;
+  }
+
+  function quickActionButton(container, label, handler, danger = false) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "small-btn" + (danger ? " danger" : "");
+    button.textContent = label;
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      const previous = button.textContent;
+      button.textContent = "Procesando…";
+      try {
+        await handler(button);
+      } catch (error) {
+        setStatus(error.message || "No se pudo completar la acción.", true);
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = previous;
+        }
+      }
+    });
+    container.append(button);
+    return button;
+  }
+
+  function quickSection(card, heading, hint = "") {
+    const section = document.createElement("div");
+    section.className = "rcc-user-quick-section";
+    const title = document.createElement("strong");
+    title.textContent = heading;
+    section.append(title);
+    if (hint) {
+      const description = document.createElement("p");
+      description.className = "rcc-user-quick-hint";
+      description.textContent = hint;
+      section.append(description);
+    }
+    const actions = document.createElement("div");
+    actions.className = "rcc-user-quick-actions";
+    section.append(actions);
+    card.append(section);
+    return actions;
+  }
+
+  async function openUserQuickMenu(user) {
     if (!userQuickMenu) {
       userQuickMenu = document.createElement("div");
       userQuickMenu.className = "rcc-user-quick-menu";
@@ -147,28 +211,29 @@
       card.className = "rcc-user-quick-card";
       card.setAttribute("role", "dialog");
       card.setAttribute("aria-modal", "true");
-      card.setAttribute("aria-label", "Acciones del usuario");
+      card.setAttribute("aria-label", "Panel de control del usuario");
       userQuickMenu.append(card);
       document.body.append(userQuickMenu);
       document.addEventListener("keydown", event => {
         if (event.key === "Escape") closeUserQuickMenu();
       });
     }
+
     const card = userQuickMenu.firstElementChild;
     card.replaceChildren();
     const head = document.createElement("div");
     head.className = "rcc-user-quick-head";
     const title = document.createElement("h3");
-    title.textContent = "Acciones · " + (user.name || user.email || user.user_id);
+    title.textContent = "Panel rápido · " + (user.name || user.email || user.user_id);
     const close = document.createElement("button");
-    close.type = "button"; close.className = "small-btn"; close.textContent = "Cerrar";
+    close.type = "button";
+    close.className = "small-btn";
+    close.textContent = "Cerrar";
     close.addEventListener("click", closeUserQuickMenu);
-    head.append(title, close); card.append(head);
+    head.append(title, close);
+    card.append(head);
 
-    const access = document.createElement("div");
-    access.className = "rcc-user-quick-section";
-    const accessTitle = document.createElement("strong");
-    accessTitle.textContent = "Permisos y distintivos";
+    const access = quickSection(card, "Permisos y distintivos", "Los cambios se aplican a la cuenta seleccionada.");
     const switches = document.createElement("div");
     switches.className = "switches";
     switches.style.marginTop = "10px";
@@ -177,43 +242,132 @@
       renderSwitch(user, "is_creator", "Creator", !dashboard.capabilities.isCreator),
       renderSwitch(user, "has_banner", "Banner", !dashboard.capabilities.hasBanner)
     );
-    access.append(accessTitle, switches);
-    card.append(access);
+    access.append(switches);
 
-    const discord = document.createElement("div");
-    discord.className = "rcc-user-quick-section";
-    const discordTitle = document.createElement("strong");
-    discordTitle.textContent = "Discord";
-    const discordInfo = document.createElement("p");
-    discordInfo.className = "rcc-user-quick-hint";
-    discordInfo.textContent = user.discord_id ? "Vinculado: " + user.discord_id : "Esta cuenta no tiene Discord vinculado.";
-    const discordActions = document.createElement("div");
-    discordActions.className = "rcc-user-quick-actions";
+    const moderation = quickSection(card, "Moderación de cuenta", user.is_banned ? "Esta cuenta está restringida." : "La cuenta puede utilizar las funciones disponibles.");
+    const isProtectedAccount = String(user.email || "").trim().toLowerCase() === ADMIN_EMAIL;
+    if (!isProtectedAccount) quickActionButton(moderation, user.is_banned ? "Reactivar cuenta" : "Suspender usuario", async () => {
+      const action = user.is_banned ? "unrestrictUser" : "restrictUser";
+      const verb = user.is_banned ? "reactivar" : "suspender";
+      if (!window.confirm("¿Confirmas " + verb + " a " + (user.email || user.user_id) + "?")) return;
+      await chatAdminApi(action, { userId: user.user_id });
+      user.is_banned = !user.is_banned;
+      setStatus(user.is_banned ? "Usuario suspendido." : "Usuario reactivado.");
+      await loadDashboard(true);
+      closeUserQuickMenu();
+    }, !user.is_banned);
+
+    const messaging = quickSection(card, "Mensajería", "Controles del chat global y de este usuario.");
+    const globalStatus = document.createElement("p");
+    globalStatus.className = "rcc-user-quick-hint";
+    globalStatus.textContent = "Consultando estado del chat…";
+    messaging.parentElement.insertBefore(globalStatus, messaging);
+    quickActionButton(messaging, "Enviar anuncio a todos", async () => {
+      const message = window.prompt("Escribe el anuncio que recibirán los usuarios:");
+      if (!message || !message.trim()) return;
+      if (!window.confirm("¿Enviar este anuncio a todos los usuarios con el chat habilitado?")) return;
+      const result = await chatAdminApi("broadcast", { content: message.trim(), confirmed: true });
+      setStatus("Anuncio enviado. Mensajes: " + (result.sent ?? "correcto") + ".");
+    });
+    quickActionButton(messaging, "Activar / desactivar chat global", async () => {
+      const state = await chatAdminApi("adminList");
+      const next = state.globalChatEnabled === false;
+      if (!window.confirm(next ? "¿Habilitar el chat para todos?" : "¿Deshabilitar el chat para todos y cerrar los chats abiertos?")) return;
+      await chatAdminApi("setGlobalChat", { enabled: next });
+      globalStatus.textContent = next ? "Chat global: ACTIVADO" : "Chat global: DESACTIVADO";
+      setStatus(next ? "Chat habilitado para todos." : "Chat deshabilitado para todos.");
+    });
+
+    const userChatActions = quickSection(card, "Conversación de este usuario", "Cargando conversación…");
+    quickActionButton(userChatActions, "Actualizar controles", async () => {
+      const state = await chatAdminApi("adminList");
+      const conversation = (state.conversations || []).find(item => item.user_id === user.user_id);
+      if (!conversation) {
+        setStatus("Este usuario todavía no tiene una conversación creada.");
+        return;
+      }
+      const chatButton = [...document.querySelectorAll("#rccConversationList .rcc-conversation")]
+        .find(button => button.textContent.includes(user.email || user.user_id) || button.textContent.includes(user.user_id));
+      document.querySelector('.admin-tab[data-tab="messages"]')?.click();
+      if (chatButton) chatButton.click();
+      else setStatus("Abre la pestaña Mensajes para ver la conversación.");
+    });
+
+    const discord = quickSection(card, "Discord", user.discord_id ? "Discord vinculado: " + user.discord_id : "Esta cuenta no tiene Discord vinculado.");
     if (user.discord_id) {
-      const unlink = document.createElement("button");
-      unlink.type = "button"; unlink.className = "small-btn danger"; unlink.textContent = "Desvincular Discord";
-      unlink.addEventListener("click", async () => { await unlinkDiscord(user, unlink); closeUserQuickMenu(); });
-      discordActions.append(unlink);
+      quickActionButton(discord, "Desvincular Discord", async () => {
+        await unlinkDiscord(user, discord.querySelector("button"));
+        closeUserQuickMenu();
+      }, true);
     }
     if (user.is_vip && user.discord_id) {
-      const force = document.createElement("button");
-      force.type = "button"; force.className = "small-btn"; force.textContent = "Forzar rol VIP";
-      force.addEventListener("click", async () => { await forceRole(user, force); closeUserQuickMenu(); });
-      discordActions.append(force);
+      quickActionButton(discord, "Forzar rol VIP", async () => {
+        await forceRole(user, discord.querySelector("button"));
+        closeUserQuickMenu();
+      });
     }
-    discord.append(discordTitle, discordInfo, discordActions);
-    card.append(discord);
 
-    const identity = document.createElement("div");
-    identity.className = "rcc-user-quick-section";
-    const identityText = document.createElement("p");
-    identityText.className = "rcc-user-quick-hint";
-    identityText.textContent = "User ID: " + user.user_id + (user.created_at ? " · Registrado: " + new Date(user.created_at).toLocaleString() : "");
-    identity.append(identityText); card.append(identity);
+    const identity = quickSection(card, "Información de cuenta", "ID: " + user.user_id + (user.created_at ? " · Registro: " + new Date(user.created_at).toLocaleString() : ""));
+    quickActionButton(identity, "Copiar ID", async () => {
+      await navigator.clipboard.writeText(user.user_id);
+      setStatus("ID copiado.");
+    });
+    quickActionButton(identity, "Copiar correo", async () => {
+      await navigator.clipboard.writeText(user.email || "");
+      setStatus("Correo copiado.");
+    });
+
     userQuickMenu.hidden = false;
     close.focus();
-  }
 
+    try {
+      const state = await chatAdminApi("adminList");
+      globalStatus.textContent = state.globalChatEnabled === false ? "Chat global: DESACTIVADO" : "Chat global: ACTIVADO";
+      const conversation = (state.conversations || []).find(item => item.user_id === user.user_id);
+      const userChatHint = userChatActions.parentElement.querySelector(".rcc-user-quick-hint");
+      if (userChatHint) userChatHint.textContent = conversation
+        ? (conversation.enabled === false ? "La conversación está deshabilitada." : "La conversación está habilitada.")
+        : "Este usuario todavía no tiene una conversación.";
+      userChatActions.replaceChildren();
+      if (conversation) {
+        quickActionButton(userChatActions, conversation.enabled === false ? "Habilitar chat de este usuario" : "Deshabilitar chat de este usuario", async () => {
+          const enabled = conversation.enabled === false;
+          if (!window.confirm(enabled ? "¿Habilitar el chat para este usuario?" : "¿Deshabilitar el chat para este usuario?")) return;
+          await chatAdminApi("setEnabled", { conversationId: conversation.id, enabled });
+          conversation.enabled = enabled;
+          setStatus(enabled ? "Chat individual habilitado." : "Chat individual deshabilitado.");
+          closeUserQuickMenu();
+        });
+        quickActionButton(userChatActions, "Enviar mensaje privado", async () => {
+          const message = window.prompt("Escribe el mensaje para " + (user.name || user.email || "este usuario") + ":");
+          if (!message || !message.trim()) return;
+          await chatAdminApi("send", { conversationId: conversation.id, content: message.trim() });
+          setStatus("Mensaje privado enviado.");
+        });
+        quickActionButton(userChatActions, "Abrir conversación", async () => {
+          document.querySelector('.admin-tab[data-tab="messages"]')?.click();
+          const target = [...document.querySelectorAll("#rccConversationList .rcc-conversation")]
+            .find(button => button.textContent.includes(user.email || user.user_id) || button.textContent.includes(user.user_id));
+          target?.click();
+          if (!target) setStatus("No se encontró la conversación en la lista. Actualiza Mensajes.");
+        });
+        quickActionButton(userChatActions, "Eliminar mensajes de esta conversación", async () => {
+          if (!window.confirm("¿Eliminar permanentemente los mensajes de esta conversación? Esta acción no se puede deshacer.")) return;
+          await chatAdminApi("deleteChat", { conversationId: conversation.id });
+          setStatus("Mensajes eliminados y conversación cerrada.");
+          closeUserQuickMenu();
+        }, true);
+      } else {
+        const hint = document.createElement("p");
+        hint.className = "rcc-user-quick-hint";
+        hint.textContent = "Cuando el usuario inicie un chat, aquí aparecerán las acciones individuales.";
+        userChatActions.append(hint);
+      }
+    } catch (error) {
+      globalStatus.textContent = "No se pudieron cargar los controles de mensajería: " + error.message;
+      setStatus(error.message, true);
+    }
+  }
   function bindUserLongPress(row, user) {
     row.classList.add("user-quick-hold");
     const cancel = () => {
@@ -221,6 +375,7 @@
       userHoldTimer = null;
     };
     row.addEventListener("pointerdown", event => {
+      if (event.target.closest("button,input,label,a,select,textarea")) return;
       if (event.pointerType === "mouse" && event.button !== 0) return;
       userHoldTriggered = false;
       cancel();
@@ -231,6 +386,7 @@
     });
     ["pointerup", "pointerleave", "pointercancel"].forEach(name => row.addEventListener(name, cancel));
     row.addEventListener("contextmenu", event => {
+      if (event.target.closest("button,input,label,a,select,textarea")) return;
       event.preventDefault();
       cancel();
       openUserQuickMenu(user);
