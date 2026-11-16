@@ -42,23 +42,23 @@
       cards.innerHTML = '<p class="rcc-feed-note">Vuelve a consultar esta sección cuando termine la primera actualización del catálogo.</p>';
       section.hidden = false; return;
     }
-    const items = mode === 'trending' ? feed.trending : feed.newest;
+    const items = mode === 'trending' ? feed.trending : feed.newest;\n    const newsItems = mode === 'updates' && Array.isArray(feed.news) ? feed.news : [];
     title.textContent = mode === 'trending' ? '🔥 Tendencias de la comunidad' : '🆕 Scripts recién publicados';
     const sources = Object.entries(feed.sources || {}).filter(([, value]) => value.ok).map(([name]) => name);
     meta.textContent = new Intl.NumberFormat('es-DO').format(items.length) + ' descubrimientos · Actualizado ' + date(feed.updatedAt) + (sources.length ? ' · Fuentes: ' + sources.join(', ') : '');
     cards.replaceChildren();
-    for (const item of items.slice(0, 72)) {
+    for (const item of [...newsItems, ...items].slice(0, 72)) {
       const card = document.createElement('article'); card.className = 'rcc-feed-card';
       const heading = document.createElement('h4'); heading.textContent = item.title || 'Script sin título';
       const description = document.createElement('p'); description.textContent = (item.game || 'Roblox') + ' · ' + (item.creator || 'Comunidad');
       const details = document.createElement('p'); details.textContent = (item.views ? new Intl.NumberFormat('es-DO',{notation:'compact'}).format(item.views) + ' vistas · ' : '') + date(item.createdAt);
       const tags = document.createElement('div'); tags.className = 'rcc-feed-tags';
       const tag = (value) => { const span=document.createElement('span');span.className='rcc-feed-tag';span.textContent=value;tags.append(span); };
-      tag(item.source || 'Fuente externa'); tag(item.verified ? 'Creador verificado' : 'No verificado por la fuente');
+      tag(item.source || 'Fuente externa'); if(item.kind !== 'news') tag(item.verified ? 'Creador verificado' : 'No verificado por la fuente');
       if (item.keyRequired) tag('Requiere clave');
       if (item.riskLevel) tag('Riesgo: ' + item.riskLevel);
       if (item.obfuscated) tag('Ofuscado');
-      const link = document.createElement('a'); link.className='rcc-feed-link'; link.href=item.url; link.target='_blank'; link.rel='noopener noreferrer'; link.textContent='Ver publicación original ↗';
+      const link = document.createElement('a'); link.className='rcc-feed-link';\n      let destination = ''; try { const parsed = new URL(item.url); if (parsed.protocol === 'https:' && ['scriptblox.com','rscripts.net','www.r-scripts.net'].includes(parsed.hostname)) destination = parsed.href; } catch (_) {}\n      if (!destination) continue;\n      link.href=destination; link.target='_blank'; link.rel='noopener noreferrer'; link.textContent=item.kind === 'news' ? 'Leer novedades ↗' : 'Ver publicación original ↗';
       card.append(heading,description,details,tags,link); cards.append(card);
     }
     note.textContent = feed.notice || 'Metadatos y enlaces originales; RCC no aloja ni ejecuta scripts de terceros.';
