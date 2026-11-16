@@ -35,8 +35,8 @@ const APP_VERSION = '3.0';
   const profile=dialog('Tu perfil');
   const color=field(profile.form,'Color del nombre','color',{value:'#dce6f5',required:true});
   const avatar=field(profile.form,'Foto · URL HTTPS','url',{maxLength:2000,placeholder:'https://…'});
-  const avatarUpload=field(profile.form,'Cambiar foto de perfil por galería','file',{accept:'image/png,image/jpeg,image/webp,image/gif,image/avif'});
-  const backgroundUpload=field(profile.form,'Fondo de perfil · imagen o GIF animado','file',{accept:'image/png,image/jpeg,image/webp,image/gif,image/avif'});
+  const avatarUpload=field(profile.form,'Cambiar foto de perfil por galería','file',{accept:'image/*'});
+  const backgroundUpload=field(profile.form,'Fondo de perfil · imagen o GIF animado','file',{accept:'image/*'});
   const backgroundPreview=el('div',null,'rcc-background-preview');backgroundUpload.parentElement.after(backgroundPreview);
 
   const name=field(profile.form,'Nombre visible','text',{required:true,maxLength:80});
@@ -70,7 +70,7 @@ const APP_VERSION = '3.0';
   const makeEffect=(label)=>{const wrap=el('label',label),select=el('select');for(const [value,title] of [['none','Sin efecto'],['shimmer','Destello'],['float','Flotación'],['aurora','Aurora']]){const option=el('option',title);option.value=value;select.append(option);}wrap.append(select);creatorEffects.append(wrap);return select;};
   const nameEffect=makeEffect('Animación del nombre'),bannerEffect=makeEffect('Efecto del banner');
   profile.form.insertBefore(creatorEffects,profile.status);
-  const bannerUpload=field(profile.form,'Banner de perfil · imagen (VIP)','file',{accept:'image/png,image/jpeg,image/webp,image/gif'});
+  const bannerUpload=field(profile.form,'Banner de perfil · imagen o GIF animado (VIP)','file',{accept:'image/*'});
   const vipBannerSettings=el('fieldset',null,'vip-banner-settings');vipBannerSettings.append(el('legend','Banner VIP · formato ampliado'));
   const bannerHeightWrap=el('label','Altura del banner'),bannerHeight=el('select');
   [['180','Amplio · 180 px'],['220','Grande · 220 px'],['260','Extra ancho · 260 px'],['300','Panorámico · 300 px']].forEach(([v,t])=>{const o=el('option',t);o.value=v;bannerHeight.append(o);});bannerHeightWrap.append(bannerHeight);
@@ -81,23 +81,39 @@ const APP_VERSION = '3.0';
   bannerUpload.parentElement.after(bannerPreview);
   let currentBannerUrl='',currentBackgroundUrl='',currentBackgroundType='image',currentRobloxId='',isProfileVip=false;
   let selectedAvatarFile=null,selectedBackgroundFile=null,selectedBannerFile=null,selectedAvatarPreviewUrl='';
-  const allowedImageTypes=new Set(['image/png','image/jpeg','image/webp','image/gif','image/avif']);
-  function validateImageFile(file,maxBytes,label){if(!file)return;if(!allowedImageTypes.has(file.type))throw new Error(label+': usa PNG, JPG, WEBP, GIF o AVIF.');if(file.size>maxBytes)throw new Error(label+': máximo '+Math.round(maxBytes/1024/1024)+' MB.');}
-  async function uploadProfileImage(sb,file,folder){const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','image/avif':'avif'})[file.type];const path=currentUser.id+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;const {data,error}=await sb.storage.from('profile-media').upload(path,file,{upsert:false,contentType:file.type,cacheControl:'3600'});if(error)throw error;return sb.storage.from('profile-media').getPublicUrl(data.path).data.publicUrl;}
+  const imageExtensionMime={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',gif:'image/gif',webp:'image/webp',avif:'image/avif',bmp:'image/bmp',svg:'image/svg+xml',tif:'image/tiff',tiff:'image/tiff',heic:'image/heic',heif:'image/heif',ico:'image/x-icon'};
+  function imageFileInfo(file){
+    const extension=String(file.name||'').split('.').pop().toLowerCase();
+    const mime=file.type&&file.type.startsWith('image/')?file.type:(imageExtensionMime[extension]||'');
+    if(!mime)throw new Error('El archivo no parece ser una imagen compatible. Selecciona un formato de imagen.');
+    return {mime,extension:extension.replace(/[^a-z0-9]/g,'')||'img'};
+  }
+  function validateImageFile(file,maxBytes,label){if(!file)return;imageFileInfo(file);if(file.size>maxBytes)throw new Error(label+': máximo '+Math.round(maxBytes/1024/1024)+' MB.');}
+  async function uploadProfileImage(sb,file,folder){
+    const info=imageFileInfo(file),knownExtension=Object.entries(imageExtensionMime).find(([,mime])=>mime===info.mime)?.[0];
+    const ext=knownExtension||info.extension;
+    const path=currentUser.id+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;
+    const {data,error}=await sb.storage.from('profile-media').upload(path,file,{upsert:false,contentType:info.mime,cacheControl:'3600'});
+    if(error)throw error;
+    return sb.storage.from('profile-media').getPublicUrl(data.path).data.publicUrl;
+  }
   async function checkProfileVip(sb){try{const {data}=await sb.auth.getSession();const token=data?.session?.access_token;if(!token)return false;const response=await fetch('/api/vip-membership',{headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});if(!response.ok)return false;return (await response.json()).isVip===true;}catch{return false;}}
   avatarUpload.addEventListener('change',()=>{selectedAvatarFile=avatarUpload.files?.[0]||null;if(selectedAvatarPreviewUrl)URL.revokeObjectURL(selectedAvatarPreviewUrl);selectedAvatarPreviewUrl='';if(!selectedAvatarFile)return;try{validateImageFile(selectedAvatarFile,5*1024*1024,'Foto');selectedAvatarPreviewUrl=URL.createObjectURL(selectedAvatarFile);updateProfilePreview();profile.status.textContent='Foto seleccionada. Guarda para aplicarla.';}catch(error){avatarUpload.value='';selectedAvatarFile=null;profile.status.textContent=error.message;}});
   backgroundUpload.addEventListener('change',()=>{selectedBackgroundFile=backgroundUpload.files?.[0]||null;if(!selectedBackgroundFile)return;try{validateImageFile(selectedBackgroundFile,12*1024*1024,'Fondo');const local=URL.createObjectURL(selectedBackgroundFile);backgroundPreview.style.backgroundImage='url("'+local+'")';profileHero.style.backgroundImage='linear-gradient(0deg,rgba(8,12,20,.55),rgba(8,12,20,.25)),url("'+local+'")';profile.status.textContent='Fondo seleccionado. Guarda para aplicarlo.';}catch(error){backgroundUpload.value='';selectedBackgroundFile=null;profile.status.textContent=error.message;}});
   bannerUpload.addEventListener('change',()=>{selectedBannerFile=bannerUpload.files?.[0]||null;if(!selectedBannerFile)return;try{validateImageFile(selectedBannerFile,10*1024*1024,'Banner');const local=URL.createObjectURL(selectedBannerFile);bannerPreview.style.backgroundImage='url("'+local+'")';profileCover.style.backgroundImage='url("'+local+'")';}catch(error){bannerUpload.value='';selectedBannerFile=null;profile.status.textContent=error.message;}});
   const saveProfile=el('button','Guardar perfil','btn btn-primary');saveProfile.type='submit';profile.status.before(saveProfile);
   const profileCustomization=el('div',null,'rcc-profile-customization');
+  profileCustomization.id='rccProfileCustomization';
   profileCustomization.hidden=true;
   [color.parentElement,avatar.parentElement,avatarUpload.parentElement,name.parentElement,robloxUsername.parentElement,bio.parentElement,backgroundUpload.parentElement,backgroundPreview,showRoblox.parentElement,showRobloxButton,creatorEffects,bannerUpload.parentElement,bannerPreview,vipBannerSettings,saveProfile].forEach(node=>profileCustomization.append(node));
+  profileHero.classList.add('rcc-profile-window');
   profileHero.setAttribute('role','button');profileHero.setAttribute('tabindex','0');profileHero.setAttribute('aria-expanded','false');
-  profileHeroHint.textContent='Toca la vista previa para personalizar tu perfil';
+  profileHero.setAttribute('aria-controls','rccProfileCustomization');
+  profileHeroHint.textContent='▾ Abrir personalización · toca esta ventana';
   const toggleProfileCustomization=()=>{
     profileCustomization.hidden=!profileCustomization.hidden;
     profileHero.setAttribute('aria-expanded',String(!profileCustomization.hidden));
-    profileHeroHint.textContent=profileCustomization.hidden?'Toca la vista previa para personalizar tu perfil':'Personalización abierta · toca para cerrar';
+    profileHeroHint.textContent=profileCustomization.hidden?'▾ Abrir personalización · toca esta ventana':'▴ Personalización abierta · toca la ventana para contraer';
   };
   profileHero.addEventListener('click',toggleProfileCustomization);
   profileHero.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleProfileCustomization();}});
@@ -130,7 +146,7 @@ const APP_VERSION = '3.0';
       nameEffect.value=isCreator?(data?.name_effect||'none'):'none';bannerEffect.value=isCreator?(data?.banner_effect||'none'):'none';
       color.value = data?.text_color || '#dce6f5';
       updateProfilePreview();
-      profileCustomization.hidden=true;profileHero.setAttribute('aria-expanded','false');profileHeroHint.textContent='Toca la vista previa para personalizar tu perfil';
+      profileCustomization.hidden=true;profileHero.setAttribute('aria-expanded','false');profileHeroHint.textContent='▾ Abrir personalización · toca esta ventana';
       if(profileNavButton){profileNavButton.replaceChildren();const navAvatar=el('img',null,'auth-profile-avatar');navAvatar.alt='';navAvatar.src=data?.avatar_url||'/assets/default-avatar.svg';const navName=el('span',data?.display_name||'Mi perfil');profileNavButton.append(navAvatar,navName);}
       profile.status.textContent='';
     } catch(error) { profile.status.textContent = error.message || 'Error al cargar perfil.'; }
@@ -180,7 +196,7 @@ const APP_VERSION = '3.0';
       if(currentUser?.id !== profileOwner){ profile.status.textContent='La sesión cambió. Abre tu perfil de nuevo.'; return; }
       const sb = await window.rccSupabaseReady;
       if(selectedAvatarFile){validateImageFile(selectedAvatarFile,5*1024*1024,'Foto');profile.status.textContent='Subiendo foto…';avatarUrl=await uploadProfileImage(sb,selectedAvatarFile,'avatars');}
-      if(selectedBackgroundFile){validateImageFile(selectedBackgroundFile,12*1024*1024,'Fondo');profile.status.textContent='Subiendo fondo…';currentBackgroundUrl=await uploadProfileImage(sb,selectedBackgroundFile,'backgrounds');currentBackgroundType=selectedBackgroundFile.type==='image/gif'?'gif':'image';}
+      if(selectedBackgroundFile){validateImageFile(selectedBackgroundFile,12*1024*1024,'Fondo');profile.status.textContent='Subiendo fondo…';currentBackgroundUrl=await uploadProfileImage(sb,selectedBackgroundFile,'backgrounds');currentBackgroundType=(imageFileInfo(selectedBackgroundFile).mime==='image/gif'||/\.gif$/i.test(selectedBackgroundFile.name))?'gif':'image';}
       if(selectedBannerFile){if(!isProfileVip)throw new Error('El banner ampliado y personalizable es exclusivo VIP.');validateImageFile(selectedBannerFile,10*1024*1024,'Banner');profile.status.textContent='Subiendo banner VIP…';currentBannerUrl=await uploadProfileImage(sb,selectedBannerFile,'banners');}
       if(currentUser?.id!==profileOwner)throw new Error('La sesión cambió. Abre tu perfil de nuevo.');
       const { error } = await sb.from('profiles').upsert({
