@@ -1,0 +1,18 @@
+{
+  "id": "/admin.html",
+  "name": "RCC Control Center",
+  "short_name": "RCC Admin",
+  "start_url": "/admin.html#messages",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080a12",
+  "theme_color": "#080a12",
+  "icons": [
+    {
+      "src": "/assets/rcc-push-badge.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
