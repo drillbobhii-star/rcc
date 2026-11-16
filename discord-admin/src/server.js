@@ -180,6 +180,15 @@ async function getGuildChannels(guildId) {
   return Array.isArray(channels) ? channels : [];
 }
 
+// Fetch independent server metadata concurrently and reuse it throughout one request.
+async function loadGuildContext(guildId) {
+  const [channels, roles] = await Promise.all([
+    getGuildChannels(guildId),
+    discordApi("/guilds/" + guildId + "/roles")
+  ]);
+  return { channels, roles: Array.isArray(roles) ? roles : [] };
+}
+
 function safeChannelName(value) {
   if (typeof value !== "string") throw new Error("El nombre del canal no es válido.");
   const name = value.trim().toLowerCase()
@@ -492,10 +501,9 @@ const SYSTEM_INSTRUCTIONS = [
   "Para cambios normales de canales, roles, permisos, apodos, invitaciones y utilidades, ejecuta la herramienta directamente y confirma con 'Hecho, jefe'. Borrar canales, borrar roles y banear siempre requieren confirmación."
 ].join(" ");
 
-async function executeAction(guildId, actionName, args) {
-  const channels = await getGuildChannels(guildId);
-
-  const roles = await discordApi("/guilds/" + guildId + "/roles");
+async function executeAction(guildId, actionName, args, context = null) {
+  const guildContext = context || await loadGuildContext(guildId);
+  const { channels, roles } = guildContext;
   const findChannelByName = (name) => {
     const normalized = safeChannelName(name);
     const matches = channels.filter(c => c.name.toLowerCase() === normalized);
@@ -797,8 +805,12 @@ async function askGemini(guildId, requestText, attachments = []) {
     throw new Error("Falta GEMINI_API_KEY. Añade tu clave de Gemini en las variables privadas de Railway; nunca la pegues en Discord ni en GitHub.");
   }
 
-  const channels = await getGuildChannels(guildId);
-  const roles = await discordApi("/guilds/" + guildId + "/roles");
+  // Do not serialize independent Discord/CDN requests: fetch them concurrently.
+  const [guildContext, attachmentParts] = await Promise.all([
+    loadGuildContext(guildId),
+    buildAttachmentContent(attachments)
+  ]);
+  const { channels, roles } = guildContext;
   const roleContext = roles.map(role => ({id:role.id,name:role.name,permissions:role.permissions}));
   const channelContext = channels.map((channel) => ({
     id: channel.id,
@@ -815,14 +827,13 @@ async function askGemini(guildId, requestText, attachments = []) {
     fetch: GEMINI_FETCH,
     fetchOptions: { dispatcher: GEMINI_DISPATCHER }
   });
-  const attachmentParts = await buildAttachmentContent(attachments);
   const userContent = [{
     type:"text",
     text:"Solicitud del administrador:\\n" + requestText +
       "\\n\\nCanales actuales del servidor (usa estos IDs exactos):\\n" + JSON.stringify(channelContext) +
       "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
   }, ...attachmentParts];
-  console.log("[Gemini] Herramientas enviadas (" + toolDefinitions.length + "):\\n" + JSON.stringify(toolDefinitions, null, 2));
+  console.log("[Gemini] Solicitud preparada; herramientas disponibles: " + toolDefinitions.length + ".");
   const response = await createGeminiCompletion(client, {
     model: GEMINI_MODEL,
     messages: [
@@ -862,32 +873,43 @@ async function askGemini(guildId, requestText, attachments = []) {
     };
   }
 
-  const result = await executeAction(guildId, actionName, args);
+  const result = await executeAction(guildId, actionName, args, guildContext);
   return { text: typeof result === "string" ? result : JSON.stringify(result, null, 2) };
 }
 
 
-async function generateRccAnnouncement(guildId) {
+async function generateRccAnnouncement(guildId, fallbackChannelId = null) {
   if (!GEMINI_API_KEY) {
     throw new Error("Falta GEMINI_API_KEY en las variables privadas de Railway.");
   }
 
-  const channels = await getGuildChannels(guildId);
-  const configuredChannelId = process.env.DISCORD_ANNOUNCEMENT_CHANNEL_ID;
-  const channel = configuredChannelId
-    ? channels.find((item) => item.id === configuredChannelId)
-    : channels.find((item) => ["anuncios", "anuncio", "announcements", "announcement"].includes(String(item.name || "").toLowerCase()));
-  if (!channel || (channel.type !== 0 && channel.type !== 5)) {
-    throw new Error("No encontré el canal de anuncios. Configura DISCORD_ANNOUNCEMENT_CHANNEL_ID o crea un canal llamado #anuncios.");
-  }
+  // Channel discovery and GitHub history are independent; do not wait for them sequentially.
+  const [channels, githubResponse] = await Promise.all([
+    getGuildChannels(guildId),
+    fetch("https://api.github.com/repos/drillbobhii-star/rcc/commits?per_page=20", {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "RCC-Discord-Admin"
+      },
+      signal: AbortSignal.timeout(15000)
+    })
+  ]);
 
-  const githubResponse = await fetch("https://api.github.com/repos/drillbobhii-star/rcc/commits?per_page=20", {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "User-Agent": "RCC-Discord-Admin"
-    },
-    signal: AbortSignal.timeout(15000)
-  });
+  const isPublishableChannel = item => item && (item.type === 0 || item.type === 5);
+  const configuredChannelId = process.env.DISCORD_ANNOUNCEMENT_CHANNEL_ID;
+  const configuredChannel = configuredChannelId
+    ? channels.find(item => item.id === configuredChannelId && isPublishableChannel(item))
+    : null;
+  const namedChannel = channels.find(item =>
+    isPublishableChannel(item) &&
+    ["anuncios", "anuncio", "announcements", "announcement"].includes(String(item.name || "").toLowerCase())
+  );
+  const fallbackChannel = fallbackChannelId
+    ? channels.find(item => item.id === fallbackChannelId && isPublishableChannel(item))
+    : null;
+  // Prefer explicit configuration, then a conventional announcements channel,
+  // and finally the text channel where the admin invoked the command.
+  const channel = configuredChannel || namedChannel || fallbackChannel;
   if (!githubResponse.ok) {
     throw new Error("GitHub respondió con HTTP " + githubResponse.status + " al consultar los commits.");
   }
@@ -914,7 +936,7 @@ async function generateRccAnnouncement(guildId) {
   const draft = response.choices?.[0]?.message?.content?.trim();
   if (!draft) throw new Error("Gemini no devolvió texto para el anuncio.");
 
-  return { channel, draft: draft.slice(0, 1800), commitCount: Math.min(commits.length, 20) };
+  return { channel: channel || null, draft: draft.slice(0, 1800), commitCount: Math.min(commits.length, 20) };
 }
 
 // Discord HTTP Interactions mode: callback type 5 is the REST equivalent of
@@ -968,7 +990,14 @@ async function processRccCommand(interaction) {
     if (interaction.channel_id) stopTyping = startTyping(interaction.channel_id);
 
     if (subcommandName === "anuncio") {
-      const { channel, draft, commitCount } = await generateRccAnnouncement(interaction.guild_id);
+      const { channel, draft, commitCount } = await generateRccAnnouncement(interaction.guild_id, interaction.channel_id);
+      if (!channel) {
+        await editOriginalResponse(APPLICATION_ID, interaction.token, {
+          content: "📝 **Borrador de anuncio RCC**\\n\\n" + draft +
+            "\\n\\nNo encontré un canal de texto válido para publicarlo. El borrador está listo, pero no se publicó. Configura DISCORD_ANNOUNCEMENT_CHANNEL_ID o ejecuta /rcc anuncio desde el canal donde quieras publicarlo."
+        });
+        return;
+      }
       const pendingId = crypto.randomUUID();
       pendingActions.set(pendingId, {
         guildId: interaction.guild_id,
