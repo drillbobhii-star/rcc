@@ -122,8 +122,8 @@ async function adminConversationList(env: Env) {
       last_message_preview: String(latest?.content || ""),
       last_message_sender: String(latest?.sender_role || ""),
       unread_count: unreadMap.get(String(conversation.id)) || 0,
-      is_active: conversation.enabled === true && lastSeen > 0 && now - lastSeen <= ACTIVE_WINDOW_MS,
-      last_user_seen_at: conversation.last_user_seen_at || null,
+      is_active: lastSeen > 0 && now - lastSeen <= ACTIVE_WINDOW_MS,
+      last_user_seen_at: presenceRow?.last_seen_at || null,
     };
   });
   return result.sort((a, b) => {
