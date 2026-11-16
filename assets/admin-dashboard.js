@@ -375,6 +375,7 @@
       userHoldTimer = null;
     };
     row.addEventListener("pointerdown", event => {
+      if (event.target.closest("button,input,label,a,select,textarea")) return;
       if (event.pointerType === "mouse" && event.button !== 0) return;
       userHoldTriggered = false;
       cancel();
@@ -385,6 +386,7 @@
     });
     ["pointerup", "pointerleave", "pointercancel"].forEach(name => row.addEventListener(name, cancel));
     row.addEventListener("contextmenu", event => {
+      if (event.target.closest("button,input,label,a,select,textarea")) return;
       event.preventDefault();
       cancel();
       openUserQuickMenu(user);
