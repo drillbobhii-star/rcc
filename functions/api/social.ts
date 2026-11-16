@@ -21,7 +21,7 @@ async function authUser(request: Request, env: Env): Promise<AuthUser | null> {
   if (!response.ok) return null;
   return await response.json() as AuthUser;
 }
-async function allAuthUsers(env: Env): Promise<AuthUser[]> {
+async function pagedRest<T>(env: Env, path: string): Promise<T[]> {\n  const rows: T[] = [];\n  for (let offset = 0; offset < 20000; offset += 1000) {\n    const batch = await rest<T[]>(env, path, { headers: { Range: offset + "-" + (offset + 999), "Range-Unit": "items" } });\n    rows.push(...batch);\n    if (batch.length < 1000) break;\n  }\n  return rows;\n}\nasync function allAuthUsers(env: Env): Promise<AuthUser[]> {
   const users: AuthUser[] = [];
   for (let page = 1; page <= 20; page++) {
     const response = await fetch(base(env) + "/auth/v1/admin/users?page=" + page + "&per_page=1000", { headers: headers(env), signal: AbortSignal.timeout(12000) });
@@ -70,8 +70,8 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (!settings.profiles_enabled) return json({ enabled: false, profiles: [] });
       const [users, profiles, memberships] = await Promise.all([
         allAuthUsers(env),
-        rest<Record<string, any>[]>(env, "profiles?select=user_id,username,display_name,avatar_url,cover_url,bio,public_profile,is_creator,is_banned&order=display_name.asc&limit=5000"),
-        rest<Array<{ user_id: string; is_vip: boolean }>>(env, "rcc_vip_memberships?select=user_id,is_vip&is_vip=eq.true&limit=5000"),
+        pagedRest<Record<string, any>>(env, "profiles?select=user_id,username,display_name,avatar_url,cover_url,bio,public_profile,is_creator,is_banned&order=user_id.asc"),
+        pagedRest<{ user_id: string; is_vip: boolean }>(env, "rcc_vip_memberships?select=user_id,is_vip&is_vip=eq.true&order=user_id.asc"),
       ]);
       const vipIds = new Set(memberships.map(row => row.user_id));
       const params = new URL(request.url).searchParams;
