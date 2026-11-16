@@ -104,7 +104,7 @@ for (let i = 0; i < results.length; i++) {
   const name = i === 0 ? 'ScriptBlox' : 'Rscripts';
   const result = results[i];
   if (result.status === 'fulfilled') {
-    sources[name] = { ok: true, newest: result.value.newest.length, trending: result.value.trending.length, skipped: result.value.skipped || false, reason: result.value.reason || null };
+    sources[name] = { ok: !result.value.skipped, newest: result.value.newest.length, trending: result.value.trending.length, skipped: result.value.skipped || false, reason: result.value.reason || null };
     newest.push(...result.value.newest);
     trending.push(...result.value.trending);
   } else {
