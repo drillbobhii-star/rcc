@@ -710,12 +710,18 @@ let catalogLoading = false;
 let catalogTotal = 0;
 let catalogLoadError = false;
 
-// Desactivación temporal del gating del catálogo: no bloquear scripts por ID.
+// El gating es solo de interfaz: los JSON del catálogo siguen siendo públicos.
+// Cachear el conjunto evita ordenar los ~15.000 IDs por cada tarjeta renderizada.
+let rccGateSource = null;
+let rccUnlockedIds = new Set();
 function rccIsGateCandidate(script) {
   if (!script || !Array.isArray(scripts) || !scripts.length) return false;
-  const unlockedCount = Math.floor(scripts.length * 0.15);
-  const unlockedIds = new Set(scripts.map(item => String(item.id)).sort().slice(0, unlockedCount));
-  return !unlockedIds.has(String(script.id));
+  if (rccGateSource !== scripts) {
+    const unlockedCount = Math.floor(scripts.length * 0.15);
+    rccUnlockedIds = new Set(scripts.map(item => String(item.id)).sort().slice(0, unlockedCount));
+    rccGateSource = scripts;
+  }
+  return !rccUnlockedIds.has(String(script.id));
 }
 let catalogSection = 'all';
 let releaseView = '';
