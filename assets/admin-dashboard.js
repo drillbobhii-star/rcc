@@ -134,6 +134,31 @@
     if (userQuickMenu) userQuickMenu.hidden = true;
   }
 
+  async function adminChatRequest(payload) {
+    if (!session?.access_token) throw new Error("La sesión de administrador expiró.");
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + session.access_token, "Content-Type": "application/json" },
+      credentials: "same-origin", cache: "no-store", body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "No se pudo completar la acción de chat.");
+    return data;
+  }
+
+  function quickActionButton(label, className, handler) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className || "small-btn";
+    button.textContent = label;
+    button.addEventListener("click", handler);
+    return button;
+  }
+
+  async function ensureAdminConversation(userId) {
+    return adminChatRequest({ action: "adminEnsureConversation", userId });
+  }
+
   function openUserQuickMenu(user) {
     if (!userQuickMenu) {
       userQuickMenu = document.createElement("div");
@@ -206,6 +231,102 @@
 
     const identity = document.createElement("div");
     identity.className = "rcc-user-quick-section";
+    const messaging = document.createElement("div");
+    messaging.className = "rcc-user-quick-section";
+    const messagingTitle = document.createElement("strong");
+    messagingTitle.textContent = "RCC Mensajes · contacto directo";
+    const composer = document.createElement("textarea");
+    composer.className = "rcc-user-quick-composer";
+    composer.rows = 3;
+    composer.maxLength = 5000;
+    composer.placeholder = "Escribe un mensaje privado a este usuario…";
+    composer.setAttribute("aria-label", "Mensaje privado para " + (user.name || user.email || "usuario"));
+    const messagingActions = document.createElement("div");
+    messagingActions.className = "rcc-user-quick-actions";
+    const send = quickActionButton("Enviar mensaje", "small-btn primary", async () => {
+      const content = composer.value.trim();
+      if (!content) { composer.focus(); return; }
+      send.disabled = true; send.textContent = "Enviando…";
+      try {
+        const result = await ensureAdminConversation(user.user_id);
+        await adminChatRequest({ action: "send", conversationId: result.conversation.id, content });
+        composer.value = "";
+        setStatus("Mensaje enviado a " + (user.name || user.email || user.user_id) + ".");
+        window.dispatchEvent(new CustomEvent("rcc:admin-chat-updated", { detail: { userId: user.user_id } }));
+        closeUserQuickMenu();
+      } catch (error) { setStatus(error.message, true); }
+      finally { send.disabled = false; send.textContent = "Enviar mensaje"; }
+    });
+    const openChat = quickActionButton("Abrir conversación", "small-btn", () => {
+      window.dispatchEvent(new CustomEvent("rcc:admin-open-user-chat", { detail: { userId: user.user_id } }));
+      closeUserQuickMenu();
+    });
+    messagingActions.append(send, openChat);
+    messaging.append(messagingTitle, composer, messagingActions);
+    card.append(messaging);
+
+    const moderation = document.createElement("div");
+    moderation.className = "rcc-user-quick-section";
+    const moderationTitle = document.createElement("strong");
+    moderationTitle.textContent = "Moderación y chat";
+    const moderationActions = document.createElement("div");
+    moderationActions.className = "rcc-user-quick-actions";
+    const toggleChat = quickActionButton("Cambiar estado del chat", "small-btn", async () => {
+      toggleChat.disabled = true;
+      try {
+        const result = await ensureAdminConversation(user.user_id);
+        const enabled = result.conversation.enabled !== true;
+        await adminChatRequest({ action: "setEnabled", conversationId: result.conversation.id, enabled });
+        toggleChat.textContent = enabled ? "Chat habilitado ✓" : "Chat deshabilitado ✓";
+        setStatus(enabled ? "Chat habilitado para este usuario." : "Chat deshabilitado para este usuario.");
+        window.dispatchEvent(new CustomEvent("rcc:admin-chat-updated", { detail: { userId: user.user_id } }));
+      } catch (error) { setStatus(error.message, true); }
+      finally { toggleChat.disabled = false; }
+    });
+    const restriction = quickActionButton(user.is_banned ? "Levantar restricción web" : "Restringir acceso web", user.is_banned ? "small-btn" : "small-btn danger", async () => {
+      const action = user.is_banned ? "unrestrictUser" : "restrictUser";
+      const verb = user.is_banned ? "levantar la restricción de" : "restringir el acceso de";
+      if (!window.confirm("¿Seguro que deseas " + verb + " " + (user.name || user.email || "este usuario") + "?")) return;
+      restriction.disabled = true;
+      try {
+        await adminChatRequest({ action, userId: user.user_id });
+        user.is_banned = !user.is_banned;
+        restriction.textContent = user.is_banned ? "Levantar restricción web" : "Restringir acceso web";
+        setStatus(user.is_banned ? "Acceso web restringido." : "Restricción retirada.");
+        await loadDashboard(true);
+      } catch (error) { setStatus(error.message, true); }
+      finally { restriction.disabled = false; }
+    });
+    const deleteHistory = quickActionButton("Borrar historial del chat", "small-btn danger", async () => {
+      if (!window.confirm("¿Borrar todos los mensajes de este usuario? No se puede deshacer.")) return;
+      deleteHistory.disabled = true;
+      try {
+        const result = await ensureAdminConversation(user.user_id);
+        await adminChatRequest({ action: "deleteChat", conversationId: result.conversation.id });
+        setStatus("Historial borrado y chat deshabilitado.");
+        window.dispatchEvent(new CustomEvent("rcc:admin-chat-updated", { detail: { userId: user.user_id } }));
+      } catch (error) { setStatus(error.message, true); }
+      finally { deleteHistory.disabled = false; }
+    });
+    moderationActions.append(toggleChat, restriction, deleteHistory);
+    moderation.append(moderationTitle, moderationActions);
+    card.append(moderation);
+
+    const utility = document.createElement("div");
+    utility.className = "rcc-user-quick-section rcc-user-quick-actions";
+    utility.append(
+      quickActionButton("Copiar correo", "small-btn", async () => {
+        try { await navigator.clipboard.writeText(user.email || ""); setStatus("Correo copiado."); }
+        catch (_) { setStatus("No se pudo copiar el correo.", true); }
+      }),
+      quickActionButton("Copiar ID", "small-btn", async () => {
+        try { await navigator.clipboard.writeText(user.user_id); setStatus("ID copiado."); }
+        catch (_) { setStatus("No se pudo copiar el ID.", true); }
+      })
+    );
+    card.append(utility);
+
+
     const identityText = document.createElement("p");
     identityText.className = "rcc-user-quick-hint";
     identityText.textContent = "User ID: " + user.user_id + (user.created_at ? " · Registrado: " + new Date(user.created_at).toLocaleString() : "");
