@@ -14,6 +14,7 @@
     .rcc-feed-card p{font-size:.83rem;color:var(--muted);line-height:1.45}
     .rcc-feed-tags{display:flex;gap:6px;flex-wrap:wrap}
     .rcc-feed-tag{font-size:.68rem;padding:4px 7px;border:1px solid var(--border-glass);border-radius:99px;color:var(--muted)}
+    .rcc-feed-tag--patched{border-color:#c45d4b;background:#8d2f241c;color:#e78b79;font-weight:800}
     .rcc-feed-link{display:inline-flex;align-items:center;justify-content:center;margin-top:auto;padding:9px 12px;border:1px solid var(--border-glass);border-radius:10px;color:var(--text);text-decoration:none;font-weight:700;font-size:.82rem}
     .rcc-feed-link:hover{background:var(--theme-color)}
     .rcc-feed-note{font-size:.75rem;color:var(--muted);margin-top:12px}
@@ -42,7 +43,8 @@
       cards.innerHTML = '<p class="rcc-feed-note">Vuelve a consultar esta sección cuando termine la primera actualización del catálogo.</p>';
       section.hidden = false; return;
     }
-    const items = mode === 'trending' ? feed.trending : feed.newest;\n    const newsItems = mode === 'updates' && Array.isArray(feed.news) ? feed.news : [];
+    const items = mode === 'trending' ? feed.trending : feed.newest;
+    const newsItems = mode === 'updates' && Array.isArray(feed.news) ? feed.news : [];
     title.textContent = mode === 'trending' ? '🔥 Tendencias de la comunidad' : '🆕 Scripts recién publicados';
     const sources = Object.entries(feed.sources || {}).filter(([, value]) => value.ok).map(([name]) => name);
     meta.textContent = new Intl.NumberFormat('es-DO').format(items.length) + ' descubrimientos · Actualizado ' + date(feed.updatedAt) + (sources.length ? ' · Fuentes: ' + sources.join(', ') : '');
@@ -53,12 +55,17 @@
       const description = document.createElement('p'); description.textContent = (item.game || 'Roblox') + ' · ' + (item.creator || 'Comunidad');
       const details = document.createElement('p'); details.textContent = (item.views ? new Intl.NumberFormat('es-DO',{notation:'compact'}).format(item.views) + ' vistas · ' : '') + date(item.createdAt);
       const tags = document.createElement('div'); tags.className = 'rcc-feed-tags';
-      const tag = (value) => { const span=document.createElement('span');span.className='rcc-feed-tag';span.textContent=value;tags.append(span); };
+      const tag = (value, extraClass = '') => { const span=document.createElement('span');span.className='rcc-feed-tag'+(extraClass?' '+extraClass:'');span.textContent=value;tags.append(span); };
       tag(item.source || 'Fuente externa'); if(item.kind !== 'news') tag(item.verified ? 'Creador verificado' : 'No verificado por la fuente');
+      if (item.patched === true) tag('⚠️ PARCHEADO','rcc-feed-tag--patched');
       if (item.keyRequired) tag('Requiere clave');
       if (item.riskLevel) tag('Riesgo: ' + item.riskLevel);
       if (item.obfuscated) tag('Ofuscado');
-      const link = document.createElement('a'); link.className='rcc-feed-link';\n      let destination = ''; try { const parsed = new URL(item.url); if (parsed.protocol === 'https:' && ['scriptblox.com','rscripts.net','www.r-scripts.net'].includes(parsed.hostname)) destination = parsed.href; } catch (_) {}\n      if (!destination) continue;\n      link.href=destination; link.target='_blank'; link.rel='noopener noreferrer'; link.textContent=item.kind === 'news' ? 'Leer novedades ↗' : 'Ver publicación original ↗';
+      const link = document.createElement('a'); link.className='rcc-feed-link';
+      let destination = ''; try { const parsed = new URL(item.url); if (parsed.protocol === 'https:' && ['scriptblox.com','rscripts.net','www.r-scripts.net'].includes(parsed.hostname)) destination = parsed.href; } catch (_) {}
+      if (!destination) continue;
+      link.href=destination; link.target='_blank'; link.rel='noopener noreferrer'; link.textContent=item.kind === 'news' ? 'Leer novedades ↗' : 'Ver publicación original ↗';
+      if (item.patched === true) { link.dataset.patched = 'true'; link.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); showPatchedWarning(item.title, () => window.open(destination, '_blank', 'noopener,noreferrer')); }); }
       card.append(heading,description,details,tags,link); cards.append(card);
     }
     note.textContent = feed.notice || 'Metadatos y enlaces originales; RCC no aloja ni ejecuta scripts de terceros.';
@@ -89,6 +96,47 @@
   if (document.getElementById('updatesTab')) document.getElementById('updatesTab').onclick = () => show('updates');
   for (const [id,sectionName] of [['libraryTab','all'],['gamesTab','games'],['webTab','web'],['vipTab','vip']]) {
     if (document.getElementById(id)) document.getElementById(id).onclick = () => { section.hidden=true; nav?.section(sectionName); };
+  }
+
+  function showPatchedWarning(name, onContinue) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'patched-confirm';
+    dialog.setAttribute('aria-labelledby', 'rccPatchedTitle');
+    const heading = document.createElement('h3');
+    heading.id = 'rccPatchedTitle';
+    heading.textContent = '⚠️ Script parcheado';
+    const message = document.createElement('p');
+    message.textContent = (name ? name + ': ' : '') + 'Este código está parcheado en Roblox. Si lo ejecuta, es bajo su propia responsabilidad. Puede que ya no funcione correctamente.';
+    const actions = document.createElement('div');
+    actions.className = 'patched-confirm-actions';
+    const no = document.createElement('button');
+    no.type = 'button'; no.className = 'btn btn-ghost'; no.textContent = 'No, volver';
+    const yes = document.createElement('button');
+    yes.type = 'button'; yes.className = 'btn btn-primary'; yes.textContent = 'Sí, continuar';
+    const close = () => { if (dialog.open) dialog.close(); dialog.remove(); };
+    no.onclick = close;
+    yes.onclick = () => { close(); onContinue?.(); };
+    dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
+    dialog.addEventListener('click', event => { if (event.target === dialog) close(); });
+    actions.append(no, yes); dialog.append(heading, message, actions);
+    document.body.append(dialog); dialog.showModal(); no.focus();
+  }
+  const originalOpenScript = window.openScript;
+  if (typeof originalOpenScript === 'function') {
+    window.openScript = function(script, ...args) {
+      if (script?.review?.status === 'patched') {
+        showPatchedWarning(script.name, () => originalOpenScript.call(this, script, ...args));
+        return;
+      }
+      return originalOpenScript.call(this, script, ...args);
+    };
+  }
+  if (window.RCCScriptReview?.confirm) {
+    window.RCCScriptReview.confirm = (script, action) => {
+      if (script?.review?.status !== 'patched') return false;
+      showPatchedWarning(script.name, action);
+      return true;
+    };
   }
   void load();
 })();

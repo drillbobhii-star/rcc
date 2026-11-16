@@ -26,7 +26,7 @@ function unique(items) {
   return [...map.values()];
 }
 function fromScriptBlox(row) {
-  if (!row || row.isPatched === true || !row._id || !row.slug) return null;
+  if (!row || !row._id || !row.slug) return null;
   return {
     id: 'sb:' + text(row._id, 80), source: 'ScriptBlox',
     title: text(row.title, 120), game: text(row.game?.name || (row.isUniversal ? 'Universal' : 'Roblox'), 100),
@@ -58,24 +58,27 @@ function fromRscripts(row) {
     obfuscated: rawRisk.isObfuscated === true, codeIncluded: false
   };
 }
-async function fetchScriptBlox() {
-  const newest = [];
-  const trending = [];
-  const trendData = await get('https://scriptblox.com/api/script/trending');
-  for (const row of trendData?.result?.scripts || []) {
-    const item = fromScriptBlox(row);
-    if (item) trending.push(item);
-  }
+async function fetchScriptBloxPages(patched) {
+  const items = [];
   for (let page = 1; page <= PAGE_LIMIT; page++) {
     const url = new URL('https://scriptblox.com/api/script/fetch');
-    url.search = new URLSearchParams({ page: String(page), max: '20', mode: 'free', patched: '0', sortBy: 'createdAt', order: 'desc' }).toString();
+    url.search = new URLSearchParams({ page: String(page), max: '20', mode: 'free', patched: patched ? '1' : '0', sortBy: 'createdAt', order: 'desc' }).toString();
     const data = await get(url);
     const rows = data?.result?.scripts || [];
-    newest.push(...rows.map(fromScriptBlox).filter(Boolean));
+    items.push(...rows.map(fromScriptBlox).filter(Boolean));
     if (rows.length < 20 || page >= Number(data?.result?.totalPages || PAGE_LIMIT)) break;
     await delay(160);
   }
-  return { newest: unique(newest), trending: unique(trending) };
+  return items;
+}
+async function fetchScriptBlox() {
+  const trendData = await get('https://scriptblox.com/api/script/trending');
+  const trending = (trendData?.result?.scripts || []).map(fromScriptBlox).filter(Boolean);
+  const [working, patched] = await Promise.all([
+    fetchScriptBloxPages(false),
+    fetchScriptBloxPages(true)
+  ]);
+  return { newest: unique([...working, ...patched]), trending: unique(trending) };
 }
 async function fetchRscripts() {
   const key = process.env.RSCRIPTS_API_KEY;
