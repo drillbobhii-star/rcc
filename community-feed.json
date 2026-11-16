@@ -1,0 +1,22 @@
+{
+  "schema": "rcc-community-feed-v1",
+  "updatedAt": null,
+  "counts": {
+    "newest": 0,
+    "trending": 0,
+    "importedMetadata": 0
+  },
+  "sources": {
+    "ScriptBlox": {
+      "ok": false,
+      "reason": "Primera sincronización pendiente"
+    },
+    "Rscripts": {
+      "ok": false,
+      "reason": "Configura RSCRIPTS_API_KEY para activar esta fuente"
+    }
+  },
+  "notice": "Descubrimientos externos: RCC muestra metadatos y enlaces originales. No aloja ni ejecuta el código de terceros.",
+  "newest": [],
+  "trending": []
+}
