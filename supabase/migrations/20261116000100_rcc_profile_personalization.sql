@@ -14,3 +14,28 @@ alter table public.profiles
   add constraint profiles_profile_background_type_check check (profile_background_type in ('image','gif'));
 
 notify pgrst, 'reload schema';
+
+-- Enforce the VIP-only expanded banner layout even if a client bypasses the UI.
+create or replace function public.rcc_enforce_vip_profile_banner()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if (new.banner_height > 180 or new.banner_position <> 'center') and not exists (
+    select 1 from public.rcc_vip_memberships m
+    where m.user_id = new.user_id and m.is_vip = true
+  ) then
+    raise exception 'La personalización ampliada del banner es exclusiva RCC VIP.' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists rcc_profiles_vip_banner_guard on public.profiles;
+create trigger rcc_profiles_vip_banner_guard
+before insert or update of banner_height, banner_position on public.profiles
+for each row execute function public.rcc_enforce_vip_profile_banner();
+
+revoke all on function public.rcc_enforce_vip_profile_banner() from public, anon, authenticated;
