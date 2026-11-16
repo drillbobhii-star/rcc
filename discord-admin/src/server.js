@@ -980,7 +980,7 @@ async function processRccCommand(interaction) {
   const subcommand = options.find((item) => item.type === 1);
   const subcommandName = subcommand?.name || "instruccion";
   const commandOptions = subcommand?.options || options;
-  const option = commandOptions.find((item) => item.name === "solicitud");
+  const option = commandOptions.find((item) => item.name === "solicitud" || item.name === "texto");
   const attachmentOption = commandOptions.find((item) => item.name === "archivo");
   const requestText = option?.value;
   const attachments = attachmentOption?.value ? [interaction.data.resolved?.attachments?.[attachmentOption.value]].filter(Boolean) : [];
@@ -1023,7 +1023,7 @@ async function processRccCommand(interaction) {
       return;
     }
 
-    if (subcommandName !== "instruccion") {
+    if (subcommandName !== "solicitud" && subcommandName !== "instruccion") {
       await editOriginalResponse(APPLICATION_ID, interaction.token, {
         content: "No reconozco ese subcomando de RCC."
       });
@@ -1031,7 +1031,7 @@ async function processRccCommand(interaction) {
     }
     if (typeof requestText !== "string" || !requestText.trim()) {
       await editOriginalResponse(APPLICATION_ID, interaction.token, {
-        content: "Escribe lo que necesitas después de /rcc instruccion."
+        content: "Escribe tu petición después de /rcc solicitud."
       });
       return;
     }
@@ -1258,9 +1258,11 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log("RCC Admin escuchando en el puerto " + PORT);
-  if (process.env.REGISTER_COMMANDS_ON_START === "true") {
-    import("../scripts/register-commands.js").catch((error) => {
-      console.error("No pude registrar /rcc automáticamente:", error);
+  // Always sync slash commands on every Railway start. Guild commands are
+  // updated immediately when DISCORD_GUILD_ID is configured.
+  import("../scripts/register-commands.js")
+    .then(() => console.log("[Discord Commands] Sincronización de /rcc completada al iniciar."))
+    .catch((error) => {
+      console.error("[Discord Commands] Falló la sincronización automática de /rcc:", error);
     });
-  }
 });
