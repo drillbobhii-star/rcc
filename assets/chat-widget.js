@@ -3,7 +3,7 @@
   const ADMIN_EMAIL = "drillbobhii@gmail.com";
   let client = null, session = null, conversationId = null, enabled = true;
   let panel = null, messagesEl = null, input = null;
-  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null, globalChatEnabled = true;
+  let pollTimer = null, presenceTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null, globalChatEnabled = true;
   const $ = id => document.getElementById(id);
 
   function el(tag, attrs = {}, text = "") {
@@ -142,6 +142,10 @@
     }
     return state;
   }
+  async function heartbeat() {
+    if (!session?.access_token || session.user?.email?.toLowerCase() === ADMIN_EMAIL) return;
+    try { await request("", { method:"POST", body:JSON.stringify({action:"heartbeat"}) }); } catch (error) { console.warn("[RCC presence]", error.message); }
+  }
   async function sendTyping() {
     if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;
     typingLastSent = Date.now();
@@ -201,13 +205,17 @@
     session = nextSession;
     if (!session || session.user?.email?.toLowerCase() === ADMIN_EMAIL) {
       if (pollTimer) clearInterval(pollTimer);
-      pollTimer = null; activeUserId = null; conversationId = null;
+      if (presenceTimer) clearInterval(presenceTimer);
+      pollTimer = null; presenceTimer = null; activeUserId = null; conversationId = null;
       $("rccChatLauncher")?.remove(); panel?.remove(); $("rccChatToast")?.remove();
       return;
     }
     if (activeUserId === session.user.id && $("rccChatLauncher")) return;
     activeUserId = session.user.id;
     ensureUi();
+    await heartbeat();
+    if (presenceTimer) clearInterval(presenceTimer);
+    presenceTimer = setInterval(() => { void heartbeat(); }, 25000);
     const state = await loadState();
     if (!state) return;
     $("rccChatStatus").textContent = state.conversation?.enabled === false
@@ -217,6 +225,9 @@
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(() => { void poll(); }, 4000);
   }
+  window.addEventListener("pageshow", () => { if (session) void heartbeat(); });
+  window.addEventListener("focus", () => { if (session) void heartbeat(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && session) void heartbeat(); });
   async function initialize() {
     try {
       client = await window.rccSupabaseReady;
