@@ -806,10 +806,12 @@ async function askGemini(guildId, requestText, attachments = []) {
   }
 
   // Do not serialize independent Discord/CDN requests: fetch them concurrently.
+  const preparationStartedAt = Date.now();
   const [guildContext, attachmentParts] = await Promise.all([
     loadGuildContext(guildId),
     buildAttachmentContent(attachments)
   ]);
+  console.log("[RCC] Contexto de Discord y adjuntos listos en " + (Date.now() - preparationStartedAt) + " ms.");
   const { channels, roles } = guildContext;
   const roleContext = roles.map(role => ({id:role.id,name:role.name,permissions:role.permissions}));
   const channelContext = channels.map((channel) => ({
@@ -834,6 +836,7 @@ async function askGemini(guildId, requestText, attachments = []) {
       "\\n\\nRoles actuales del servidor (usa estos nombres exactos):\\n" + JSON.stringify(roleContext)
   }, ...attachmentParts];
   console.log("[Gemini] Solicitud preparada; herramientas disponibles: " + toolDefinitions.length + ".");
+  const geminiStartedAt = Date.now();
   const response = await createGeminiCompletion(client, {
     model: GEMINI_MODEL,
     messages: [
@@ -844,6 +847,7 @@ async function askGemini(guildId, requestText, attachments = []) {
     tool_choice: "auto",
     max_completion_tokens: 1024
   });
+  console.log("[Gemini] Primera respuesta recibida en " + (Date.now() - geminiStartedAt) + " ms.");
 
   const message = response.choices?.[0]?.message;
   const functionCall = message?.tool_calls?.[0]?.function;
@@ -993,8 +997,8 @@ async function processRccCommand(interaction) {
       const { channel, draft, commitCount } = await generateRccAnnouncement(interaction.guild_id, interaction.channel_id);
       if (!channel) {
         await editOriginalResponse(APPLICATION_ID, interaction.token, {
-          content: "📝 **Borrador de anuncio RCC**\\n\\n" + draft +
-            "\\n\\nNo encontré un canal de texto válido para publicarlo. El borrador está listo, pero no se publicó. Configura DISCORD_ANNOUNCEMENT_CHANNEL_ID o ejecuta /rcc anuncio desde el canal donde quieras publicarlo."
+          content: "📝 **Borrador de anuncio RCC**\n\n" + draft +
+            "\n\nNo encontré un canal de texto válido para publicarlo. El borrador está listo, pero no se publicó. Configura DISCORD_ANNOUNCEMENT_CHANNEL_ID o ejecuta /rcc anuncio desde el canal donde quieras publicarlo."
         });
         return;
       }
