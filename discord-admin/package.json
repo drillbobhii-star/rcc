@@ -9,8 +9,9 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "register": "node --env-file=.env scripts/register-commands.js",
-    "check": "node --check src/server.js && node --check scripts/register-commands.js"
+    "register": "node scripts/register-commands.js",
+    "check": "node --check src/server.js && node --check scripts/register-commands.js",
+    "register:global": "node scripts/register-commands.js --global"
   },
   "dependencies": {
     "openai": "^7.43.0",
