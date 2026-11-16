@@ -130,7 +130,9 @@
     const body = $("usersBody");
     body.replaceChildren();
     const query = filterText();
-    const rows = dashboard.users.filter(user => !query || searchableUser(user).includes(query));
+    const filter=$("userFilter")?.value||"all", sort=$("userSort")?.value||"newest";
+    let rows=dashboard.users.filter(user=>{const q=!query||searchableUser(user).includes(query);const f=filter==="vip"?user.is_vip:filter==="nonvip"?!user.is_vip:filter==="discord"?!!user.discord_id:filter==="no-discord"?!user.discord_id:filter==="banned"?user.is_banned===true:true;return q&&f;});
+    rows=[...rows].sort((x,y)=>sort==="oldest"?new Date(x.created_at)-new Date(y.created_at):sort==="vip"?Number(y.is_vip)-Number(x.is_vip):sort==="discord"?Number(!!y.discord_id)-Number(!!x.discord_id):sort==="email"?String(x.email).localeCompare(String(y.email)):new Date(y.created_at)-new Date(x.created_at));
     $("userCount").textContent = rows.length + " / " + dashboard.users.length;
     if (!rows.length) {
       const row = document.createElement("tr");
@@ -367,6 +369,7 @@
 
   $("refreshAdmin").addEventListener("click", () => { void loadDashboard(false); });
   $("globalSearch").addEventListener("input", render);
+  $("userSort")?.addEventListener("change",render); $("userFilter")?.addEventListener("change",render);
   $("adminLogout").addEventListener("click", async () => {
     if (refreshTimer) clearInterval(refreshTimer);
     await supabaseClient.auth.signOut().catch(() => {});

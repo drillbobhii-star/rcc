@@ -3,7 +3,7 @@
   const ADMIN_EMAIL = "drillbobhii@gmail.com";
   let client = null, session = null, conversationId = null, enabled = true;
   let panel = null, messagesEl = null, input = null;
-  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null;
+  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null, globalChatEnabled = true;
   const $ = id => document.getElementById(id);
 
   function el(tag, attrs = {}, text = "") {
@@ -43,6 +43,7 @@
       ".rcc-chat-composer{padding:11px;border-top:1px solid #ffffff18;display:grid;grid-template-columns:1fr auto;gap:8px}",
       "#rccChatInput{min-width:0;resize:none;height:44px;max-height:100px;border:1px solid #ffffff24;border-radius:11px;background:#11182a;color:#fff;padding:11px;font:13px system-ui}",
       ".rcc-chat-actions button{border:0;border-radius:10px;background:#6656c2;color:white;padding:10px;cursor:pointer;font-weight:750}",
+      "#rccGlobalChatOverlay{position:fixed;left:22px;bottom:86px;width:min(390px,calc(100vw - 24px));height:min(590px,calc(100vh - 120px));z-index:9515;display:grid;place-items:center;background:rgba(12,15,27,.76);backdrop-filter:blur(18px);border:1px solid #a8a5ff42;border-radius:20px;color:#fff;text-align:center;padding:24px;font:700 20px system-ui;box-shadow:0 22px 70px #000b}#rccGlobalChatOverlay[hidden]{display:none}#rccGlobalChatOverlay span{display:block;font-size:13px;color:#c7cce0;margin-top:8px;font-weight:500}#rccChatPushEnable{font-size:11px;background:#25334b;padding:7px 9px;margin:0 11px 8px;border:1px solid #ffffff25;border-radius:9px;color:#dce5ff;cursor:pointer}",
       "#rccChatStatus{font-size:11px;color:#aeb7d5;padding:0 12px 8px;min-height:18px}",
       "#rccChatToast{position:fixed;left:20px;bottom:85px;z-index:9520;padding:12px 16px;background:#242b43;border:1px solid #9e91ff70;border-radius:12px;color:#fff;box-shadow:0 10px 40px #0009;max-width:min(340px,calc(100vw - 40px))}",
       "#rccChatToast[hidden]{display:none}",
@@ -64,9 +65,11 @@
     const send = el("button", { id:"rccChatSend", type:"button" }, "Enviar");
     actions.append(send); composer.append(input, actions);
     const status = el("div", { id:"rccChatStatus", role:"status" });
-    panel.append(head, messagesEl, composer, status);
+    const pushButton=el("button",{id:"rccChatPushEnable",type:"button"},"Activar notificaciones en este dispositivo");pushButton.addEventListener("click",enableUserPush);
+    panel.append(head,messagesEl,composer,pushButton,status);
     const toast = el("div", { id:"rccChatToast", hidden:true, role:"alert" });
-    document.head.append(style); document.body.append(launcher, panel, toast);
+    const globalOverlay=el("div",{id:"rccGlobalChatOverlay",hidden:true,role:"status"});const overlayCard=el("div");overlayCard.append(el("div",{},"✉"),el("div",{},"Creador desactivó el chat"),el("span",{},"La mensajería está temporalmente pausada para todos."));globalOverlay.append(overlayCard);
+    document.head.append(style); document.body.append(launcher,panel,toast,globalOverlay);
     launcher.addEventListener("click", () => setOpen(true));
     head.querySelector("button").addEventListener("click", () => setOpen(false));
     send.addEventListener("click", sendMessage);
@@ -86,6 +89,7 @@
     clearTimeout(notify.timer);
     notify.timer = setTimeout(() => { toast.hidden = true; }, 5200);
   }
+  async function enableUserPush(){try{if(!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window))throw new Error("Este navegador no admite Push.");if(Notification.permission!=="granted"&&await Notification.requestPermission()!=="granted")throw new Error("No se concedió permiso.");const key=await request("?action=pushPublicKey");const reg=await navigator.serviceWorker.register("/sw.js",{scope:"/"});await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub){const raw=atob((key.publicKey+"=".repeat((4-key.publicKey.length%4)%4)).replace(/-/g,"+").replace(/_/g,"/"));sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:Uint8Array.from(raw,c=>c.charCodeAt(0))});}await request("",{method:"POST",body:JSON.stringify({action:"savePush",subscription:sub.toJSON()})});$("rccChatPushEnable").textContent="Notificaciones activadas ✓";}catch(e){notify(e.message);}}
   async function ensureConversation() {
     if (conversationId) return;
     const result = await request("", { method:"POST", body:JSON.stringify({action:"ensureConversation"}) });
@@ -93,7 +97,7 @@
     enabled = result.enabled === true;
   }
   async function setOpen(open) {
-    if (open && !enabled) { notify("Chat cerrado por el administrador."); return; }
+    if (open && (!enabled || !globalChatEnabled)) { notify(globalChatEnabled ? "Chat cerrado por el administrador." : "Creador desactivó el chat."); return; }
     if (open && !conversationId) {
       try { await ensureConversation(); }
       catch (error) { notify(error.message); return; }
@@ -129,10 +133,12 @@
     if (state.isBanned) { blockAccount(); return null; }
     conversationId = state.conversation?.id || null;
     enabled = state.conversation?.enabled !== false;
+    globalChatEnabled = state.globalChatEnabled !== false;
+    $("rccGlobalChatOverlay").hidden = globalChatEnabled;
     $("rccChatLauncher").hidden = false;
-    if (!enabled && chatVisible) {
+    if ((!enabled || !globalChatEnabled) && chatVisible) {
       await setOpen(false);
-      notify("Chat cerrado por el administrador.");
+      notify(globalChatEnabled ? "Chat cerrado por el administrador." : "Creador desactivó el chat.");
     }
     return state;
   }
@@ -149,6 +155,7 @@
       const state = await loadState();
       if (!state) return;
       if (!conversationId) return;
+      if (!globalChatEnabled) { $("rccChatStatus").textContent = "Creador desactivó el chat."; return; }
       if (!enabled) { $("rccChatStatus").textContent = "Chat cerrado por el administrador."; return; }
       const result = await request("?action=messages&conversationId=" + encodeURIComponent(conversationId));
       const messages = result.messages || [];
@@ -170,7 +177,7 @@
     }
   }
   async function sendMessage() {
-    if (busy || !enabled) return;
+    if (busy || !enabled || !globalChatEnabled) return;
     const text = input.value.trim();
     if (!text) return;
     if (!conversationId) {

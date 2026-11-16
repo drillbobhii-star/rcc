@@ -228,6 +228,7 @@ async function loadDashboard(env: Env) {
       is_creator: profile?.is_creator === true,
       has_banner: profile?.has_banner === true,
       is_supporter: profile?.is_supporter === true,
+      is_banned: profile?.is_banned === true,
     };
   });
   const userByEmail = new Map(users.map(user => [user.email.toLowerCase(), user]));

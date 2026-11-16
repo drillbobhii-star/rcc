@@ -8,7 +8,7 @@ type Env = {
 };
 
 type Actor = { id: string; email?: string; role: "admin" | "user" };
-type PushSubscriptionRow = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string };
+type PushSubscriptionRow = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string; audience?: string };
 
 const ADMIN_EMAIL = "drillbobhii@gmail.com";
 const PROJECT_URL = "https://cbkrpyfkteomcukdisdw.supabase.co";
@@ -256,35 +256,12 @@ async function sendPush(env: Env, subscription: PushSubscriptionRow, payload: un
     signal: AbortSignal.timeout(10000),
   });
 }
-async function notifyAdminDevices(env: Env, message: string) {
+async function notifyDevices(env: Env, audience: "admin" | "user", userId: string | null, payload: Record<string, unknown>) {
   if (!env.RCC_WEB_PUSH_PUBLIC_KEY || !env.RCC_WEB_PUSH_PRIVATE_KEY) return;
   let subs: PushSubscriptionRow[] = [];
-  try {
-    subs = await rest<PushSubscriptionRow[]>(env,
-      "rcc_chat_push_subscriptions?select=id,user_id,endpoint,p256dh,auth");
-  } catch (error) {
-    console.warn("[RCC Web Push] No se pudieron leer las suscripciones; el mensaje se guarda igualmente:", error);
-    return;
-  }
-  await Promise.all(subs.map(async sub => {
-    try {
-      const response = await sendPush(env, sub, {
-        title: "RCC · Nuevo mensaje",
-        body: message.slice(0, 120),
-        url: "/admin.html#messages",
-        tag: "rcc-chat-" + Date.now(),
-      });
-      if (response.status === 404 || response.status === 410) {
-        await rest(env, "rcc_chat_push_subscriptions?id=eq." + encodeURIComponent(sub.id), {
-          method: "DELETE", headers: { Prefer: "return=minimal" },
-        });
-      } else if (!response.ok) {
-        console.warn("[RCC Web Push] El proveedor rechazó la notificación:", response.status);
-      }
-    } catch (error) {
-      console.warn("[RCC Web Push] No se pudo notificar un dispositivo:", error);
-    }
-  }));
+  try { const q="rcc_chat_push_subscriptions?select=id,user_id,endpoint,p256dh,auth,audience&audience=eq."+audience+(userId?"&user_id=eq."+encodeURIComponent(userId):""); subs=await rest<PushSubscriptionRow[]>(env,q); }
+  catch(error){console.warn("[RCC Push] No se pudieron leer suscripciones:",error);return;}
+  await Promise.all(subs.map(async sub=>{try{const response=await sendPush(env,sub,payload);if(response.status===404||response.status===410)await rest(env,"rcc_chat_push_subscriptions?id=eq."+encodeURIComponent(sub.id),{method:"DELETE",headers:{Prefer:"return=minimal"}});else if(!response.ok)console.warn("[RCC Push] Proveedor rechazó:",response.status);}catch(error){console.warn("[RCC Push] Fallo de envío:",error);}}));
 }
 async function listAuthUsers(env: Env) {
   const all: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }> = [];
@@ -318,9 +295,9 @@ async function saveMessage(env: Env, actor: Actor, conversation: Record<string, 
     body: JSON.stringify({ updated_at: new Date().toISOString() }),
   });
   if (actor.role === "user") {
-    const userText = String(conversation.email || actor.email || "Un usuario RCC");
-    await notifyAdminDevices("Un usuario ha enviado un nuevo mensaje al soporte RCC.");
+    await notifyDevices(env,"admin",null,{title:"RCC · Nuevo mensaje",body:"Un usuario ha enviado un mensaje al soporte.",url:"/admin.html#messages",tag:"rcc-user-message-"+Date.now()});
   }
+  if(actor.role==="admin") await notifyDevices(env,"user",String(conversation.user_id),{title:"RCC · Mensaje del Creador",body:"Tienes un nuevo mensaje en RCC Mensajes.",url:"/index.html#rcc-messages",tag:"rcc-admin-message-"+Date.now()});
   return json({ ok: true, message: saved[0] });
 }
 async function broadcastMessage(env: Env, actor: Actor, content: string) {
@@ -353,6 +330,7 @@ async function broadcastMessage(env: Env, actor: Actor, content: string) {
       body: JSON.stringify({ updated_at: now }),
     });
     delivered += targets.length;
+    await Promise.all(targets.map(c=>notifyDevices(env,"user",c.user_id,{title:"RCC · Anuncio del Creador",body:content.trim().slice(0,120),url:"/index.html#rcc-messages",tag:"rcc-broadcast-"+c.user_id+"-"+Date.now()})));
   }
   return json({ ok: true, delivered });
 }
@@ -368,7 +346,6 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       const url = new URL(request.url);
       const action = url.searchParams.get("action") || "state";
       if (action === "pushPublicKey") {
-        if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
         if (!env.RCC_WEB_PUSH_PUBLIC_KEY || !env.RCC_WEB_PUSH_PRIVATE_KEY) {
           return json({ error: "Configura RCC_WEB_PUSH_PUBLIC_KEY y RCC_WEB_PUSH_PRIVATE_KEY en Cloudflare Pages." }, 503);
         }
@@ -376,14 +353,17 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       }
       if (action === "adminList") {
         if (actor.role !== "admin") return json({ error: "Solo el Creador puede abrir estos chats." }, 403);
-        return json({ conversations: await adminConversationList(env) });
+        const settings=await rest<Array<{chat_enabled:boolean}>>(env,"rcc_chat_settings?select=chat_enabled&singleton=eq.true&limit=1").catch(()=>[{chat_enabled:true}]);
+        return json({conversations:await adminConversationList(env),globalChatEnabled:settings[0]?.chat_enabled!==false});
       }
       if (action === "messages") {
         const id = url.searchParams.get("conversationId") || "";
         if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: "conversationId inválido." }, 400);
         return await getMessages(env, actor, id);
       }
-      if (actor.role === "admin") return json({ role: "admin", conversations: await adminConversationList(env) });
+      const settings=await rest<Array<{chat_enabled:boolean}>>(env,"rcc_chat_settings?select=chat_enabled&singleton=eq.true&limit=1").catch(()=>[{chat_enabled:true}]);
+      const globalChatEnabled=settings[0]?.chat_enabled!==false;
+      if (actor.role === "admin") return json({role:"admin",globalChatEnabled,conversations:await adminConversationList(env)});
       const state = await profileState(env, actor.id);
       if (state.isBanned) return json({ role: "user", isBanned: true });
       const q = new URLSearchParams({ user_id: "eq." + actor.id, select: "id,enabled", limit: "1" });
@@ -395,7 +375,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
           body: JSON.stringify({ last_user_seen_at: new Date().toISOString() }),
         });
       }
-      return json({ role: "user", isBanned: false, conversation: conversation ? { id: conversation.id, enabled: conversation.enabled === true } : null });
+      return json({role:"user",isBanned:false,globalChatEnabled,conversation:conversation?{id:conversation.id,enabled:conversation.enabled===true}:null});
     }
 
     const length = Number(request.headers.get("content-length") || 0);
@@ -409,7 +389,6 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     if (userId && !/^[0-9a-f-]{36}$/i.test(userId)) return json({ error: "Usuario inválido." }, 400);
 
     if (action === "savePush") {
-      if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
       const subscription = body.subscription as { endpoint?: string; keys?: { p256dh?: string; auth?: string } } | undefined;
       if (!subscription?.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) return json({ error: "Suscripción Push inválida." }, 400);
       const endpoint = new URL(subscription.endpoint);
@@ -418,6 +397,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify({
           user_id: actor.id,
+          audience: actor.role === "admin" ? "admin" : "user",
           endpoint: endpoint.toString(),
           p256dh: subscription.keys.p256dh,
           auth: subscription.keys.auth,
@@ -427,7 +407,6 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       return json({ ok: true });
     }
     if (action === "deletePush") {
-      if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
       const endpoint = typeof body.endpoint === "string" ? body.endpoint : "";
       if (!endpoint) return json({ error: "Endpoint inválido." }, 400);
       await rest(env, "rcc_chat_push_subscriptions?user_id=eq." + encodeURIComponent(actor.id) + "&endpoint=eq." + encodeURIComponent(endpoint), {
@@ -442,6 +421,8 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
           "rcc_chat_conversations?id=eq." + encodeURIComponent(conversationId) + "&select=*&limit=1");
         conversation = rows[0];
       } else {
+        const globalSettings=await rest<Array<{chat_enabled:boolean}>>(env,"rcc_chat_settings?select=chat_enabled&singleton=eq.true&limit=1").catch(()=>[{chat_enabled:true}]);
+        if(globalSettings[0]?.chat_enabled===false)return json({error:"El Creador desactivó el chat para todos."},423);
         const banned = await profileState(env, actor.id);
         if (banned.isBanned) return json({ error: "Tu cuenta ha sido restringida." }, 403);
         const rows = await rest<Array<Record<string, unknown>>>(env,
@@ -457,6 +438,8 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (actor.role === "admin") return json({ error: "El administrador no abre conversaciones de usuario desde este flujo." }, 403);
       const banned = await profileState(env, actor.id);
       if (banned.isBanned) return json({ error: "Tu cuenta ha sido restringida." }, 403);
+      const settings=await rest<Array<{chat_enabled:boolean}>>(env,"rcc_chat_settings?select=chat_enabled&singleton=eq.true&limit=1").catch(()=>[{chat_enabled:true}]);
+      if(settings[0]?.chat_enabled===false)return json({error:"El Creador desactivó el chat para todos."},423);
       const conversation = await getOrCreateConversation(env, actor.id);
       if (conversation.enabled !== true) return json({ error: "Chat cerrado por el administrador." }, 423);
       return json({ id: conversation.id, enabled: true });
@@ -481,6 +464,12 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     }
 
     if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
+    if (action === "setGlobalChat") {
+      const enabled=body.enabled===true;
+      await rest(env,"rcc_chat_settings?on_conflict=singleton",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({singleton:true,chat_enabled:enabled,updated_at:new Date().toISOString(),updated_by:actor.id})});
+      if(!enabled){const subs=await rest<Array<PushSubscriptionRow>>(env,"rcc_chat_push_subscriptions?select=user_id&audience=eq.user");const users=[...new Set(subs.map(sub=>sub.user_id))];await Promise.all(users.map(userId=>notifyDevices(env,"user",userId,{title:"RCC · Chat desactivado",body:"El Creador desactivó el chat para todos.",url:"/index.html",tag:"rcc-global-chat-disabled"})));}
+      return json({ok:true,enabled});
+    }
     if (action === "broadcast") {
       if (body.confirmed !== true) return json({ error: "Confirma el envío del anuncio." }, 400);
       return await broadcastMessage(env, actor, content);
