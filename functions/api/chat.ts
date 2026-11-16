@@ -476,6 +476,11 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     }
 
     if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
+    if (action === "adminEnsureConversation") {
+      if (!/^[0-9a-f-]{36}$/i.test(userId)) return json({ error: "Usuario inválido." }, 400);
+      const conversation = await getOrCreateConversation(env, userId);
+      return json({ conversation: { id: String(conversation.id), user_id: String(conversation.user_id), enabled: conversation.enabled === true } });
+    }
     if (action === "setGlobalChat") {
       const enabled=body.enabled===true;
       await rest(env,"rcc_chat_settings?on_conflict=singleton",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({singleton:true,chat_enabled:enabled,updated_at:new Date().toISOString(),updated_by:actor.id})});
