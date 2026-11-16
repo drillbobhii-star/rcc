@@ -85,10 +85,10 @@
   }
   const nav = window.RCCNavigation;
   const show = mode => { nav?.section('all',{view:mode}); render(mode); };
-  document.getElementById('trendingTab')?.addEventListener('click', () => show('trending'));
-  document.getElementById('updatesTab')?.addEventListener('click', () => show('updates'));
+  if (document.getElementById('trendingTab')) document.getElementById('trendingTab').onclick = () => show('trending');
+  if (document.getElementById('updatesTab')) document.getElementById('updatesTab').onclick = () => show('updates');
   for (const [id,sectionName] of [['libraryTab','all'],['gamesTab','games'],['webTab','web'],['vipTab','vip']]) {
-    document.getElementById(id)?.addEventListener('click', () => { section.hidden=true; nav?.section(sectionName); });
+    if (document.getElementById(id)) document.getElementById(id).onclick = () => { section.hidden=true; nav?.section(sectionName); };
   }
   void load();
 })();
