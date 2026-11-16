@@ -135,3 +135,51 @@
     max-width:100%!important;
   }
 }
+
+/* RCC animated banner editor: constrain the live GIF/image preview to its frame. */
+.rcc-profile-window,
+.rcc-profile-window .rcc-instagram-cover{
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+.rcc-profile-window{
+  overflow:hidden;
+  contain:layout paint;
+}
+.rcc-profile-window .rcc-instagram-cover{
+  display:block;
+  position:relative;
+  height:clamp(118px,30vw,220px);
+  max-height:220px;
+  overflow:hidden;
+  contain:paint;
+  background-size:cover!important;
+  background-position:center;
+  background-repeat:no-repeat;
+  border-radius:0;
+}
+.rcc-profile-window .rcc-instagram-avatar{
+  max-width:calc(100% - 44px);
+  object-fit:cover;
+}
+.rcc-profile-customization{
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+.rcc-profile-customization input,
+.rcc-profile-customization select,
+.rcc-profile-customization textarea{
+  box-sizing:border-box;
+  max-width:100%;
+  min-width:0;
+}
+@media(max-width:560px){
+  .rcc-profile-window .rcc-instagram-cover{
+    height:clamp(118px,34vw,170px);
+    max-height:170px;
+  }
+}
