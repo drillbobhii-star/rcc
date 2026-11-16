@@ -81,16 +81,18 @@ async function getOrCreateConversation(env: Env, userId: string) {
 }
 
 async function adminConversationList(env: Env) {
-  const [conversations, users, profiles, notes, messages] = await Promise.all([
+  const [conversations, users, profiles, notes, messages, presence] = await Promise.all([
     rest<Array<Record<string, unknown>>>(env, "rcc_chat_conversations?select=*&order=updated_at.desc&limit=5000"),
     listAuthUsers(env),
     rest<Array<Record<string, unknown>>>(env, "profiles?select=user_id,display_name,avatar_url,discord_id,is_banned"),
     rest<Array<Record<string, unknown>>>(env, "rcc_admin_private_notes?select=user_id,note,updated_at"),
     rest<Array<Record<string, unknown>>>(env, "rcc_chat_messages?select=id,conversation_id,sender_role,content,created_at,read_at&order=created_at.desc&limit=5000"),
+    rest<Array<Record<string, unknown>>>(env, "rcc_site_presence?select=user_id,last_seen_at"),
   ]);
   const userMap = new Map(users.map(u => [u.id, u]));
   const profileMap = new Map(profiles.map(p => [String(p.user_id), p]));
   const noteMap = new Map(notes.map(n => [String(n.user_id), n]));
+  const presenceMap = new Map(presence.map(p => [String(p.user_id), p]));
   const latestMap = new Map<string, Record<string, unknown>>();
   const unreadMap = new Map<string, number>();
   for (const message of messages) {
@@ -106,7 +108,8 @@ async function adminConversationList(env: Env) {
     const note = noteMap.get(userId);
     const latest = latestMap.get(String(conversation.id));
     const lastMessageAt = String(latest?.created_at || conversation.updated_at || conversation.created_at || "");
-    const lastSeen = conversation.last_user_seen_at ? new Date(String(conversation.last_user_seen_at)).getTime() : 0;
+    const presenceRow = presenceMap.get(userId);
+    const lastSeen = presenceRow?.last_seen_at ? new Date(String(presenceRow.last_seen_at)).getTime() : 0;
     return {
       ...conversation,
       email: user?.email || "",
@@ -388,6 +391,15 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     const conversationId = typeof body.conversationId === "string" ? body.conversationId : "";
     if (userId && !/^[0-9a-f-]{36}$/i.test(userId)) return json({ error: "Usuario inválido." }, 400);
 
+    if (action === "heartbeat") {
+      const seenAt = new Date().toISOString();
+      await rest(env, "rcc_site_presence?on_conflict=user_id", {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ user_id: actor.id, last_seen_at: seenAt, updated_at: seenAt }),
+      });
+      return json({ ok: true, last_seen_at: seenAt });
+    }
     if (action === "savePush") {
       const subscription = body.subscription as { endpoint?: string; keys?: { p256dh?: string; auth?: string } } | undefined;
       if (!subscription?.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) return json({ error: "Suscripción Push inválida." }, 400);
