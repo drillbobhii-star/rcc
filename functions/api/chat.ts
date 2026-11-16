@@ -295,7 +295,6 @@ async function saveMessage(env: Env, actor: Actor, conversation: Record<string, 
     body: JSON.stringify({ updated_at: new Date().toISOString() }),
   });
   if (actor.role === "user") {
-    const userText = String(conversation.email || actor.email || "Un usuario RCC");
     await notifyDevices(env,"admin",null,{title:"RCC · Nuevo mensaje",body:"Un usuario ha enviado un mensaje al soporte.",url:"/admin.html#messages",tag:"rcc-user-message-"+Date.now()});
   }
   if(actor.role==="admin") await notifyDevices(env,"user",String(conversation.user_id),{title:"RCC · Mensaje del Creador",body:"Tienes un nuevo mensaje en RCC Mensajes.",url:"/index.html#rcc-messages",tag:"rcc-admin-message-"+Date.now()});
@@ -468,7 +467,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     if (action === "setGlobalChat") {
       const enabled=body.enabled===true;
       await rest(env,"rcc_chat_settings?on_conflict=singleton",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({singleton:true,chat_enabled:enabled,updated_at:new Date().toISOString(),updated_by:actor.id})});
-      if(!enabled){const subs=await rest<Array<PushSubscriptionRow>>(env,"rcc_chat_push_subscriptions?select=id,user_id,endpoint,p256dh,auth,audience&audience=eq.user");await Promise.all(subs.map(sub=>notifyDevices(env,"user",sub.user_id,{title:"RCC · Chat desactivado",body:"El Creador desactivó el chat para todos.",url:"/index.html",tag:"rcc-global-chat-disabled"})));}
+      if(!enabled){const subs=await rest<Array<PushSubscriptionRow>>(env,"rcc_chat_push_subscriptions?select=user_id&audience=eq.user");const users=[...new Set(subs.map(sub=>sub.user_id))];await Promise.all(users.map(userId=>notifyDevices(env,"user",userId,{title:"RCC · Chat desactivado",body:"El Creador desactivó el chat para todos.",url:"/index.html",tag:"rcc-global-chat-disabled"})));}
       return json({ok:true,enabled});
     }
     if (action === "broadcast") {
