@@ -3,7 +3,7 @@
   const ADMIN_EMAIL = "drillbobhii@gmail.com";
   let client = null, session = null, conversationId = null, enabled = true;
   let panel = null, messagesEl = null, input = null;
-  let pollTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null, globalChatEnabled = true;
+  let pollTimer = null, presenceTimer = null, lastAdminMessage = null, busy = false, chatVisible = false, typingTimer = null, typingLastSent = 0, activeUserId = null, globalChatEnabled = true;
   const $ = id => document.getElementById(id);
 
   function el(tag, attrs = {}, text = "") {
@@ -142,7 +142,7 @@
     }
     return state;
   }
-  async function sendTyping() {
+  async function heartbeat() {\n    if (!session?.access_token || session.user?.email?.toLowerCase() === ADMIN_EMAIL) return;\n    try { await request("", { method:"POST", body:JSON.stringify({action:"heartbeat"}) }); } catch (error) { console.warn("[RCC presence]", error.message); }\n  }\n  async function sendTyping() {
     if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;
     typingLastSent = Date.now();
     try {
@@ -217,7 +217,7 @@
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(() => { void poll(); }, 4000);
   }
-  async function initialize() {
+  window.addEventListener("pageshow", () => { if (session) void heartbeat(); });\n  window.addEventListener("focus", () => { if (session) void heartbeat(); });\n  document.addEventListener("visibilitychange", () => { if (!document.hidden && session) void heartbeat(); });\n  async function initialize() {
     try {
       client = await window.rccSupabaseReady;
       client.auth.onAuthStateChange((_event, nextSession) => {
