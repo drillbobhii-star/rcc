@@ -144,13 +144,16 @@ function userIdOf(interaction) {
 }
 
 function userCanManageGuild(interaction) {
+  const userId = userIdOf(interaction);
+  const ownerId = String(process.env.DISCORD_OWNER_ID || "").trim();
+  if (ownerId && userId === ownerId) return true;
+
   const permissions = interaction.member?.permissions;
   if (!permissions) return false;
   try {
     const bits = BigInt(permissions);
     const ADMINISTRATOR = 1n << 3n;
-    const MANAGE_GUILD = 1n << 5n;
-    return (bits & (ADMINISTRATOR | MANAGE_GUILD)) !== 0n;
+    return (bits & ADMINISTRATOR) !== 0n;
   } catch {
     return false;
   }
@@ -162,7 +165,7 @@ function validateGuild(interaction) {
     throw new Error("RCC Admin no está autorizado para administrar este servidor.");
   }
   if (!userCanManageGuild(interaction)) {
-    throw new Error("Necesitas el permiso Gestionar servidor o Administrador para usar RCC Admin.");
+    throw new Error("Solo el creador configurado o un administrador real de Discord puede usar RCC Admin.");
   }
   if (!APPLICATION_ID || !BOT_TOKEN || !PUBLIC_KEY) {
     throw new Error("Falta completar la configuración de Discord en las variables del hosting.");
