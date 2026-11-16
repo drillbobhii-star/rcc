@@ -169,7 +169,7 @@
   async function postAction(payload) {
     return api("", { method:"POST", body:JSON.stringify(payload) });
   }
-  async function poll() {
+  async function heartbeat() {\n    if (!session?.access_token) return;\n    try { await postAction({action:"heartbeat"}); } catch(error) { console.warn("[RCC Admin Presence]",error.message); }\n  }\n  async function poll() {
     if (busy || !session) return;
     try {
       await loadConversations();
@@ -297,7 +297,7 @@
       });
     } catch(error) { status("No se pudo iniciar el chat: " + error.message,true); }
   }
-  $("rccAdminSend").addEventListener("click",sendMessage);
+  window.addEventListener("pageshow",()=>{if(session)void heartbeat();});\n  window.addEventListener("focus",()=>{if(session)void heartbeat();});\n  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&session)void heartbeat();});\n  $("rccAdminSend").addEventListener("click",sendMessage);
   $("rccAdminChatInput").addEventListener("keydown",event => {
     if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }
   });
