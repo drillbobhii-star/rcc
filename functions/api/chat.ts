@@ -476,7 +476,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     }
 
     if (actor.role !== "admin") return json({ error: "Acceso exclusivo del Creador." }, 403);
-    if (action === "setGlobalChat") {
+    if (action === "setUserChatEnabled") {\n      if (!userId || typeof body.enabled !== "boolean") return json({ error: "Selecciona un usuario y un estado válido." }, 400);\n      const conversation = await getOrCreateConversation(env, userId);\n      await rest(env, "rcc_chat_conversations?id=eq." + encodeURIComponent(String(conversation.id)), { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ enabled: body.enabled, updated_at: new Date().toISOString() }) });\n      return json({ ok: true, enabled: body.enabled });\n    }\n    if (action === "setGlobalChat") {
       const enabled=body.enabled===true;
       await rest(env,"rcc_chat_settings?on_conflict=singleton",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({singleton:true,chat_enabled:enabled,updated_at:new Date().toISOString(),updated_by:actor.id})});
       if(!enabled){const subs=await rest<Array<PushSubscriptionRow>>(env,"rcc_chat_push_subscriptions?select=user_id&audience=eq.user");const users=[...new Set(subs.map(sub=>sub.user_id))];await Promise.all(users.map(userId=>notifyDevices(env,"user",userId,{title:"RCC · Chat desactivado",body:"El Creador desactivó el chat para todos.",url:"/index.html",tag:"rcc-global-chat-disabled"})));}
