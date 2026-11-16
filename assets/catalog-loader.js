@@ -8,9 +8,18 @@
     return response.json();
   }
   async function json(file){return request(file,'no-cache');}
-  async function part(file){
-    try{return await request(file,'force-cache');}
-    catch{return request(file,'reload');}
+  async function part(file,count){
+    try{
+      const rows=await request(file,'force-cache');
+      if(!Array.isArray(rows)||rows.length!==count)throw Error('Recuento inválido');
+      return rows;
+    }catch{
+      // A cached response can be valid JSON but belong to an older manifest.
+      // Validate its count before accepting it, then retry once from the network.
+      const rows=await request(file,'reload');
+      if(!Array.isArray(rows)||rows.length!==count)throw Error('Recuento inválido');
+      return rows;
+    }
   }
   const pause=()=>new Promise(resolve=>{
     if(window.requestIdleCallback)window.requestIdleCallback(resolve,{timeout:300});
@@ -31,9 +40,7 @@
         const batch=manifest.parts.slice(offset,offset+(offset===0?1:3));
         const results=await Promise.all(batch.map(async entry=>{
           try{
-            const rows=await part(entry.file);
-            if(!Array.isArray(rows)||rows.length!==entry.count)throw Error('Recuento inválido');
-            return rows;
+            return await part(entry.file,entry.count);
           }catch(error){throw Error('No se pudo cargar una parte del catálogo',{cause:error});}
         }));
         for(const rows of results)for(const row of rows){

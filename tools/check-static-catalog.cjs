@@ -52,6 +52,22 @@ const plain=value=>JSON.parse(JSON.stringify(value));
  const retryLoader=newLoader(async file=>({ok:!(failing&&file===manifest.parts[1].file),json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}));
  await assert.rejects(()=>retryLoader.load(),/cargar una parte/);
  failing=false;assert.equal((await retryLoader.load()).length,catalog.length);
+ // A cached response can be valid JSON but stale relative to the current manifest.
+ // Its count mismatch must trigger one cache-bypassing retry before the part is rejected.
+ let staleCacheSeen=false,staleCacheReloaded=false;
+ const staleCacheLoader=newLoader(async(file,options)=>{
+   const data=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
+   if(file===manifest.parts[1].file&&options?.cache==='force-cache'&&!staleCacheSeen){
+     staleCacheSeen=true;
+     return {ok:true,json:async()=>data.slice(1)};
+   }
+   if(file===manifest.parts[1].file&&options?.cache==='reload')staleCacheReloaded=true;
+   return {ok:true,json:async()=>data};
+ });
+ const staleCacheLoaded=await staleCacheLoader.load();
+ assert(staleCacheSeen,'A stale but valid cached JSON part must be exercised');
+ assert(staleCacheReloaded,'A stale cached part must retry with cache: reload');
+ assert.equal(staleCacheLoaded.length,catalog.length,'The network retry must restore the complete catalog');
  // Invalid paths cannot make the loader request unrelated URLs.
  const invalid=plain(manifest);invalid.parts[0].file='https://unrelated.test/data.json';
  const invalidLoader=newLoader(async file=>{assert.equal(file,'scripts.json');return {ok:true,json:async()=>invalid};});
