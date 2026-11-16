@@ -142,7 +142,11 @@
     }
     return state;
   }
-  async function heartbeat() {\n    if (!session?.access_token || session.user?.email?.toLowerCase() === ADMIN_EMAIL) return;\n    try { await request("", { method:"POST", body:JSON.stringify({action:"heartbeat"}) }); } catch (error) { console.warn("[RCC presence]", error.message); }\n  }\n  async function sendTyping() {
+  async function heartbeat() {
+    if (!session?.access_token || session.user?.email?.toLowerCase() === ADMIN_EMAIL) return;
+    try { await request("", { method:"POST", body:JSON.stringify({action:"heartbeat"}) }); } catch (error) { console.warn("[RCC presence]", error.message); }
+  }
+  async function sendTyping() {
     if (!conversationId || !enabled || Date.now() - typingLastSent < 1800) return;
     typingLastSent = Date.now();
     try {
@@ -217,7 +221,10 @@
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(() => { void poll(); }, 4000);
   }
-  window.addEventListener("pageshow", () => { if (session) void heartbeat(); });\n  window.addEventListener("focus", () => { if (session) void heartbeat(); });\n  document.addEventListener("visibilitychange", () => { if (!document.hidden && session) void heartbeat(); });\n  async function initialize() {
+  window.addEventListener("pageshow", () => { if (session) void heartbeat(); });
+  window.addEventListener("focus", () => { if (session) void heartbeat(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && session) void heartbeat(); });
+  async function initialize() {
     try {
       client = await window.rccSupabaseReady;
       client.auth.onAuthStateChange((_event, nextSession) => {
