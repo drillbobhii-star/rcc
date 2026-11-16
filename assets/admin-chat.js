@@ -11,7 +11,7 @@
   ];
   const $ = id => document.getElementById(id);
   let client = null, session = null, conversations = [], selected = null;
-  let pollTimer = null, busy = false, savingNote = false, lastUserMessageId = null;
+  let pollTimer = null, presenceTimer = null, busy = false, savingNote = false, lastUserMessageId = null;
   let listMode = "recent", typingSentAt = 0, globalChatEnabled = true;
 
   function status(message, error = false) {
@@ -282,6 +282,8 @@
       if (!session?.access_token || session.user?.email?.trim().toLowerCase() !== ADMIN_EMAIL) {
         location.replace("/index.html"); return;
       }
+      await heartbeat();
+      presenceTimer = setInterval(() => { void heartbeat(); },25000);
       await poll();
       pollTimer = setInterval(() => { void poll(); },4000);
       if ("Notification" in window) {
@@ -292,12 +294,16 @@
         session = next;
         if (!session?.access_token || session.user?.email?.trim().toLowerCase() !== ADMIN_EMAIL) {
           if (pollTimer) clearInterval(pollTimer);
+          if (presenceTimer) clearInterval(presenceTimer);
           location.replace("/index.html");
         }
       });
     } catch(error) { status("No se pudo iniciar el chat: " + error.message,true); }
   }
-  window.addEventListener("pageshow",()=>{if(session)void heartbeat();});\n  window.addEventListener("focus",()=>{if(session)void heartbeat();});\n  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&session)void heartbeat();});\n  $("rccAdminSend").addEventListener("click",sendMessage);
+  window.addEventListener("pageshow",()=>{if(session)void heartbeat();});
+  window.addEventListener("focus",()=>{if(session)void heartbeat();});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&session)void heartbeat();});
+  $("rccAdminSend").addEventListener("click",sendMessage);
   $("rccAdminChatInput").addEventListener("keydown",event => {
     if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }
   });
