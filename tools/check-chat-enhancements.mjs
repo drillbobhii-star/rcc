@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = path => readFile(new URL("../" + path, import.meta.url), "utf8");
-const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration, pushMigration, worker, manifest] = await Promise.all([
+const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration, pushMigration, globalMigration, worker, manifest, webhook, sharedPush] = await Promise.all([
   read("admin.html"),
   read("assets/admin-chat.js"),
   read("assets/chat-widget.js"),
@@ -11,8 +11,11 @@ const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration
   read("assets/admin-dashboard.js"),
   read("supabase/migrations/20261115000400_rcc_private_support_chat.sql"),
   read("supabase/migrations/20261115000500_rcc_chat_presence_and_push.sql"),
+  read("supabase/migrations/20261115000600_rcc_global_chat_and_notifications.sql"),
   read("sw.js"),
   read("site.webmanifest"),
+  read("functions/api/kofi-webhook.ts"),
+  read("functions/_shared/rcc-web-push.ts"),
 ]);
 
 assert.match(adminHtml, /id="rccActiveChatsTab"/);
@@ -69,4 +72,20 @@ assert.match(worker, /showNotification/);
 assert.match(worker, /notificationclick/);
 assert.match(manifest, /"display": "standalone"/);
 
-console.log("RCC chat UX, text-only, broadcast and Web Push static checks passed.");
+
+assert.match(adminHtml, /rccGlobalChatToggle/);
+assert.match(adminHtml, /rccMainMessagePreviewBody/);
+assert.match(adminHtml, /userSort/);
+assert.match(adminHtml, /userFilter/);
+assert.match(adminChat, /setGlobalChat/);
+assert.match(userChat, /enableUserPush/);
+assert.match(userChat, /rccGlobalChatOverlay/);
+assert.match(api, /notifyDevices/);
+assert.match(api, /audience: actor.role/);
+assert.match(api, /setGlobalChat/);
+assert.match(globalMigration, /rcc_chat_settings/);
+assert.match(globalMigration, /audience/);
+assert.match(webhook, /notifyRccCreator/);
+assert.match(sharedPush, /sendRccWebPush/);
+console.log("RCC chat UX, broadcast, global pause and audience Push static checks passed.");
+
