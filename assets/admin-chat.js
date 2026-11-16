@@ -18,6 +18,24 @@
     $("rccChatAdminStatus").textContent = message;
     $("rccChatAdminStatus").className = "pill " + (error ? "warn" : "ok");
   }
+  function errorMessage(error) {
+    return String(error?.message || error || "Error desconocido");
+  }
+  function reportChatError(message) {
+    const panel = $("rccChatAdminError");
+    if (panel) {
+      panel.textContent = message;
+      panel.hidden = false;
+    }
+    status(message, true);
+  }
+  function clearChatError() {
+    const panel = $("rccChatAdminError");
+    if (panel) {
+      panel.textContent = "";
+      panel.hidden = true;
+    }
+  }
   async function api(path = "", options = {}) {
     if (!session?.access_token) throw new Error("La sesión de administrador expiró.");
     const headers = { Authorization:"Bearer " + session.access_token, ...(options.headers || {}) };
@@ -25,14 +43,19 @@
     const response = await fetch("/api/chat" + path, {
       ...options, headers, cache:"no-store", credentials:"same-origin"
     });
-    const result = await response.json().catch(() => ({}));
+    const rawBody = await response.text();
+    let result = {};
+    if (rawBody) {
+      try { result = JSON.parse(rawBody); }
+      catch (_) { result = { error: rawBody.slice(0, 500) }; }
+    }
     if (response.status === 401 || response.status === 403) {
       if (response.status === 403) throw new Error(result.error || "Acceso denegado.");
       await client.auth.signOut().catch(() => {});
       location.replace("/index.html");
       throw new Error(result.error || "Sesión expirada.");
     }
-    if (!response.ok) throw new Error(result.error || "Error del chat.");
+    if (!response.ok) throw new Error(result.error || ("HTTP " + response.status + " " + response.statusText));
     return result;
   }
   function node(tag, className, text) {
@@ -122,29 +145,55 @@
     if (document.activeElement !== $("rccPrivateNote")) $("rccPrivateNote").value = selected?.admin_note || "";
   }
   async function loadConversations() {
-    const result = await api("?action=adminList");
-    conversations = result.conversations || [];
-    globalChatEnabled = result.globalChatEnabled !== false;
-    $("rccGlobalChatToggle").textContent = globalChatEnabled ? "Desactivar chat para todos" : "Activar chat para todos";
-    if (selected) {
-      const fresh = conversations.find(c => c.id === selected.id);
-      if (fresh) selected = fresh;
-      else selected = null;
+    try {
+      const result = await api("?action=adminList");
+      conversations = result.conversations || [];
+      globalChatEnabled = result.globalChatEnabled !== false;
+      $("rccGlobalChatToggle").textContent = globalChatEnabled ? "Desactivar chat para todos" : "Activar chat para todos";
+      if (selected) {
+        const fresh = conversations.find(c => c.id === selected.id);
+        if (fresh) selected = fresh;
+        else selected = null;
+      }
+      renderList();
+      setControls();
+      const preview = $("rccMainMessagePreviewBody");
+      if (preview) {
+        preview.replaceChildren();
+        const latest = conversations[0];
+        if (latest) {
+          const btn = node("button","small-btn",(latest.name || latest.email || "Usuario RCC") + " · " + (latest.last_message_preview || "Sin mensajes"));
+          btn.style.width = "100%";
+          btn.addEventListener("click",() => {
+            document.querySelector('.admin-tab[data-tab="messages"]')?.click();
+            void selectConversation(latest);
+          });
+          preview.append(btn);
+        } else {
+          preview.textContent = "Todavía no hay conversaciones.";
+        }
+      }
+      clearChatError();
+    } catch (error) {
+      reportChatError("Error al cargar conversaciones: " + errorMessage(error));
+      throw error;
     }
-    renderList();
-    setControls();
-    const preview=$("rccMainMessagePreviewBody");
-    if(preview){preview.replaceChildren();const latest=conversations[0];if(latest){const btn=node("button","small-btn",(latest.name||latest.email||"Usuario RCC")+" · "+(latest.last_message_preview||"Sin mensajes"));btn.style.width="100%";btn.addEventListener("click",()=>{document.querySelector('.admin-tab[data-tab="messages"]')?.click();void selectConversation(latest);});preview.append(btn);}else preview.textContent="Todavía no hay conversaciones.";}
   }
   async function loadMessages() {
     if (!selected) return;
-    const result = await api("?action=messages&conversationId=" + encodeURIComponent(selected.id));
-    renderMessages(result.messages || []);
-    $("rccChatAdminTyping").textContent = result.typing?.user ? "El usuario está escribiendo…" : "";
-    const latest = [...(result.messages || [])].reverse().find(m => m.sender_role === "user");
-    if (latest && latest.id !== lastUserMessageId) {
-      if (lastUserMessageId !== null) playIncomingSound();
-      lastUserMessageId = latest.id;
+    try {
+      const result = await api("?action=messages&conversationId=" + encodeURIComponent(selected.id));
+      renderMessages(result.messages || []);
+      $("rccChatAdminTyping").textContent = result.typing?.user ? "El usuario está escribiendo…" : "";
+      const latest = [...(result.messages || [])].reverse().find(m => m.sender_role === "user");
+      if (latest && latest.id !== lastUserMessageId) {
+        if (lastUserMessageId !== null) playIncomingSound();
+        lastUserMessageId = latest.id;
+      }
+      clearChatError();
+    } catch (error) {
+      reportChatError("Error al cargar mensajes: " + errorMessage(error));
+      throw error;
     }
   }
   function playIncomingSound() {
@@ -169,14 +218,24 @@
   async function postAction(payload) {
     return api("", { method:"POST", body:JSON.stringify(payload) });
   }
-  async function heartbeat() {\n    if (!session?.access_token) return;\n    try { await postAction({action:"heartbeat"}); } catch(error) { console.warn("[RCC Admin Presence]",error.message); }\n  }\n  async function poll() {
+  async function heartbeat() {
+    if (!session?.access_token) return;
+    try {
+      await postAction({action:"heartbeat"});
+    } catch(error) {
+      reportChatError("Error de presencia: " + errorMessage(error));
+    }
+  }
+  async function poll() {
     if (busy || !session) return;
     try {
       await loadConversations();
       if (selected) await loadMessages();
     } catch(error) {
-      if (/expiró|acceso denegado/i.test(error.message)) status(error.message,true);
-      else console.warn("[RCC Admin Chat]",error.message);
+      const message = errorMessage(error);
+      if (!/Error al cargar (conversaciones|mensajes):/.test(message)) {
+        reportChatError("Error al actualizar mensajería: " + message);
+      }
     }
   }
   async function sendMessage() {
@@ -298,8 +357,16 @@
           location.replace("/index.html");
         }
       });
-    } catch(error) { status("No se pudo iniciar el chat: " + error.message,true); }
+    } catch(error) {
+      reportChatError("No se pudo iniciar el chat: " + errorMessage(error));
+    }
   }
+  window.addEventListener("error", event => {
+    reportChatError("Error de JavaScript: " + errorMessage(event.error || event.message));
+  });
+  window.addEventListener("unhandledrejection", event => {
+    reportChatError("Error de red/API/Supabase: " + errorMessage(event.reason));
+  });
   window.addEventListener("pageshow",()=>{if(session)void heartbeat();});
   window.addEventListener("focus",()=>{if(session)void heartbeat();});
   document.addEventListener("visibilitychange",()=>{if(!document.hidden&&session)void heartbeat();});
