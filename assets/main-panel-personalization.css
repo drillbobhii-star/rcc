@@ -1,0 +1,6 @@
+/* RCC main panel background and optional logo overlay */
+.rcc-custom-main-background .glass-background{opacity:.1!important}
+#rccMainBackdrop{background-color:#070b14}
+#rccMainLogo[hidden]{display:none!important}
+#rccMainCustomize:focus-visible,#rccMainDialog button:focus-visible,#rccMainDialog input:focus-visible,#rccMainDialog select:focus-visible{outline:2px solid #d9a7ff;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){#rccMainBackdrop{transition:none}}
