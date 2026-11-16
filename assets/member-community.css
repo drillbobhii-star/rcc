@@ -153,8 +153,8 @@
   position:relative;
   height:clamp(118px,30vw,220px);
   max-height:220px;
-  overflow:hidden;
-  contain:paint;
+  overflow:visible;
+  contain:none;
   background-size:cover!important;
   background-position:center;
   background-repeat:no-repeat;
