@@ -82,7 +82,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         if (!profile) return json({ error: "Este perfil no está disponible." }, 404);
         return json({ enabled: true, settings: { creator_messages_enabled: settings.creator_messages_enabled }, profile });
       }
-      const matches = profiles.filter(p => {
+      const creatorUser = users.find(u => u.email?.trim().toLowerCase() === ADMIN_EMAIL);\n      const creatorProfile = creatorUser ? profiles.find(p => p.user_id === creatorUser.id) : null;\n      const creator = creatorUser && creatorProfile && creatorProfile.public_profile !== false && creatorProfile.is_banned !== true ? { user_id: creatorUser.id, username: String(creatorProfile.username || ""), display_name: String(creatorProfile.display_name || creatorUser.user_metadata?.name || "Drillbobhii"), avatar_url: String(creatorProfile.avatar_url || creatorUser.user_metadata?.avatar_url || creatorUser.user_metadata?.picture || ""), is_vip: vipIds.has(creatorUser.id), is_creator: true } : null;\n      const matches = profiles.filter(p => {
         if (p.public_profile === false || p.is_banned === true) return false;
         const user = users.find(u => u.id === p.user_id);
         if (!user) return false;
@@ -93,7 +93,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         const user = users.find(u => u.id === p.user_id)!;
         return { user_id: p.user_id, username: String(p.username || ""), display_name: String(p.display_name || user.user_metadata?.name || user.email?.split("@")[0] || "Usuario RCC"), avatar_url: String(p.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || ""), is_vip: vipIds.has(p.user_id), is_creator: user.email?.trim().toLowerCase() === ADMIN_EMAIL || p.is_creator === true };
       });
-      return json({ enabled: true, profiles: matches, settings: { creator_messages_enabled: settings.creator_messages_enabled, follows_enabled: settings.follows_enabled } });
+      return json({ enabled: true, profiles: matches, creator, settings: { creator_messages_enabled: settings.creator_messages_enabled, follows_enabled: settings.follows_enabled } });
     }
     if (!viewer) return json({ error: "Inicia sesión para realizar esta acción." }, 401);
     const body = await request.json() as Record<string, unknown>;
@@ -121,7 +121,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       const cover = String(body.cover_url || "").trim();
       if (username && !/^[a-z0-9_]{3,24}$/.test(username)) return json({ error: "El usuario debe tener 3–24 caracteres: letras, números o guion bajo." }, 400);
       if (cover && (!/^https:\/\//i.test(cover) || cover.length > 1000)) return json({ error: "La portada debe ser una URL HTTPS válida." }, 400);
-      await rest(env, "profiles?user_id=eq." + viewer.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ username: username || null, bio, cover_url: cover || null }) });
+      await rest(env, "profiles?on_conflict=user_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ user_id: viewer.id, username: username || null, bio, cover_url: cover || null }) });
       return json({ ok: true });
     }
     if (action === "addCode") {
