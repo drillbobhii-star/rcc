@@ -87,7 +87,7 @@ async function adminConversationList(env: Env) {
     rest<Array<Record<string, unknown>>>(env, "profiles?select=user_id,display_name,avatar_url,discord_id,is_banned"),
     rest<Array<Record<string, unknown>>>(env, "rcc_admin_private_notes?select=user_id,note,updated_at"),
     rest<Array<Record<string, unknown>>>(env, "rcc_chat_messages?select=id,conversation_id,sender_role,content,created_at,read_at&order=created_at.desc&limit=5000"),
-    rest<Array<Record<string, unknown>>>(env, "rcc_site_presence?select=user_id,last_seen_at"),
+    rest<Array<Record<string, unknown>>>(env, "rcc_site_presence?select=user_id,last_seen_at&last_seen_at=gte." + encodeURIComponent(new Date(Date.now() - ACTIVE_WINDOW_MS).toISOString()) + "&limit=10000"),
   ]);
   const userMap = new Map(users.map(u => [u.id, u]));
   const profileMap = new Map(profiles.map(p => [String(p.user_id), p]));
