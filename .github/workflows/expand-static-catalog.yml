@@ -21,7 +21,7 @@ on:
       robloxscripts_target:
         description: Maximum number of free public RobloxScripts.com listings to index
         required: true
-        default: "3000"
+        default: "10000"
         type: string
   push:
     branches: [main]
