@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-const [sync, ui, workflow, feed, vip] = await Promise.all([
+const [sync, importer, ui, workflow, feed, vip] = await Promise.all([
   readFile(new URL('../tools/sync-community-feed.mjs', import.meta.url), 'utf8'),
+  readFile(new URL('../tools/import-community.cjs', import.meta.url), 'utf8'),
   readFile(new URL('../assets/community-feed.js', import.meta.url), 'utf8'),
   readFile(new URL('../.github/workflows/refresh-community-catalog.yml', import.meta.url), 'utf8'),
   readFile(new URL('../community-feed.json', import.meta.url), 'utf8').then(JSON.parse),
@@ -23,6 +24,10 @@ assert.match(sync, /includeScript: 'false'/);
 assert.match(sync, /codeIncluded: false/);
 assert.doesNotMatch(sync, /row\.script\s*\|\|/);
 assert.match(sync, /RSCRIPTS_API_KEY/);
+assert.match(importer, /api\\.rscripts\\.net\\/v1\\/scripts/);
+assert.match(importer, /RSCRIPTS_API_KEY/);
+assert.match(importer, /risk\\?\.score|risk\.score/);
+assert.match(importer, /\['safe', 'low risk'\]/);
 assert.match(workflow, /schedule:/);
 assert.match(workflow, /RSCRIPTS_API_KEY/);
 assert.match(ui, /community-feed\.json/);
