@@ -16,17 +16,18 @@ const [index, vip, admin, api, migration, docs, webhook, successPage, kofiMigrat
 
 assert.match(index, /Únete a RCC Supporter por solo \$1\.99 USD \/ mes/);
 assert.match(index, /Cancela cuando quieras\. Al suscribirte, desbloqueas más de 5,000 scripts exclusivos, insignia, rol en Discord y cero esperas/);
-assert.match(index, /id="vipTab"/);
+assert.match(index, /id="vipTab"[^>]*hidden/);
 assert.match(index, /id="javaTab"/);
 assert.match(index, /id="javaNav"/);
 assert.match(index, /id="javaTools"/);
-assert.match(index, /id="rccSupportButton"/);
-assert.match(vip, /VIP_PERCENTAGE = 45/);
-assert.match(vip, /script.platform === 'java'/);
-assert.match(vip, /tags.includes\('RCC Supporter'\)/);
-assert.match(vip, /rcc-vip-code-locked/);
+assert.match(index, /id="rccSupportButton" hidden/);
+assert.match(index, /window\.rccCodeLocked = script => Boolean\(script\) && !currentUser/);
+assert.match(vip, /communityGiftMode: true/);
+assert.match(vip, /isVipScript = \(\) => false/);
+assert.match(vip, /RCCVIP_PAUSED = true/);
 assert.match(admin, /VIP desde rcc_vip_memberships/);
 assert.match(api, /RCC_ADMIN_EMAIL/);
+assert.match(api, /every authenticated account receives the VIP capability flag/i);
 assert.ok(api.includes("const RCC_KOFI_MONTHLY_URL = env.RCC_KOFI_MONTHLY_URL?.trim() || 'https://ko-fi.com/lubensdrill/tiers';"));
 assert.match(api, /SUPABASE_SERVICE_ROLE_KEY/);
 assert.match(api, /DISCORD_WEBHOOK_URL/);

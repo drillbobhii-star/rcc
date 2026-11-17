@@ -402,7 +402,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
-<script src="assets/assistant-guide.js?v=2" defer></script>
+<script src="assets/assistant-guide.js?v=3" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -458,7 +458,7 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/notification-banners.css?v=2">
 <link rel="stylesheet" href="assets/prism-logo.css">
 <link rel="stylesheet" href="assets/main-panel-personalization.css?v=1">
-<script src="assets/main-panel-personalization.js?v=2" defer></script>
+<script src="assets/main-panel-personalization.js?v=3" defer></script>
 <link rel="stylesheet" href="assets/script-review.css">
 <script src="assets/review-signals.js"></script>
 <script src="assets/script-review.js"></script>
@@ -499,7 +499,7 @@ window.rccSupabaseReady.catch(() => {});
     </div>
   </div>
   <button class="appearance-toggle" id="appearanceToggle" type="button" aria-controls="personalization" aria-expanded="false">
-    <span>Personalizar interfaz</span><span class="appearance-switch" aria-hidden="true"></span>
+    <span>🎨 Personalizar fondo y pantalla</span><span class="appearance-switch" aria-hidden="true"></span>
   </button>
   <div class="device-toggle">
     <button class="dev-btn active" data-dev="all"><span class="ico">🌐</span>Todos</button>
@@ -549,7 +549,7 @@ window.rccSupabaseReady.catch(() => {});
         <a class="roblox-follow" href="https://www.roblox.com/share?code=86b2c3c1d4ef024fafa196db62dac9a6&amp;type=Profile&amp;source=ProfileShare&amp;stamp=1793551063604" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 1 31 8 24 31 1 24Zm5 10-2 8 8 2 2-8Z"/></svg>Seguime en Roblox<span aria-hidden="true">↗</span></a>
         <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
         <div class="auth-controls"><button type="button" id="authEmail" class="btn btn-ghost auth-email" aria-label="Editar tu perfil" hidden></button><button class="btn btn-ghost" id="loginBtn" type="button" aria-haspopup="dialog" aria-controls="authModal" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
-        <button type="button" class="btn btn-supporter" id="rccSupportButton">Apoyar a RCC 💎</button>
+        <button type="button" class="btn btn-supporter" id="rccSupportButton" hidden>RCC Supporter pausado temporalmente</button>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
       </div>
     </header>
@@ -562,7 +562,7 @@ window.rccSupabaseReady.catch(() => {});
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
         <button id="javaTab" type="button" aria-pressed="false">Java · JDK 17+ <span id="javaCount"></span></button>
         <button id="fivemTab" type="button" aria-pressed="false">FiveM <span id="fivemCount"></span></button>
-        <button id="vipTab" type="button" aria-pressed="false">💎 Zona VIP</button>
+        <button id="vipTab" type="button" aria-pressed="false" hidden>Zona VIP</button>
         <a class="help-link" href="#analysis">Sección de prueba ↗</a>
         <a class="help-link" href="#obfuscator">Generador de ofuscador ↗</a>
         <a class="help-link" href="soporte.html">Centro de ayuda ↗</a>
@@ -708,6 +708,8 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/member-community.js?v=9.0"></script>
 <script>
 let currentUser = null;
+// Durante el regalo comunitario, todos los scripts se muestran gratis; la sesión sí es obligatoria.
+window.rccCodeLocked = script => Boolean(script) && !currentUser;
 let favoriteIds = new Set();
 let showFavorites = false;
 let favoritesStatus = 'idle';
@@ -1672,8 +1674,8 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
   </div>
 </div>
 
-<script src="assets/vip-membership.js?v=1"></script>
-<script src="assets/rcc-assistant.js?v=2"></script>
+<script src="assets/vip-membership.js?v=2"></script>
+<script src="assets/rcc-assistant.js?v=3" defer></script>
 <script src="assets/chat-widget.js?v=1"></script>
 <script src="assets/community-feed.js?v=2"></script>
 </body>

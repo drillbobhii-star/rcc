@@ -151,7 +151,9 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       if (tokenPresent && !user) return reply({ error: 'La sesión no es válida.' }, 401);
       if (!user) return reply({ isVip: false, isAdmin: false, checkoutUrl });
 
-      const isVip = await readMembership(base, env, user.id);
+      // Community gift mode: every authenticated account receives the VIP capability flag.
+      // Real membership records and admin management remain intact for later reactivation.
+      const isVip = true;
       const adminEmail = env.RCC_ADMIN_EMAIL?.trim().toLowerCase();
       return reply({
         isVip,

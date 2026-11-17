@@ -5,8 +5,8 @@
   if (!guide) return;
   const style = document.createElement('style');
   style.textContent = [
-    '#rccAssistantLauncher{position:fixed;right:18px;bottom:18px;z-index:1900;border:1px solid #ffffff35;border-radius:999px;padding:13px 17px;background:linear-gradient(130deg,#216b88,#6654bd);color:#fff;font:700 14px system-ui;box-shadow:0 12px 38px #0008;cursor:pointer}',
-    '#rccAssistantPanel{position:fixed;right:18px;bottom:82px;width:min(380px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 110px));z-index:1910;display:flex;flex-direction:column;border:1px solid #9ec9f555;border-radius:20px;background:rgba(12,18,31,.97);color:#f5f7ff;box-shadow:0 22px 70px #000b;backdrop-filter:blur(22px);overflow:hidden;font:14px system-ui}',
+    '#rccAssistantLauncher{position:fixed;right:18px;bottom:92px;z-index:1900;border:1px solid #ffffff35;border-radius:999px;padding:13px 17px;background:linear-gradient(130deg,#216b88,#6654bd);color:#fff;font:700 14px system-ui;box-shadow:0 12px 38px #0008;cursor:pointer}',
+    '#rccAssistantPanel{position:fixed;right:18px;bottom:156px;width:min(380px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 110px));z-index:1910;display:flex;flex-direction:column;border:1px solid #9ec9f555;border-radius:20px;background:rgba(12,18,31,.97);color:#f5f7ff;box-shadow:0 22px 70px #000b;backdrop-filter:blur(22px);overflow:hidden;font:14px system-ui}',
     '#rccAssistantPanel[hidden],#rccAssistantLauncher[hidden]{display:none}',
     '.rcc-assistant-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(120deg,#1c5872,#493d82);font-weight:800}',
     '.rcc-assistant-head small{display:block;font-size:10px;font-weight:500;opacity:.8;margin-top:3px}',
@@ -20,11 +20,11 @@
     '#rccAssistantInput{min-width:0;border:1px solid #ffffff30;border-radius:10px;padding:11px;background:#0d1727;color:#fff;font:13px system-ui}',
     '#rccAssistantSend{border:0;border-radius:10px;padding:0 14px;background:#a9d7ef;color:#10283a;font-weight:800}',
     '.rcc-assistant-foot{padding:0 12px 10px;color:#aab8cc;font-size:10px}',
-    '@media(max-width:520px){#rccAssistantLauncher{right:12px;bottom:12px;padding:11px 13px}#rccAssistantPanel{right:8px;bottom:70px;width:calc(100vw - 16px);max-height:72vh}}',
+    '@media(max-width:520px){#rccAssistantLauncher{right:12px;bottom:82px;padding:11px 13px}#rccAssistantPanel{right:8px;bottom:146px;width:calc(100vw - 16px);max-height:72vh}}',
     '@media(prefers-reduced-motion:reduce){#rccAssistantPanel{scroll-behavior:auto}}'
   ].join('');
   const el=(tag,attrs={},text='')=>{const node=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>node.setAttribute(k,v));if(text)node.textContent=text;return node;};
-  const launcher=el('button',{id:'rccAssistantLauncher',type:'button','aria-expanded':'false','aria-controls':'rccAssistantPanel'},'🤖 Asistente RCC');
+  const launcher=el('button',{id:'rccAssistantLauncher',type:'button','aria-expanded':'false','aria-controls':'rccAssistantPanel'},'✦ Asistente RCC');
   const panel=el('section',{id:'rccAssistantPanel',hidden:true,'aria-label':'Asistente RCC'});
   const head=el('div',{class:'rcc-assistant-head'});
   const title=el('div');title.append(el('div',{},'Asistente RCC'),el('small',{},'Guía de catálogos, herramientas y novedades'));
@@ -42,10 +42,13 @@
   const shut=()=>{panel.hidden=true;launcher.setAttribute('aria-expanded','false');launcher.focus();};
   const quick=(label,query)=>{const button=el('button',{type:'button'},label);button.addEventListener('click',()=>answer(query));suggestions.append(button);};
   function act(action,query){
-    if(action==='java')document.getElementById('javaTab')?.click();
+    if(action==='appearance')document.getElementById('rccMainCustomize')?.click();
+    else if(action==='java')document.getElementById('javaTab')?.click();
     else if(action==='roblox')document.getElementById('gamesTab')?.click();
     else if(action==='fivem')document.getElementById('fivemTab')?.click();
     else if(action==='updates'||action==='github')document.getElementById('updatesTab')?.click();
+    else if(action==='chat')document.getElementById('rccChatLauncher')?.click();
+    else if(action==='admin')window.location.href='/admin.html';
     else if(action==='catalogs')document.getElementById('libraryTab')?.click();
     else if(query){const search=document.getElementById('search');if(search){search.value=query;search.dispatchEvent(new Event('input',{bubbles:true}));}}
   }
@@ -68,8 +71,11 @@
   quick('Java','¿Dónde encuentro ejemplos Java?');
   quick('Mods APK','¿Qué es el Buscador de mods APK?');
   quick('Perfiles','¿Ya está el buscador de perfiles?');
-  quick('Chat','¿Qué mejoras tendrá el chat?');
-  quick('Panel admin','¿Qué novedades hay en el panel admin?');
-  say('¡Hola! Soy el Asistente RCC. Puedo ayudarte a explorar los catálogos, entender las herramientas y conocer las novedades. ¿Qué quieres buscar?');
+  quick('Chat','¿Cómo funciona el chat RCC?');
+  quick('Panel admin','¿Qué herramientas tiene el panel admin?');
+  quick('Fondo y logo','¿Cómo personalizo el fondo del panel?');
+  quick('Mi perfil','¿Cómo cambio mi foto o banner?');
+  quick('Regalo RCC','¿Cómo funciona el regalo comunitario?');
+  say('¡Hola! Soy el Asistente RCC, actualizado para el regalo de la comunidad. Puedo ayudarte con los catálogos, el acceso gratuito, perfiles, banners, fondos, chat, herramientas y administración. ¿Qué necesitas?');
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden)shut();});
 })();
