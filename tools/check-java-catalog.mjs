@@ -9,7 +9,8 @@ const catalog = require('./catalog-store.cjs').readCatalog();
 const examples = catalog.filter(item => item.id.startsWith('rcc_java_'));
 assert.equal(examples.length, 48, 'Expected 48 Java examples');
 assert.equal(new Set(examples.map(item => item.code)).size, examples.length, 'Java examples must have unique source code');
-assert(examples.some(item => item.tags.includes('RCC Supporter')), 'Some advanced Java examples must be reserved for RCC Supporter');
+assert.equal(examples.filter(item => item.tags.includes('RCC Supporter')).length, 19, 'Exactly 19 Java examples must be reserved for RCC Supporter');
+assert(!examples.find(item => item.id === 'rcc_java_42_sealed').code.includes('case Circle c ->'), 'Java 17 must not use preview switch patterns');
 const compiler = spawnSync('javac', ['-version'], { encoding: 'utf8' });
 if (compiler.error || compiler.status !== 0) {
   if (process.env.RCC_REQUIRE_JAVA === '1') throw new Error('JDK 17+ is required for Java catalogue validation');
