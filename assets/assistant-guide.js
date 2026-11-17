@@ -11,11 +11,18 @@
     github:'Los descubrimientos de GitHub son metadatos y enlaces a repositorios públicos. Revisa licencia, actividad, issues, dependencias y código antes de reutilizar. Que un repositorio aparezca no significa que RCC lo haya auditado.',
     roblox:'Roblox utiliza Luau, derivado de Lua 5.1. Separa ejemplos para Roblox Studio de publicaciones de terceros para juegos. Consulta Creator Hub y revisa la ubicación Script/LocalScript y permisos.',
     games:'RCC está ampliando descubrimientos para Minecraft, Godot, Unity, GameGuardian y AutoTouch. Comprueba la versión del juego, el lenguaje, las dependencias y la licencia en la fuente original.',
-    apk:'El Buscador de mods APK está anunciado como Próximamente. Aún no permite buscar ni descargar APK. Cuando esté disponible, RCC deberá mostrar fuentes, permisos, firma y advertencias de seguridad.'
+    apk:'El Buscador de mods APK está anunciado como Próximamente. Aún no permite buscar ni descargar APK. Cuando esté disponible, RCC deberá mostrar fuentes, permisos, firma y advertencias de seguridad.',
+    profiles:'El buscador público de perfiles está en la propuesta PR #113. Hasta que se revise y fusione, no lo presentes como una función ya publicada. Consulta Novedades para conocer su estado.',
+    banner:'La corrección del banner animado y su vista previa está en la propuesta PR #112. Si aún ves desbordamiento, la corrección no se ha desplegado hasta que se fusione y publique.',
+    admin:'El panel rápido de administración al mantener pulsado un usuario está en la propuesta PR #99. Las acciones administrativas deben respetar permisos y confirmaciones; no asumas que una función en revisión ya está activa.',
+    chat:'Las mejoras del chat RCC incluyen notificaciones Web Push, mensajería de texto y avisos globales; están descritas en la propuesta PR #91 y requieren revisión y despliegue.',
+    vip:'RCC Supporter utiliza una suscripción mensual. Si el acceso VIP no se actualiza, revisa que uses el mismo correo en RCC y Ko-fi y contacta con soporte; la corrección de sesión y herramientas de Jarvis está en la propuesta PR #70.',
+    discord:'La propuesta PR #103 refuerza los permisos del bot RCC para reservar acciones administrativas al creador y a administradores autorizados. No compartas tokens ni permisos de administrador innecesarios.'
   };
 
   const groups={
-    updates:[['¿Qué cambió en esta actualización?','release'],['¿Qué catálogos y lenguajes tiene RCC?','catalogs'],['¿Dónde encuentro scripts de FiveM?','fivem'],['¿Dónde encuentro ejemplos Java?','java'],['¿Qué es el Buscador de mods APK?','apk'],['¿Dónde veo los scripts añadidos?','updates'],['¿Por qué ya no hay reproductor de música?','release'],['¿Dónde están los ocho ejecutores?','executors'],['¿Qué significa el aviso de compatibilidad?','requirements']],
+    updates:[['¿Qué cambió en esta actualización?','release'],['¿Qué catálogos y lenguajes tiene RCC?','catalogs'],['¿Dónde encuentro scripts de FiveM?','fivem'],['¿Dónde encuentro ejemplos Java?','java'],['¿Qué es el Buscador de mods APK?','apk'],['¿Ya está el buscador de perfiles?','profiles'],['¿Qué pasa con el banner animado?','banner'],['¿Qué novedades hay en el panel admin?','admin'],['¿Qué mejoras tendrá el chat?','chat'],['¿Cómo funciona RCC Supporter?','vip'],['¿Qué cambia en el bot de Discord?','discord'],['¿Dónde veo los scripts añadidos?','updates'],['¿Por qué ya no hay reproductor de música?','release'],['¿Dónde están los ocho ejecutores?','executors'],['¿Qué significa el aviso de compatibilidad?','requirements']],
+    features:[['¿Cómo busco perfiles?','profiles'],['¿Cómo cambio el banner?','banner'],['¿Qué puede hacer el panel de administración?','admin'],['¿Qué incluye el chat RCC?','chat'],['¿Cómo funciona Supporter?','vip'],['¿Qué permisos tiene el bot?','discord']],
     catalogs:[['¿Qué lenguajes incluye RCC?','release'],['¿Dónde busco Roblox y Luau?','roblox'],['¿Dónde encuentro recursos FiveM?','fivem'],['¿Dónde encuentro Java y JavaScript?','java'],['¿Dónde están los repositorios de GitHub?','github'],['¿Dónde veo Minecraft, Godot o Unity?','games'],['¿El código externo está probado por RCC?','safety']],
     safety:[['¿Qué hago si Windows bloquea la descarga?','safety'],['¿Es seguro desactivar el antivirus?','safety'],['¿Cómo evito botones de descarga engañosos?','safety'],['¿Qué riesgos tiene el código remoto?','safety'],['¿Los ejecutores están verificados?','executors'],['¿Por qué tengo que esperar diez segundos?','downloads'],['¿Cómo cancelo una descarga?','downloads'],['¿Qué son loadstring y HttpGet?','requirements'],['¿La foto del juego garantiza seguridad?','safety']],
     navigation:[['¿Cómo busco código?','search'],['¿Me recomiendas algo del catálogo?','recommend'],['¿Cómo filtro por plataforma?','filters'],['¿Dónde cambio el fondo y las animaciones?','appearance'],['¿Dónde comparo o analizo código?','tools'],['¿Dónde veo mis favoritos?','favorites'],['¿Qué copié recientemente?','recent'],['¿Dónde están las tendencias?','trending'],['¿Cómo limpio los filtros?','clear'],['¿Cómo vuelvo a ver la presentación?','guide'],['¿Dónde veo ejemplos animados?','motion']]
@@ -70,6 +77,12 @@
     if(/roblox|luau|studio/.test(text))return {action:'roblox'};
     if(/minecraft|godot|unity|gameguardian|autotouch/.test(text))return {action:'games'};
     if(/apk|mods? de android|mod apk/.test(text))return {action:'apk'};
+    if(/perfil|buscar usuarios|buscador de usuarios/.test(text))return {action:'profiles'};
+    if(/banner|portada|foto de portada/.test(text))return {action:'banner'};
+    if(/admin|administrador|mantener pulsado/.test(text))return {action:'admin'};
+    if(/chat|mensaje|notificacion|web push/.test(text))return {action:'chat'};
+    if(/vip|supporter|ko-fi|kofi/.test(text))return {action:'vip'};
+    if(/discord|bot|jarvis/.test(text))return {action:'discord'};
     if(/novedades|scripts nuevos|scripts anadidos/.test(text))return {action:'updates'};
     return null;
   }
