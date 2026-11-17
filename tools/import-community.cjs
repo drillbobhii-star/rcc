@@ -4,11 +4,13 @@ async function main() {
   const catalog = require('./catalog-store.cjs').readCatalog();
   const ids = new Set(catalog.map(s => s.id));
   const sources = new Set(catalog.flatMap(s => s.compatibility?.sources || []));
+const denied = /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux|password.?steal|key.?logger|credential|session.?steal|webhook.?steal|malware|ransom|backdoor|rat\b|bypass.?anti.?cheat/i;
   const date = new Date().toISOString().slice(0,10);
   const target = Number(process.argv[2] || 2200);
   let added = 0;
   for (let page = 1; page <= 900 && added < target; page++) {
-    const response = await fetch(`https://scriptblox.com/api/script/fetch?page=${page}&mode=free`, {signal: AbortSignal.timeout(25000)});
+    const params = new URLSearchParams({page:String(page),max:'20',mode:'free',patched:'0',sortBy:'createdAt',order:'desc'});
+    const response = await fetch(`https://scriptblox.com/api/script/fetch?${params}`, {signal: AbortSignal.timeout(25000)});
     if (!response.ok) { console.log(`Import stopped at page ${page}: HTTP ${response.status}`); break; }
     const {result} = await response.json();
     if (!Array.isArray(result?.scripts)) throw new Error('Unexpected public listing');
@@ -17,8 +19,9 @@ async function main() {
       if (!/^[a-f0-9]{24}$/.test(item._id) || typeof item.slug !== 'string' || !/^[\w().%-]+$/.test(item.slug)) continue;
       const source = 'https://scriptblox.com/script/' + item.slug;
       if (ids.has(id) || sources.has(source) || item.isPatched || item.scriptType !== 'free') continue;
-      if (!item.title || !item.game?.name || /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux/i.test(item.title)) continue;
-      catalog.push({id, name:item.title.slice(0,180), description:`${item.game.name}. Funciones anunciadas en el título: ${item.title.slice(0,180)}. ${item.key?'Requiere clave':'Sin clave indicada'}. Contenido remoto y funcionamiento sin verificar.`,
+      const gameName = typeof item.game?.name === 'string' ? item.game.name : (item.isUniversal ? 'Universal' : '');
+      if (!item.title || !gameName || denied.test(item.title) || item.isPatched !== false) continue;
+      catalog.push({id, name:item.title.slice(0,180), description:`${gameName}. Funciones anunciadas en el título: ${item.title.slice(0,180)}. ${item.key?'Requiere clave':'Sin clave indicada'}. Contenido remoto y funcionamiento sin verificar.`,
         level:'free', device:'unknown', platform:'roblox', type:'loadstring', executors:['Ejecutor externo (sin verificar)'], tags:['Juegos','Comunidad',item.key?'Con clave':'Sin clave'], version:'1.0', created_at:date,
         reference_image:typeof item.game.imageUrl==='string' && /^\/images\/[\w/.-]+$/.test(item.game.imageUrl)?'https://scriptblox.com'+item.game.imageUrl:undefined,
         code:`loadstring(game:HttpGet(${JSON.stringify('https://scriptblox.com/raw/'+item.slug)}))()`, game:item.game.name.slice(0,180), game_id:String(item.game.gameId || 0), catalog_section:'games',
