@@ -98,6 +98,45 @@ async function fetchRscripts() {
   }
   return { newest: unique(newest), trending: unique(trending) };
 }
+
+async function fetchGitHubTopic(topic, label) {
+  const headers = { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'RCC-Catalog/1.0' };
+  if (process.env.GH_TOKEN) headers.Authorization = 'Bearer ' + process.env.GH_TOKEN;
+  const url = new URL('https://api.github.com/search/repositories');
+  url.search = new URLSearchParams({ q: 'topic:' + topic + ' fork:false archived:false', sort: 'updated', order: 'desc', per_page: '20' }).toString();
+  const data = await get(url, headers);
+  return (data.items || []).filter(row => row.html_url && row.full_name).map(row => ({
+    id: 'gh:' + row.id, kind: 'repository', source: 'GitHub · ' + label,
+    title: text(row.full_name, 120), game: label,
+    creator: text(row.owner?.login || 'GitHub', 70),
+    createdAt: iso(row.pushed_at || row.updated_at || row.created_at),
+    updatedAt: iso(row.updated_at), views: Number(row.stargazers_count || 0),
+    likes: Number(row.stargazers_count || 0), url: row.html_url,
+    sourceId: String(row.id), language: text(row.language || '', 40),
+    description: text(row.description || 'Repositorio público de código fuente.', 240),
+    topics: Array.isArray(row.topics) ? row.topics.slice(0, 8).map(value => text(value, 32)) : [],
+    codeIncluded: false, verified: false
+  }));
+}
+async function fetchGitHubDiscoveries() {
+  const topics = [
+    ['roblox','Roblox / Luau'], ['fivem','FiveM'], ['java','Java'],
+    ['javascript','JavaScript'], ['gameguardian','GameGuardian'],
+    ['autotouch','AutoTouch'], ['minecraft-mods','Minecraft Mods'],
+    ['godot','Godot'], ['unity','Unity'], ['python','Python']
+  ];
+  const settled = await Promise.allSettled(topics.map(([topic,label]) => fetchGitHubTopic(topic,label)));
+  const items = [], sourceStatus = {};
+  settled.forEach((result,index) => {
+    const [topic,label] = topics[index];
+    if (result.status === 'fulfilled') {
+      sourceStatus[label] = { ok:true, count:result.value.length };
+      items.push(...result.value);
+    } else sourceStatus[label] = { ok:false, error:text(result.reason?.message || result.reason,160) };
+  });
+  return { items:unique(items), sources:sourceStatus };
+}
+
 const old = await fs.readFile(OUTPUT, 'utf8').then(JSON.parse).catch(() => null);
 const results = await Promise.allSettled([fetchScriptBlox(), fetchRscripts()]);
 const sources = {};
