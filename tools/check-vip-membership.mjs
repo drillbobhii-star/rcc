@@ -22,6 +22,8 @@ assert.match(index, /id="javaNav"/);
 assert.match(index, /id="javaTools"/);
 assert.match(index, /id="rccSupportButton"/);
 assert.match(vip, /VIP_PERCENTAGE = 45/);
+assert.match(vip, /script.platform === 'java'/);
+assert.match(vip, /tags.includes\('RCC Supporter'\)/);
 assert.match(vip, /rcc-vip-code-locked/);
 assert.match(admin, /Es VIP/);
 assert.match(api, /RCC_ADMIN_EMAIL/);

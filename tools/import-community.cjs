@@ -51,10 +51,10 @@ function safeImage(value) {
 }
 
 async function main() {
-  const target = Number(process.argv[2] || process.env.RCC_SCRIPTBLOX_TARGET || 1500);
+  const target = Number(process.argv[2] || process.env.RCC_SCRIPTBLOX_TARGET || 10000);
   const maxPages = Number(process.env.RCC_SCRIPTBLOX_MAX_PAGES || 900);
-  if (!Number.isSafeInteger(target) || target < 1 || target > 5000) {
-    throw new Error('Target ScriptBlox debe estar entre 1 y 5000.');
+  if (!Number.isSafeInteger(target) || target < 1 || target > 10000) {
+    throw new Error('Target ScriptBlox debe estar entre 1 y 10000.');
   }
 
   const catalog = readCatalog();

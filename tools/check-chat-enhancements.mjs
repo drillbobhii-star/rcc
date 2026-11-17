@@ -51,7 +51,7 @@ assert.match(api, /rcc_chat_push_subscriptions/);
 assert.match(api, /RCC_WEB_PUSH_PUBLIC_KEY/);
 assert.match(api, /RCC_WEB_PUSH_PRIVATE_KEY/);
 assert.match(api, /Authorization: "vapid t="/);
-assert.match(api, /Content-Encoding: "aes128gcm"/);
+assert(api.includes('"Content-Encoding": "aes128gcm"'));
 assert.match(api, /action === "savePush"/);
 assert.match(api, /action === "pushPublicKey"/);
 assert.match(api, /request\.json\(\)/);

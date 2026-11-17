@@ -20,7 +20,9 @@
     return hash >>> 0;
   }
   function isVipScript(script) {
-    return Boolean(script && hashId(script.id) % 100 < VIP_PERCENTAGE);
+    if (!script || !script.id) return false;
+    if (script.platform === 'java') return Array.isArray(script.tags) && script.tags.includes('RCC Supporter');
+    return hashId(script.id) % 100 < VIP_PERCENTAGE;
   }
   function openModal() {
     if (!modal) return;

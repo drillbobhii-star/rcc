@@ -7,13 +7,13 @@ function main() {
     throw new Error('The RCC Java library must contain at least 30 reviewed examples.');
   }
 
-  const catalog = readCatalog().filter(item => !String(item.id).startsWith('rcc_java_'));
+  const catalog = readCatalog();
   const ids = new Set(catalog.map(item => item.id));
   const createdAt = process.env.RCC_IMPORT_DATE || new Date().toISOString().slice(0, 10);
 
   for (const example of examples) {
-    const id = 'rcc_java_' + example.id;
-    if (ids.has(id)) throw new Error('Duplicate Java example ID: ' + id);
+    const id = 'java_lib_' + example.id;
+    if (ids.has(id)) continue;
     ids.add(id);
 
     catalog.push({
@@ -30,16 +30,16 @@ function main() {
       created_at: createdAt,
       file_extension: 'java',
       catalog_section: 'java',
-      code: example.code.trim() + '\n',
+      code,
       compatibility: {
         environment: 'java',
         runtime: 'Java 17+ · OpenJDK',
         context: 'Aplicación de consola independiente. Guarda el ejemplo como Main.java.',
         requirements: 'JDK 17 o posterior. Compila con javac Main.java y ejecuta con java Main. No requiere dependencias externas.',
-        verification: 'javac-tested',
+        verification: 'java-compiled',
         executor_status: 'not-applicable',
         mobile_status: 'Ejemplo de consola para ordenador; no es una aplicación Android.',
-        test_details: 'Código original RCC comprobado con javac en el flujo de validación.',
+        test_details: 'Código original RCC compilado con JDK 17+ durante la validación automática del catálogo.',
         sources: ['https://docs.oracle.com/en/java/javase/17/']
       }
     });
