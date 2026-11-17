@@ -42,9 +42,9 @@ assert.match(ui, /No, volver/);
 assert.match(vip, /VIP_PERCENTAGE = 40/);
 const check = spawnSync(process.execPath, ['--check', new URL('../tools/sync-community-feed.mjs', import.meta.url).pathname], {encoding:'utf8'});
 assert.equal(check.status, 0, check.stderr);
-console.log('RCC community feed checks passed.');
 
 const importerCheck = spawnSync(process.execPath, ['--check', new URL('../tools/import-community.cjs', import.meta.url).pathname], {encoding:'utf8'});
 assert.equal(importerCheck.status, 0, importerCheck.stderr);
 const javaGeneratorCheck = spawnSync(process.execPath, ['--check', new URL('../tools/expand-java.cjs', import.meta.url).pathname], {encoding:'utf8'});
 assert.equal(javaGeneratorCheck.status, 0, javaGeneratorCheck.stderr);
+console.log('RCC community feed checks passed.');
