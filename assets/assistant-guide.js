@@ -17,7 +17,8 @@
     admin:'El panel de administración reúne herramientas para gestionar miembros y moderar la comunidad. Las acciones sensibles deben ejecutarse únicamente con permisos de administrador y conservar sus confirmaciones. El acceso al panel administrativo sigue restringido a las cuentas autorizadas.',
     chat:'RCC incluye mensajería privada entre miembros y soporte, con avisos de nuevos mensajes y opción de activar notificaciones en el dispositivo cuando el navegador lo admite. Inicia sesión para abrir el chat. Si el creador pausa la mensajería global, el chat mostrará el aviso correspondiente.',
     vip:'¡Sorpresa! RCC está en modo regalo para la comunidad: por ahora no necesitas pagar ni tener una membresía Supporter para consultar los catálogos y acceder al contenido. La cuenta y los registros de Supporter se conservan para una posible reactivación futura. Solo es obligatorio iniciar sesión para ver, copiar o descargar scripts.',
-    appearance:'En el panel principal puedes elegir una foto o GIF animado como fondo, ajustar cómo encaja, cambiar su posición e intensidad y superponer el logo RCC o uno propio. Pulsa «Fondo y logo» para abrir el editor. Inicia sesión para guardar la personalización en tu cuenta.',\n    discord:'El bot RCC ayuda a gestionar y moderar la comunidad desde Discord. Sus acciones administrativas deben quedar limitadas al creador y a los administradores autorizados. Nunca compartas el token del bot ni concedas permisos de administrador innecesarios.'
+    appearance:'En el panel principal puedes elegir una foto o GIF animado como fondo, ajustar cómo encaja, cambiar su posición e intensidad y superponer el logo RCC o uno propio. Pulsa «Fondo y logo» para abrir el editor. Inicia sesión para guardar la personalización en tu cuenta.',
+    discord:'El bot RCC ayuda a gestionar y moderar la comunidad desde Discord. Sus acciones administrativas deben quedar limitadas al creador y a los administradores autorizados. Nunca compartas el token del bot ni concedas permisos de administrador innecesarios.'
   };
 
   const groups={
@@ -77,11 +78,12 @@
     if(/roblox|luau|studio/.test(text))return {action:'roblox'};
     if(/minecraft|godot|unity|gameguardian|autotouch/.test(text))return {action:'games'};
     if(/apk|mods? de android|mod apk/.test(text))return {action:'apk'};
-    if(/perfil|buscar usuarios|buscador de usuarios|foto de perfil|mi cuenta/.test(text))return {action:'profiles'};\n    if(/fondo|pantalla|personaliz|imagen de fondo|gif/.test(text))return {action:'appearance'};
+    if(/perfil|buscar usuarios|buscador de usuarios|foto de perfil|mi cuenta/.test(text))return {action:'profiles'};
+    if(/fondo|pantalla|personaliz|imagen de fondo|gif/.test(text))return {action:'appearance'};
     if(/banner|portada|foto de portada/.test(text))return {action:'banner'};
     if(/admin|administrador|mantener pulsado/.test(text))return {action:'admin'};
     if(/chat|mensaje|notificacion|web push/.test(text))return {action:'chat'};
-    if(/vip|supporter|ko-fi|kofi/.test(text))return {action:'vip'};
+    if(/vip|supporter|ko-fi|kofi|regalo|community gift/.test(text))return {action:'vip'};
     if(/discord|bot|jarvis/.test(text))return {action:'discord'};
     if(/novedades|scripts nuevos|scripts anadidos/.test(text))return {action:'updates'};
     return null;
