@@ -138,17 +138,18 @@ async function fetchGitHubDiscoveries() {
 }
 
 const old = await fs.readFile(OUTPUT, 'utf8').then(JSON.parse).catch(() => null);
-const results = await Promise.allSettled([fetchScriptBlox(), fetchRscripts()]);
+const results = await Promise.allSettled([fetchScriptBlox(), fetchRscripts(), fetchGitHubDiscoveries()]);
 const sources = {};
 const newest = [];
 const trending = [];
 for (let i = 0; i < results.length; i++) {
-  const name = i === 0 ? 'ScriptBlox' : 'Rscripts';
+  const name = ['ScriptBlox','Rscripts','GitHub'][i];
   const result = results[i];
   if (result.status === 'fulfilled') {
     sources[name] = { ok: !result.value.skipped, newest: result.value.newest.length, trending: result.value.trending.length, skipped: result.value.skipped || false, reason: result.value.reason || null };
-    newest.push(...result.value.newest);
-    trending.push(...result.value.trending);
+    newest.push(...(result.value.newest || []), ...(result.value.items || []));
+    trending.push(...(result.value.trending || []));
+    if (result.value.sources) Object.assign(sources, result.value.sources);
   } else {
     sources[name] = { ok: false, error: text(result.reason?.message || result.reason, 180) };
   }
