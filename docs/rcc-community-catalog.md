@@ -15,7 +15,7 @@ GitHub Actions ejecuta `.github/workflows/refresh-community-catalog.yml` cada se
 
 ## Importación adicional al catálogo estático
 
-El workflow manual **Expand RCC catalog** permite importar un lote de publicaciones gratuitas, recientes y declaradas no parcheadas de ScriptBlox. El importador compara IDs y URLs de origen para evitar duplicados, aplica una lista preventiva de títulos de alto riesgo y añade únicamente metadatos y un enlace al origen; no descarga ni ejecuta el código externo. Las fichas importadas permanecen como `unverified` hasta una revisión técnica independiente. La cantidad final puede ser menor que el objetivo solicitado si las páginas contienen duplicados, fichas parcheadas o entradas que no superan los filtros.
+El workflow manual **Expand RCC catalog** importa publicaciones gratuitas, recientes y declaradas no parcheadas de ScriptBlox; cuando existe el secreto `RSCRIPTS_API_KEY`, también consulta Rscripts v1 y acepta solo fichas con análisis explícito `Safe` o `Low Risk` y puntuación de riesgo máxima 3. Configura el secreto en GitHub → Settings → Secrets and variables → Actions. El importador compara IDs y URLs de origen para evitar duplicados, aplica una lista preventiva de títulos de alto riesgo y añade únicamente metadatos y enlaces al origen; no descarga ni ejecuta el código externo. Las fichas importadas permanecen como `unverified` hasta una revisión técnica independiente. La cantidad final puede ser menor que el objetivo solicitado si las páginas contienen duplicados, riesgos no evaluados o entradas que no superan los filtros.
 
 ## Activar Rscripts
 
