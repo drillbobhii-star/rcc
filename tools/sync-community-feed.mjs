@@ -165,6 +165,7 @@ const payload = {
   updatedAt: new Date().toISOString(),
   counts: { newest: mergedNewest.length, trending: mergedTrending.length, importedMetadata: mergedNewest.length },
   sources,
+  news: Array.isArray(old?.news) ? old.news : [],
   notice: 'Descubrimientos externos: RCC muestra metadatos y enlaces originales. No aloja ni ejecuta el código de terceros.',
   newest: mergedNewest,
   trending: mergedTrending
