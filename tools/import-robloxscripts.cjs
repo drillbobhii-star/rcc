@@ -113,7 +113,7 @@ function rowToEntry(row, checkedAt = new Date().toISOString()) {
   };
 }
 async function main() {
-  const target = Number(process.argv[2] || process.env.RCC_ROBLOXSCRIPTS_TARGET || 3000);
+  const target = Number(process.argv[2] || process.env.RCC_ROBLOXSCRIPTS_TARGET || 10000);
   const maxPages = Number(process.env.RCC_ROBLOXSCRIPTS_MAX_PAGES || 200);
   if (!Number.isSafeInteger(target) || target < 1 || target > 10000) throw new Error('Target RobloxScripts debe estar entre 1 y 10000.');
   if (!Number.isSafeInteger(maxPages) || maxPages < 1 || maxPages > 200) throw new Error('RobloxScripts admite como máximo 200 páginas.');
