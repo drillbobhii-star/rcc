@@ -1,13 +1,13 @@
 // Import public listing metadata only. Never fetch, evaluate, or execute third-party code.
 const { readCatalog, writeCatalog } = require('./catalog-store.cjs');
 
-const denied = /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux|password.?steal|key.?logger|credential|session.?steal|webhook.?steal|malware|ransom|backdoor|rat\\b|bypass.?anti.?cheat/i;
+const denied = /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux|password.?steal|key.?logger|credential|session.?steal|webhook.?steal|malware|ransom|backdoor|rat\b|bypass.?anti.?cheat/i;
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const dateStamp = value => {
   const date = value ? new Date(value) : new Date();
   return Number.isFinite(date.getTime()) ? date.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
 };
-const cleanText = (value, max = 500) => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, max);
+const cleanText = (value, max = 500) => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 function allowedUrl(value, host, prefix) {
   try {
     const url = new URL(value);
@@ -78,7 +78,7 @@ async function main() {
       const result = payload?.result;
       if (!Array.isArray(result?.scripts)) throw new Error('ScriptBlox returned an unexpected listing');
       for (const item of result.scripts) {
-        if (!/^[a-f0-9]{24}$/.test(String(item?._id || '')) || typeof item.slug !== 'string' || !/^[\\w().%-]+$/.test(item.slug)) continue;
+        if (!/^[a-f0-9]{24}$/.test(String(item?._id || '')) || typeof item.slug !== 'string' || !/^[\w().%-]+$/.test(item.slug)) continue;
         if (item.isPatched !== false || item.scriptType !== 'free') continue;
         const game = item.game || {};
         const gameName = typeof game.name === 'string' ? game.name : (item.isUniversal ? 'Universal' : '');
@@ -89,7 +89,7 @@ async function main() {
           id: `games_sb_${item._id}`, source, title: item.title,
           description: `${gameName}. ${item.title}. ${item.key ? 'Requiere clave.' : 'Sin clave indicada.'} Ficha externa, no verificada por RCC.`,
           gameName, gameId: game.gameId || 0, rawUrl,
-          imageUrl: typeof game.imageUrl === 'string' && /^\\/images\\/[\\w/.-]+$/.test(game.imageUrl) ? 'https://scriptblox.com' + game.imageUrl : null,
+          imageUrl: typeof game.imageUrl === 'string' && game.imageUrl.startsWith('/images/') ? 'https://scriptblox.com' + game.imageUrl : null,
           keyRequired: item.key === true, createdAt: item.createdAt,
           sourceName: 'ScriptBlox', device: 'unknown',
           testDetails: `Publicación declarada gratuita y no parcheada por ScriptBlox. Revisada en listado el ${new Date().toISOString().slice(0, 10)}; RCC no descargó ni ejecutó el código.`
