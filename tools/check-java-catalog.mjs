@@ -20,7 +20,7 @@ if (compiler.error || compiler.status !== 0) {
     assert.equal(item.catalog_section, 'java', item.id);
     assert.equal(item.compatibility.verification, 'java-compiled', item.id);
     assert(item.code.startsWith('// RCC | Ejemplo independiente de Java 17'), item.id);
-    assert.doesNotMatch(item.code, /ProcessBuilder|Runtime\\.getRuntime\\(\\)\\.exec|HttpClient|new Socket\\(/, item.id);
+    assert(!['ProcessBuilder', 'Runtime.getRuntime().exec', 'HttpClient', 'new Socket('].some(value => item.code.includes(value)), item.id);
     const dir = mkdtempSync(join(tmpdir(), 'rcc-java-'));
     try {
       const source = join(dir, 'Main.java');
