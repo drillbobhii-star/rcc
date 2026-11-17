@@ -27,5 +27,13 @@ assert.match(api, /rcc_vip_memberships/);
 assert.match(api, /RCC_VIP_API_URL/);
 assert.match(migration, /ADD COLUMN IF NOT EXISTS is_creator boolean/);
 assert.match(migration, /ADD COLUMN IF NOT EXISTS has_banner boolean/);
+assert.match(html, /admin-premium\.css/);
+assert.match(html, /admin-dashboard\.js\?v=4/);
+assert.match(api, /capabilities: \{ isCreator: true, hasBanner: true \}/);
+assert.match(api, /\[field\]: value/);
+assert.match(client, /data\?\.is_creator===true/);
+assert.match(client, /hasBannerPermission=data\?\.has_banner===true/);
+assert.match(client, /!isProfileVip&&!hasBannerPermission/);
+assert.doesNotMatch(client, /is_creator: \(currentUser\.email/);
 
 console.log("RCC admin dashboard static checks passed.");

@@ -161,9 +161,8 @@ async function setProfileFlag(env: Env, userId: string, field: string, value: bo
     body: JSON.stringify({ [field]: value }),
   });
   if (!updated.length) {
-    if (field !== "is_supporter") {
-      throw new Error("No existe un perfil para actualizar. El usuario debe completar su registro RCC primero.");
-    }
+    // Create profiles lazily for Auth users who have not completed their first visit.
+    // Only the requested entitlement is written; other profile flags stay untouched.
     const authResponse = await fetch(baseUrl(env) + "/auth/v1/admin/users/" + encodeURIComponent(userId), {
       headers: serviceHeaders(env),
       signal: AbortSignal.timeout(10000),
@@ -177,7 +176,7 @@ async function setProfileFlag(env: Env, userId: string, field: string, value: bo
     await rest(env, "profiles?on_conflict=user_id", {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-      body: JSON.stringify({ user_id: userId, display_name: displayName, is_supporter: value }),
+      body: JSON.stringify({ user_id: userId, display_name: displayName, [field]: value }),
     });
   }
 }
@@ -250,10 +249,8 @@ async function loadDashboard(env: Env) {
       linkedDiscord: users.filter(user => user.discord_id).length,
       usdRevenueShown: Math.round(totalRevenue * 100) / 100,
     },
-    capabilities: {
-      isCreator: profiles.some(p => Object.prototype.hasOwnProperty.call(p, "is_creator")),
-      hasBanner: profiles.some(p => Object.prototype.hasOwnProperty.call(p, "has_banner")),
-    },
+    // The migration defines these columns even when profiles is empty.
+    capabilities: { isCreator: true, hasBanner: true },
   };
 }
 

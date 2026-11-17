@@ -79,7 +79,7 @@ const APP_VERSION = '3.0';
   const bannerPositionWrap=el('label','Posición de la imagen'),bannerPosition=el('select');
   [['center','Centro'],['top','Arriba'],['bottom','Abajo']].forEach(([v,t])=>{const o=el('option',t);o.value=v;bannerPosition.append(o);});bannerPositionWrap.append(bannerPosition);vipBannerSettings.append(bannerHeightWrap,bannerPositionWrap);
 
-  let currentBannerUrl='',currentBackgroundUrl='',currentBackgroundType='image',currentRobloxId='',isProfileVip=false;
+  let currentBannerUrl='',currentBackgroundUrl='',currentBackgroundType='image',currentRobloxId='',isProfileVip=false,hasBannerPermission=false;
   let selectedAvatarFile=null,selectedBackgroundFile=null,selectedBannerFile=null,selectedAvatarPreviewUrl='';
   const imageExtensionMime={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',gif:'image/gif',webp:'image/webp',avif:'image/avif',bmp:'image/bmp',svg:'image/svg+xml',tif:'image/tiff',tiff:'image/tiff',heic:'image/heic',heif:'image/heif',ico:'image/x-icon'};
   function imageFileInfo(file){
@@ -132,6 +132,7 @@ const APP_VERSION = '3.0';
       if(error) throw error;
       if(currentUser?.id !== profileOwner){ profile.d.close(); return; }
       isProfileVip=await checkProfileVip(sb);
+      hasBannerPermission=data?.has_banner===true;
       name.value = data?.display_name || '';
       updateProfilePreview();
       avatar.value = data?.avatar_url || '';
@@ -139,10 +140,11 @@ const APP_VERSION = '3.0';
       currentBackgroundUrl=data?.profile_background_url||'';currentBackgroundType=data?.profile_background_type||'image';backgroundPreview.style.backgroundImage=currentBackgroundUrl?'url("'+currentBackgroundUrl+'")':'';
       profileHero.style.backgroundImage=currentBackgroundUrl?'linear-gradient(0deg,rgba(8,12,20,.55),rgba(8,12,20,.25)),url("'+currentBackgroundUrl+'")':'';
       bannerHeight.value=String(data?.banner_height||220);bannerPosition.value=data?.banner_position||'center';
-      vipBannerSettings.hidden=!isProfileVip;bannerUpload.parentElement.hidden=!isProfileVip;
+      vipBannerSettings.hidden=!isProfileVip;bannerUpload.parentElement.hidden=!(isProfileVip||hasBannerPermission);
+      bannerUpload.parentElement.firstChild.textContent=isProfileVip?'Banner de perfil · imagen o GIF animado (VIP)':'Banner de perfil · imagen o GIF animado (permiso especial)';
       robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
       bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';
-      const isCreator=(currentUser?.email||'').trim().toLowerCase()===creatorEmail;creatorEffects.hidden=!isCreator;
+      const isCreator=data?.is_creator===true;creatorEffects.hidden=!isCreator;
       nameEffect.value=isCreator?(data?.name_effect||'none'):'none';bannerEffect.value=isCreator?(data?.banner_effect||'none'):'none';
       color.value = data?.text_color || '#dce6f5';
       updateProfilePreview();
@@ -197,7 +199,7 @@ const APP_VERSION = '3.0';
       const sb = await window.rccSupabaseReady;
       if(selectedAvatarFile){validateImageFile(selectedAvatarFile,5*1024*1024,'Foto');profile.status.textContent='Subiendo foto…';avatarUrl=await uploadProfileImage(sb,selectedAvatarFile,'avatars');}
       if(selectedBackgroundFile){validateImageFile(selectedBackgroundFile,12*1024*1024,'Fondo');profile.status.textContent='Subiendo fondo…';currentBackgroundUrl=await uploadProfileImage(sb,selectedBackgroundFile,'backgrounds');currentBackgroundType=(imageFileInfo(selectedBackgroundFile).mime==='image/gif'||/\.gif$/i.test(selectedBackgroundFile.name))?'gif':'image';}
-      if(selectedBannerFile){if(!isProfileVip)throw new Error('El banner ampliado y personalizable es exclusivo VIP.');validateImageFile(selectedBannerFile,10*1024*1024,'Banner');profile.status.textContent='Subiendo banner VIP…';currentBannerUrl=await uploadProfileImage(sb,selectedBannerFile,'banners');}
+      if(selectedBannerFile){if(!isProfileVip&&!hasBannerPermission)throw new Error('Necesitas VIP o el permiso especial de banner para subir una portada.');validateImageFile(selectedBannerFile,10*1024*1024,'Banner');profile.status.textContent='Subiendo banner VIP…';currentBannerUrl=await uploadProfileImage(sb,selectedBannerFile,'banners');}
       if(currentUser?.id!==profileOwner)throw new Error('La sesión cambió. Abre tu perfil de nuevo.');
       const { error } = await sb.from('profiles').upsert({
         user_id: currentUser.id,
@@ -214,7 +216,6 @@ const APP_VERSION = '3.0';
         bio: bio.value.trim(),
         name_effect: nameEffect.value,
         banner_effect: bannerEffect.value,
-        is_creator: (currentUser.email||'').trim().toLowerCase()===creatorEmail,
         text_color: color.value
       });
       if(error) throw error;
@@ -237,7 +238,7 @@ const APP_VERSION = '3.0';
   const publicAvatar=el('img',null,'rcc-profile-avatar');publicAvatar.alt='Foto de perfil';
   const publicName=el('div',null,'rcc-profile-name'),publicBio=el('p',null,'rcc-profile-bio'),publicRoblox=el('a',null,'rcc-profile-roblox'),publicFounder=el('div','👑 RCC FOUNDER · DRILLBOBHII','rcc-founder-mark');
   publicContent.append(publicAvatar,publicName,publicBio,publicRoblox,publicFounder);publicProfile.d.insertBefore(publicBanner,publicProfile.d.firstChild);publicProfile.d.insertBefore(publicContent,publicProfile.form);
-  function openPublicProfile(profileData={},isCreator=false){
+  function openPublicProfile(profileData={},isCreator=profileData.is_creator===true){
     publicName.textContent=profileData.display_name||'Miembro RCC';
     publicAvatar.src=profileData.avatar_url||new URL('/assets/default-avatar.svg',location.origin).href;
     publicBio.textContent=profileData.bio||'';publicBio.hidden=!publicBio.textContent;
@@ -335,7 +336,7 @@ const APP_VERSION = '3.0';
         const authorName = prof.display_name || (row.user_email || 'Miembro').split('@')[0];
         const authorColor = prof.text_color || '#dce6f5';
         
-        const isCreator=(row.user_email||'').trim().toLowerCase()===creatorEmail;
+        const isCreator=prof.is_creator===true;
         const author=el('button',authorName,'comment-author-button');author.type='button';
         if(/^#[a-f0-9]{6}$/i.test(authorColor)) author.style.color = authorColor;
         author.onclick=()=>openPublicProfile(prof,isCreator);

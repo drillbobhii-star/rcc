@@ -1,0 +1,27 @@
+/* RCC Admin premium visual layer */
+:root{--bg:#070812;--panel:rgba(19,22,39,.82);--line:rgba(173,160,255,.17);--muted:#969bb8;--text:#f4f3ff;--accent:#a78bfa;--cyan:#67e8f9}
+body{background:radial-gradient(ellipse at 8% -8%,rgba(124,91,230,.30),transparent 38%),radial-gradient(ellipse at 94% 0%,rgba(41,173,202,.17),transparent 34%),linear-gradient(145deg,#080914,#0b1020 55%,#080a14);background-attachment:fixed}
+#rccAdminShell{max-width:1600px;padding:22px clamp(12px,2.4vw,34px) 48px}
+.admin-top{padding:17px 19px;margin:0 0 16px;border:1px solid rgba(185,171,255,.2);border-radius:22px;background:linear-gradient(115deg,rgba(35,29,67,.88),rgba(17,29,49,.86) 65%,rgba(19,23,42,.9));box-shadow:0 18px 55px #0005;backdrop-filter:blur(24px)}
+.brand-mark{border-radius:15px;background:linear-gradient(145deg,#8b5cf6,#256d91);box-shadow:0 8px 30px #7958df55}
+.brand h1{letter-spacing:-.045em}.brand p{letter-spacing:.02em}
+.admin-search{margin:0 0 13px}.admin-search input{border-radius:15px;background:rgba(15,18,34,.88);border-color:rgba(174,158,255,.2);box-shadow:0 8px 28px #0002}
+.admin-tabs{position:sticky;top:8px;z-index:50;display:flex;align-items:center;gap:7px;flex-wrap:nowrap;overflow-x:auto;padding:8px;margin:0 0 18px;border:1px solid rgba(183,170,255,.19);border-radius:17px;background:rgba(11,13,27,.88);backdrop-filter:blur(24px);box-shadow:0 12px 35px #0005;scrollbar-width:thin}
+.admin-tab{flex:0 0 auto;position:relative;border-color:transparent;background:transparent;border-radius:11px;padding:11px 16px;color:#bfc2da;white-space:nowrap}
+.admin-tab.active{background:linear-gradient(120deg,rgba(139,92,246,.32),rgba(34,211,238,.12));border-color:rgba(178,155,255,.35);color:#fff;box-shadow:inset 0 1px #ffffff12,0 5px 18px #6d50cf22}
+.admin-tab.active:after{content:'';position:absolute;left:22%;right:22%;bottom:-1px;height:2px;border-radius:4px;background:linear-gradient(90deg,#a78bfa,#67e8f9)}
+.admin-panel.active{animation:rccPanelIn .22s ease-out}
+@keyframes rccPanelIn{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.stat-card,.glass-card{border-color:rgba(176,164,255,.17);background:linear-gradient(145deg,rgba(23,26,46,.91),rgba(14,19,34,.9));box-shadow:0 18px 48px #0003}
+.stat-card{position:relative;overflow:hidden}.stat-card:after{content:'';position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,#8b5cf6,#22d3ee,transparent)}
+.stat-card strong{font-size:clamp(1.45rem,3vw,2rem);letter-spacing:-.055em}
+.glass-card{border-radius:20px}.card-head h2{letter-spacing:-.025em}
+.table-wrap{border-color:rgba(176,164,255,.15);border-radius:15px}
+th{background:rgba(12,15,29,.96);backdrop-filter:blur(12px)}
+tbody tr{transition:background .16s ease}tbody tr:hover{background:rgba(139,115,236,.09)}
+.small-btn{transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.small-btn:hover{transform:translateY(-1px)}
+.switch-label{padding:5px 8px;border:1px solid rgba(170,165,220,.12);border-radius:9px;background:rgba(255,255,255,.025)}
+#adminStatus{position:sticky;bottom:8px;z-index:60;width:fit-content;max-width:100%;padding:7px 12px;border:1px solid var(--line);border-radius:11px;background:rgba(12,15,29,.92);backdrop-filter:blur(14px)}
+@media(max-width:700px){#rccAdminShell{padding:12px 9px 30px}.admin-top{padding:14px;border-radius:17px}.admin-tabs{top:4px;padding:6px;border-radius:14px}.admin-tab{padding:10px 12px;font-size:.8rem}.admin-search input{height:48px}.admin-stats{gap:9px}.stat-card{padding:13px;border-radius:15px}.glass-card{padding:13px;border-radius:16px}}
+@media(prefers-reduced-motion:reduce){.admin-panel.active{animation:none}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
