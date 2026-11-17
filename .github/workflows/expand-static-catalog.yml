@@ -18,10 +18,17 @@ on:
         required: true
         default: "1200"
         type: string
+      robloxscripts_target:
+        description: Maximum number of free public RobloxScripts.com listings to index
+        required: true
+        default: "3000"
+        type: string
   push:
     branches: [main]
     paths:
       - ".github/workflows/expand-static-catalog.yml"
+      - "tools/import-robloxscripts.cjs"
+      - "tools/check-robloxscripts-import.mjs"
   schedule:
     - cron: "31 11 * * *"
 
@@ -62,6 +69,12 @@ jobs:
           TARGET: ${{ inputs.scriptblox_target || '10000' }}
         run: node tools/import-community.cjs "$TARGET"
 
+      - name: Import public free RobloxScripts.com listings
+        env:
+          TARGET: ${{ inputs.robloxscripts_target || '3000' }}
+          RCC_ROBLOXSCRIPTS_MAX_PAGES: "200"
+        run: node tools/import-robloxscripts.cjs "$TARGET"
+
       - name: Import public low-risk RScripts listings
         env:
           TARGET: ${{ inputs.rscripts_target || '3000' }}
@@ -100,9 +113,9 @@ jobs:
           body: |
             ## RCC catalog growth
 
-            This automated proposal imports newly published public free listings from ScriptBlox and public free low-risk listings from the current RScripts v1 API, then adds the reviewed original Java examples authored in RCC.
+            This automated proposal imports newly published public free listings from ScriptBlox and RobloxScripts.com, optional public free low-risk listings from the current RScripts v1 API, public FiveM release metadata from Cfx.re, and the reviewed original Java examples authored in RCC.
 
-            - ScriptBlox listings are deduplicated by source ID and canonical URL; patched, paid and suspicious-title entries are skipped.
+            - ScriptBlox and RobloxScripts.com listings are deduplicated by source ID and canonical URL; paid and suspicious-title entries are skipped. RobloxScripts.com is credited visibly and rate-limited according to its public API documentation.
             - RScripts listings require the configured RSCRIPTS_API_KEY secret; only public, free, non-patched entries marked Safe or Low Risk, with a numeric score from 1 to 4 and no detected obfuscation, are considered.
             - External scripts remain source-linked loaders. RCC does not download or execute their remote Lua.
             - Original Java examples are compiled individually with JDK 21 using the Java validation script.
