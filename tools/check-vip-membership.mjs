@@ -20,6 +20,7 @@ assert.match(index, /id="vipTab"/);
 assert.match(index, /id="rccSupportButton"/);
 assert.match(vip, /VIP_PERCENTAGE = 40/);
 assert.match(vip, /includes\('RCC Supporter'\)/);
+assert.match(vip, /script\.platform === 'java'/);
 assert.match(vip, /RCCCatalogScriptsById/);
 assert.match(index, /id="javaTab"/);
 assert.match(index, /catalogSection==='java'/);
