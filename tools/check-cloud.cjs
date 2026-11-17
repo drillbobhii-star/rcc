@@ -1,6 +1,9 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('index.html','utf8');
-const source=html.slice(html.indexOf('const votedIds ='),html.indexOf('\ninitializeAuth();'));
+const start=html.indexOf('const votedIds =');
+const end=html.indexOf('window.rccSessionReady=initializeAuth();',start);
+assert(start>=0&&end>start,'Could not isolate the inline catalog application script');
+const source=html.slice(start,end);
 const els=new Map(),messages=[],requests=[];
 const element=()=>({hidden:false,disabled:false,value:'',textContent:'',isConnected:true,
  classList:{contains:()=>false,add(){},remove(){}},setAttribute(){},addEventListener(){},querySelectorAll:()=>[],focus(){},reportValidity:()=>true});
