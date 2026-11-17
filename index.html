@@ -4,7 +4,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RCC — Lua, juegos y JavaScript</title>
+<title>RCC — Lua, juegos, Java y JavaScript</title>
 
 <style>
   :root{
@@ -510,6 +510,7 @@ window.rccSupabaseReady.catch(() => {});
   <button class="games-nav" id="favoritesBtn" type="button" aria-pressed="false">❤️ Favoritos <span id="favoritesCount">0</span></button>
   <button class="games-nav" id="gamesNav" type="button">Juegos Roblox <span aria-hidden="true">↗</span></button>
   <button class="games-nav" id="webNav" type="button">JavaScript · Web ↗</button>
+  <button class="games-nav" id="javaNav" type="button">Java · Programación ↗</button>
   <a class="games-nav help-link" href="soporte.html">Ayuda y reportar errores ↗</a>
   <div class="sidebar-section">
     <div id="recentBtn" class="nav-item">
@@ -557,6 +558,7 @@ window.rccSupabaseReady.catch(() => {});
         <button id="trendingTab" type="button" aria-pressed="false">Tendencia</button><button id="updatesTab" type="button" aria-pressed="false">Novedades</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
+        <button id="javaTab" type="button" aria-pressed="false">Java · Programación <span id="javaCount"></span></button>
         <button id="vipTab" type="button" aria-pressed="false">💎 Zona VIP</button>
         <a class="help-link" href="#analysis">Sección de prueba ↗</a>
         <a class="help-link" href="#obfuscator">Generador de ofuscador ↗</a>
@@ -738,6 +740,7 @@ const PLATFORMS = [
   { id:'gameguardian',name:'GameGuardian', icon:'🕹️' },
   { id:'autotouch',   name:'AutoTouch',    icon:'📱' },
   { id:'web', name:'JavaScript / Web', icon:'⌘' },
+  { id:'java', name:'Java', icon:'☕' },
   { id:'universal',   name:'Universal',    icon:'⚙️' },
 ];
 
@@ -763,16 +766,17 @@ async function loadScripts(){
     const data=await window.RCCCatalogLoader.load({onBatch:batch=>{
       catalogTotal=batch.total;
       if(catalogStatus!=='ready'){
-        scripts=batch.scripts;catalogStatus='ready';buildSidebar();render();
+        scripts=batch.scripts;window.RCCCatalogScriptsById=new Map(scripts.map(item=>[String(item.id),item]));catalogStatus='ready';buildSidebar();render();
       }
     },onProgress:({loaded,total})=>{
       document.getElementById('resultCount').textContent=`Descargando: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos. Ya puedes explorar; la búsqueda completa estará disponible al terminar.`;
     }});
-    scripts=data;catalogLoading=false;catalogStatus='ready';
+    scripts=data;window.RCCCatalogScriptsById=new Map(scripts.map(item=>[String(item.id),item]));catalogLoading=false;catalogStatus='ready';
     const tagSelect = document.getElementById('tagFilter');
     tagSelect.options.length=1;document.getElementById('gameFilter').options.length=1;
     [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
     document.getElementById('webCount').textContent='· '+scripts.filter(s=>s.catalog_section==='web').length;
+    document.getElementById('javaCount').textContent='· '+scripts.filter(s=>s.catalog_section==='java').length;
     const games=scripts.filter(s=>s.catalog_section==='games');
     document.getElementById('gamesCount').textContent='· '+games.length;
     const gameCounts=new Map();
@@ -951,8 +955,13 @@ function render(reset = true){
     document.getElementById('heroTitle').textContent='JavaScript para la web';
     document.getElementById('heroSubtitle').textContent='HTML, CSS y JavaScript en un archivo. Copia, descarga y empieza a crear tu página.';
   }
+  if(catalogSection==='java'){
+    list=list.filter(s=>s.catalog_section==='java');
+    document.getElementById('heroTitle').textContent='Java · Programación';
+    document.getElementById('heroSubtitle').textContent='Ejemplos independientes de Java 17: algoritmos, estructuras de datos, colecciones, archivos y concurrencia. No son scripts de Roblox.';
+  }
   if(catalogSection==='vip'){document.getElementById('heroTitle').textContent='Zona VIP';document.getElementById('heroSubtitle').textContent='Una selección exclusiva para RCC Supporter. Desbloquea el acceso mensual para ver, copiar y descargar estos códigos.';}
-  if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza aquí.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos y JavaScript. Incluye variantes configurables y visuales.';}
+  if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza aquí.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos, Java y JavaScript. Incluye variantes configurables y visuales.';}
   if (showFavorites) list = list.filter(s => favoriteIds.has(s.id));
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
@@ -1238,7 +1247,7 @@ modal.addEventListener('keydown',e=>{
 });
 function selectSection(section, options={}){
   clearCatalogFilters();
-  catalogSection=['all','games','web','vip'].includes(section)?section:'all';
+  catalogSection=['all','games','web','java','vip'].includes(section)?section:'all';
   releaseView=options.view || '';
   showRecent=options.recent===true;showFavorites=options.favorites===true;
   filterDevice=options.device || 'all';filterPlatform=options.platform || 'all';
@@ -1246,9 +1255,10 @@ function selectSection(section, options={}){
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev===filterDevice));
   document.getElementById('recentBtn').classList.toggle('active',showRecent);
   document.getElementById('favoritesBtn').setAttribute('aria-pressed',String(showFavorites));
-  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['vipTab',catalogSection==='vip'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
+  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['javaTab',catalogSection==='java'],['vipTab',catalogSection==='vip'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
   document.body.classList.toggle('games-mode',catalogSection==='games');
   document.body.classList.toggle('web-mode',catalogSection==='web');
+  document.body.classList.toggle('java-mode',catalogSection==='java');
   document.getElementById('gameTools').hidden=catalogSection!=='games';
   document.getElementById('webTools').hidden=catalogSection!=='web';
   if(showRecent){document.getElementById('heroTitle').textContent='Tus scripts recientes';document.getElementById('heroSubtitle').textContent='Los últimos scripts que has copiado.';}
@@ -1292,8 +1302,10 @@ window.RCCNavigation = {
 };
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
 document.getElementById('webTab').onclick=()=>selectSection('web');
+document.getElementById('javaTab').onclick=()=>selectSection('java');
 document.getElementById('vipTab').onclick=()=>selectSection('vip');
 document.getElementById('webNav').onclick=()=>selectSection('web');
+document.getElementById('javaNav').onclick=()=>selectSection('java');
 document.getElementById('gamesTab').onclick=()=>selectSection('games');
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;
