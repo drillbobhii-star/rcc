@@ -14,6 +14,10 @@ Los nombres de las partes incluyen una huella SHA-256 truncada de su contenido. 
 
 El catálogo incluye una sección independiente de Java 17, separada de los scripts Lua/Luau de Roblox y de la biblioteca JavaScript para navegador. Cada ejemplo es autocontenido, usa bibliotecas estándar y se identifica con la etiqueta `Java`. Para probarlo, guarda el código como `Main.java`, compila con `javac Main.java` y ejecuta `java Main`. Los ejemplos avanzados llevan la etiqueta `RCC Supporter`; el resto sigue disponible en el catálogo general. La verificación `java-compiled` corresponde a compilación y ejecución automatizadas con JDK 17, no a Roblox Studio.
 
+## Biblioteca Java
+
+El catálogo incluye una sección independiente de Java 17, separada de los scripts Lua/Luau de Roblox y de la biblioteca JavaScript para navegador. Cada ejemplo es autocontenido, usa bibliotecas estándar y se identifica con la etiqueta `Java`. Para probarlo, guarda el código como `Main.java`, compila con `javac Main.java` y ejecuta `java Main`. Los ejemplos avanzados llevan la etiqueta `RCC Supporter`; los otros ejemplos Java permanecen gratuitos. La verificación `java-compiled` corresponde a compilación y ejecución automatizadas con JDK 17, no a Roblox Studio.
+
 ## Publicación
 
 Publica `scripts.json`, la carpeta `catalog/`, el nuevo cargador y los archivos estáticos habituales. El despliegue debe incluirlos juntos, como ocurre al publicar la revisión completa del repositorio. La configuración existente de Cloudflare Pages no requiere un nuevo comando de compilación.
