@@ -12,9 +12,9 @@ for (const item of library) {
     'import java.nio.file.*;', 'import java.nio.charset.StandardCharsets;', 'import java.util.concurrent.*;',
     'import java.util.concurrent.atomic.*;', 'import java.util.regex.*;', 'import java.util.stream.*;',
     'public class Main {', '  public static void main(String[] args) throws Exception {',
-    ...item.body.split('\\n').map(line => '    ' + line), '  }',
-    ...(item.helpers ? item.helpers.split('\\n').map(line => '  ' + line) : []), '}'
-  ].join('\\n') + '\\n';
+    ...item.body.split('\n').map(line => '    ' + line), '  }',
+    ...(item.helpers ? item.helpers.split('\n').map(line => '  ' + line) : []), '}'
+  ].join('\n') + '\\n';
   catalog.push({
     id: item.id, name: 'Java: ' + item.name,
     description: item.description + ' Ejemplo autocontenido en Java 17, sin dependencias externas. ' + (item.premium ? 'Contenido avanzado reservado para RCC Supporter.' : 'Disponible en el catálogo gratuito.'),
