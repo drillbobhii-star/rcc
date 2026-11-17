@@ -18,7 +18,7 @@ assert.match(migration, /create table if not exists public\\.rcc_chat_conversati
 assert.match(migration, /create table if not exists public\\.rcc_chat_messages/i);
 assert.match(migration, /create table if not exists public\\.rcc_admin_private_notes/i);
 assert.match(migration, /revoke all on public\\.rcc_admin_private_notes from anon, authenticated/i);
-assert.match(migration, /values\\s*\\(\\s*'chat-files',[\\s\\S]*?false/i);
+assert.match(migration, /values\s*\(\s*'chat-files',[\s\S]*?false/i);
 
 assert.match(api, /const ADMIN_EMAIL = "drillbobhii@gmail\\.com"/);
 assert.match(api, /auth\\/v1\\/user/);
