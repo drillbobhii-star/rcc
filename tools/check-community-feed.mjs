@@ -39,7 +39,7 @@ assert.match(ui, /⚠️ PARCHEADO/);
 assert.match(ui, /Este código está parcheado en Roblox/);
 assert.match(ui, /Sí, continuar/);
 assert.match(ui, /No, volver/);
-assert.match(vip, /VIP_PERCENTAGE = 40/);
+assert.match(vip, /VIP_PERCENTAGE = 45/);
 const check = spawnSync(process.execPath, ['--check', new URL('../tools/sync-community-feed.mjs', import.meta.url).pathname], {encoding:'utf8'});
 assert.equal(check.status, 0, check.stderr);
 
