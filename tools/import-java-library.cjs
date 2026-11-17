@@ -9,12 +9,18 @@ function main() {
 
   const catalog = readCatalog();
   const ids = new Set(catalog.map(item => item.id));
+  const existingJavaCode = new Set(catalog.filter(item => item.platform === 'java').map(item => item.code));
   const createdAt = process.env.RCC_IMPORT_DATE || new Date().toISOString().slice(0, 10);
 
   for (const example of examples) {
     const id = 'java_lib_' + example.id;
     if (ids.has(id)) continue;
+    const code = '// RCC | Ejemplo independiente de Java 17\\n'
+      + '// Guarda este archivo como Main.java; compila con javac Main.java y ejecuta java Main.\\n'
+      + example.code.trim() + '\\n';
+    if (existingJavaCode.has(code)) continue;
     ids.add(id);
+    existingJavaCode.add(code);
 
     catalog.push({
       id,

@@ -5,6 +5,11 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync, execFileSync } = require('node:child_process');
 const examples = require('./java-library.cjs');
+const javaImporter = fs.readFileSync(path.join(__dirname, 'import-java-library.cjs'), 'utf8');
+assert.match(javaImporter, /const code =/);
+assert.match(javaImporter, /existingJavaCode\.has\(code\)/);
+assert.match(javaImporter, /code,/);
+assert.match(javaImporter, /verification: 'java-compiled'/);
 
 assert(Array.isArray(examples));
 assert(examples.length >= 30, 'Expected at least 30 Java examples.');

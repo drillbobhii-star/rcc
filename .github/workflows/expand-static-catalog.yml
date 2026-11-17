@@ -1,4 +1,5 @@
 name: RCC Catalog Expansion
+# The initial full catalog import runs once when this reviewed workflow is merged to main.
 
 on:
   workflow_dispatch:
