@@ -329,8 +329,8 @@ public class Main {
         String text = "RCC crea código Java y RCC comparte código";
         Map<String, Integer> frequency = new HashMap<>();
 
-        for (String word : text.toLowerCase().split("\\\\s+")) {
-            String clean = word.replaceAll("[^\\\\p{L}\\\\p{N}]", "");
+        for (String word : text.toLowerCase().split("\\s+")) {
+            String clean = word.replaceAll("[^\\p{L}\\p{N}]", "");
             if (!clean.isEmpty()) frequency.merge(clean, 1, Integer::sum);
         }
 
