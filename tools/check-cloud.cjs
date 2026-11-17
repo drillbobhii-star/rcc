@@ -44,6 +44,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  await vm.runInContext(`loadFavorites()`,context);assert(vm.runInContext(`favoriteIds.has('other')`,context));
  await els.get('googleLoginBtn').onclick();assert.equal(requests.at(-1).oauth.provider,'google');assert.equal(requests.at(-1).oauth.options.redirectTo,'https://rcc-3m0.pages.dev');
  next={data:[],error:null};await vm.runInContext(`voteForScript('sample',{})`,context);assert.equal(requests.at(-2).table,'votes');assert.equal(requests.at(-2).method,'INSERT');
+ messages.length=0;
  await vm.runInContext(`submitAuth(true)`,context);assert(els.get('authStatus').textContent.includes('Ya se usó este correo'));
  els.get('authEmailInput').value='member@example.test';els.get('authPassword').value='test-password';
  await vm.runInContext(`submitAuth(false)`,context);
