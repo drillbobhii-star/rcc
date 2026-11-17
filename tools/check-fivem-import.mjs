@@ -16,6 +16,8 @@ assert.equal(entry.platform, 'fivem');
 assert.equal(entry.catalog_section, 'fivem');
 assert.equal(entry.type, 'source');
 assert.equal(entry.level, 'free');
+const repeatedTags = topicToEntry({ ...sample, id: 782345, tags: ['fivem-scripts', 'fivem-scripts', 'qbcore', 'qbcore', 'free'] });
+assert.equal(new Set(repeatedTags.tags).size, repeatedTags.tags.length, 'Imported FiveM tags must be unique.');
 assert.equal(entry.source_only, true);
 assert.match(entry.code, /no contiene el código del recurso/);
 assert.match(entry.compatibility.sources[0], /^https:\/\/forum\.cfx\.re\/t\//);

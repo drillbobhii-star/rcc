@@ -18,6 +18,28 @@
   },
   "news": [
     {
+      "id": "rcc:fivem-discovery-directories:2026-11-17",
+      "kind": "news",
+      "source": "RCC · FiveM",
+      "title": "Más fuentes para descubrir recursos FiveM",
+      "game": "FiveM · ESX / QBCore / Qbox / Standalone",
+      "creator": "RCC",
+      "createdAt": "2026-11-17T23:10:00.000Z",
+      "description": "La guía RCC amplía sus fuentes de descubrimiento con LXR Dev, Pigeon Studios, Resourced, MSK Scripts, YBN Limax, Force Developments y FreeScriptsHub. Son directorios externos que pueden mezclar scripts, librerías, mapas, vehículos y recursos de pago; revisa licencia, framework y dependencias antes de instalar.",
+      "url": "https://forum.cfx.re/c/releases/7"
+    },
+    {
+      "id": "rcc:robloxscripts-api-source:2026-11-17",
+      "kind": "news",
+      "source": "RCC · Catálogo",
+      "title": "Nueva fuente pública para Roblox/Luau",
+      "game": "Roblox · Luau",
+      "creator": "RCC",
+      "createdAt": "2026-11-17T23:00:00.000Z",
+      "description": "RCC prepara la integración de RobloxScripts.com: fichas gratuitas enlazadas a su publicación original, con atribución a la fuente y sin descargar ni ejecutar código de terceros. Las fichas externas permanecen sin verificar por RCC.",
+      "url": "https://docs.robloxscripts.com/"
+    },
+    {
       "id": "fivem:r-antihitbox:2026-11-14",
       "kind": "news",
       "source": "R-Scripts · FiveM",
