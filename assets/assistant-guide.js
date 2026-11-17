@@ -46,7 +46,7 @@
     return result;
   }
   function resolve(key) {
-    const text=key.replace(/[¿?¡!]/g,'').trim();
+    const text=key.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[¿?¡!]/g,'').trim().toLowerCase();
     for(const item of fixed('all')) {
       const label=item.label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[¿?¡!]/g,'');
       if(text===label)return item;
