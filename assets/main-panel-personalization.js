@@ -9,7 +9,7 @@
     #rccMainBackdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,14,.2),rgba(4,7,14,.58))}
     #rccMainLogo{position:fixed;z-index:1;pointer-events:none;left:50%;top:50%;transform:translate(-50%,-50%);width:min(var(--rcc-logo-size,220px),65vw);max-height:45vh;object-fit:contain;opacity:var(--rcc-logo-opacity,.28);filter:drop-shadow(0 8px 28px #0008)}
     body.rcc-custom-main-background .glass-background,body.rcc-custom-main-background>.blob{opacity:.12}
-    #rccMainCustomize{position:fixed;right:18px;top:calc(env(safe-area-inset-top, 0px) + 112px);bottom:auto;z-index:1700;border:1px solid #ffffff35;border-radius:999px;padding:12px 17px;background:#171d2c;color:#fff;font:700 .88rem inherit;box-shadow:0 8px 28px #0008;cursor:pointer}
+    #rccMainCustomize{position:fixed;right:18px;top:calc(env(safe-area-inset-top, 0px) + 112px);bottom:auto;z-index:9600;border:1px solid #ffffff35;border-radius:999px;padding:12px 17px;background:#171d2c;color:#fff;font:700 .88rem inherit;box-shadow:0 8px 28px #0008;cursor:pointer}
     #rccMainCustomize:hover{background:#29334c}
     #rccMainDialog{position:fixed;inset:0;z-index:2100;display:none;align-items:center;justify-content:center;padding:16px;background:#030611c9;backdrop-filter:blur(10px)}
     #rccMainDialog.open{display:flex}
@@ -34,7 +34,7 @@
   const backdrop=document.createElement('div');backdrop.id='rccMainBackdrop';backdrop.setAttribute('aria-hidden','true');
   const logo=document.createElement('div');logo.id='rccMainLogo';logo.textContent='RCC';logo.setAttribute('aria-hidden','true');logo.hidden=true;
   document.body.prepend(backdrop,logo);
-  const trigger=document.createElement('button');trigger.id='rccMainCustomize';trigger.type='button';trigger.textContent='🎨 Personalizar fondo';
+  const trigger=document.createElement('button');trigger.id='rccMainCustomize';trigger.type='button';trigger.textContent='🖼️ Fondo y logo';trigger.setAttribute('aria-label','Personalizar fondo de pantalla y logo RCC');trigger.title='Cambiar el fondo del panel y ajustar el logo';
   const dialog=document.createElement('div');dialog.id='rccMainDialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','rccMainTitle');
   dialog.innerHTML=`<section class="rcc-main-box"><button class="rcc-main-close" type="button" aria-label="Cerrar">×</button><h2 id="rccMainTitle">Personaliza el panel principal</h2><p>Elige una foto o GIF animado para el fondo. Puedes superponer el logo RCC o tu propio logo y ajustar su apariencia.</p>
   <label>Fondo del panel · imagen o GIF<input id="rccMainBgFile" type="file" accept="image/*"></label>
