@@ -73,7 +73,8 @@ assert.match(worker, /notificationclick/);
 assert.match(manifest, /"display": "standalone"/);
 
 
-assert.match(adminHtml, /rccGlobalChatToggle/);
+assert.match(adminHtml, /rccGlobalChatDisable/);
+assert.match(adminHtml, /rccGlobalChatEnable/);
 assert.match(adminHtml, /rccMainMessagePreviewBody/);
 assert.match(adminHtml, /userSort/);
 assert.match(adminHtml, /userFilter/);
