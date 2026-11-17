@@ -54,7 +54,7 @@ assert.match(api, /email_confirmed_at/);
 assert.match(successPage, /provider: 'discord'/);
 assert.match(successPage, /action: 'linkDiscord'/);
 assert.match(api, /body\.action === 'linkDiscord'/);
-assert.match(api, /identity\.provider === 'discord'/);
+assert.match(api, /find\(item => item\.provider === 'discord'\)/);
 assert.match(api, /profiles/);
 assert.match(kofiMigration, /is_supporter boolean/i);
 assert.match(kofiMigration, /discord_id text/i);
