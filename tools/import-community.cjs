@@ -6,7 +6,8 @@ async function main() {
   const sources = new Set(catalog.flatMap(s => s.compatibility?.sources || []));
 const denied = /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|dupe.?robux|free.?robux|password.?steal|key.?logger|credential|session.?steal|webhook.?steal|malware|ransom|backdoor|rat\b|bypass.?anti.?cheat/i;
   const date = new Date().toISOString().slice(0,10);
-  const target = Number(process.argv[2] || 2200);
+  const target = Number(process.argv[2] || 1200);
+  if (!Number.isSafeInteger(target) || target < 1 || target > 2000) throw new Error('Target must be between 1 and 2000');
   let added = 0;
   for (let page = 1; page <= 900 && added < target; page++) {
     const params = new URLSearchParams({page:String(page),max:'20',mode:'free',patched:'0',sortBy:'createdAt',order:'desc'});
@@ -18,13 +19,14 @@ const denied = /steal|token.?log|cookie.?log|account.?hack|beam|phish|grabber|du
       const id = `games_sb_${item._id}`;
       if (!/^[a-f0-9]{24}$/.test(item._id) || typeof item.slug !== 'string' || !/^[\w().%-]+$/.test(item.slug)) continue;
       const source = 'https://scriptblox.com/script/' + item.slug;
-      if (ids.has(id) || sources.has(source) || item.isPatched || item.scriptType !== 'free') continue;
-      const gameName = typeof item.game?.name === 'string' ? item.game.name : (item.isUniversal ? 'Universal' : '');
-      if (!item.title || !gameName || denied.test(item.title) || item.isPatched !== false) continue;
+      if (ids.has(id) || sources.has(source) || item.isPatched !== false || item.scriptType !== 'free') continue;
+      const game = item.game || {};
+      const gameName = typeof game.name === 'string' ? game.name : (item.isUniversal ? 'Universal' : '');
+      if (!item.title || !gameName || denied.test(item.title)) continue;
       catalog.push({id, name:item.title.slice(0,180), description:`${gameName}. Funciones anunciadas en el título: ${item.title.slice(0,180)}. ${item.key?'Requiere clave':'Sin clave indicada'}. Contenido remoto y funcionamiento sin verificar.`,
         level:'free', device:'unknown', platform:'roblox', type:'loadstring', executors:['Ejecutor externo (sin verificar)'], tags:['Juegos','Comunidad',item.key?'Con clave':'Sin clave'], version:'1.0', created_at:date,
-        reference_image:typeof item.game.imageUrl==='string' && /^\/images\/[\w/.-]+$/.test(item.game.imageUrl)?'https://scriptblox.com'+item.game.imageUrl:undefined,
-        code:`loadstring(game:HttpGet(${JSON.stringify('https://scriptblox.com/raw/'+item.slug)}))()`, game:item.game.name.slice(0,180), game_id:String(item.game.gameId || 0), catalog_section:'games',
+        reference_image:typeof game.imageUrl==='string' && /^\/images\/[\w/.-]+$/.test(game.imageUrl)?'https://scriptblox.com'+game.imageUrl:undefined,
+        code:`loadstring(game:HttpGet(${JSON.stringify('https://scriptblox.com/raw/'+item.slug)}))()`, game:gameName.slice(0,180), game_id:String(game.gameId || 0), catalog_section:'games',
         compatibility:{environment:'client',runtime:'Roblox · ejecutor externo',context:'Cliente de Roblox; publicación externa de la comunidad.',requirements:'API loadstring y game:HttpGet. Revisar el contenido en la fuente antes de ejecutarlo.',verification:'unverified',test_details:`Ficha encontrada en el listado público el ${date}. No se descargó, auditó ni ejecutó el código remoto.`,mobile_status:'PC, Android e iOS sin comprobar.',executor_status:'unverified',sources:[source],checked_at:date}});
       ids.add(id); sources.add(source); added++;
       if (added >= target) break;
