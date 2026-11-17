@@ -1145,6 +1145,15 @@ function copyCode(confirmed=false){
   const copiedId=currentCopiedId;
   navigator.clipboard.writeText(document.getElementById('modalCode').textContent).then(()=> {
       recordCatalogAction(copiedId,'copy');
+      try {
+        const copied = scripts.find(s => String(s.id) === String(copiedId)) || activeScript;
+        localStorage.setItem('rcc_ai_last_copied', JSON.stringify({
+          id: String(copiedId || ''),
+          name: String(copied?.name || copied?.title || 'Script RCC').slice(0,160),
+          code: String(document.getElementById('modalCode').textContent || '').slice(0,9000),
+          copiedAt: new Date().toISOString()
+        }));
+      } catch {}
       showToast('📋 ¡Copiado!');
       offerCodeAnalysis(document.getElementById('modalCode').textContent);
       

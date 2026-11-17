@@ -1,6 +1,18 @@
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Centro de ayuda — RCC</title><meta name="description" content="Ayuda para códigos Lua, scripts de juegos y JavaScript. Notifica errores a RCC o únete a Discord."><link rel="stylesheet" href="assets/support.css"><script src="assets/support.js" defer></script><link rel="stylesheet" href="assets/motion-studio.css">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Centro de ayuda — RCC</title><meta name="description" content="Ayuda para códigos Lua, scripts de juegos y JavaScript. Notifica errores a RCC o únete a Discord."><link rel="stylesheet" href="assets/support.css">
+<meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtp0bJYKlDM8U">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.js"></script>
+<script>
+window.rccSupabaseReady = Promise.resolve().then(() => {
+  const key = document.querySelector('meta[name="supabase-anon-key"]').content.trim();
+  if (!window.supabase?.createClient || !key) throw new Error('Auth no disponible');
+  return window.supabase.createClient('https://cbkrpyfkteomcukdisdw.supabase.co', key, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+});
+window.rccSupabaseReady.catch(() => {});
+</script>
+<script src="assets/rcc-moderation.js" defer></script>
+<script src="assets/support.js" defer></script><link rel="stylesheet" href="assets/motion-studio.css">
 <script src="assets/motion-studio.js" defer></script>
 </head>
 <body>
@@ -19,6 +31,17 @@
 <details><summary>¿Puedo pedir un juego o un ejemplo nuevo?</summary><p>Sí. Selecciona «Solicitar código» en el formulario e indica el juego, el lenguaje y qué quieres conseguir. También puedes proponerlo en Discord. No hay un plazo de respuesta garantizado.</p></details>
 </section>
 <section class="report" id="reportar" aria-labelledby="reportHeading"><span class="eyebrow">Cuéntanos qué ocurre</span><h2 id="reportHeading">Notificar un error</h2><p>El formulario envía tu consulta al equipo de RCC. Elige soporte o reporta un error. Ambas opciones se envían a Discord con una clasificación automática orientativa del texto.</p>
+<section class="rcc-ai" aria-labelledby="rccAiHeading">
+<h2 id="rccAiHeading">Asistente RCC</h2>
+<p id="rccAiWelcome" class="privacy">Pregúntame sobre los scripts del catálogo, Lua, Roblox Studio o JavaScript.</p>
+<div id="rccAiMessages" class="rcc-ai-messages" role="log" aria-live="polite"></div>
+<form id="rccAiForm" class="rcc-ai-form">
+<label for="rccAiInput">Tu mensaje</label>
+<textarea id="rccAiInput" rows="3" maxlength="6000" placeholder="¿Cómo ejecuto este script?"></textarea>
+<button id="rccAiSend" type="submit">Enviar al asistente</button>
+<p id="rccAiStatus" class="privacy" role="status" aria-live="polite"></p>
+</form>
+</section>
 <div class="mode-picker" role="group" aria-label="Tipo de solicitud"><button type="button" id="supportMode" aria-pressed="false">Soporte</button><button type="button" id="errorMode" aria-pressed="true">Reportar error</button></div>
 <form enctype="multipart/form-data" name="rcc-support" method="POST" action="/api/send-error" id="supportForm">
 <p hidden><label>No rellenar <input name="bot-field" autocomplete="off" tabindex="-1"></label></p>
