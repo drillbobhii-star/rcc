@@ -141,7 +141,7 @@ async function main() {
           provider: 'ScriptBlox',
           source,
           checkedAt: checkedAt,
-          status: item.isPatched === true ? 'patched' : 'source-unpatched',
+          status: item.isPatched === true ? 'patched' : item.isPatched === false ? 'source-unpatched' : 'unknown',
           commentsStatus: 'unavailable',
           declaredVerified: item.verified === true,
           riskAssessment: 'No evaluado por RCC'
