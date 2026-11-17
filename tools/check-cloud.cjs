@@ -63,11 +63,11 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  assert(els.get('authStatus').textContent.includes('Cuenta creada. Revisa tu correo'));
  loginResult={data:{session:null},error:{code:'email_not_confirmed',message:'Email not confirmed'}};
  await vm.runInContext(`applySession(null)`,context);
- setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ setCredentials();await vm.runInContext(`submitAuth(false)`,context);
  assert(els.get('authStatus').textContent.includes('Confirma tu correo'));
  assert.equal(vm.runInContext(`currentUser`,context),null);
  loginResult={data:{session:null}};
- setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ setCredentials();await vm.runInContext(`submitAuth(false)`,context);
  assert(els.get('authStatus').textContent.includes('No se pudo acceder'));
  assert.equal(vm.runInContext(`currentUser`,context),null);
  signupResult={data:{user:{identities:[]},session:null}};
