@@ -45,9 +45,10 @@
     }
     const items = mode === 'trending' ? feed.trending : feed.newest;
     const newsItems = mode === 'updates' && Array.isArray(feed.news) ? feed.news : [];
-    title.textContent = mode === 'trending' ? '🔥 Tendencias de la comunidad' : '🆕 Scripts recién publicados';
+    title.textContent = mode === 'trending' ? '🔥 Tendencias de la comunidad' : mode === 'updates' ? '🆕 Novedades y descubrimientos' : '🆕 Scripts recién publicados';
     const sources = Object.entries(feed.sources || {}).filter(([, value]) => value.ok).map(([name]) => name);
-    meta.textContent = new Intl.NumberFormat('es-DO').format(items.length) + ' descubrimientos · Actualizado ' + date(feed.updatedAt) + (sources.length ? ' · Fuentes: ' + sources.join(', ') : '');
+    const totalItems = mode === 'updates' ? newsItems.length + items.length : items.length;
+    meta.textContent = new Intl.NumberFormat('es-DO').format(totalItems) + (mode === 'updates' ? ' novedades y descubrimientos' : ' descubrimientos') + ' · Actualizado ' + date(feed.updatedAt) + (sources.length ? ' · Fuentes: ' + sources.join(', ') : '');
     cards.replaceChildren();
     for (const item of [...newsItems, ...items].slice(0, 72)) {
       const card = document.createElement('article'); card.className = 'rcc-feed-card';
@@ -80,7 +81,7 @@
       feed = data;
       const banner = document.querySelector('#catalogNews p');
       if (banner) banner.textContent = 'RCC amplía su biblioteca y consulta nuevas publicaciones y tendencias de fuentes externas. Las fichas muestran su fuente original, fecha y estado de verificación.';
-      const count = feed.counts?.newest || feed.newest.length;
+      const count = feed.newest.length + (Array.isArray(feed.news) ? feed.news.length : 0);
       const tabs = document.getElementById('updatesTab');
       if (tabs) tabs.textContent = 'Novedades · ' + new Intl.NumberFormat('es-DO').format(count);
       const trending = document.getElementById('trendingTab');
