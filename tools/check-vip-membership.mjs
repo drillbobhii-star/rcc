@@ -25,7 +25,7 @@ assert.match(vip, /RCCCatalogScriptsById/);
 assert.match(index, /id="javaTab"/);
 assert.match(index, /catalogSection==='java'/);
 assert.match(vip, /rcc-vip-code-locked/);
-assert.match(admin, /Es VIP/);
+assert.match(admin, /VIP desde rcc_vip_memberships/);
 assert.match(api, /RCC_ADMIN_EMAIL/);
 assert.ok(api.includes("const RCC_KOFI_MONTHLY_URL = env.RCC_KOFI_MONTHLY_URL?.trim() || 'https://ko-fi.com/lubensdrill/tiers';"));
 assert.match(api, /SUPABASE_SERVICE_ROLE_KEY/);
