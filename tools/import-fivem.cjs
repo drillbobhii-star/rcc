@@ -27,21 +27,21 @@ function topicToEntry(topic, checkedAt = new Date().toISOString()) {
   if (!title || DENIED.test(title + ' ' + excerpt) || !isFiveMResource(topic)) return null;
   const id = 'fivem_cfx_' + topic.id;
   const source = SOURCE_BASE + '/t/' + encodeURIComponent(topic.slug) + '/' + topic.id;
-  const tags = Array.isArray(topic.tags) ? topic.tags.map(tag => clean(tag, 40).toLowerCase()).filter(Boolean) : [];
+  const tags = [...new Set((Array.isArray(topic.tags) ? topic.tags : []).map(tag => clean(tag, 40).toLowerCase()).filter(Boolean))];
   const pricing = tags.includes('paid') ? 'paid' : tags.includes('free') ? 'free' : 'unknown';
   const author = clean(topic.last_poster_username || topic.posters?.at(-1)?.username || 'Comunidad Cfx.re', 100);
   const createdAt = dateOnly(topic.created_at);
   const checkedDate = dateOnly(checkedAt);
-  const labels = ['FiveM', 'Cfx.re', 'Recurso externo', ...tags.slice(0, 8)];
-  if (pricing === 'paid') labels.push('Listado de pago');
-  else if (pricing === 'free') labels.push('Marcado gratuito por Cfx.re');
-  else labels.push('Precio no indicado');
+  const labels = new Set(['FiveM', 'Cfx.re', 'Recurso externo', ...tags.slice(0, 8)]);
+  if (pricing === 'paid') labels.add('Listado de pago');
+  else if (pricing === 'free') labels.add('Marcado gratuito por Cfx.re');
+  else labels.add('Precio no indicado');
   return {
     id, name: title,
     description: (excerpt || 'Publicación de recurso en la categoría Releases de Cfx.re.') + ' Fuente externa. RCC no aloja, descarga ni ejecuta el recurso.',
     level: pricing === 'paid' ? 'paid' : pricing === 'free' ? 'free' : 'external',
     device: 'pc', platform: 'fivem', type: 'source', executors: ['FiveM / FXServer'],
-    tags: labels, version: 'Publicación comunitaria', created_at: createdAt,
+    tags: [...labels], version: 'Publicación comunitaria', created_at: createdAt,
     code: '-- RCC · Ficha externa de FiveM; este registro no contiene el código del recurso.\n'
       + '-- Autor/última actividad mostrada por el foro: ' + author + '\n'
       + '-- Abre la publicación original y revisa licencia, dependencias y compatibilidad:\n'
