@@ -23,7 +23,7 @@ const supabase={auth:{getSession:async()=>({data:{session:null}}),signOut:async(
  then(resolve,reject){return Promise.resolve(next).then(resolve,reject)}};return query;
 }};
 const context=vm.createContext({document:{getElementById:id=>{if(!els.has(id))els.set(id,element());return els.get(id)},body:{style:{}}},
- window:{rccSupabaseReady:Promise.resolve(supabase),rccAuthRedirect:'https://rcc-3m0.pages.dev'},location:{origin:'https://rcc.test',pathname:'/',assign(){}},URL,JSON,setTimeout,
+ window:{rccSupabaseReady:Promise.resolve(supabase),rccAuthRedirect:'https://rcc-3m0.pages.dev'},location:{origin:'https://rcc.test',pathname:'/',assign(){}},URL,JSON,Event,setTimeout,
 
  showToast:m=>messages.push(m),render(){},selectSection(){},closeSidebar(){},modal:element(),console});
 vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),favoritesStatus='ready',showFavorites=false,showRecent=false,currentCopiedId=null;const favoritePending=new Set();`+source,context);
