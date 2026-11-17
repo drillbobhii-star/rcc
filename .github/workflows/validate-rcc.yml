@@ -1,0 +1,46 @@
+name: Validate RCC catalog and VIP
+
+on:
+  push:
+    branches: [main, feat/rcc-java-community-expansion]
+  pull_request:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "assets/**"
+      - "catalog/**"
+      - "scripts.json"
+      - "netlify/functions/lib/catalog-ids.json"
+      - "tools/**"
+      - "functions/api/**"
+      - "docs/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run repository tests
+        run: npm test
+        env:
+          RCC_REQUIRE_JAVA: "1"

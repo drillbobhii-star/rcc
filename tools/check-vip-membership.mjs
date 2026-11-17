@@ -19,6 +19,11 @@ assert.match(index, /Cancela cuando quieras\. Al suscribirte, desbloqueas más d
 assert.match(index, /id="vipTab"/);
 assert.match(index, /id="rccSupportButton"/);
 assert.match(vip, /VIP_PERCENTAGE = 40/);
+assert.match(vip, /includes\('RCC Supporter'\)/);
+assert.match(vip, /script\.platform === 'java'/);
+assert.match(vip, /RCCCatalogScriptsById/);
+assert.match(index, /id="javaTab"/);
+assert.match(index, /catalogSection==='java'/);
 assert.match(vip, /rcc-vip-code-locked/);
 assert.match(admin, /Es VIP/);
 assert.match(api, /RCC_ADMIN_EMAIL/);

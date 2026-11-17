@@ -120,12 +120,16 @@ if (!newest.length && !trending.length) {
 }
 const mergedNewest = unique(newest).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).slice(0, 3400);
 const mergedTrending = unique(trending).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 300);
+const previousSnapshot = old ? { sources: old.sources || {}, newest: old.newest || [], trending: old.trending || [] } : null;
+const nextSnapshot = { sources, newest: mergedNewest, trending: mergedTrending };
+const unchanged = previousSnapshot && JSON.stringify(previousSnapshot) === JSON.stringify(nextSnapshot);
 const payload = {
   schema: 'rcc-community-feed-v1',
   updatedAt: unchanged ? old.updatedAt : new Date().toISOString(),
   counts: { newest: mergedNewest.length, trending: mergedTrending.length, importedMetadata: mergedNewest.length },
   sources,
   notice: 'Descubrimientos externos: RCC muestra metadatos y enlaces originales. No aloja ni ejecuta el código de terceros.',
+  news: Array.isArray(old?.news) ? old.news : [],
   newest: mergedNewest,
   trending: mergedTrending
 };
