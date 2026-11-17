@@ -71,6 +71,50 @@
       "createdAt": "2026-11-09T12:00:00.000Z",
       "description": "Nuevo recurso gratuito de robos con herramientas, cajas, ruido y aviso policial.",
       "url": "https://www.r-scripts.net/changelog"
+    },
+    {
+      "id": "guide:roblox-luau",
+      "kind": "news",
+      "source": "Roblox Creator Hub · Documentación oficial",
+      "title": "Guía oficial de scripting Roblox y Luau",
+      "game": "Roblox / Luau",
+      "creator": "Roblox",
+      "description": "Referencia oficial sobre scripts, Luau, fundamentos y creación de mecánicas en Roblox Studio.",
+      "url": "https://create.roblox.com/docs/scripting",
+      "codeIncluded": false
+    },
+    {
+      "id": "guide:fivem-resources",
+      "kind": "news",
+      "source": "Cfx.re · Documentación oficial",
+      "title": "Cómo encontrar recursos para FiveM y RedM",
+      "game": "FiveM / RedM",
+      "creator": "Cfx.re",
+      "description": "Directorio oficial de recursos, marketplace y publicaciones comunitarias; revisa dependencias, precio y licencia.",
+      "url": "https://docs.fivem.net/docs/server-manual/finding-resources/",
+      "codeIncluded": false
+    },
+    {
+      "id": "guide:fivem-scripting",
+      "kind": "news",
+      "source": "Cfx.re · Documentación oficial",
+      "title": "Referencia de scripting FiveM",
+      "game": "FiveM",
+      "creator": "Cfx.re",
+      "description": "FiveM admite Lua, C# y JavaScript. Consulta eventos, funciones nativas y referencias de servidor y cliente.",
+      "url": "https://docs.fivem.net/docs/scripting-reference/",
+      "codeIncluded": false
+    },
+    {
+      "id": "guide:java-dev",
+      "kind": "news",
+      "source": "Dev.java · Documentación oficial",
+      "title": "Tutoriales oficiales de Java",
+      "game": "Java · JDK",
+      "creator": "OpenJDK",
+      "description": "Fundamentos, POO, colecciones, streams, expresiones lambda, concurrencia y herramientas de la plataforma.",
+      "url": "https://dev.java/learn/",
+      "codeIncluded": false
     }
   ],
   "notice": "Descubrimientos externos: RCC muestra metadatos y enlaces originales. No aloja ni ejecuta el código de terceros.",
