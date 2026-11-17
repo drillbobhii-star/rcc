@@ -146,7 +146,9 @@ for (let i = 0; i < results.length; i++) {
   const name = ['ScriptBlox','Rscripts','GitHub'][i];
   const result = results[i];
   if (result.status === 'fulfilled') {
-    const sourceNewest = result.value.newest || result.value.items || [];\n    const sourceTrending = result.value.trending || [];\n    sources[name] = { ok: !result.value.skipped, newest: sourceNewest.length, trending: sourceTrending.length, skipped: result.value.skipped || false, reason: result.value.reason || null };
+    const sourceNewest = result.value.newest || result.value.items || [];
+    const sourceTrending = result.value.trending || [];
+    sources[name] = { ok: !result.value.skipped, newest: sourceNewest.length, trending: sourceTrending.length, skipped: result.value.skipped || false, reason: result.value.reason || null };
     newest.push(...(result.value.newest || []), ...(result.value.items || []));
     trending.push(...(result.value.trending || []));
     if (result.value.sources) Object.assign(sources, result.value.sources);
