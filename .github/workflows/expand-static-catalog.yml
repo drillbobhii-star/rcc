@@ -91,6 +91,3 @@ jobs:
             - The complete RCC regression suite must pass before this PR is created.
 
             Review the import counts in the Actions log. Some requests may add fewer items than the configured target because records are duplicates or fail the source filters.
-          labels: |
-            catalog
-            automated
