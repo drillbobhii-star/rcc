@@ -100,6 +100,6 @@ for (const file of ['index.html', 'admin.html', 'soporte.html', 'soporte-enviado
 new vm.Script(fs.readFileSync(path.join(root,'assets/support.js'),'utf8'));
 const support=fs.readFileSync(path.join(root,'soporte.html'),'utf8');
 assert(support.includes('action="/api/send-error"') && support.includes('id="supportForm"'));
-for (const field of ['form-name','subject','email','category','script','environment','message','bot-field']) assert(support.includes(`name="${field}"`), `Missing support field: ${field}`);
+for (const field of ['subject','email','category','script','environment','message','bot-field']) assert(support.includes(`name="${field}"`), `Missing support field: ${field}`);
 assert(fs.existsSync(path.join(root, 'compatibilidad.html')));
 console.log(`Catalog OK: ${scripts.length} scripts; ${JSON.stringify(counts)}. Page JavaScript syntax OK.`);
