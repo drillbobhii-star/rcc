@@ -13,7 +13,7 @@ for (const item of library) {
     'public class Main {', '  public static void main(String[] args) throws Exception {',
     ...item.body.split('\n').map(line => '    ' + line), '  }',
     ...(item.helpers ? item.helpers.split('\n').map(line => '  ' + line) : []), '}'
-  ].join('\n') + '\\n';
+  ].join('\n') + '\n';
   const entry = {
     id: item.id, name: 'Java: ' + item.name,
     description: item.description + ' Ejemplo autocontenido en Java 17, sin dependencias externas. ' + (item.premium ? 'Contenido avanzado reservado para RCC Supporter.' : 'Disponible en el catálogo gratuito.'),
