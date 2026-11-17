@@ -402,7 +402,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
-<script src="assets/assistant-guide.js" defer></script>
+<script src="assets/assistant-guide.js?v=2" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -458,10 +458,11 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/notification-banners.css?v=2">
 <link rel="stylesheet" href="assets/prism-logo.css">
 <link rel="stylesheet" href="assets/main-panel-personalization.css?v=1">
-<script src="assets/main-panel-personalization.js?v=1" defer></script>
+<script src="assets/main-panel-personalization.js?v=2" defer></script>
 <link rel="stylesheet" href="assets/script-review.css">
 <script src="assets/review-signals.js"></script>
 <script src="assets/script-review.js"></script>
+<style>.rcc-apk-coming{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 12px;border:1px dashed var(--border-glass);border-radius:12px;color:var(--muted);font-size:.82rem}.rcc-apk-coming strong{font-size:.68rem;letter-spacing:.08em;color:var(--accent)}</style>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -578,6 +579,7 @@ window.rccSupabaseReady.catch(() => {});
           <button type="button" data-platform-shortcut="fivem" aria-pressed="false" disabled>FiveM <span>20 nuevos ↗</span></button>
           <button type="button" data-platform-shortcut="gameguardian" aria-pressed="false" disabled>GameGuardian <span>20 nuevos ↗</span></button>
           <button type="button" data-platform-shortcut="autotouch" aria-pressed="false" disabled>AutoTouch <span>20 nuevos ↗</span></button>
+          <span class="rcc-apk-coming" aria-label="Buscador de mods APK, próximamente">📦 Buscador de mods APK <strong>PRÓXIMAMENTE</strong></span>
         </div>
       </section>
       </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
@@ -651,7 +653,7 @@ window.rccSupabaseReady.catch(() => {});
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>Ampliamos la biblioteca con más scripts para diferentes juegos y seguimos sumando códigos, contenido y mejoras en los perfiles, la comunidad y las opciones de personalización.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>RCC amplía sus catálogos de Roblox, FiveM, Java y JavaScript y añade descubrimientos comunitarios de otros ecosistemas. Novedades reúne publicaciones recientes y propuestas en revisión para perfiles, banners, chat y administración. Próximamente: Buscador de mods APK. Las fuentes externas conservan sus enlaces originales.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <section class="rcc-safety-notices" aria-label="Avisos importantes">
@@ -1671,8 +1673,9 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 </div>
 
 <script src="assets/vip-membership.js?v=1"></script>
+<script src="assets/rcc-assistant.js?v=2"></script>
 <script src="assets/chat-widget.js?v=1"></script>
-<script src="assets/community-feed.js?v=1"></script>
+<script src="assets/community-feed.js?v=2"></script>
 </body>
 </html>
 
