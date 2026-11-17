@@ -62,7 +62,7 @@
       if (item.riskLevel) tag('Riesgo: ' + item.riskLevel);
       if (item.obfuscated) tag('Ofuscado');
       const link = document.createElement('a'); link.className='rcc-feed-link';
-      let destination = ''; try { const parsed = new URL(item.url); if (parsed.protocol === 'https:' && ['scriptblox.com','rscripts.net','www.r-scripts.net','github.com'].includes(parsed.hostname)) destination = parsed.href; } catch (_) {}
+      let destination = ''; try { const parsed = new URL(item.url); if (parsed.protocol === 'https:' && ['scriptblox.com','rscripts.net','www.r-scripts.net','github.com','forum.cfx.re','docs.fivem.net','dev.java','docs.oracle.com','create.roblox.com','docs.python.org'].includes(parsed.hostname)) destination = parsed.href; } catch (_) {}
       if (!destination) continue;
       link.href=destination; link.target='_blank'; link.rel='noopener noreferrer'; link.textContent=item.kind === 'news' ? 'Leer novedades ↗' : item.kind === 'repository' ? 'Ver repositorio ↗' : 'Ver publicación original ↗';
       if (item.patched === true) { link.dataset.patched = 'true'; link.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); showPatchedWarning(item.title, () => window.open(destination, '_blank', 'noopener,noreferrer')); }); }
