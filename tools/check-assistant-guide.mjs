@@ -7,11 +7,11 @@ assert.match(fs.readFileSync('assets/rcc-assistant.js','utf8'), /rccAssistantLau
 assert.match(fs.readFileSync('assets/rcc-assistant.js','utf8'), /speechSynthesis/);
 vm.runInNewContext(fs.readFileSync('assets/assistant-guide.js','utf8'),context);
 const guide=context.window.RCCAssistantGuide;
-for(const [text,action] of [['que es loadstring','requirements'],['windows bloquea la descarga','safety'],['como cancelo una descarga','downloads'],['panel de ejecutores','executors'],['que cambio en esta actualizacion','release'],['scripts nuevos','updates'],['buscador de mods apk','apk'],['scripts de fivem','fivem'],['ejemplos java','java'],['repositorios github','github'],['roblox luau','roblox'],['¿Qué cambió en esta actualización?','release']])assert.equal(guide.resolve(text).action,action);
+for(const [text,action] of [['que es loadstring','requirements'],['windows bloquea la descarga','safety'],['como cancelo una descarga','downloads'],['panel de ejecutores','executors'],['que cambio en esta actualizacion','release'],['scripts nuevos','updates'],['buscador de mods apk','apk'],['scripts de fivem','fivem'],['ejemplos java','java'],['repositorios github','github'],['roblox luau','roblox'],['¿Qué cambió en esta actualización?','release'],['buscador de perfiles','profiles'],['banner animado','banner'],['panel admin','admin'],['chat RCC','chat'],['RCC Supporter VIP','vip'],['bot de Discord','discord']])assert.equal(guide.resolve(text).action,action);
 assert.equal(guide.resolve('inventario Lua'),null);
 assert.equal(guide.resolve('donde encuentro inventario').query,'inventario');
 assert.equal(guide.resolve('otras preguntas').action,'questions');
-for(const topic of ['all','catalog','updates','catalogs','safety','navigation']) {
+for(const topic of ['all','catalog','updates','catalogs','features','safety','navigation']) {
   const subjects=['Inventario','<img src=x onerror=alert(1)>'];
   const items=guide.sample(subjects,topic,4,()=>0);
   assert.equal(new Set(items.map(i=>i.label)).size,items.length);
