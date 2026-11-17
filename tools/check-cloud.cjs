@@ -1,6 +1,9 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('index.html','utf8');
-const source=html.slice(html.indexOf('const votedIds ='),html.indexOf('\ninitializeAuth();'));
+const start=html.indexOf('const votedIds =');
+const end=html.indexOf('window.rccSessionReady=initializeAuth();',start);
+assert(start>=0&&end>start,'Could not isolate the inline catalog application script');
+const source=html.slice(start,end);
 const els=new Map(),messages=[],requests=[];
 const element=()=>({hidden:false,disabled:false,value:'',textContent:'',isConnected:true,
  classList:{contains:()=>false,add(){},remove(){}},setAttribute(){},addEventListener(){},querySelectorAll:()=>[],focus(){},reportValidity:()=>true});
@@ -20,7 +23,7 @@ const supabase={auth:{getSession:async()=>({data:{session:null}}),signOut:async(
  then(resolve,reject){return Promise.resolve(next).then(resolve,reject)}};return query;
 }};
 const context=vm.createContext({document:{getElementById:id=>{if(!els.has(id))els.set(id,element());return els.get(id)},body:{style:{}}},
- window:{rccSupabaseReady:Promise.resolve(supabase),rccAuthRedirect:'https://rcc-3m0.pages.dev'},location:{origin:'https://rcc.test',pathname:'/',assign(){}},URL,JSON,setTimeout,
+ window:{rccSupabaseReady:Promise.resolve(supabase),rccAuthRedirect:'https://rcc-3m0.pages.dev',dispatchEvent(){}},location:{origin:'https://rcc.test',pathname:'/',assign(){}},URL,JSON,Event,setTimeout,
 
  showToast:m=>messages.push(m),render(){},selectSection(){},closeSidebar(){},modal:element(),console});
 vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),favoritesStatus='ready',showFavorites=false,showRecent=false,currentCopiedId=null;const favoritePending=new Set();`+source,context);
@@ -41,6 +44,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  await vm.runInContext(`loadFavorites()`,context);assert(vm.runInContext(`favoriteIds.has('other')`,context));
  await els.get('googleLoginBtn').onclick();assert.equal(requests.at(-1).oauth.provider,'google');assert.equal(requests.at(-1).oauth.options.redirectTo,'https://rcc-3m0.pages.dev');
  next={data:[],error:null};await vm.runInContext(`voteForScript('sample',{})`,context);assert.equal(requests.at(-2).table,'votes');assert.equal(requests.at(-2).method,'INSERT');
+ messages.length=0;
  await vm.runInContext(`submitAuth(true)`,context);assert(els.get('authStatus').textContent.includes('Ya se usó este correo'));
  els.get('authEmailInput').value='member@example.test';els.get('authPassword').value='test-password';
  await vm.runInContext(`submitAuth(false)`,context);
@@ -52,20 +56,18 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  let loginCount=requests.filter(r=>r.login).length;
  setCredentials();await vm.runInContext(`submitAuth(true)`,context);
  assert.equal(requests.filter(r=>r.login).length,loginCount,'A signup session must not trigger a second login');
- assert.equal(messages.pop(),'Cuenta creada');
+ assert.equal(vm.runInContext(`currentUser?.id`,context),'a');
  signupResult={data:{user:account,session:null}};
  setCredentials();await vm.runInContext(`submitAuth(true)`,context);
- assert.equal(requests.filter(r=>r.login).length,++loginCount);
- assert.equal(requests.filter(r=>r.login).at(-1).login.email,'member@example.test');
- assert.equal(requests.filter(r=>r.login).at(-1).login.password,'test-password');
- assert.equal(messages.pop(),'Cuenta creada');
+ assert.equal(requests.filter(r=>r.login).length,loginCount,'Do not log in before email confirmation when signup returns no session');
+ assert(els.get('authStatus').textContent.includes('Cuenta creada. Revisa tu correo'));
  loginResult={data:{session:null},error:{code:'email_not_confirmed',message:'Email not confirmed'}};
  await vm.runInContext(`applySession(null)`,context);
- setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ setCredentials();await vm.runInContext(`submitAuth(false)`,context);
  assert(els.get('authStatus').textContent.includes('Confirma tu correo'));
  assert.equal(vm.runInContext(`currentUser`,context),null);
  loginResult={data:{session:null}};
- setCredentials();await vm.runInContext(`submitAuth(true)`,context);
+ setCredentials();await vm.runInContext(`submitAuth(false)`,context);
  assert(els.get('authStatus').textContent.includes('No se pudo acceder'));
  assert.equal(vm.runInContext(`currentUser`,context),null);
  signupResult={data:{user:{identities:[]},session:null}};

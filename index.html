@@ -397,12 +397,12 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/catalog-ui.css">
 <script src="assets/languages.js" defer></script>
 <style>
-.help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}body.java-mode .main{background:linear-gradient(135deg,rgba(44,88,112,.24),transparent 65%)}body.java-mode .section-tabs button[aria-pressed="true"]{background:#a8cfe0;color:#172d39;border-color:#a8cfe0}.source-attribution{font-size:.82rem;opacity:.8}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
+.help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}body.java-mode .main{background:linear-gradient(135deg,rgba(44,88,112,.24),transparent 65%)}body.java-mode .section-tabs button[aria-pressed="true"]{background:#a8cfe0;color:#172d39;border-color:#a8cfe0}.source-attribution{font-size:.82rem;opacity:.8}.rcc-apk-coming{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 12px;border:1px dashed var(--border-glass);border-radius:12px;color:var(--muted);font-size:.82rem}.rcc-apk-coming strong{font-size:.68rem;letter-spacing:.08em;color:var(--accent)}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
 </style>
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
-<script src="assets/assistant-guide.js" defer></script>
+<script src="assets/assistant-guide.js?v=2" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -458,7 +458,7 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/notification-banners.css?v=2">
 <link rel="stylesheet" href="assets/prism-logo.css">
 <link rel="stylesheet" href="assets/main-panel-personalization.css?v=1">
-<script src="assets/main-panel-personalization.js?v=1" defer></script>
+<script src="assets/main-panel-personalization.js?v=2" defer></script>
 <link rel="stylesheet" href="assets/script-review.css">
 <script src="assets/review-signals.js"></script>
 <script src="assets/script-review.js"></script>
@@ -571,11 +571,12 @@ window.rccSupabaseReady.catch(() => {});
       <div class="studio-actions"><a class="studio-primary" href="#catalogHeading">Explorar códigos <span aria-hidden="true">↗</span></a><button type="button" data-motion-library>Probar animaciones <span aria-hidden="true">→</span></button><span class="studio-shortcut"><kbd>Ctrl / ⌘ K</kbd> para buscar</span></div>
       <section class="platform-spotlight" aria-label="Nuevos scripts independientes">
         <span class="eyebrow">NUEVO · CÓDIGO FUENTE INDEPENDIENTE</span>
-        <p>60 scripts nuevos para FiveM, GameGuardian y AutoTouch. Revisa el entorno y la instalación en cada ficha; ejecución en dispositivos reales pendiente.</p>
+        <p>Explora descubrimientos y repositorios públicos para Roblox/Luau, FiveM, Java, JavaScript, GameGuardian, AutoTouch, Minecraft, Godot, Unity y Python. Las publicaciones externas abren su fuente original; RCC no las ejecuta ni las presenta como verificadas.</p>
         <div class="platform-shortcuts">
           <button type="button" data-platform-shortcut="fivem" aria-pressed="false" disabled>FiveM <span>20 nuevos ↗</span></button>
           <button type="button" data-platform-shortcut="gameguardian" aria-pressed="false" disabled>GameGuardian <span>20 nuevos ↗</span></button>
-          <button type="button" data-platform-shortcut="autotouch" aria-pressed="false" disabled>AutoTouch <span>20 nuevos ↗</span></button>
+          <button type="button" data-platform-shortcut="autotouch" aria-pressed="false" disabled>AutoTouch <span>Explorar en Novedades</span></button>
+          <span class="rcc-apk-coming" aria-label="Buscador de mods APK, próximamente">📦 Buscador de mods APK <strong>PRÓXIMAMENTE</strong></span>
         </div>
       </section>
       </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
@@ -648,7 +649,7 @@ window.rccSupabaseReady.catch(() => {});
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>Ampliamos la biblioteca con más scripts para diferentes juegos y seguimos sumando códigos, contenido y mejoras en los perfiles, la comunidad y las opciones de personalización.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>RCC amplía sus descubrimientos a Roblox, FiveM, Java, JavaScript y otros ecosistemas. Novedades también informa de propuestas en revisión para perfiles, banners, chat y administración. Próximamente: Buscador de mods APK. Cada fuente externa conserva su enlace original y requiere revisión antes de utilizarse.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <section class="rcc-safety-notices" aria-label="Avisos importantes">
@@ -1383,7 +1384,7 @@ async function submitAuth(register){
     if(!data?.session?.user)throw new Error('No session returned');
     await applySession(data.session.user);closeAuth();showToast(register?'Cuenta creada':'Sesión iniciada');
   }catch(error){authStatus.textContent=authError(error);}
-  finally{setAuthBusy(false);}
+  finally{setAuthBusy(false);document.getElementById('authPassword').value='';}
 }
 authForm.onsubmit=e=>{e.preventDefault();submitAuth(false);};
 document.getElementById('signupBtn').onclick=()=>{const label=document.getElementById('signupRobloxLabel');if(label.hidden){label.hidden=false;document.getElementById('signupRoblox').focus();authStatus.textContent='Busca tu Roblox y vuelve a pulsar Registrarse.';return;}submitAuth(true);};
@@ -1658,8 +1659,9 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 </div>
 
 <script src="assets/vip-membership.js?v=1"></script>
+<script src="assets/rcc-assistant.js?v=2"></script>
 <script src="assets/chat-widget.js?v=1"></script>
-<script src="assets/community-feed.js?v=1"></script>
+<script src="assets/community-feed.js?v=2"></script>
 </body>
 </html>
 

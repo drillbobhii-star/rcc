@@ -2,12 +2,13 @@
 
 ## Qué añade
 
-- Sincroniza hasta 1,000 registros recientes de ScriptBlox por ejecución (50 páginas × 20).
+- Sincroniza publicaciones recientes y tendencias de ScriptBlox, con metadatos y enlace original.
 - Puede sincronizar hasta 2,400 registros de Rscripts (50 páginas × 48) si se configura su clave API.
 - Consulta los listados de tendencias de ambas fuentes.
 - Mantiene metadatos, fuente, juego, fecha, autor, estado de verificación y enlaces originales.
 - No descarga ni guarda el código Lua de terceros. Las fichas abren la publicación original.
-- Conserva las novedades editoriales de FiveM entre sincronizaciones.
+- Descubre repositorios públicos de GitHub por temas: Roblox/Luau, FiveM, Java, JavaScript, GameGuardian, AutoTouch, Minecraft, Godot, Unity y Python.
+- Conserva las novedades editoriales y enlaces oficiales de Roblox, FiveM y Java entre sincronizaciones.
 
 ## Actualización automática
 
@@ -16,7 +17,7 @@ GitHub Actions ejecuta `.github/workflows/refresh-community-catalog.yml` cada se
 ## Activar Rscripts
 
 1. Crear una API key desde el panel de cuenta de Rscripts.
-2. En GitHub → Settings → Secrets and variables → Actions, crear el secreto `RSCRIPTS_API_KEY`.
+2. En GitHub → Settings → Secrets and variables → Actions, crear el secreto `RSCRIPTS_API_KEY`. La sincronización utiliza `GITHUB_TOKEN` de Actions para consultar repositorios públicos.
 3. Volver a ejecutar el workflow.
 
 La clave nunca se expone en el navegador ni se guarda en el repositorio.
@@ -28,7 +29,7 @@ La clave nunca se expone en el navegador ni se guarda en el repositorio.
 - El estado `verified` corresponde a la plataforma de origen, no a una verificación de RCC.
 - RCC no afirma que un script externo funcione ni lo ejecuta.
 - Los datos externos se presentan como descubrimientos; para incorporarlos al catálogo ejecutable estático se requiere revisión independiente.
-- El feed no sustituye el catálogo local ni cambia su contador de códigos.
+- El feed no sustituye el catálogo local ni cambia su contador de códigos. Los descubrimientos externos se contabilizan por separado; no se suman al total de scripts alojados en RCC.
 
 ## VIP
 

@@ -9,7 +9,7 @@
     #rccMainBackdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,14,.2),rgba(4,7,14,.58))}
     #rccMainLogo{position:fixed;z-index:1;pointer-events:none;left:50%;top:50%;transform:translate(-50%,-50%);width:min(var(--rcc-logo-size,220px),65vw);max-height:45vh;object-fit:contain;opacity:var(--rcc-logo-opacity,.28);filter:drop-shadow(0 8px 28px #0008)}
     body.rcc-custom-main-background .glass-background,body.rcc-custom-main-background>.blob{opacity:.12}
-    #rccMainCustomize{position:fixed;right:18px;bottom:18px;z-index:1800;border:1px solid #ffffff35;border-radius:999px;padding:12px 17px;background:#171d2c;color:#fff;font:700 .88rem inherit;box-shadow:0 8px 28px #0008;cursor:pointer}
+    #rccMainCustomize{position:fixed;right:18px;top:calc(env(safe-area-inset-top, 0px) + 112px);bottom:auto;z-index:1700;border:1px solid #ffffff35;border-radius:999px;padding:12px 17px;background:#171d2c;color:#fff;font:700 .88rem inherit;box-shadow:0 8px 28px #0008;cursor:pointer}
     #rccMainCustomize:hover{background:#29334c}
     #rccMainDialog{position:fixed;inset:0;z-index:2100;display:none;align-items:center;justify-content:center;padding:16px;background:#030611c9;backdrop-filter:blur(10px)}
     #rccMainDialog.open{display:flex}
@@ -28,7 +28,7 @@
     #rccMainDialog button.rcc-main-save{background:#d52bd8;color:#190b20}
     #rccMainDialog button.rcc-main-reset{background:#ffffff18;color:#fff;border:1px solid #ffffff25}
     #rccMainStatus{min-height:1.4em;margin-top:12px!important;font-size:.85rem}
-    @media(max-width:520px){#rccMainCustomize{right:12px;bottom:12px;padding:11px 13px}#rccMainDialog .rcc-main-grid{grid-template-columns:1fr}#rccMainDialog .rcc-main-box{padding:17px}}
+    @media(max-width:520px){#rccMainCustomize{right:12px;top:calc(env(safe-area-inset-top, 0px) + 104px);bottom:auto;padding:10px 12px}#rccMainDialog .rcc-main-grid{grid-template-columns:1fr}#rccMainDialog .rcc-main-box{padding:17px}}
   `;
   document.head.append(style);
   const backdrop=document.createElement('div');backdrop.id='rccMainBackdrop';backdrop.setAttribute('aria-hidden','true');
