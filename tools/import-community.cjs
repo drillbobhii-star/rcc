@@ -28,7 +28,7 @@ async function main() {
   let addedRscripts = 0;
   const addEntry = entry => {
     if (ids.has(entry.id) || sources.has(entry.source)) return false;
-    if (!entry.title || denied.test(entry.title) || !entry.rawUrl) return false;
+    if (!entry.title || denied.test(`${entry.title} ${entry.description || ''}`) || !entry.rawUrl) return false;
     catalog.push({
       id: entry.id,
       name: cleanText(entry.title, 180),
