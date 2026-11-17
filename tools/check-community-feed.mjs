@@ -14,8 +14,6 @@ assert.equal(feed.news.length, 5);
 assert.match(sync, /RCC_COMMUNITY_PAGES \|\| 50/);
 assert.match(sync, /const unchanged =/);
 assert.match(sync, /news: Array\.isArray\(old\?\.news\)/);
-assert.match(sync, /const unchanged =/);
-assert.match(sync, /news: Array\.isArray\(old\?\.news\)/);
 assert.match(sync, /max: '20'/);
 assert.match(sync, /limit: '48'/);
 assert.match(sync, /patched: patched \? '1' : '0'/);
