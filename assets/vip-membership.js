@@ -20,7 +20,9 @@
     return hash >>> 0;
   }
   function isVipScript(script) {
-    return Boolean(script && hashId(script.id) % 100 < VIP_PERCENTAGE);
+    if (!script || !script.id) return false;
+    if (Array.isArray(script.tags) && script.tags.includes('RCC Supporter')) return true;
+    return hashId(script.id) % 100 < VIP_PERCENTAGE;
   }
   function openModal() {
     if (!modal) return;
@@ -133,10 +135,12 @@
   }
   function decorateCards() {
     document.querySelectorAll('[data-script-id]').forEach(card => {
-      const locked = isVipScript({ id: card.dataset.scriptId }) && !state.isVip;
+      const script = window.RCCCatalogScriptsById?.get(String(card.dataset.scriptId)) || { id: card.dataset.scriptId };
+      const vipEntry = isVipScript(script);
+      const locked = vipEntry && !state.isVip;
       card.classList.toggle('rcc-vip-locked', locked);
       const badge = card.querySelector('.badges .badge.free');
-      if (badge && isVipScript({ id: card.dataset.scriptId })) {
+      if (badge && vipEntry) {
         badge.classList.toggle('rcc-vip-badge', true);
         badge.textContent = '💎 VIP';
       }
