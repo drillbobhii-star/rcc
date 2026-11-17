@@ -57,7 +57,7 @@
       const details = document.createElement('p'); details.textContent = (item.views ? new Intl.NumberFormat('es-DO',{notation:'compact'}).format(item.views) + ' vistas · ' : '') + date(item.createdAt);
       const tags = document.createElement('div'); tags.className = 'rcc-feed-tags';
       const tag = (value, extraClass = '') => { const span=document.createElement('span');span.className='rcc-feed-tag'+(extraClass?' '+extraClass:'');span.textContent=value;tags.append(span); };
-      tag(item.source || 'Fuente externa'); if(item.kind !== 'news') tag(item.verified ? 'Creador verificado' : 'No verificado por la fuente');
+      tag(item.source || 'Fuente externa'); if(item.status) tag(item.status); if(item.kind !== 'news') tag(item.verified ? 'Creador verificado' : 'No verificado por la fuente');
       if (item.patched === true) tag('⚠️ PARCHEADO','rcc-feed-tag--patched');
       if (item.keyRequired) tag('Requiere clave');
       if (item.riskLevel) tag('Riesgo: ' + item.riskLevel);
