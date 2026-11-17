@@ -1,6 +1,8 @@
 name: Validate RCC catalog and VIP
 
 on:
+  push:
+    branches: [main, feat/rcc-java-community-expansion]
   pull_request:
     branches: [main]
     paths:
