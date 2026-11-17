@@ -4,10 +4,19 @@
     requirements:'loadstring convierte texto en código; HttpGet obtiene contenido remoto. El script puede depender de ambas funciones. Revisa el dispositivo, la versión y los requisitos del ejecutor. El aviso detecta esas palabras en el código; no garantiza compatibilidad ni seguridad.',
     downloads:'Abre Panel de ejecutores y elige una opción. Revisa el dominio y el aviso; espera diez segundos y pulsa «Sí, ir a la descarga» para continuar. Cancelar o cambiar de ejecutor reinicia la espera. RCC no aloja los ejecutables ni verifica esas descargas.',
     safety:'Las páginas externas pueden incluir anuncios, redirecciones y botones engañosos. Mantén el antivirus y las protecciones del navegador activos. Si aparece un bloqueo, detente y verifica el origen. Nunca compartas contraseñas, cookies ni tokens. Revisa el código remoto antes de usarlo; una imagen o una ficha no garantiza seguridad.',
-    release:'Esta actualización incorpora avisos en fichas y modales para loadstring/HttpGet, un panel de ocho ejecutores con confirmación y espera de diez segundos, y nuevas animaciones de fondo. El catálogo también incluye publicaciones recientes con imágenes de referencia y funciones sin verificar. Se retiraron el audio de fondo y el reproductor. Usa Novedades para consultar las fichas añadidas.'
+    release:'RCC amplió la biblioteca con secciones de Roblox/Luau, Java, JavaScript y descubrimientos comunitarios para FiveM, GameGuardian, AutoTouch, Minecraft, Godot, Unity y Python. Novedades reúne publicaciones recientes, repositorios públicos y cambios editoriales; cada enlace conserva su fuente original y no implica que RCC haya probado el código. La personalización del fondo permite usar imágenes y GIF. El Buscador de mods APK está anunciado como Próximamente y todavía no está disponible.'
   };
+    catalogs:'RCC reúne catálogos de Roblox/Luau, FiveM, Java, JavaScript, GameGuardian, AutoTouch y repositorios públicos de Minecraft, Godot, Unity y Python. Usa Novedades para explorar publicaciones recientes y abre siempre la fuente original.',
+    fivem:'Los recursos FiveM pueden usar Lua, JavaScript o C#. Consulta la documentación Cfx.re y los repositorios enlazados. Revisa framework, dependencias, fxmanifest.lua y licencia antes de instalar. RCC no ejecuta recursos externos.',
+    java:'La sección Java contiene ejemplos educativos para JDK 17+. Java es diferente de JavaScript. Puedes explorar fundamentos, POO, colecciones, algoritmos, archivos y concurrencia; revisa cada ejemplo y compílalo en un entorno de prueba.',
+    github:'Los descubrimientos de GitHub son metadatos y enlaces a repositorios públicos. Revisa licencia, actividad, issues, dependencias y código antes de reutilizar. Que un repositorio aparezca no significa que RCC lo haya auditado.',
+    roblox:'Roblox utiliza Luau, derivado de Lua 5.1. Separa ejemplos para Roblox Studio de publicaciones de terceros para juegos. Consulta Creator Hub y revisa la ubicación Script/LocalScript y permisos.',
+    games:'RCC está ampliando descubrimientos para Minecraft, Godot, Unity, GameGuardian y AutoTouch. Comprueba la versión del juego, el lenguaje, las dependencias y la licencia en la fuente original.',
+    apk:'El Buscador de mods APK está anunciado como Próximamente. Aún no permite buscar ni descargar APK. Cuando esté disponible, RCC deberá mostrar fuentes, permisos, firma y advertencias de seguridad.';
+
   const groups={
-    updates:[['¿Qué cambió en esta actualización?','release'],['¿Dónde veo los scripts añadidos?','updates'],['¿Por qué ya no hay reproductor de música?','release'],['¿Dónde están los ocho ejecutores?','executors'],['¿Qué significa el aviso de compatibilidad?','requirements']],
+    updates:[['¿Qué cambió en esta actualización?','release'],['¿Qué catálogos y lenguajes tiene RCC?','catalogs'],['¿Dónde encuentro scripts de FiveM?','fivem'],['¿Dónde encuentro ejemplos Java?','java'],['¿Qué es el Buscador de mods APK?','apk'],['¿Dónde veo los scripts añadidos?','updates'],['¿Por qué ya no hay reproductor de música?','release'],['¿Dónde están los ocho ejecutores?','executors'],['¿Qué significa el aviso de compatibilidad?','requirements']],
+    catalogs:[['¿Qué lenguajes incluye RCC?','release'],['¿Dónde busco Roblox y Luau?','roblox'],['¿Dónde encuentro recursos FiveM?','fivem'],['¿Dónde encuentro Java y JavaScript?','java'],['¿Dónde están los repositorios de GitHub?','github'],['¿Dónde veo Minecraft, Godot o Unity?','games'],['¿El código externo está probado por RCC?','safety']],
     safety:[['¿Qué hago si Windows bloquea la descarga?','safety'],['¿Es seguro desactivar el antivirus?','safety'],['¿Cómo evito botones de descarga engañosos?','safety'],['¿Qué riesgos tiene el código remoto?','safety'],['¿Los ejecutores están verificados?','executors'],['¿Por qué tengo que esperar diez segundos?','downloads'],['¿Cómo cancelo una descarga?','downloads'],['¿Qué son loadstring y HttpGet?','requirements'],['¿La foto del juego garantiza seguridad?','safety']],
     navigation:[['¿Cómo busco código?','search'],['¿Me recomiendas algo del catálogo?','recommend'],['¿Cómo filtro por plataforma?','filters'],['¿Dónde cambio el fondo y las animaciones?','appearance'],['¿Dónde comparo o analizo código?','tools'],['¿Dónde veo mis favoritos?','favorites'],['¿Qué copié recientemente?','recent'],['¿Dónde están las tendencias?','trending'],['¿Cómo limpio los filtros?','clear'],['¿Cómo vuelvo a ver la presentación?','guide'],['¿Dónde veo ejemplos animados?','motion']]
   };
@@ -54,7 +63,13 @@
     if(/antivirus|anuncios|advertencia|riesgo|segur[oa]|bloquea|contrasena|cookies|tokens/.test(text))return {action:'safety'};
     if(/descarg|temporizador|diez segundos|10 segundos/.test(text))return {action:'downloads'};
     if(/ejecutor|solara|wave|xeno|velocity|delta|arceus|codex|vega/.test(text))return {action:'executors'};
-    if(/que cambio|actualizacion|musica|reproductor/.test(text))return {action:'release'};
+    if(/que cambio|actualizacion|musica|reproductor|novedades/.test(text))return {action:'release'};
+    if(/five.?m|fivem|cfx|qbcore|esx/.test(text))return {action:'fivem'};
+    if(/java|jdk|javase|javascript/.test(text))return {action:'java'};
+    if(/github|repositorio|codigo fuente/.test(text))return {action:'github'};
+    if(/roblox|luau|studio/.test(text))return {action:'roblox'};
+    if(/minecraft|godot|unity|gameguardian|autotouch/.test(text))return {action:'games'};
+    if(/apk|mods? de android|mod apk/.test(text))return {action:'apk'};
     if(/novedades|scripts nuevos|scripts anadidos/.test(text))return {action:'updates'};
     return null;
   }
