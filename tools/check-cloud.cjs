@@ -59,9 +59,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  assert.equal(vm.runInContext(`currentUser?.id`,context),'a');
  signupResult={data:{user:account,session:null}};
  setCredentials();await vm.runInContext(`submitAuth(true)`,context);
- assert.equal(requests.filter(r=>r.login).length,++loginCount);
- assert.equal(requests.filter(r=>r.login).at(-1).login.email,'member@example.test');
- assert.equal(requests.filter(r=>r.login).at(-1).login.password,'test-password');
+ assert.equal(requests.filter(r=>r.login).length,loginCount,'Do not log in before email confirmation when signup returns no session');
  assert(els.get('authStatus').textContent.includes('Cuenta creada. Revisa tu correo'));
  loginResult={data:{session:null},error:{code:'email_not_confirmed',message:'Email not confirmed'}};
  await vm.runInContext(`applySession(null)`,context);
