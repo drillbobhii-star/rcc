@@ -66,6 +66,9 @@
   quick('FiveM','¿Dónde encuentro scripts de FiveM?');
   quick('Java','¿Dónde encuentro ejemplos Java?');
   quick('Mods APK','¿Qué es el Buscador de mods APK?');
+  quick('Perfiles','¿Ya está el buscador de perfiles?');
+  quick('Chat','¿Qué mejoras tendrá el chat?');
+  quick('Panel admin','¿Qué novedades hay en el panel admin?');
   say('¡Hola! Soy el Asistente RCC. Puedo ayudarte a explorar los catálogos, entender las herramientas y conocer las novedades. ¿Qué quieres buscar?');
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden)shut();});
 })();
