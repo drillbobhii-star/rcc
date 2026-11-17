@@ -17,8 +17,11 @@ const [index, vip, admin, api, migration, docs, webhook, successPage, kofiMigrat
 assert.match(index, /Únete a RCC Supporter por solo \$1\.99 USD \/ mes/);
 assert.match(index, /Cancela cuando quieras\. Al suscribirte, desbloqueas más de 5,000 scripts exclusivos, insignia, rol en Discord y cero esperas/);
 assert.match(index, /id="vipTab"/);
+assert.match(index, /id="javaTab"/);
+assert.match(index, /id="javaNav"/);
+assert.match(index, /id="javaTools"/);
 assert.match(index, /id="rccSupportButton"/);
-assert.match(vip, /VIP_PERCENTAGE = 40/);
+assert.match(vip, /VIP_PERCENTAGE = 45/);
 assert.match(vip, /rcc-vip-code-locked/);
 assert.match(admin, /Es VIP/);
 assert.match(api, /RCC_ADMIN_EMAIL/);

@@ -1,0 +1,93 @@
+name: RCC Catalog Expansion
+
+on:
+  workflow_dispatch:
+    inputs:
+      scriptblox_target:
+        description: Maximum number of new free ScriptBlox listings to import
+        required: true
+        default: "1500"
+        type: string
+      rscripts_target:
+        description: Maximum number of new free low-risk RScripts listings to import
+        required: true
+        default: "500"
+        type: string
+  schedule:
+    - cron: "31 11 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rcc-catalog-expansion
+  cancel-in-progress: false
+
+jobs:
+  expand:
+    name: Import, validate and propose catalog growth
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out RCC
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Import recent free ScriptBlox publications
+        env:
+          TARGET: ${{ inputs.scriptblox_target || '1500' }}
+        run: node tools/import-community.cjs "$TARGET"
+
+      - name: Import public low-risk RScripts listings
+        env:
+          TARGET: ${{ inputs.rscripts_target || '500' }}
+          RSCRIPTS_API_KEY: ${{ secrets.RSCRIPTS_API_KEY }}
+        run: node tools/import-public-games.cjs "$TARGET"
+
+      - name: Add original Java examples
+        run: node tools/import-java-library.cjs
+
+      - name: Validate Java examples with javac
+        run: npm run test:java
+
+      - name: Run RCC regression suite
+        run: npm test
+
+      - name: Create a reviewable catalog pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/rcc-catalog-expansion
+          delete-branch: true
+          add-paths: |
+            catalog/
+            scripts.json
+            netlify/functions/lib/catalog-ids.json
+          commit-message: "chore: expand RCC catalog with fresh scripts and Java examples"
+          title: "RCC catalog expansion: new scripts + Java library"
+          body: |
+            ## RCC catalog growth
+
+            This automated proposal imports newly published public free listings from ScriptBlox and public free low-risk listings from the current RScripts v1 API, then adds the reviewed original Java examples authored in RCC.
+
+            - ScriptBlox listings are deduplicated by source ID and canonical URL; patched, paid and suspicious-title entries are skipped.
+            - RScripts listings require the configured RSCRIPTS_API_KEY secret; only public, free, non-patched entries marked Safe or Low Risk, with a numeric score from 1 to 4 and no detected obfuscation, are considered.
+            - External scripts remain source-linked loaders. RCC does not download or execute their remote Lua.
+            - Original Java examples are compiled individually with JDK 21 using the Java validation script.
+            - The complete RCC regression suite must pass before this PR is created.
+
+            Review the import counts in the Actions log. Some requests may add fewer items than the configured target because records are duplicates or fail the source filters.
