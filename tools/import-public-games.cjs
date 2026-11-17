@@ -167,7 +167,7 @@ async function main() {
           provider: 'RScripts',
           source,
           checkedAt,
-          status: row.isPatched === true ? 'patched' : 'source-unpatched',
+          status: row.isPatched === true ? 'patched' : row.isPatched === false ? 'source-unpatched' : 'unknown',
           commentsStatus: 'unavailable',
           declaredVerified: row.creator?.isVerified === true,
           riskScore,
