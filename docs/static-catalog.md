@@ -10,6 +10,14 @@ La búsqueda espera 180 ms después de la última pulsación. Los recuentos por 
 
 Los nombres de las partes incluyen una huella SHA-256 truncada de su contenido. El cargador revalida `scripts.json` en cada carga y solicita las partes con `cache: 'force-cache'`: una URL de parte identifica contenido inmutable, por lo que el navegador puede reutilizarlo entre visitas. El índice nunca se trata como inmutable. La política HTTP/CDN publicada debe seguir alineada con esta distinción: revalidación para `scripts.json` y caché prolongada solo para `catalog/part-*.json` con nombre hasheado.
 
+## Biblioteca Java
+
+El catálogo incluye una sección independiente de Java 17, separada de los scripts Lua/Luau de Roblox y de la biblioteca JavaScript para navegador. Cada ejemplo es autocontenido, usa bibliotecas estándar y se identifica con la etiqueta `Java`. Para probarlo, guarda el código como `Main.java`, compila con `javac Main.java` y ejecuta `java Main`. Los ejemplos avanzados llevan la etiqueta `RCC Supporter`; el resto sigue disponible en el catálogo general. La verificación `java-compiled` corresponde a compilación y ejecución automatizadas con JDK 17, no a Roblox Studio.
+
+## Biblioteca Java
+
+El catálogo incluye una sección independiente de Java 17, separada de los scripts Lua/Luau de Roblox y de la biblioteca JavaScript para navegador. Cada ejemplo es autocontenido, usa bibliotecas estándar y se identifica con la etiqueta `Java`. Para probarlo, guarda el código como `Main.java`, compila con `javac Main.java` y ejecuta `java Main`. Los ejemplos avanzados llevan la etiqueta `RCC Supporter`; los otros ejemplos Java permanecen gratuitos. La verificación `java-compiled` corresponde a compilación y ejecución automatizadas con JDK 17, no a Roblox Studio.
+
 ## Publicación
 
 Publica `scripts.json`, la carpeta `catalog/`, el nuevo cargador y los archivos estáticos habituales. El despliegue debe incluirlos juntos, como ocurre al publicar la revisión completa del repositorio. La configuración existente de Cloudflare Pages no requiere un nuevo comando de compilación.

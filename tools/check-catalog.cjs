@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const scripts = require('./catalog-store.cjs').readCatalog();
 const ids = new Set();
 const newCode = new Set();
-const counts = { lua: 0, client: 0, server: 0, legacy: 0, browser: 0 };
+const counts = { lua: 0, client: 0, server: 0, legacy: 0, browser: 0, java: 0 };
 for (const s of scripts) {
   for (const key of ['id', 'name', 'code', 'platform', 'device', 'type']) {
     assert.equal(typeof s[key], 'string', `${s.id}: ${key}`);
@@ -18,11 +18,25 @@ for (const s of scripts) {
   ids.add(s.id);
   assert(['pc', 'mobile', 'both', 'unknown'].includes(s.device), s.id);
   assert(['source', 'loadstring'].includes(s.type), s.id);
-  assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch', 'web'].includes(s.platform), s.id);
+  assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch', 'web', 'java'].includes(s.platform), s.id);
   for (const key of ['tags', 'executors']) {
     assert(Array.isArray(s[key]), `${s.id}: ${key}`);
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
+  }
+  if (s.catalog_section === 'java') {
+    assert.equal(s.platform, 'java');
+    assert.equal(s.type, 'source');
+    assert.equal(s.file_extension, 'java');
+    assert.equal(s.compatibility.environment, 'java');
+    assert.equal(s.compatibility.verification, 'java-compiled');
+    assert(s.tags.includes('Java'), `${s.id}: missing Java tag`);
+    assert(s.code.startsWith('// RCC | Ejemplo independiente de Java 17'));
+    assert(!newCode.has(s.code), `Duplicate Java code: ${s.id}`);
+    assert(!['ProcessBuilder', 'Runtime.getRuntime().exec', 'HttpClient', 'new Socket('].some(value => s.code.includes(value)), `${s.id}: unexpected process or network access`);
+    newCode.add(s.code);
+    counts.java++;
+    continue;
   }
   if (s.catalog_section === 'web') {
     assert.equal(s.platform, 'web');
@@ -75,7 +89,7 @@ for (const s of scripts) {
     assert.equal(c.executor_status, 'not-applicable');
   }
 }
-assert(counts.lua >= 435 && counts.server >= 326 && counts.client >= 45 && counts.browser >= 144, 'Expected expanded learning libraries');
+assert(counts.lua >= 435 && counts.server >= 326 && counts.client >= 45 && counts.browser >= 144 && counts.java >= 48, 'Expected expanded Lua, web and Java libraries');
 assert(scripts.filter(s=>s.catalog_section==='games' && s.type==='loadstring').length >= 2800, 'Expected expanded community library');
 for (const file of ['index.html', 'admin.html', 'soporte.html', 'soporte-enviado.html']) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
@@ -85,7 +99,7 @@ for (const file of ['index.html', 'admin.html', 'soporte.html', 'soporte-enviado
 }
 new vm.Script(fs.readFileSync(path.join(root,'assets/support.js'),'utf8'));
 const support=fs.readFileSync(path.join(root,'soporte.html'),'utf8');
-assert(support.includes('data-netlify="true"') && support.includes('netlify-honeypot="bot-field"'));
-for (const field of ['form-name','subject','email','category','script','environment','message','bot-field']) assert(support.includes(`name="${field}"`), `Missing support field: ${field}`);
+assert(support.includes('action="/api/send-error"') && support.includes('id="supportForm"'));
+for (const field of ['subject','email','category','script','environment','message','bot-field']) assert(support.includes(`name="${field}"`), `Missing support field: ${field}`);
 assert(fs.existsSync(path.join(root, 'compatibilidad.html')));
 console.log(`Catalog OK: ${scripts.length} scripts; ${JSON.stringify(counts)}. Page JavaScript syntax OK.`);

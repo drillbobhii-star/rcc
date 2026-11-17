@@ -1,0 +1,49 @@
+name: Validate RCC catalog, assistant and discovery feed
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "assets/**"
+      - "catalog/**"
+      - "community-feed.json"
+      - "scripts.json"
+      - "tools/**"
+      - "docs/**"
+      - "rocio-informacion.html"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+concurrency:
+  group: rcc-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run RCC regression suite
+        run: npm test
+        env:
+          RCC_REQUIRE_JAVA: "1"

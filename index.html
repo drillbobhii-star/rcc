@@ -397,12 +397,12 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/catalog-ui.css">
 <script src="assets/languages.js" defer></script>
 <style>
-.help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}body.java-mode .main{background:linear-gradient(135deg,rgba(44,88,112,.24),transparent 65%)}body.java-mode .section-tabs button[aria-pressed="true"]{background:#a8cfe0;color:#172d39;border-color:#a8cfe0}.source-attribution{font-size:.82rem;opacity:.8}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
+.help-link{color:var(--text);text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--border-glass);border-radius:12px}.help-link:hover{border-color:#c2d6aa}body.web-mode .main{background:linear-gradient(135deg,rgba(94,75,31,.24),transparent 65%)}body.web-mode .section-tabs button[aria-pressed="true"]{background:#dfc79a;color:#382b17;border-color:#dfc79a}body.java-mode .main{background:linear-gradient(135deg,rgba(44,88,112,.24),transparent 65%)}body.java-mode .section-tabs button[aria-pressed="true"]{background:#a8cfe0;color:#172d39;border-color:#a8cfe0}body.fivem-mode .main{background:linear-gradient(135deg,rgba(43,122,93,.22),transparent 65%)}body.fivem-mode .section-tabs button[aria-pressed="true"]{background:#8bcbb1;color:#173d30;border-color:#8bcbb1}.source-attribution{font-size:.82rem;opacity:.8}.section-tabs a{font-size:.9rem}.games-nav{margin-bottom:8px}.actions a{color:inherit;text-decoration:none}
 </style>
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
-<script src="assets/assistant-guide.js" defer></script>
+<script src="assets/assistant-guide.js?v=2" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -458,10 +458,11 @@ window.rccSupabaseReady.catch(() => {});
 <link rel="stylesheet" href="assets/notification-banners.css?v=2">
 <link rel="stylesheet" href="assets/prism-logo.css">
 <link rel="stylesheet" href="assets/main-panel-personalization.css?v=1">
-<script src="assets/main-panel-personalization.js?v=1" defer></script>
+<script src="assets/main-panel-personalization.js?v=2" defer></script>
 <link rel="stylesheet" href="assets/script-review.css">
 <script src="assets/review-signals.js"></script>
 <script src="assets/script-review.js"></script>
+<style>.rcc-apk-coming{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 12px;border:1px dashed var(--border-glass);border-radius:12px;color:var(--muted);font-size:.82rem}.rcc-apk-coming strong{font-size:.68rem;letter-spacing:.08em;color:var(--accent)}</style>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -511,6 +512,7 @@ window.rccSupabaseReady.catch(() => {});
   <button class="games-nav" id="gamesNav" type="button">Juegos Roblox <span aria-hidden="true">↗</span></button>
   <button class="games-nav" id="webNav" type="button">JavaScript · Web ↗</button>
   <button class="games-nav" id="javaNav" type="button">Java · JDK 17+ ↗</button>
+  <button class="games-nav" id="fivemNav" type="button">FiveM / FXServer ↗</button>
   <a class="games-nav help-link" href="soporte.html">Ayuda y reportar errores ↗</a>
   <div class="sidebar-section">
     <div id="recentBtn" class="nav-item">
@@ -559,6 +561,7 @@ window.rccSupabaseReady.catch(() => {});
         <button id="gamesTab" type="button" aria-pressed="false">Juegos Roblox <span id="gamesCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
         <button id="javaTab" type="button" aria-pressed="false">Java · JDK 17+ <span id="javaCount"></span></button>
+        <button id="fivemTab" type="button" aria-pressed="false">FiveM <span id="fivemCount"></span></button>
         <button id="vipTab" type="button" aria-pressed="false">💎 Zona VIP</button>
         <a class="help-link" href="#analysis">Sección de prueba ↗</a>
         <a class="help-link" href="#obfuscator">Generador de ofuscador ↗</a>
@@ -576,6 +579,7 @@ window.rccSupabaseReady.catch(() => {});
           <button type="button" data-platform-shortcut="fivem" aria-pressed="false" disabled>FiveM <span>20 nuevos ↗</span></button>
           <button type="button" data-platform-shortcut="gameguardian" aria-pressed="false" disabled>GameGuardian <span>20 nuevos ↗</span></button>
           <button type="button" data-platform-shortcut="autotouch" aria-pressed="false" disabled>AutoTouch <span>20 nuevos ↗</span></button>
+          <span class="rcc-apk-coming" aria-label="Buscador de mods APK, próximamente">📦 Buscador de mods APK <strong>PRÓXIMAMENTE</strong></span>
         </div>
       </section>
       </div><div class="code-preview" aria-hidden="true"><div class="code-preview-bar"><span></span><span></span><span></span><small>tu_proximo_proyecto.lua</small></div><pre><span class="code-comment">-- Todo empieza con una idea.</span>
@@ -599,6 +603,7 @@ window.rccSupabaseReady.catch(() => {});
       </div>
       <div id="webTools" class="compat-note" hidden><strong>Crea tu primera página.</strong> JavaScript es el lenguaje de interacción de la web, distinto de Java. Cada ejemplo incluye HTML, CSS y JavaScript: descárgalo como index.html y ábrelo en tu navegador. Incluye componentes de interfaz y 2,048 recetas de procesamiento de datos: filtros, transformaciones y resúmenes combinables. Las variantes están etiquetadas. <a href="soporte.html">Ver ayuda ↗</a></div>
       <div id="javaTools" class="compat-note" hidden><strong>Programación Java · JDK 17+.</strong> Esta sección es independiente de JavaScript · Web. Cada ficha contiene un ejemplo Java original de RCC para guardar como <code>Main.java</code>, compilar con <code>javac Main.java</code> y ejecutar con <code>java Main</code>. Incluye fundamentos, POO, colecciones, algoritmos, archivos, datos y concurrencia. No requiere dependencias externas. <a href="https://docs.oracle.com/en/java/javase/17/" target="_blank" rel="noopener noreferrer">Documentación de Java 17 ↗</a></div>
+      <div id="fivemTools" class="compat-note" hidden><strong>FiveM · FXServer.</strong> Catálogo de recursos y scripts comunitarios para servidores GTA V. Las fichas de Cfx.re son enlaces externos: comprueba el framework (ESX, QBCore, Qbox o standalone), dependencias, licencia, precio y versión en la publicación original. RCC no descarga ni ejecuta el recurso. <a href="https://docs.fivem.net/docs/scripting-reference/" target="_blank" rel="noopener noreferrer">Documentación oficial Cfx.re ↗</a></div>
       <div class="stats">
         <div class="stat"><b id="statTotal">0</b><small>Scripts</small></div>
         <div class="stat"><b id="statPC">0</b><small>Para PC</small></div>
@@ -648,7 +653,7 @@ window.rccSupabaseReady.catch(() => {});
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>Ampliamos la biblioteca con más scripts para diferentes juegos y seguimos sumando códigos, contenido y mejoras en los perfiles, la comunidad y las opciones de personalización.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>RCC amplía sus catálogos de Roblox, FiveM, Java y JavaScript y añade descubrimientos comunitarios de otros ecosistemas. Novedades reúne publicaciones recientes y propuestas en revisión para perfiles, banners, chat y administración. Próximamente: Buscador de mods APK. Las fuentes externas conservan sus enlaces originales.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <section class="rcc-safety-notices" aria-label="Avisos importantes">
@@ -779,6 +784,7 @@ async function loadScripts(){
     [...new Set(scripts.flatMap(s=>s.tags || []))].sort((a,b)=>a.localeCompare(b,'es')).forEach(tag=>tagSelect.add(new Option(tag,tag)));
     document.getElementById('webCount').textContent='· '+scripts.filter(s=>s.catalog_section==='web').length;
     document.getElementById('javaCount').textContent='· '+scripts.filter(s=>s.catalog_section==='java').length;
+    document.getElementById('fivemCount').textContent='· '+scripts.filter(s=>s.platform==='fivem').length;
     const games=scripts.filter(s=>s.catalog_section==='games');
     document.getElementById('gamesCount').textContent='· '+games.length;
     const gameCounts=new Map();
@@ -961,6 +967,11 @@ function render(reset = true){
     list=list.filter(s=>s.catalog_section==='java');
     document.getElementById('heroTitle').textContent='Java · JDK 17+';
     document.getElementById('heroSubtitle').textContent='Ejemplos Java originales de RCC: fundamentos, POO, colecciones, algoritmos, archivos, datos y concurrencia. Java no es JavaScript.';
+  }
+  if(catalogSection==='fivem'){
+    list=list.filter(s=>s.platform==='fivem');
+    document.getElementById('heroTitle').textContent='FiveM · FXServer';
+    document.getElementById('heroSubtitle').textContent='Recursos comunitarios de FiveM para ESX, QBCore, Qbox y servidores standalone. Revisa la fuente, licencia y compatibilidad antes de instalar.';
   }
   if(catalogSection==='vip'){document.getElementById('heroTitle').textContent='Zona VIP';document.getElementById('heroSubtitle').textContent='Una selección exclusiva para RCC Supporter. Desbloquea el acceso mensual para ver, copiar y descargar estos códigos.';}
   if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza aquí.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos, Java y JavaScript. Incluye ejemplos originales, variantes y publicaciones enlazadas.';}
@@ -1249,7 +1260,7 @@ modal.addEventListener('keydown',e=>{
 });
 function selectSection(section, options={}){
   clearCatalogFilters();
-  catalogSection=['all','games','web','java','vip'].includes(section)?section:'all';
+  catalogSection=['all','games','web','java','fivem','vip'].includes(section)?section:'all';
   releaseView=options.view || '';
   showRecent=options.recent===true;showFavorites=options.favorites===true;
   filterDevice=options.device || 'all';filterPlatform=options.platform || 'all';
@@ -1257,13 +1268,15 @@ function selectSection(section, options={}){
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev===filterDevice));
   document.getElementById('recentBtn').classList.toggle('active',showRecent);
   document.getElementById('favoritesBtn').setAttribute('aria-pressed',String(showFavorites));
-  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['javaTab',catalogSection==='java'],['vipTab',catalogSection==='vip'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
+  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['javaTab',catalogSection==='java'],['fivemTab',catalogSection==='fivem'],['vipTab',catalogSection==='vip'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
   document.body.classList.toggle('games-mode',catalogSection==='games');
   document.body.classList.toggle('web-mode',catalogSection==='web');
   document.body.classList.toggle('java-mode',catalogSection==='java');
+  document.body.classList.toggle('fivem-mode',catalogSection==='fivem');
   document.getElementById('gameTools').hidden=catalogSection!=='games';
   document.getElementById('webTools').hidden=catalogSection!=='web';
   document.getElementById('javaTools').hidden=catalogSection!=='java';
+  document.getElementById('fivemTools').hidden=catalogSection!=='fivem';
   if(showRecent){document.getElementById('heroTitle').textContent='Tus scripts recientes';document.getElementById('heroSubtitle').textContent='Los últimos scripts que has copiado.';}
   const main=document.querySelector('.main');
   main.classList.remove('section-enter');void main.offsetWidth;main.classList.add('section-enter');
@@ -1306,9 +1319,11 @@ window.RCCNavigation = {
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
 document.getElementById('webTab').onclick=()=>selectSection('web');
 document.getElementById('javaTab').onclick=()=>selectSection('java');
+document.getElementById('fivemTab').onclick=()=>selectSection('fivem');
 document.getElementById('vipTab').onclick=()=>selectSection('vip');
 document.getElementById('webNav').onclick=()=>selectSection('web');
 document.getElementById('javaNav').onclick=()=>selectSection('java');
+document.getElementById('fivemNav').onclick=()=>selectSection('fivem');
 document.getElementById('gamesTab').onclick=()=>selectSection('games');
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;
@@ -1658,8 +1673,9 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 </div>
 
 <script src="assets/vip-membership.js?v=1"></script>
+<script src="assets/rcc-assistant.js?v=2"></script>
 <script src="assets/chat-widget.js?v=1"></script>
-<script src="assets/community-feed.js?v=1"></script>
+<script src="assets/community-feed.js?v=2"></script>
 </body>
 </html>
 

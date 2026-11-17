@@ -6,13 +6,22 @@ on:
       scriptblox_target:
         description: Maximum number of new free ScriptBlox listings to import
         required: true
-        default: "1500"
+        default: "10000"
         type: string
       rscripts_target:
         description: Maximum number of new free low-risk RScripts listings to import
         required: true
-        default: "500"
+        default: "3000"
         type: string
+      fivem_target:
+        description: Maximum number of public FiveM resource cards to index from Cfx.re
+        required: true
+        default: "1200"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/expand-static-catalog.yml"
   schedule:
     - cron: "31 11 * * *"
 
@@ -28,19 +37,19 @@ jobs:
   expand:
     name: Import, validate and propose catalog growth
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 60
     steps:
       - name: Check out RCC
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
@@ -50,17 +59,26 @@ jobs:
 
       - name: Import recent free ScriptBlox publications
         env:
-          TARGET: ${{ inputs.scriptblox_target || '1500' }}
+          TARGET: ${{ inputs.scriptblox_target || '10000' }}
         run: node tools/import-community.cjs "$TARGET"
 
       - name: Import public low-risk RScripts listings
         env:
-          TARGET: ${{ inputs.rscripts_target || '500' }}
+          TARGET: ${{ inputs.rscripts_target || '3000' }}
           RSCRIPTS_API_KEY: ${{ secrets.RSCRIPTS_API_KEY }}
         run: node tools/import-public-games.cjs "$TARGET"
 
-      - name: Add original Java examples
+      - name: Generate the 48 reviewed Java examples
+        run: node tools/expand-java.cjs
+
+      - name: Add the 36 original Java learning examples
         run: node tools/import-java-library.cjs
+
+      - name: Import public FiveM resource cards from Cfx.re
+        env:
+          TARGET: ${{ inputs.fivem_target || '1200' }}
+          RCC_FIVEM_MAX_PAGES: "120"
+        run: node tools/import-fivem.cjs "$TARGET"
 
       - name: Validate Java examples with javac
         run: npm run test:java

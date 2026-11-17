@@ -31,9 +31,9 @@ assert.match(html, /admin-premium\.css/);
 assert.match(html, /admin-dashboard\.js\?v=4/);
 assert.match(api, /capabilities: \{ isCreator: true, hasBanner: true \}/);
 assert.match(api, /\[field\]: value/);
-assert.match(client, /data\?\.is_creator===true/);
-assert.match(client, /hasBannerPermission=data\?\.has_banner===true/);
-assert.match(client, /!isProfileVip&&!hasBannerPermission/);
+assert.match(client, /renderSwitch\(user, "is_creator", "Creator", !dashboard\.capabilities\.isCreator\)/);
+assert.match(client, /renderSwitch\(user, "has_banner", "Banner", !dashboard\.capabilities\.hasBanner\)/);
+assert.match(client, /dashboard\.capabilities\.isCreator/);
 assert.doesNotMatch(client, /is_creator: \(currentUser\.email/);
 
 console.log("RCC admin dashboard static checks passed.");
