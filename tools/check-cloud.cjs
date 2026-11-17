@@ -62,7 +62,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  assert.equal(requests.filter(r=>r.login).length,++loginCount);
  assert.equal(requests.filter(r=>r.login).at(-1).login.email,'member@example.test');
  assert.equal(requests.filter(r=>r.login).at(-1).login.password,'test-password');
- assert.equal(messages.pop(),'Cuenta creada');
+ assert(els.get('authStatus').textContent.includes('Cuenta creada. Revisa tu correo'));
  loginResult={data:{session:null},error:{code:'email_not_confirmed',message:'Email not confirmed'}};
  await vm.runInContext(`applySession(null)`,context);
  setCredentials();await vm.runInContext(`submitAuth(true)`,context);
