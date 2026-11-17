@@ -37,6 +37,8 @@ jobs:
         run: npm ci
       - name: Import new community metadata
         run: node tools/import-community.cjs "${{ inputs.community_target }}"
+        env:
+          RSCRIPTS_API_KEY: ${{ secrets.RSCRIPTS_API_KEY }}
       - name: Validate catalog and Java examples
         run: npm test
         env:
