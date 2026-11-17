@@ -16,8 +16,8 @@ for (const example of examples) {
   assert.match(example.name, /^Java:/);
   assert(example.description.length >= 40);
   assert.match(example.code, /public class Main/);
-  assert.match(example.code, /static void main\\(String\\[\\] args\\)/);
-  assert(!/loadstring|HttpGet|Runtime\\.getRuntime\\(\\)\\.exec/.test(example.code));
+  assert(example.code.includes('public static void main(String[] args)'), 'Missing Java main method: ' + example.id);
+  assert(!example.code.includes('loadstring') && !example.code.includes('HttpGet') && !example.code.includes('Runtime.getRuntime().exec'));
 }
 
 const javac = spawnSync('javac', ['-version'], { encoding: 'utf8' });
