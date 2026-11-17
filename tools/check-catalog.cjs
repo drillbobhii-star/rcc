@@ -33,7 +33,7 @@ for (const s of scripts) {
     assert(s.tags.includes('Java'), `${s.id}: missing Java tag`);
     assert(s.code.startsWith('// RCC | Ejemplo independiente de Java 17'));
     assert(!newCode.has(s.code), `Duplicate Java code: ${s.id}`);
-    assert(!/ProcessBuilder|Runtime\\.getRuntime\\(\\)\\.exec|HttpClient|new Socket\\(/.test(s.code), `${s.id}: unexpected process or network access`);
+    assert(!['ProcessBuilder', 'Runtime.getRuntime().exec', 'HttpClient', 'new Socket('].some(value => s.code.includes(value)), `${s.id}: unexpected process or network access`);
     newCode.add(s.code);
     counts.java++;
     continue;
