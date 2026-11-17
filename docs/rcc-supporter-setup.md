@@ -65,6 +65,10 @@ El usuario debe iniciar sesión primero en su cuenta RCC y después pulsar **Vin
 
 El webhook procesa de forma idempotente los IDs de evento de Ko-fi. Esta implementación activa la membresía cuando llega un pago válido; la cancelación/fin de periodo debe retirarse desde el panel admin hasta que se integre un evento de cancelación fiable de Ko-fi.
 
+## Contenido Java RCC Supporter
+
+Los ejemplos Java avanzados marcados con la etiqueta `RCC Supporter` se reservan de forma explícita para la Zona VIP. Los otros ejemplos Java siguen gratuitos. La selección de Java se aplica por etiqueta editorial; el porcentaje VIP existente permanece para las demás bibliotecas.
+
 ## 7. Comprobación
 
 1. Aplica la migración y configura todos los secretos.
