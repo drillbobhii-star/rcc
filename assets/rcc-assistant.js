@@ -42,10 +42,13 @@
   const shut=()=>{panel.hidden=true;launcher.setAttribute('aria-expanded','false');launcher.focus();};
   const quick=(label,query)=>{const button=el('button',{type:'button'},label);button.addEventListener('click',()=>answer(query));suggestions.append(button);};
   function act(action,query){
-    if(action==='appearance')document.getElementById('rccMainCustomize')?.click();\n    else if(action==='java')document.getElementById('javaTab')?.click();
+    if(action==='appearance')document.getElementById('rccMainCustomize')?.click();
+    else if(action==='java')document.getElementById('javaTab')?.click();
     else if(action==='roblox')document.getElementById('gamesTab')?.click();
     else if(action==='fivem')document.getElementById('fivemTab')?.click();
-    else if(action==='updates'||action==='github')document.getElementById('updatesTab')?.click();\n    else if(action==='chat')document.getElementById('rccChatLauncher')?.click();\n    else if(action==='admin')window.location.href='/admin.html';
+    else if(action==='updates'||action==='github')document.getElementById('updatesTab')?.click();
+    else if(action==='chat')document.getElementById('rccChatLauncher')?.click();
+    else if(action==='admin')window.location.href='/admin.html';
     else if(action==='catalogs')document.getElementById('libraryTab')?.click();
     else if(query){const search=document.getElementById('search');if(search){search.value=query;search.dispatchEvent(new Event('input',{bubbles:true}));}}
   }
@@ -69,7 +72,10 @@
   quick('Mods APK','¿Qué es el Buscador de mods APK?');
   quick('Perfiles','¿Ya está el buscador de perfiles?');
   quick('Chat','¿Cómo funciona el chat RCC?');
-  quick('Panel admin','¿Qué herramientas tiene el panel admin?');\n  quick('Fondo y logo','¿Cómo personalizo el fondo del panel?');\n  quick('Mi perfil','¿Cómo cambio mi foto o banner?');\n  quick('Regalo RCC','¿Cómo funciona el regalo comunitario?');
+  quick('Panel admin','¿Qué herramientas tiene el panel admin?');
+  quick('Fondo y logo','¿Cómo personalizo el fondo del panel?');
+  quick('Mi perfil','¿Cómo cambio mi foto o banner?');
+  quick('Regalo RCC','¿Cómo funciona el regalo comunitario?');
   say('¡Hola! Soy el Asistente RCC, actualizado para el regalo de la comunidad. Puedo ayudarte con los catálogos, el acceso gratuito, perfiles, banners, fondos, chat, herramientas y administración. ¿Qué necesitas?');
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden)shut();});
 })();
