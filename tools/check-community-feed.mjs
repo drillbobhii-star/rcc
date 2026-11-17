@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-const [sync, ui, workflow, feed, vip, importer] = await Promise.all([
+const [sync, ui, workflow, feed, vip, importer, rscriptsImporter] = await Promise.all([
   readFile(new URL('../tools/sync-community-feed.mjs', import.meta.url), 'utf8'),
   readFile(new URL('../assets/community-feed.js', import.meta.url), 'utf8'),
   readFile(new URL('../.github/workflows/refresh-community-catalog.yml', import.meta.url), 'utf8'),
   readFile(new URL('../community-feed.json', import.meta.url), 'utf8').then(JSON.parse),
   readFile(new URL('../assets/vip-membership.js', import.meta.url), 'utf8'),
-  readFile(new URL('../tools/import-community.cjs', import.meta.url), 'utf8')
+  readFile(new URL('../tools/import-community.cjs', import.meta.url), 'utf8'),
+  readFile(new URL('../tools/import-public-games.cjs', import.meta.url), 'utf8')
 ]);
 assert.equal(feed.schema, 'rcc-community-feed-v1');
 assert(Array.isArray(feed.newest) && Array.isArray(feed.trending) && Array.isArray(feed.news));
@@ -48,4 +49,4 @@ assert.equal(check.status, 0, check.stderr);
 console.log('RCC community feed checks passed.');
 
 assert.match(importer, /target > 10000/);
-assert.match(importer, /RSCRIPTS_API_KEY/);
+assert.match(rscriptsImporter, /RSCRIPTS_API_KEY/);
