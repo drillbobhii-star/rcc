@@ -56,7 +56,7 @@ vm.runInContext(`let currentUser=null,sessionRevision=0,favoriteIds=new Set(),fa
  let loginCount=requests.filter(r=>r.login).length;
  setCredentials();await vm.runInContext(`submitAuth(true)`,context);
  assert.equal(requests.filter(r=>r.login).length,loginCount,'A signup session must not trigger a second login');
- assert.equal(messages.pop(),'Cuenta creada');
+ assert.equal(vm.runInContext(`currentUser?.id`,context),'a');
  signupResult={data:{user:account,session:null}};
  setCredentials();await vm.runInContext(`submitAuth(true)`,context);
  assert.equal(requests.filter(r=>r.login).length,++loginCount);
