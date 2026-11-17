@@ -1,6 +1,6 @@
 {
   "format": "rcc-catalog-v1",
-  "total": 14882,
+  "total": 14930,
   "parts": [
     {
       "file": "catalog/part-001-a0a3bb686b4e0131.json",
@@ -101,6 +101,11 @@
       "file": "catalog/part-020-678cbf3319f7efd0.json",
       "count": 877,
       "bytes": 1513760
+    },
+    {
+      "file": "catalog/part-021-052ea26b7bc3d534.json",
+      "count": 48,
+      "bytes": 101973
     }
   ]
 }
