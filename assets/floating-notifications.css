@@ -1,4 +1,10 @@
-.floating-notifications{position:relative;display:inline-flex;align-items:center;flex:0 0 auto;z-index:110;width:42px;height:42px;margin-left:6px}
+.notification-sidebar-section{padding:0 16px!important}
+.notification-sidebar-section .notification-bell{width:100%;height:auto;min-height:44px;display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:12px 14px;border:0;border-radius:12px;background:transparent;box-shadow:none;color:var(--muted);font:inherit;text-align:left}
+.notification-sidebar-section .notification-bell:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.notification-sidebar-section .notification-bell .notification-nav-icon{font-size:1.1rem;width:22px;text-align:center}
+.notification-sidebar-section .notification-bell svg{display:none}
+.notification-sidebar-section .notification-bell.has-unread:after{content:"";width:8px;height:8px;border-radius:50%;background:#ef6262;margin-left:auto;box-shadow:0 0 0 3px #ef626225}
+.notification-sidebar-section .notification-bell[aria-expanded="true"]{background:rgba(255,255,255,.1);color:var(--text);font-weight:600}
 .floating-notifications[hidden],.floating-notification-panel[hidden]{display:none!important}
 .notification-bell{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--border-glass,#b6cee540);border-radius:14px;background:var(--card-glass,#17212bea);color:var(--accent,#b7d9ef);box-shadow:inset 0 1px 0 #ffffff20,0 12px 30px #02050950;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);user-select:none;-webkit-user-select:none;cursor:pointer;transition:box-shadow .18s,border-color .18s}
 .notification-bell svg{width:25px;height:25px;pointer-events:none}
@@ -13,4 +19,4 @@
 .notification-bell:focus-visible,.notification-close:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 @media(prefers-reduced-motion:reduce){.notification-bell{transition:none}}
 
-.auth-controls{display:flex;align-items:center;gap:6px}.floating-notifications .notification-bell{width:42px;height:42px}
+
