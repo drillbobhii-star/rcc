@@ -29,7 +29,9 @@ const loader = await readFile(new URL("../assets/catalog-loader.js", import.meta
 assert.ok(loader.includes("row.catalog_section='studio'") && loader.includes("verification==='source-imported'"), "Legacy imported Roblox Studio files must be separated from game scripts");
 assert.ok(html.includes("s.catalog_section==='games'?0:s.platform==='roblox'?1"), "Main feed ordering is not wired");
 assert.ok(!html.includes('id="rcc-maintenance"') && !html.includes("rm-hours") && !html.includes("rcc-maintenance-end-v2"), "Maintenance overlay/timer was not removed");
-assert.ok(notifications.includes("notification-sidebar-section") && notifications.includes("recentBtn") && !notifications.includes("position:fixed"), "Notification bell must be an independent sidebar navigation section");
+assert.ok(notifications.includes(".notification-sidebar-section{") && notifications.includes(".notification-sidebar-section .notification-bell{") && !notifications.includes(".floating-notifications{position:fixed"), "Notification bell must be styled as an independent sidebar navigation section, not a floating control");
+const notificationUi = await readFile(new URL("../assets/floating-notifications.js", import.meta.url), "utf8");
+assert.ok(notificationUi.includes('className = \'sidebar-section notification-sidebar-section\'') && notificationUi.includes("recentSection.insertAdjacentElement('afterend', control)"), "Notifications must be inserted as a standalone sidebar section directly below Recientes");
 assert.ok(profileUi.includes("from('rcc_public_profiles')"), "Profile directory must use privacy-safe view");
 assert.ok(profileUi.includes("range(suggestionPage*20,suggestionPage*20+19)"), "Profile suggestions must paginate beyond the first 20");
 assert.ok(privacyMigration.includes("case when show_roblox then roblox_username else null end"), "Privacy view must mask Roblox usernames when opted out");
