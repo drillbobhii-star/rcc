@@ -93,7 +93,7 @@
   }
   const nav = window.RCCNavigation;
   const show = mode => { nav?.section('all',{view:mode}); render(mode); };
-  if (document.getElementById('trendingTab')) document.getElementById('trendingTab').onclick = () => show('trending');
+  // Popular is owned by roblox-trends.js; external community posts are not trends.
   if (document.getElementById('updatesTab')) document.getElementById('updatesTab').onclick = () => show('updates');
   for (const [id,sectionName] of [['libraryTab','all'],['gamesTab','games'],['webTab','web'],['vipTab','vip']]) {
     if (document.getElementById(id)) document.getElementById(id).onclick = () => { section.hidden=true; nav?.section(sectionName); };
