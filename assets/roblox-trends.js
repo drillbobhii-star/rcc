@@ -8,7 +8,7 @@
   panel.className = "rcc-roblox-trends";
   panel.hidden = true;
   panel.setAttribute("aria-labelledby", "rccRobloxTrendsTitle");
-  panel.innerHTML = '<div class="rcc-trends-heading"><div><span class="eyebrow">ROBLOX DISCOVER · DATOS PÚBLICOS</span><h2 id="rccRobloxTrendsTitle">Juegos más populares</h2><p>Ordenados por jugadores conectados ahora; las visitas totales sirven como segundo criterio.</p></div><button type="button" class="btn btn-ghost" data-refresh>Actualizar</button></div><p class="rcc-trends-status" role="status" aria-live="polite">Cargando datos públicos de Roblox…</p><div class="rcc-trends-grid"></div><small class="rcc-trends-source">Fuente: Roblox Discover, Games y Thumbnails APIs. Las cifras son lecturas públicas y pueden cambiar.</small>';
+  panel.innerHTML = '<div class="rcc-trends-heading"><div><span class="eyebrow">ROBLOX DISCOVER · DATOS PÚBLICOS</span><h2 id="rccRobloxTrendsTitle">Juegos populares</h2><p>Ordenados por jugadores conectados ahora; las visitas totales sirven como segundo criterio.</p></div><button type="button" class="btn btn-ghost" data-refresh>Actualizar</button></div><p class="rcc-trends-status" role="status" aria-live="polite">Cargando datos públicos de Roblox…</p><div class="rcc-trends-grid"></div><small class="rcc-trends-source">Fuente: Roblox Discover, Games y Thumbnails APIs. Las cifras son lecturas públicas y pueden cambiar.</small>';
   document.getElementById("activeFilters")?.before(panel);
   const status = panel.querySelector(".rcc-trends-status");
   const cards = panel.querySelector(".rcc-trends-grid");
@@ -62,7 +62,7 @@
     })();
     return request;
   }
-  tab.textContent = "Tendencias";
+  tab.textContent = "Popular";
   tab.onclick = () => {
     window.RCCNavigation?.section("all", { view: "trending" });
     window.loadTrends?.();
