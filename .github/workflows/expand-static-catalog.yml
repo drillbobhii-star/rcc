@@ -105,6 +105,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node tools/import-github-scripts.cjs all "$TARGET"
 
+      - name: Validate new importer syntax
+        run: node --check tools/import-github-scripts.cjs && node --check tools/tag-rcc-catalog.cjs
+
+      - name: Apply the RCC label and platform tags to the full catalog
+        run: node tools/tag-rcc-catalog.cjs
+
       - name: Validate Java examples with javac
         run: npm run test:java
 
