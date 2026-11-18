@@ -1045,7 +1045,7 @@ function render(reset = true){
     card.innerHTML = `
       <div class="card-top">
         <div class="badges">
-          <span class="badge free">GRATIS</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
+          <span class="badge ${s.level==='external'?'release-badge':'free'}">${s.level==='external'?'FICHA EXTERNA':'GRATIS'}</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
           <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
           ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
@@ -1116,7 +1116,7 @@ function openScript(s){
   modalBody.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
-      <span class="badge free">GRATIS</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
+      <span class="badge ${s.level==='external'?'release-badge':'free'}">${s.level==='external'?'FICHA EXTERNA':'GRATIS'}</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
       ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
       ${plat?`<span class="badge" style="background:rgba(255,255,255,.1);color:#fff; border:1px solid rgba(255,255,255,.2)">${plat.icon} ${plat.name}</span>`:''}
     </div>
