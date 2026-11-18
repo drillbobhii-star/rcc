@@ -43,6 +43,8 @@ jobs:
           java-version: "17"
       - name: Install dependencies
         run: npm ci
+      - name: Normalize RCC tags for the catalog validation run
+        run: node tools/tag-rcc-catalog.cjs
       - name: Run RCC regression suite
         run: npm test
         env:
