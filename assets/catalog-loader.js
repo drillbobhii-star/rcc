@@ -12,6 +12,12 @@
     try{return await request(file,'force-cache');}
     catch{return request(file,'reload');}
   }
+  function normalizeRow(row){
+    // Older archive imports mislabeled Roblox Studio libraries as game scripts.
+    // Preserve every record and identity; correct only the section metadata in memory.
+    if(row?.platform==='roblox'&&row.compatibility?.verification==='source-imported')row.catalog_section='studio';
+    return row;
+  }
   const pause=()=>new Promise(resolve=>{
     if(window.requestIdleCallback)window.requestIdleCallback(resolve,{timeout:300});
     else setTimeout(resolve,32);
@@ -38,7 +44,7 @@
         }));
         for(const rows of results)for(const row of rows){
           if(!row||typeof row.id!=='string'||ids.has(row.id))throw Error('Identificador de catálogo inválido');
-          ids.add(row.id);all.push(row);
+          ids.add(row.id);all.push(normalizeRow(row));
         }
         offset+=batch.length;
         onBatch?.({scripts:all.slice(),total:manifest.total,complete:offset===manifest.parts.length});
