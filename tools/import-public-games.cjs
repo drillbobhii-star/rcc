@@ -139,7 +139,7 @@ async function main() {
       const executorNames = Array.isArray(row.executors)
         ? row.executors.map(executor => clean(executor?.name, 70)).filter(Boolean).slice(0, 8)
         : [];
-      const tags = ['Juegos', 'Comunidad', 'RScripts', riskLevel === 'safe' ? 'Riesgo bajo' : 'Riesgo evaluado'];
+      const tags = ['RCC', 'Juegos', 'Comunidad', riskLevel === 'safe' ? 'Riesgo bajo' : 'Riesgo evaluado'];
       if (row.isKeySystem === true) tags.push('Con clave');
       if (row.isMobileReady === true) tags.push('Móvil indicado por la fuente');
 
