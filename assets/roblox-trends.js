@@ -53,8 +53,8 @@
   function openGameScripts(name) {
     const filter = document.getElementById("gameFilter");
     if (!filter || typeof window.RCCNavigation?.section !== "function") return;
-    const normalized = value => String(value || "").normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLocaleLowerCase("es").replace(/[^a-z0-9]+/g, " ").trim();
-    const option = [...filter.options].find(item => item.value === name || item.textContent.trim() === name || normalized(item.value) === normalized(name) || normalized(item.textContent.replace(/\\s*\\(\\d+\\)\\s*$/, "")) === normalized(name));
+    const normalized = value => String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es").replace(/[^a-z0-9]+/g, " ").trim();
+    const option = [...filter.options].find(item => item.value === name || item.textContent.trim() === name || normalized(item.value) === normalized(name) || normalized(item.textContent.replace(/\s*\(\d+\)\s*$/, "")) === normalized(name));
     if (!option) {
       status.textContent = "RCC todavía no tiene scripts registrados para " + name + ".";
       return;
