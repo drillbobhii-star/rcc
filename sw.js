@@ -1,4 +1,4 @@
-/* RCC admin Web Push service worker. */
+/* RCC admin Web Push service worker. Build: 2026-11-18-google-admin-auth-v2 */
 self.addEventListener("install", event => {
   event.waitUntil(self.skipWaiting());
 });
