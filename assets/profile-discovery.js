@@ -49,7 +49,7 @@
     save.onclick=async()=>{save.disabled=true;try{const data=await preferences({toggleProfile:profile.user_id});saved=new Set(data.profiles||[]);ready=true;document.querySelectorAll('[data-profile-save]').forEach(b=>{const selected=saved.has(b.dataset.profileSave);b.textContent=selected?'Guardado':'Guardar';b.setAttribute('aria-pressed',String(selected));});if(view==='saved')loadProfiles();}catch{(compact?$('socialSuggestionStatus'):status).textContent='No se pudo guardar el perfil. Inténtalo de nuevo.';}finally{save.disabled=false;}};
     card.append(photo,identity);if(!compact){card.append(make('p',profile.bio||'Un espacio para compartir ideas y descubrir código.','social-person-bio'));const visit=make('button','Ver perfil','social-person-visit');visit.type='button';visit.onclick=()=>openProfile(profile);card.append(visit);}card.append(save);return card;
   }
-  const publicQuery=sb=>sb.from('profiles').select(fields);
+  const publicQuery=sb=>sb.from('rcc_public_profiles').select(fields);
   async function getSessionId(sb){try{return (await sb.auth.getSession()).data.session?.user?.id;}catch{return null;}}
   function skeleton(target,count){target.replaceChildren(...Array.from({length:count},()=>make('div',null,'social-skeleton')));target.setAttribute('aria-busy','true');}
   async function loadProfiles(append=false){
