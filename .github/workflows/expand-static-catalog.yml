@@ -29,6 +29,10 @@ on:
       - ".github/workflows/expand-static-catalog.yml"
       - "tools/import-robloxscripts.cjs"
       - "tools/check-robloxscripts-import.mjs"
+      - "tools/import-github-resources.cjs"
+      - "tools/check-github-resource-import.mjs"
+      - "tools/tag-rcc-catalog.cjs"
+      - "tools/check-rcc-tags.mjs"
   schedule:
     - cron: "31 11 * * *"
 
@@ -93,6 +97,15 @@ jobs:
           RCC_FIVEM_MAX_PAGES: "120"
         run: node tools/import-fivem.cjs "$TARGET"
 
+      - name: Index source files across seven RCC catalogs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RCC_GITHUB_FILES_PER_REPO: "25"
+        run: node tools/import-github-resources.cjs
+
+      - name: Apply RCC tag to every catalog entry
+        run: node tools/tag-rcc-catalog.cjs
+
       - name: Validate Java examples with javac
         run: npm run test:java
 
@@ -113,11 +126,13 @@ jobs:
           body: |
             ## RCC catalog growth
 
-            This automated proposal imports newly published public free listings from ScriptBlox and RobloxScripts.com, optional public free low-risk listings from the current RScripts v1 API, public FiveM release metadata from Cfx.re, and the reviewed original Java examples authored in RCC.
+            This automated proposal imports recent public free listings from ScriptBlox and RobloxScripts.com, optional low-risk RScripts metadata, Cfx.re FiveM release cards, reviewed original Java examples, and source-linked code files discovered across Roblox/Luau, FiveM, GameGuardian learning templates, AutoTouch, JavaScript/Web, Java, and Universal repositories.
 
             - ScriptBlox and RobloxScripts.com listings are deduplicated by source ID and canonical URL; paid and suspicious-title entries are skipped. RobloxScripts.com is credited visibly and rate-limited according to its public API documentation.
             - RScripts listings require the configured RSCRIPTS_API_KEY secret; only public, free, non-patched entries marked Safe or Low Risk, with a numeric score from 1 to 4 and no detected obfuscation, are considered.
-            - External scripts remain source-linked loaders. RCC does not download or execute their remote Lua.
+            - Third-party repository files are indexed as source-only cards with a direct HTTPS link. RCC does not download, copy, rehost or execute their code. Repository licence and source metadata are retained for review.
+            - GameGuardian discovery is deliberately limited to tutorials, templates and documentation; cheat, bypass, anti-ban, exploit, deobfuscation and account-theft repositories are excluded.
+            - Roblox public tags omit provider names for the new Studio index; any third-party source that legally requires attribution retains it.
             - Original Java examples are compiled individually with JDK 21 using the Java validation script.
             - The complete RCC regression suite must pass before this PR is created.
 
