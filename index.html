@@ -515,6 +515,7 @@ window.rccSupabaseReady.catch(() => {});
   
   <button class="games-nav" id="favoritesBtn" type="button" aria-pressed="false">❤️ Favoritos <span id="favoritesCount">0</span></button>
   <button class="games-nav" id="gamesNav" type="button">Juegos de Roblox <span aria-hidden="true">↗</span></button>
+  <button class="games-nav" id="studioNav" type="button">Roblox Studio <span aria-hidden="true">↗</span></button>
   <button class="games-nav" id="webNav" type="button">JavaScript · Web ↗</button>
   <button class="games-nav" id="javaNav" type="button">Java · JDK 17+ ↗</button>
   <button class="games-nav" id="fivemNav" type="button">FiveM / FXServer ↗</button>
@@ -563,6 +564,7 @@ window.rccSupabaseReady.catch(() => {});
         <button id="executorsMainBtn" type="button" data-open-executors aria-haspopup="dialog" aria-controls="executorDrawer">Ejecutores compatibles <span aria-hidden="true">↗</span></button>
         <button id="trendingTab" type="button" aria-pressed="false">Tendencias</button><button id="updatesTab" type="button" aria-pressed="false" hidden>Novedades</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos de Roblox <span id="gamesCount"></span></button>
+        <button id="studioTab" type="button" aria-pressed="false">Roblox Studio</button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
         <button id="javaTab" type="button" aria-pressed="false">Java · JDK 17+ <span id="javaCount"></span></button>
         <button id="fivemTab" type="button" aria-pressed="false">FiveM <span id="fivemCount"></span></button>
@@ -732,6 +734,7 @@ function rccIsGateCandidate(script) {
   return !unlockedIds.has(String(script.id));
 }
 let catalogSection = 'all';
+let studioOnly = false;
 let releaseView = '';
 let trendCounts = {};
 let trendStatus = 'loading';
@@ -961,6 +964,7 @@ function render(reset = true){
   const q = normalize(searchInput.value.trim());
   
   let list = [...scripts];
+  if(studioOnly) list=list.filter(s=>s.platform==='roblox'&&s.catalog_section!=='games');
   const reviewFilter=document.getElementById('reviewFilter').value;
   if(reviewFilter!=='all')list=list.filter(s=>(s.review?.status||'pending')===reviewFilter);
   if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7'||s.review?.updateAvailable||s.review?.status==='patched'||s.tags?.includes('Nueva incorporación'));
@@ -1003,6 +1007,10 @@ function render(reset = true){
   const order = document.getElementById('sortOrder').value;
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
+  if(catalogSection==='all'&&!showRecent&&!showFavorites&&!releaseView){
+    const priority=s=>s.catalog_section==='games'?0:s.platform==='roblox'?1:s.catalog_section==='java'?2:s.platform==='python'?3:s.platform==='fivem'?4:s.catalog_section==='web'?5:6;
+    list.sort((a,b)=>priority(a)-priority(b)||(order==='az'||order==='za'?a.name.localeCompare(b.name,'es')*(order==='za'?-1:1):(b.created_at||'').localeCompare(a.created_at||'')));
+  }
   if(showRecent) list.sort((a,b)=>recentIds.indexOf(a.id)-recentIds.indexOf(b.id));
   if(releaseView==='updates') list.sort((a,b)=>(b.review?.sourceUpdatedAt||b.release?.date||b.created_at||'').localeCompare(a.review?.sourceUpdatedAt||a.release?.date||a.created_at||''));
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`+(catalogLoading?` · Cargando el resto de ${catalogTotal.toLocaleString('es')}… Pulsa «Cargar catálogo completo» o escribe para ampliar la búsqueda.`:'');
@@ -1011,7 +1019,7 @@ function render(reset = true){
     document.getElementById('resultCount').append(' ',retry);
   }
   window.dispatchEvent(new CustomEvent('rcc:results', {detail:{count:list.length, query:searchInput.value.trim()}}));
-  const sectionScripts=catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
+  const sectionScripts=studioOnly?scripts.filter(s=>s.platform==='roblox'&&s.catalog_section!=='games'):catalogSection==='all'?scripts:scripts.filter(s=>s.catalog_section===catalogSection);
   document.getElementById('statTotal').textContent = sectionScripts.length;
   document.getElementById('statPC').textContent = sectionScripts.filter(s=>s.device==='pc'||s.device==='both').length;
   document.getElementById('statMobile').textContent = sectionScripts.filter(s=>s.device==='mobile'||s.device==='both').length;
@@ -1269,6 +1277,7 @@ function selectSection(section, options={}){
   document.dispatchEvent(new Event('rcc:catalog-demand'));
   clearCatalogFilters();
   catalogSection=['all','games','web','java','fivem'].includes(section)?section:'all';
+  studioOnly=options.studio===true;
   releaseView=options.view || '';
   showRecent=options.recent===true;showFavorites=options.favorites===true;
   filterDevice=options.device || 'all';filterPlatform=options.platform || 'all';
@@ -1276,7 +1285,7 @@ function selectSection(section, options={}){
   document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active',b.dataset.dev===filterDevice));
   document.getElementById('recentBtn').classList.toggle('active',showRecent);
   document.getElementById('favoritesBtn').setAttribute('aria-pressed',String(showFavorites));
-  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['webTab',catalogSection==='web'],['javaTab',catalogSection==='java'],['fivemTab',catalogSection==='fivem'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
+  for(const [id,active] of [['libraryTab',catalogSection==='all'&&!studioOnly&&!releaseView&&!showRecent&&!showFavorites],['gamesTab',catalogSection==='games'],['studioTab',studioOnly],['webTab',catalogSection==='web'],['javaTab',catalogSection==='java'],['fivemTab',catalogSection==='fivem'],['trendingTab',releaseView==='trending'],['updatesTab',releaseView==='updates']])document.getElementById(id).setAttribute('aria-pressed',String(active));
   document.body.classList.toggle('games-mode',catalogSection==='games');
   document.body.classList.toggle('web-mode',catalogSection==='web');
   document.body.classList.toggle('java-mode',catalogSection==='java');
@@ -1302,13 +1311,13 @@ function getNavigationSearchIndex() {
 window.RCCNavigation = {
   ready: () => catalogStatus === 'ready' && !catalogLoading,
   status: () => catalogStatus,
-  state: () => ({section:catalogSection, view:releaseView, query:searchInput.value, scroll:scrollY, limit:visibleLimit,
+  state: () => ({section:catalogSection, studio:studioOnly, view:releaseView, query:searchInput.value, scroll:scrollY, limit:visibleLimit,
     device:filterDevice, platform:filterPlatform, executor:filterExecutor, type:filterType,
     tag:document.getElementById('tagFilter').value, environment:document.getElementById('environmentFilter').value,
     verification:document.getElementById('verificationFilter').value, review:document.getElementById('reviewFilter').value, sort:document.getElementById('sortOrder').value,
     game:document.getElementById('gameFilter').value, origin:document.getElementById('originFilter').value}),
   restore: state => {
-    selectSection(state.section, {view:state.view, device:state.device, platform:state.platform, executor:state.executor, type:state.type});
+    selectSection(state.section, {view:state.view, studio:state.studio, device:state.device, platform:state.platform, executor:state.executor, type:state.type});
     searchInput.value = state.query || '';
     for (const [id,key] of [['tagFilter','tag'],['environmentFilter','environment'],['verificationFilter','verification'],['reviewFilter','review'],['sortOrder','sort'],['gameFilter','game'],['originFilter','origin']]) {
       const control = document.getElementById(id);
@@ -1333,6 +1342,8 @@ document.getElementById('webNav').onclick=()=>selectSection('web');
 document.getElementById('javaNav').onclick=()=>selectSection('java');
 document.getElementById('fivemNav').onclick=()=>selectSection('fivem');
 document.getElementById('gamesTab').onclick=()=>selectSection('games');
+document.getElementById('studioTab').onclick=()=>selectSection('all',{studio:true});
+document.getElementById('studioNav').onclick=()=>selectSection('all',{studio:true});
 document.getElementById('gamesNav').onclick=()=>selectSection('games');
 document.getElementById('gameFilter').onchange=render;
 document.getElementById('originFilter').onchange=render;
