@@ -49,7 +49,7 @@
     save.onclick=async()=>{save.disabled=true;try{const data=await preferences({toggleProfile:profile.user_id});saved=new Set(data.profiles||[]);ready=true;document.querySelectorAll('[data-profile-save]').forEach(b=>{const selected=saved.has(b.dataset.profileSave);b.textContent=selected?'Guardado':'Guardar';b.setAttribute('aria-pressed',String(selected));});if(view==='saved')loadProfiles();}catch{(compact?$('socialSuggestionStatus'):status).textContent='No se pudo guardar el perfil. Inténtalo de nuevo.';}finally{save.disabled=false;}};
     card.append(photo,identity);if(!compact){card.append(make('p',profile.bio||'Un espacio para compartir ideas y descubrir código.','social-person-bio'));const visit=make('button','Ver perfil','social-person-visit');visit.type='button';visit.onclick=()=>openProfile(profile);card.append(visit);}card.append(save);return card;
   }
-  const publicQuery=sb=>sb.from('profiles').select(fields);
+  const publicQuery=sb=>sb.from('rcc_public_profiles').select(fields);
   async function getSessionId(sb){try{return (await sb.auth.getSession()).data.session?.user?.id;}catch{return null;}}
   function skeleton(target,count){target.replaceChildren(...Array.from({length:count},()=>make('div',null,'social-skeleton')));target.setAttribute('aria-busy','true');}
   async function loadProfiles(append=false){
@@ -72,7 +72,39 @@
     }catch{if(rev===revision){if(!append)box.replaceChildren();else{more.hidden=false;more.textContent='Reintentar cargar más perfiles';}status.textContent='No se pudieron cargar los perfiles. Pulsa Actualizar para reintentar.';}}
     finally{if(rev===revision){box.setAttribute('aria-busy','false');more.disabled=false;}}
   }
-  async function suggestions(){const rev=++suggestionsRevision;const target=$('socialSuggestions'),message=$('socialSuggestionStatus');skeleton(target,4);message.textContent='';try{const sb=await window.rccSupabaseReady;const ownId=await getSessionId(sb);let q=publicQuery(sb).order('is_creator',{ascending:false}).order('display_name').limit(20);if(ownId)q=q.neq('user_id',ownId);const {data,error}=await q.abortSignal(AbortSignal.timeout(10000));await prefs;if(rev!==suggestionsRevision)return;if(error)throw error;const featured=(data||[]);target.replaceChildren(...featured.slice(0,5).map(p=>profileCard(p,true)));if(!featured.length)message.textContent='Aún no hay otros perfiles para sugerir. Vuelve más tarde.';}catch{if(rev===suggestionsRevision){target.replaceChildren();const retry=make('button','Reintentar sugerencias','social-retry');retry.type='button';retry.onclick=suggestions;target.append(retry);message.textContent='Las sugerencias no están disponibles en este momento.';}}finally{if(rev===suggestionsRevision)target.setAttribute('aria-busy','false');}}
+  let suggestionPage=0;
+  async function suggestions(append=false){
+    const rev=++suggestionsRevision,target=$('socialSuggestions'),message=$('socialSuggestionStatus');
+    const existingMore=target.querySelector('[data-suggestion-more]');
+    if(existingMore)existingMore.remove();
+    if(!append){suggestionPage=0;skeleton(target,4);}
+    message.textContent=append?'Cargando más sugerencias…':'';
+    try{
+      const sb=await window.rccSupabaseReady,ownId=await getSessionId(sb);
+      let q=publicQuery(sb).order('is_creator',{ascending:false}).order('display_name').order('user_id').range(suggestionPage*20,suggestionPage*20+19);
+      if(ownId)q=q.neq('user_id',ownId);
+      const {data,error}=await q.abortSignal(AbortSignal.timeout(10000));
+      await prefs;if(rev!==suggestionsRevision)return;if(error)throw error;
+      const featured=data||[];
+      if(!append)target.replaceChildren();
+      target.append(...featured.map(profile=>profileCard(profile,true)));
+      suggestionPage++;
+      if(featured.length===20){
+        const moreSuggestions=make('button','Cargar más sugerencias','social-retry');
+        moreSuggestions.type='button';moreSuggestions.dataset.suggestionMore='true';
+        moreSuggestions.onclick=()=>suggestions(true);target.append(moreSuggestions);
+      }
+      if(!target.querySelector('.social-suggestion'))message.textContent='Aún no hay otros perfiles para sugerir. Vuelve más tarde.';
+      else message.textContent='Puedes cargar más perfiles para descubrir a otras personas.';
+    }catch{
+      if(rev===suggestionsRevision){
+        if(!append)target.replaceChildren();
+        const retry=make('button',append?'Reintentar sugerencias':'Reintentar sugerencias','social-retry');
+        retry.type='button';retry.onclick=()=>suggestions(append);target.append(retry);
+        message.textContent='Las sugerencias no están disponibles en este momento.';
+      }
+    }finally{if(rev===suggestionsRevision)target.setAttribute('aria-busy','false');}
+  }
   function selectView(next){view=next;root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));}
   root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{selectView(b.dataset.view);loadProfiles();});
   input.onfocus=showQuickSuggestions;

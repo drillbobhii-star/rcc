@@ -1,4 +1,4 @@
-.floating-notifications{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(22px,env(safe-area-inset-bottom));z-index:110;width:56px;height:56px}
+.floating-notifications{position:fixed;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));z-index:110;width:56px;height:56px;left:auto;bottom:auto}
 .floating-notifications[hidden],.floating-notification-panel[hidden]{display:none!important}
 .notification-bell{display:grid;place-items:center;width:56px;height:56px;border:1px solid var(--border-glass,#b6cee540);border-radius:20px;background:var(--card-glass,#17212bea);color:var(--accent,#b7d9ef);box-shadow:inset 0 1px 0 #ffffff20,0 12px 30px #02050950;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;transition:box-shadow .18s,border-color .18s}
 .notification-bell svg{width:25px;height:25px;pointer-events:none}
