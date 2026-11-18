@@ -1110,7 +1110,7 @@ function openScript(s){
   const sourceCandidate = s.source_url || s.compatibility?.sources?.find(value => typeof value === 'string' && value.startsWith('https://')) || s.review?.source || '';
   let sourceHref = '';
   try { const candidate = new URL(sourceCandidate); if (candidate.protocol === 'https:' && !candidate.username && !candidate.password) sourceHref = candidate.href; } catch {}
-  const sourceOnly = s.source_only === true && Boolean(sourceHref);
+  const sourceOnly = s.source_only === true && Boolean(sourceHref);\n  const canOpenSource = sourceOnly && Boolean(currentUser);
   
   modalTitle.innerHTML = `${isLoadstring ? '🔗' : '📝'} ${escapeHTML(s.name)} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${escapeHTML(s.version)}</span>`;
   modalBody.innerHTML = `
@@ -1129,7 +1129,7 @@ function openScript(s){
     <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
     <pre class="notranslate" translate="no" ${sourceOnly ? 'hidden' : ''}><code id="modalCode"></code></pre>
     <div class="actions">
-      ${sourceOnly ? `<a class="btn btn-primary" href="${escapeHTML(sourceHref)}" target="_blank" rel="noopener noreferrer">Abrir código original ↗</a>` : `<button id="scriptCopyBtn" class="btn btn-primary" onclick="copyCode()">Copiar código</button><button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>`}
+      ${sourceOnly ? (canOpenSource ? `<a class="btn btn-primary" href="${escapeHTML(sourceHref)}" target="_blank" rel="noopener noreferrer">Abrir código original ↗</a>` : `<button class="btn btn-primary" type="button" onclick="openAuth()">Inicia sesión para abrir el original</button>`) : `<button id="scriptCopyBtn" class="btn btn-primary" onclick="copyCode()">Copiar código</button><button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>`}
       <button class="btn btn-ghost" onclick="shareCurrent()">Copiar enlace</button>
       <button class="btn btn-ghost" id="voteBtn" type="button">👍 Me gusta</button>
       <a class="btn btn-ghost" href="soporte.html?script=${encodeURIComponent(s.id)}#reportar">Notificar error</a>
