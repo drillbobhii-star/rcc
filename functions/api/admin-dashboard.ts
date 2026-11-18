@@ -2,8 +2,6 @@ type Env = {
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
-  RCC_VIP_API_URL?: string;
-  RCC_VIP_WEBHOOK_SECRET?: string;
 };
 
 type AuthUser = {
@@ -17,7 +15,6 @@ const ADMIN_EMAIL = "drillbobhii@gmail.com";
 const PROJECT_URL = "https://cbkrpyfkteomcukdisdw.supabase.co";
 const PAGE_SIZE = 1000;
 const MAX_PAGES = 20;
-const VIP_MINIMUM_USD = 1.99;
 
 function json(body: unknown, status = 200) {
   return Response.json(body, {
@@ -108,52 +105,9 @@ async function pagedRest<T>(env: Env, path: string, maxPages = 20): Promise<T[]>
   return rows;
 }
 
-function eventView(event: Record<string, unknown>) {
-  return {
-    message_id: String(event.message_id || ""),
-    kofi_transaction_id: event.kofi_transaction_id ? String(event.kofi_transaction_id) : null,
-    user_id: event.user_id ? String(event.user_id) : null,
-    buyer_email: String(event.buyer_email || ""),
-    amount: Number(event.amount || 0),
-    currency: String(event.currency || "USD"),
-    created_at: String(event.created_at || event.timestamp || event.payment_date || ""),
-  };
-}
-
-async function grantDiscordRole(env: Env, discordId: string) {
-  if (!env.RCC_VIP_API_URL || !env.RCC_VIP_WEBHOOK_SECRET) {
-    return { status: "NOT_CONFIGURED", message: "Railway VIP API no está configurada." };
-  }
-  const endpoint = new URL(env.RCC_VIP_API_URL);
-  if (endpoint.protocol !== "https:") throw new Error("RCC_VIP_API_URL debe usar HTTPS.");
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + env.RCC_VIP_WEBHOOK_SECRET,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ discord_id: discordId }),
-    signal: AbortSignal.timeout(15000),
-  });
-  const result = await response.json().catch(() => ({})) as { status?: string; invite_url?: string; error?: string };
-  if (result.status === "NOT_IN_GUILD") return { status: "NOT_IN_GUILD", inviteUrl: result.invite_url || null };
-  if (result.status === "VIP_ROLE_NOT_FOUND") return { status: "VIP_ROLE_NOT_FOUND", message: result.error || "El rol VIP no existe." };
-  if (!response.ok) throw new Error(result.error || "Railway rechazó la asignación del rol (HTTP " + response.status + ").");
-  return { status: "ROLE_GRANTED" };
-}
-
-async function upsertVip(env: Env, userId: string, isVip: boolean, adminId: string) {
-  await rest(env, "rcc_vip_memberships?on_conflict=user_id", {
-    method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ user_id: userId, is_vip: isVip }),
-  });
-  // Keep the existing catalog/profile entitlement mirror synchronized too.
-  await setProfileFlag(env, userId, "is_supporter", isVip);
-}
 
 async function setProfileFlag(env: Env, userId: string, field: string, value: boolean) {
-  if (!["is_creator", "has_banner", "is_supporter"].includes(field)) throw new Error("Campo de perfil no permitido.");
+  if (!["is_creator", "has_banner"].includes(field)) throw new Error("Campo de perfil no permitido.");
   const query = new URLSearchParams({ user_id: "eq." + userId });
   const updated = await rest<Array<{ user_id: string }>>(env, "profiles?" + query.toString(), {
     method: "PATCH",
@@ -181,39 +135,13 @@ async function setProfileFlag(env: Env, userId: string, field: string, value: bo
   }
 }
 
-async function lookupAuthUserByEmail(env: Env, email: string) {
-  const users = await listAuthUsers(env);
-  return users.find(user => user.email?.trim().toLowerCase() === email.trim().toLowerCase()) || null;
-}
-
-async function ensureSupporterProfile(env: Env, user: AuthUser) {
-  const query = new URLSearchParams({ user_id: "eq." + user.id, select: "user_id,discord_id" });
-  let profiles = await rest<Array<{ user_id: string; discord_id?: string | null }>>(env, "profiles?" + query.toString());
-  if (!profiles.length) {
-    const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
-    const displayName = typeof metaName === "string" && metaName.trim()
-      ? metaName.trim().slice(0, 80)
-      : (user.email?.split("@")[0] || "RCC Supporter").slice(0, 80);
-    profiles = await rest<Array<{ user_id: string; discord_id?: string | null }>>(env, "profiles?on_conflict=user_id", {
-      method: "POST",
-      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-      body: JSON.stringify({ user_id: user.id, display_name: displayName, is_supporter: true }),
-    });
-  } else {
-    await setProfileFlag(env, user.id, "is_supporter", true);
-  }
-  return profiles[0] || { user_id: user.id, discord_id: null };
-}
 
 async function loadDashboard(env: Env) {
-  const [authUsers, profiles, memberships, events] = await Promise.all([
+  const [authUsers, profiles] = await Promise.all([
     listAuthUsers(env),
     pagedRest<Record<string, unknown>>(env, "profiles?select=*&order=user_id.asc"),
-    pagedRest<{ user_id: string; is_vip: boolean }>(env, "rcc_vip_memberships?select=user_id,is_vip&order=user_id.asc"),
-    pagedRest<Record<string, unknown>>(env, "rcc_kofi_events?select=*&order=message_id.desc", 5),
   ]);
-  const profileMap = new Map(profiles.map(p => [String(p.user_id), p]));
-  const vipMap = new Map(memberships.map(m => [m.user_id, m.is_vip === true]));
+  const profileMap = new Map(profiles.map(profile => [String(profile.user_id), profile]));
   const users = authUsers.map(user => {
     const profile = profileMap.get(user.id);
     return {
@@ -223,33 +151,14 @@ async function loadDashboard(env: Env) {
       name: String(profile?.display_name || user.user_metadata?.full_name || user.user_metadata?.name || ""),
       avatar_url: String(profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || ""),
       discord_id: typeof profile?.discord_id === "string" ? profile.discord_id : null,
-      is_vip: vipMap.get(user.id) === true,
       is_creator: profile?.is_creator === true,
       has_banner: profile?.has_banner === true,
-      is_supporter: profile?.is_supporter === true,
       is_banned: profile?.is_banned === true,
     };
   });
-  const userByEmail = new Map(users.map(user => [user.email.toLowerCase(), user]));
-  const userById = new Map(users.map(user => [user.user_id, user]));
-  const payments = events.map(event => {
-    const item = eventView(event);
-    const user = item.user_id ? userById.get(item.user_id) : userByEmail.get(item.buyer_email.toLowerCase());
-    const emailMatches = user && user.email.toLowerCase() === item.buyer_email.toLowerCase();
-    const matchedUser = emailMatches ? user : null;
-    return { ...item, matched_user_id: matchedUser?.user_id || null, matched_discord_id: matchedUser?.discord_id || null };
-  });
-  const totalRevenue = payments.reduce((sum, event) => event.currency === "USD" ? sum + (Number.isFinite(event.amount) ? event.amount : 0) : sum, 0);
   return {
     users,
-    payments,
-    stats: {
-      totalUsers: users.length,
-      activeVips: users.filter(user => user.is_vip).length,
-      linkedDiscord: users.filter(user => user.discord_id).length,
-      usdRevenueShown: Math.round(totalRevenue * 100) / 100,
-    },
-    // The migration defines these columns even when profiles is empty.
+    stats: { totalUsers: users.length, linkedDiscord: users.filter(user => user.discord_id).length },
     capabilities: { isCreator: true, hasBanner: true },
   };
 }
@@ -272,54 +181,8 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     if (action === "setFlag") {
       const field = String(body.field || "");
       if (typeof body.value !== "boolean" || !userId) return json({ error: "Datos incompletos." }, 400);
-      if (field === "is_vip") await upsertVip(env, userId, body.value, auth.id);
-      else await setProfileFlag(env, userId, field, body.value);
+      await setProfileFlag(env, userId, field, body.value);
       return json({ ok: true, field, value: body.value });
-    }
-
-    if (action === "approvePayment") {
-      const messageId = typeof body.messageId === "string" ? body.messageId : "";
-      if (!messageId || messageId.length > 200) return json({ error: "Identificador de pago inválido." }, 400);
-      const eventQuery = new URLSearchParams({ message_id: "eq." + messageId, select: "*", limit: "1" });
-      const rows = await rest<Record<string, unknown>[]>(env, "rcc_kofi_events?" + eventQuery.toString());
-      const event = rows[0];
-      if (!event) return json({ error: "No se encontró el pago registrado por Ko-fi." }, 404);
-      if (String(event.currency || "").toUpperCase() !== "USD" || Number(event.amount) < VIP_MINIMUM_USD) {
-        return json({ error: "El pago no cumple los requisitos de RCC Supporter." }, 422);
-      }
-      let buyer = typeof event.user_id === "string" && event.user_id
-        ? (await listAuthUsers(env)).find(user => user.id === event.user_id) || null
-        : null;
-      if (buyer && typeof event.buyer_email === "string" &&
-          buyer.email?.trim().toLowerCase() !== event.buyer_email.trim().toLowerCase()) {
-        return json({ error: "El user_id y el correo guardados en el evento Ko-fi no coinciden; requiere revisión manual." }, 409);
-      }
-      if (!buyer && typeof event.buyer_email === "string") buyer = await lookupAuthUserByEmail(env, event.buyer_email);
-      if (!buyer) return json({ error: "El correo del pago todavía no corresponde a un usuario registrado." }, 404);
-      const profile = await ensureSupporterProfile(env, buyer);
-      await upsertVip(env, buyer.id, true, auth.id);
-      if (!event.user_id) {
-        const updateEvent = new URLSearchParams({ message_id: "eq." + messageId });
-        await rest(env, "rcc_kofi_events?" + updateEvent.toString(), {
-          method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ user_id: buyer.id }),
-        });
-      }
-      const discordId = typeof profile.discord_id === "string" ? profile.discord_id : "";
-      if (!discordId) return json({ ok: true, isVip: true, roleStatus: "DISCORD_NOT_LINKED" });
-      const roleStatus = await grantDiscordRole(env, discordId);
-      return json({ ok: true, isVip: true, roleStatus });
-    }
-
-    if (action === "forceRole") {
-      if (!userId) return json({ error: "Selecciona un usuario." }, 400);
-      const membershipQuery = new URLSearchParams({ user_id: "eq." + userId, select: "is_vip", limit: "1" });
-      const memberships = await rest<Array<{ is_vip: boolean }>>(env, "rcc_vip_memberships?" + membershipQuery.toString());
-      if (memberships[0]?.is_vip !== true) return json({ error: "Solo se puede forzar el rol a miembros con VIP activo." }, 409);
-      const query = new URLSearchParams({ user_id: "eq." + userId, select: "discord_id", limit: "1" });
-      const profiles = await rest<Array<{ discord_id?: string | null }>>(env, "profiles?" + query.toString());
-      const discordId = profiles[0]?.discord_id || "";
-      if (!discordId) return json({ error: "Este usuario no tiene Discord vinculado." }, 409);
-      return json({ ok: true, roleStatus: await grantDiscordRole(env, discordId) });
     }
 
     if (action === "unlinkDiscord") {

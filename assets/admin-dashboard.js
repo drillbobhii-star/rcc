@@ -8,7 +8,7 @@
   const statusEl = $("adminStatus");
   let supabaseClient = null;
   let session = null;
-  let dashboard = { users: [], payments: [], stats: {}, capabilities: {} };
+  let dashboard = { users: [], stats: {}, capabilities: {} };
   let activeTab = "users";
   let refreshing = false;
   let refreshTimer = null;
@@ -190,20 +190,6 @@
     close.addEventListener("click", closeUserQuickMenu);
     head.append(title, close); card.append(head);
 
-    const access = document.createElement("div");
-    access.className = "rcc-user-quick-section";
-    const accessTitle = document.createElement("strong");
-    accessTitle.textContent = "Permisos y distintivos";
-    const switches = document.createElement("div");
-    switches.className = "switches";
-    switches.style.marginTop = "10px";
-    switches.append(
-      renderSwitch(user, "is_vip", "VIP"),
-      renderSwitch(user, "is_creator", "Creator", !dashboard.capabilities.isCreator),
-      renderSwitch(user, "has_banner", "Banner", !dashboard.capabilities.hasBanner)
-    );
-    access.append(accessTitle, switches);
-    card.append(access);
 
     const discord = document.createElement("div");
     discord.className = "rcc-user-quick-section";
@@ -219,12 +205,6 @@
       unlink.type = "button"; unlink.className = "small-btn danger"; unlink.textContent = "Desvincular Discord";
       unlink.addEventListener("click", async () => { await unlinkDiscord(user, unlink); closeUserQuickMenu(); });
       discordActions.append(unlink);
-    }
-    if (user.is_vip && user.discord_id) {
-      const force = document.createElement("button");
-      force.type = "button"; force.className = "small-btn"; force.textContent = "Forzar rol VIP";
-      force.addEventListener("click", async () => { await forceRole(user, force); closeUserQuickMenu(); });
-      discordActions.append(force);
     }
     discord.append(discordTitle, discordInfo, discordActions);
     card.append(discord);
@@ -338,8 +318,8 @@
     body.replaceChildren();
     const query = filterText();
     const filter=$("userFilter")?.value||"all", sort=$("userSort")?.value||"newest";
-    let rows=dashboard.users.filter(user=>{const q=!query||searchableUser(user).includes(query);const f=filter==="vip"?user.is_vip:filter==="nonvip"?!user.is_vip:filter==="discord"?!!user.discord_id:filter==="no-discord"?!user.discord_id:filter==="banned"?user.is_banned===true:true;return q&&f;});
-    rows=[...rows].sort((x,y)=>sort==="oldest"?new Date(x.created_at)-new Date(y.created_at):sort==="vip"?Number(y.is_vip)-Number(x.is_vip):sort==="discord"?Number(!!y.discord_id)-Number(!!x.discord_id):sort==="email"?String(x.email).localeCompare(String(y.email)):new Date(y.created_at)-new Date(x.created_at));
+    let rows=dashboard.users.filter(user=>{const q=!query||searchableUser(user).includes(query);const f=filter==="discord"?!!user.discord_id:filter==="no-discord"?!user.discord_id:filter==="banned"?user.is_banned===true:true;return q&&f;});
+    rows=[...rows].sort((x,y)=>sort==="oldest"?new Date(x.created_at)-new Date(y.created_at):sort==="discord"?Number(!!y.discord_id)-Number(!!x.discord_id):sort==="email"?String(x.email).localeCompare(String(y.email)):new Date(y.created_at)-new Date(x.created_at));
     $("userCount").textContent = rows.length + " / " + dashboard.users.length;
     if (!rows.length) {
       const row = document.createElement("tr");
@@ -368,7 +348,6 @@
       const group = document.createElement("div");
       group.className = "switches";
       group.append(
-        renderSwitch(user, "is_vip", "VIP"),
         renderSwitch(user, "is_creator", "Creator", !dashboard.capabilities.isCreator),
         renderSwitch(user, "has_banner", "Banner", !dashboard.capabilities.hasBanner)
       );
@@ -380,59 +359,6 @@
     body.append(fragment);
   }
 
-  function roleStatusLabel(result) {
-    const status = result?.roleStatus?.status || result?.roleStatus;
-    if (status === "ROLE_GRANTED") return "VIP guardado y rol entregado en Discord.";
-    if (status === "NOT_IN_GUILD") return "VIP activado. El usuario todavía no está en el servidor de Discord.";
-    if (status === "VIP_ROLE_NOT_FOUND") return "VIP activado en la web, pero no existe DISCORD_VIP_ROLE_ID en el servidor.";
-    if (status === "DISCORD_NOT_LINKED") return "VIP activado en la web. El usuario todavía no ha vinculado Discord.";
-    if (status === "NOT_CONFIGURED") return "VIP activado en la web. La conexión Railway no está configurada.";
-    return "VIP aprobado. Estado de rol: " + safeText(status || "desconocido");
-  }
-
-  function renderPayments() {
-    const body = $("paymentsBody");
-    body.replaceChildren();
-    const query = filterText();
-    const usersById = new Map(dashboard.users.map(user => [user.user_id, user]));
-    const rows = dashboard.payments.filter(item => {
-      const linked = usersById.get(item.matched_user_id);
-      return !query || [item.buyer_email, item.message_id, item.kofi_transaction_id, item.user_id, item.matched_discord_id, linked?.user_id].join(" ").toLowerCase().includes(query);
-    });
-    $("paymentCount").textContent = rows.length + " / " + dashboard.payments.length;
-    if (!rows.length) {
-      const tr = document.createElement("tr"); const td = document.createElement("td");
-      td.colSpan = 5; td.className = "empty-state"; td.textContent = "No hay pagos que coincidan con la búsqueda.";
-      tr.append(td); body.append(tr); return;
-    }
-    const frag = document.createDocumentFragment();
-    for (const payment of rows) {
-      const tr = document.createElement("tr");
-      const buyer = document.createElement("td"); buyer.textContent = payment.buyer_email || "Correo no disponible";
-      const amount = document.createElement("td");
-      const amountStrong = document.createElement("strong");
-      amountStrong.textContent = (Number(payment.amount) || 0).toFixed(2) + " " + (payment.currency || "USD");
-      amount.append(amountStrong);
-      const date = document.createElement("td"); date.textContent = payment.created_at ? new Date(payment.created_at).toLocaleString() : "Fecha no registrada";
-      const match = document.createElement("td");
-      const matchedUser = payment.matched_user_id ? dashboard.users.find(u => u.user_id === payment.matched_user_id) : null;
-      const pill = document.createElement("span");
-      pill.className = "pill " + (matchedUser ? "ok" : "warn");
-      pill.textContent = matchedUser ? "Cuenta RCC encontrada" : "Sin cuenta RCC";
-      match.append(pill);
-      const action = document.createElement("td");
-      if (matchedUser && payment.message_id && Number(payment.amount) >= 1.99 && payment.currency === "USD") {
-        const button = document.createElement("button"); button.className = "small-btn"; button.textContent = "Aprobar VIP";
-        button.addEventListener("click", () => approvePayment(payment, button));
-        action.append(button);
-      } else {
-        const text = document.createElement("span"); text.className = "hint"; text.textContent = matchedUser ? "No cumple el mínimo" : "Esperando registro"; action.append(text);
-      }
-      tr.append(buyer, amount, date, match, action); frag.append(tr);
-    }
-    body.append(frag);
-  }
-
   function renderDiscord() {
     const body = $("discordBody");
     body.replaceChildren();
@@ -441,34 +367,28 @@
     $("discordCount").textContent = rows.length;
     if (!rows.length) {
       const tr = document.createElement("tr"); const td = document.createElement("td");
-      td.colSpan = 4; td.className = "empty-state"; td.textContent = "No hay cuentas Discord vinculadas que coincidan.";
+      td.colSpan = 3; td.className = "empty-state"; td.textContent = "No hay cuentas Discord vinculadas que coincidan.";
       tr.append(td); body.append(tr); return;
     }
     for (const user of rows) {
       const tr = document.createElement("tr");
       const userTd = document.createElement("td"); userTd.append(makeUserCell(user));
       const discordTd = document.createElement("td"); discordTd.textContent = user.discord_id;
-      const vipTd = document.createElement("td");
-      const vip = document.createElement("span"); vip.className = "pill " + (user.is_vip ? "ok" : "muted"); vip.textContent = user.is_vip ? "VIP" : "No VIP"; vipTd.append(vip);
       const actions = document.createElement("td");
-      const grant = document.createElement("button"); grant.className = "small-btn"; grant.textContent = "Forzar rol";
-      grant.addEventListener("click", () => forceRole(user, grant));
       const unlink = document.createElement("button"); unlink.className = "small-btn danger"; unlink.textContent = "Desvincular";
       unlink.style.marginLeft = "6px"; unlink.addEventListener("click", () => unlinkDiscord(user, unlink));
-      actions.append(grant, unlink); tr.append(userTd, discordTd, vipTd, actions); body.append(tr);
+      actions.append(unlink); tr.append(userTd, discordTd, actions); body.append(tr);
     }
   }
 
   function renderStats() {
     $("statUsers").textContent = Number(dashboard.stats.totalUsers || 0).toLocaleString();
-    $("statVips").textContent = Number(dashboard.stats.activeVips || 0).toLocaleString();
     $("statDiscord").textContent = Number(dashboard.stats.linkedDiscord || 0).toLocaleString();
-    $("statRevenue").textContent = "$" + Number(dashboard.stats.usdRevenueShown || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     $("lastUpdated").textContent = "Última actualización: " + new Date().toLocaleTimeString();
   }
 
   function render() {
-    renderUsers(); renderPayments(); renderDiscord(); renderStats();
+    renderUsers(); renderDiscord(); renderStats();
   }
 
   async function loadDashboard(silent = false) {
@@ -496,37 +416,6 @@
 
   async function postAction(body) {
     return api("", { method: "POST", body: JSON.stringify(body) });
-  }
-
-  async function approvePayment(payment, button) {
-    if (!window.confirm("¿Aprobar el VIP para " + payment.buyer_email + "? Se activará en la web y se intentará asignar el rol Discord.")) return;
-    button.disabled = true; button.textContent = "Procesando…";
-    try {
-      const result = await postAction({ action: "approvePayment", messageId: payment.message_id });
-      setStatus(roleStatusLabel(result));
-      await loadDashboard(true);
-    } catch (error) {
-      setStatus(error.message, true);
-    } finally {
-      button.disabled = false; button.textContent = "Aprobar VIP";
-    }
-  }
-
-  async function forceRole(user, button) {
-    if (user.is_vip !== true) {
-      setStatus("No se puede forzar el rol: esta cuenta no tiene una membresía VIP activa.", true);
-      return;
-    }
-    if (!window.confirm("¿Forzar la asignación del rol VIP a " + user.email + "?")) return;
-    button.disabled = true; button.textContent = "Enviando…";
-    try {
-      const result = await postAction({ action: "forceRole", userId: user.user_id });
-      const roleStatus = result.roleStatus?.status || result.roleStatus;
-      setStatus(roleStatusLabel(result));
-      if (roleStatus === "NOT_IN_GUILD" && result.roleStatus?.inviteUrl) setStatus("El usuario no está en el servidor. Invitación: " + result.roleStatus.inviteUrl, true);
-      await loadDashboard(true);
-    } catch (error) { setStatus(error.message, true); }
-    finally { button.disabled = false; button.textContent = "Forzar rol"; }
   }
 
   async function unlinkDiscord(user, button) {
