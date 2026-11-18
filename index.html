@@ -564,7 +564,7 @@ window.rccSupabaseReady.catch(() => {});
         <button id="executorsMainBtn" type="button" data-open-executors aria-haspopup="dialog" aria-controls="executorDrawer">Ejecutores compatibles <span aria-hidden="true">↗</span></button>
         <button id="trendingTab" type="button" aria-pressed="false">Tendencias</button><button id="updatesTab" type="button" aria-pressed="false" hidden>Novedades</button>
         <button id="gamesTab" type="button" aria-pressed="false">Juegos de Roblox <span id="gamesCount"></span></button>
-        <button id="studioTab" type="button" aria-pressed="false">Roblox Studio</button>
+        <button id="studioTab" type="button" aria-pressed="false">Roblox Studio <span id="studioCount"></span></button>
         <button id="webTab" type="button" aria-pressed="false">JavaScript · Web <span id="webCount"></span></button>
         <button id="javaTab" type="button" aria-pressed="false">Java · JDK 17+ <span id="javaCount"></span></button>
         <button id="fivemTab" type="button" aria-pressed="false">FiveM <span id="fivemCount"></span></button>
@@ -806,6 +806,7 @@ async function loadScripts(){
     document.getElementById('fivemCount').textContent='· '+scripts.filter(s=>s.platform==='fivem').length;
     const games=scripts.filter(s=>s.catalog_section==='games');
     document.getElementById('gamesCount').textContent='· '+games.length;
+    document.getElementById('studioCount').textContent='· '+scripts.filter(s=>s.platform==='roblox'&&s.catalog_section!=='games').length;
     const gameCounts=new Map();
     for(const game of games)gameCounts.set(game.game,(gameCounts.get(game.game)||0)+1);
     [...gameCounts].sort(([a],[b])=>a.localeCompare(b,'es')).forEach(([name,count])=>document.getElementById('gameFilter').add(new Option(name+' ('+count+')',name)));
