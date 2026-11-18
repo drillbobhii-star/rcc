@@ -82,7 +82,7 @@ jobs:
 
       - name: Import public free RobloxScripts.com listings
         env:
-          TARGET: ${{ inputs.robloxscripts_target || '3000' }}
+          TARGET: ${{ inputs.robloxscripts_target || '10000' }}
           RCC_ROBLOXSCRIPTS_MAX_PAGES: "200"
         run: node tools/import-robloxscripts.cjs "$TARGET"
 
