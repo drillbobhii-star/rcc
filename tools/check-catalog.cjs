@@ -24,7 +24,17 @@ for (const s of scripts) {
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
   }
-  if (s.catalog_section === 'java') {
+  // Educational sources retain their declared verification level.
+  if (s.catalog_section === 'java' && s.compatibility.verification === 'unverified') {
+    assert.equal(s.platform, 'java', s.id);
+    assert.equal(s.file_extension, 'java', s.id);
+    assert.equal(s.type, 'source', s.id);
+  }
+  if (s.catalog_section === 'web' && s.compatibility.verification === 'unverified' && s.file_extension === 'js') {
+    assert.equal(s.platform, 'web', s.id);
+    new vm.Script(s.code, {filename:s.id});
+  }
+  if (s.catalog_section === 'java' && s.compatibility.verification === 'java-compiled') {
     assert.equal(s.platform, 'java');
     assert.equal(s.type, 'source');
     assert.equal(s.file_extension, 'java');
@@ -38,7 +48,7 @@ for (const s of scripts) {
     counts.java++;
     continue;
   }
-  if (s.catalog_section === 'web') {
+  if (s.catalog_section === 'web' && s.compatibility.verification === 'js-syntax') {
     assert.equal(s.platform, 'web');
     assert.equal(s.file_extension, 'html');
     assert.equal(s.compatibility.environment, 'browser');

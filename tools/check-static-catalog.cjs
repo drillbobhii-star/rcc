@@ -25,7 +25,7 @@ assert.match(source,/request\(file,'force-cache'\)/,'Content-addressed catalog p
 assert.match(source,/request\(file,'reload'\)/,'A failed cached response must retry from the network');
 assert.match(source,/rootPath=file=>.*file\.replace/,'Catalog requests must resolve from the site root');
 assert.match(source,/const partPath=/,'Catalog part paths must remain explicitly restricted');
-const newLoader=fetch=>{const wrappedFetch=(url,options)=>fetch(String(url).replace(/^\/+/,''),options);const context=vm.createContext({window:{},fetch:wrappedFetch,AbortController,AbortSignal,setTimeout});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
+const newLoader=(fetch,globals={})=>{const wrappedFetch=(url,options)=>fetch(String(url).replace(/^\/+/,''),options);const context=vm.createContext({window:{},fetch:wrappedFetch,AbortController,AbortSignal,setTimeout,...globals});vm.runInContext(source,context);return context.window.RCCCatalogLoader;};
 const plain=value=>JSON.parse(JSON.stringify(value));
 (async()=>{
  let active=0,peak=0;const progress=[];
@@ -46,6 +46,15 @@ const plain=value=>JSON.parse(JSON.stringify(value));
  }});
  assert.equal(firstBatchRequests,2,'First results must appear after only the manifest and first part');
  assert(batchCount>1);assert.deepEqual(plain(progressivelyLoaded),catalog);
+ // A real browser must finish loading without a click, search or custom event.
+ const browserLoader=newLoader(async file=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}),{
+   document:{createElement:()=>({addEventListener(){},remove(){}}),addEventListener(){},removeEventListener(){},getElementById:()=>null,querySelector:()=>null}
+ });
+ let browserTimer;
+ try{
+   const browserRows=await Promise.race([browserLoader.load({onBatch(){}}),new Promise((_,reject)=>{browserTimer=setTimeout(()=>reject(Error('Browser catalog load stalled waiting for user interaction')),5000);})]);
+   assert.equal(browserRows.length,catalog.length);
+ }finally{clearTimeout(browserTimer);}
  assert.equal(progress.at(-1).loaded,catalog.length);assert.equal(progress.at(-1).total,catalog.length);
  // A missing file must fail as a whole, so UI retry can never silently lose scripts.
  let failing=true;

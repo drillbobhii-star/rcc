@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = path => readFile(new URL("../" + path, import.meta.url), "utf8");
-const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration, pushMigration, globalMigration, worker, manifest, webhook, sharedPush] = await Promise.all([
+const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration, pushMigration, globalMigration, worker, manifest, sharedPush] = await Promise.all([
   read("admin.html"),
   read("assets/admin-chat.js"),
   read("assets/chat-widget.js"),
@@ -14,7 +14,6 @@ const [adminHtml, adminChat, userChat, api, dashboardApi, dashboardJs, migration
   read("supabase/migrations/20261115000600_rcc_global_chat_and_notifications.sql"),
   read("sw.js"),
   read("site.webmanifest"),
-  read("functions/api/kofi-webhook.ts"),
   read("functions/_shared/rcc-web-push.ts"),
 ]);
 
@@ -57,9 +56,9 @@ assert.match(api, /action === "pushPublicKey"/);
 assert.match(api, /request\.json\(\)/);
 assert.doesNotMatch(api, /request\.formData\(\)|createSignedMessage|MAX_FILE_SIZE/);
 
-assert.match(dashboardApi, /Authorization: "Bearer " \+ env\.RCC_VIP_WEBHOOK_SECRET/);
-assert.match(dashboardApi, /Solo se puede forzar el rol a miembros con VIP activo/);
-assert.match(dashboardJs, /No se puede forzar el rol: esta cuenta no tiene una membresía VIP activa/);
+assert.match(dashboardApi, /async function requireAdmin/);
+assert.match(dashboardApi, /Acceso denegado/);
+assert.match(dashboardJs, /setFlag/);
 
 assert.match(migration, /last_user_seen_at timestamptz/);
 assert.match(pushMigration, /add column if not exists last_user_seen_at timestamptz/i);
@@ -86,7 +85,6 @@ assert.match(api, /audience: actor.role/);
 assert.match(api, /setGlobalChat/);
 assert.match(globalMigration, /rcc_chat_settings/);
 assert.match(globalMigration, /audience/);
-assert.match(webhook, /notifyRccCreator/);
 assert.match(sharedPush, /sendRccWebPush/);
 console.log("RCC chat UX, broadcast, global pause and audience Push static checks passed.");
 

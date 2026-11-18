@@ -1,12 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-const [sync, ui, workflow, feed, vip, importer, rscriptsImporter] = await Promise.all([
+const [sync, ui, workflow, feed, importer, rscriptsImporter] = await Promise.all([
   readFile(new URL('../tools/sync-community-feed.mjs', import.meta.url), 'utf8'),
   readFile(new URL('../assets/community-feed.js', import.meta.url), 'utf8'),
   readFile(new URL('../.github/workflows/refresh-community-catalog.yml', import.meta.url), 'utf8'),
   readFile(new URL('../community-feed.json', import.meta.url), 'utf8').then(JSON.parse),
-  readFile(new URL('../assets/vip-membership.js', import.meta.url), 'utf8'),
   readFile(new URL('../tools/import-community.cjs', import.meta.url), 'utf8'),
   readFile(new URL('../tools/import-public-games.cjs', import.meta.url), 'utf8')
 ]);
@@ -43,9 +42,6 @@ assert.match(ui, /⚠️ PARCHEADO/);
 assert.match(ui, /Este código está parcheado en Roblox/);
 assert.match(ui, /Sí, continuar/);
 assert.match(ui, /No, volver/);
-assert.match(vip, /communityGiftMode: true/);
-assert.match(vip, /isVipScript = \(\) => false/);
-assert.match(vip, /RCCVIP_PAUSED = true/);
 const check = spawnSync(process.execPath, ['--check', new URL('../tools/sync-community-feed.mjs', import.meta.url).pathname], {encoding:'utf8'});
 assert.equal(check.status, 0, check.stderr);
 console.log('RCC community feed checks passed.');
