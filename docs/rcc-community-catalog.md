@@ -29,8 +29,9 @@ Las fichas no ejecutadas permanecen `unverified`. Las entradas de directorios Fi
 
 ## Fuentes consultadas
 
-- Roblox Creator Hub: [bibliotecas de scripting Luau](https://create.roblox.com/docs/resources/scripting-libraries).
-- FiveM: [Cfx.re](https://forum.cfx.re/c/releases/7), [LXR Dev](https://lxrdev.com/Community/free-scripts) y [Resourced](https://resourced.dev/).
+- Roblox Creator Hub: [bibliotecas de scripting Luau](https://create.roblox.com/docs/resources/scripting-libraries) y [documentación de Luau](https://create.roblox.com/docs/luau).
+- Repositorio oficial de código y herramientas Roblox: [github.com/Roblox](https://github.com/Roblox); los módulos MIT se pueden importar respetando su licencia y atribución.
+- FiveM: [Cfx.re Releases](https://forum.cfx.re/c/releases/7), [LXR Dev](https://lxrdev.com/Community/free-scripts), [Resourced](https://resourced.dev/), [Force Developments](https://forcedevelopments.com/free), [KrakenCore](https://www.krakencore.org/resources) y la lista comunitaria [Awesome FiveM Scripts](https://github.com/rpScripts/awesome-fivem-scripts). Estos directorios mezclan recursos de distintos tipos; cada ficha debe clasificarse antes de importarse.
 - GameGuardian: [documentación de scripting Lua](https://docs.gameguardian.net/).
 - AutoTouch: [guía oficial de Lua](https://docs.autotouch.net/lua/).
 - JavaScript/Web: [API pública de Greasy Fork](https://greasyfork.org/en/help/api) y [OpenUserJS](https://openuserjs.org/about).
