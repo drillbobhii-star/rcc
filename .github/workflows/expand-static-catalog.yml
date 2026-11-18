@@ -75,6 +75,46 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Repair catalog part checksums before importing
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const crypto = require('node:crypto');
+          const manifest = JSON.parse(fs.readFileSync('scripts.json', 'utf8'));
+          if (!manifest || manifest.format !== 'rcc-catalog-v1' || !Array.isArray(manifest.parts)) {
+            throw new Error('Unexpected RCC catalog manifest format');
+          }
+          const repaired = [];
+          for (const part of manifest.parts) {
+            const oldPath = path.join('.', part.file);
+            const raw = fs.readFileSync(oldPath);
+            const rows = JSON.parse(raw.toString('utf8'));
+            if (!Array.isArray(rows) || rows.length !== part.count) {
+              throw new Error('Catalog part content/count mismatch: ' + part.file);
+            }
+            const hash = crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16);
+            const file = part.file.replace(/-[a-f0-9]{16}\\.json$/, '-' + hash + '.json');
+            const nextPath = path.join('.', file);
+            if (nextPath !== oldPath) fs.renameSync(oldPath, nextPath);
+            repaired.push({ file, count: rows.length, bytes: raw.length });
+          }
+          const allIds = new Set();
+          let total = 0;
+          for (const part of repaired) {
+            const rows = JSON.parse(fs.readFileSync(path.join('.', part.file), 'utf8'));
+            for (const row of rows) {
+              if (!row || !row.id || allIds.has(row.id)) throw new Error('Missing or duplicate catalog ID: ' + (row && row.id));
+              allIds.add(row.id);
+            }
+            total += rows.length;
+          }
+          if (total !== manifest.total) throw new Error('Catalog manifest total mismatch: ' + total + ' != ' + manifest.total);
+          manifest.parts = repaired;
+          fs.writeFileSync('scripts.json', JSON.stringify(manifest, null, 2) + '\\n');
+          console.log('Catalog checksums normalized; validated ' + total + ' existing records.');
+          NODE
+
       - name: Import recent free ScriptBlox publications
         env:
           TARGET: ${{ inputs.scriptblox_target || '10000' }}
