@@ -149,7 +149,7 @@ async function main() {
         compatibility: {
           environment: 'client',
           runtime: 'Roblox · ejecutor externo',
-          context: 'Publicación pública de ScriptBlox; el catálogo conserva sus metadatos y el enlace original.',
+          context: 'Publicación pública externa; el catálogo conserva sus metadatos y el enlace original.',
           requirements: 'Requiere un ejecutor compatible con loadstring y game:HttpGet. Revisa la publicación y el contenido remoto antes de ejecutarlo.',
           verification: 'unverified',
           test_details: 'Metadatos consultados el ' + checkedAt.slice(0, 10) + '. RCC no descargó ni ejecutó el código remoto.',
