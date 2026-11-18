@@ -34,7 +34,7 @@ const CATEGORIES = [
   {
     key: 'gameguardian', platform: 'gameguardian', section: 'games', game: 'GameGuardian',
     label: 'GameGuardian · plantillas y aprendizaje', runtime: 'GameGuardian · Lua',
-    queries: ['topic:gameguardian language:Lua fork:false archived:false'],
+    queries: ['topic:gameguardian language:Lua fork:false archived:false', 'GameGuardian Lua tutorial fork:false archived:false', 'GameGuardian Lua example fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /script|template|example|tutorial|documentation|reference|library|helper|api|sample/i,
     denyRepo: /\b(cheat|hack|bypass|anti.?ban|offset|mod.?menu|speed.?hack|aimbot|wallhack|stealer|backdoor)\b/i
@@ -66,7 +66,7 @@ const CATEGORIES = [
   {
     key: 'universal', platform: 'universal', section: 'all', game: 'Universal',
     label: 'Universal', runtime: 'Lua / Python / Shell / PowerShell',
-    queries: ['language:Lua topic:lua fork:false archived:false', 'language:Python topic:python-scripts fork:false archived:false', 'language:Shell topic:shell-scripts fork:false archived:false', 'language:PowerShell topic:powershell fork:false archived:false'],
+    queries: ['language:Lua topic:lua fork:false archived:false', 'language:Python topic:python-scripts fork:false archived:false', 'language:Python topic:automation fork:false archived:false', 'language:Shell topic:shell-scripts fork:false archived:false', 'language:Shell topic:bash fork:false archived:false', 'language:PowerShell topic:powershell fork:false archived:false', 'language:PowerShell topic:automation fork:false archived:false'],
     extensions: ['.lua', '.py', '.sh', '.ps1', '.bat'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /script|automation|utility|tool|example|sample|cli|library|lua|python|shell|powershell/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|ransomware)\b/i
