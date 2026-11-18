@@ -64,6 +64,7 @@
       if(text===label)return item;
     }
     if(/^(preguntas|sugerencias|otras preguntas|sorprendeme)$/.test(text))return {action:'questions'};
+    if(/greasy.?fork|openuserjs|userscript|user script|tampermonkey|greasemonkey|violentmonkey/.test(text))return {action:'web'};
     for(const template of templates) {
       const normalized=template.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[¿?¡!]/g,'');
       const [start,end]=normalized.split('{s}');
