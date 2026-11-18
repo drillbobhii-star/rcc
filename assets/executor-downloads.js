@@ -55,6 +55,7 @@
     proceed.disabled=seconds>0;
     if(!seconds)clearTimer();
   }
+  const rail=document.createElement('nav');rail.className='wb-rail';rail.setAttribute('aria-label','Ejecutores externos · compatibilidad sin verificar');document.querySelector('.main').append(rail);
   executors.forEach(executor=>{
     const button=document.createElement('button');button.type='button';button.className='executor-option';
     const logo=document.createElement('img');logo.src='assets/executors/'+(executor.image||executor.id+'.png');logo.alt='';logo.width=44;logo.height=44;
@@ -63,10 +64,11 @@
     const text=document.createElement('span'),name=document.createElement('strong'),host=document.createElement('small');name.textContent=executor.name;host.textContent=new URL(executor.url).hostname;text.className='executor-option-info';text.append(name,host,platformBadges(executor));button.append(logo,fallback,text);
     button.addEventListener('click',()=>{
       reset();selected=executor;sourceButton=button;list.hidden=true;confirm.hidden=false;
-      heading.textContent=`¿Deseas descargar ${executor.name}?`;destination.textContent=executor.url;
+      heading.textContent=`¿Estás seguro de ir a la página de ${executor.name}?`;destination.textContent=executor.url;
       const platformSummary=drawer.querySelector('#executorConfirmPlatforms');platformSummary.innerHTML='';platformSummary.append(platformBadges(executor));
       deadline=Date.now()+10000;tick();timer=setInterval(tick,250);heading.focus();
     });list.append(button);
+    const shortcut=document.createElement('button');shortcut.type='button';shortcut.title=executor.name+' · compatibilidad sin verificar';shortcut.setAttribute('aria-label','Abrir página de '+executor.name);const icon=document.createElement('img');icon.src=logo.src;icon.alt=executor.name;icon.addEventListener('error',()=>{icon.replaceWith(document.createTextNode(executor.name.slice(0,2)));});shortcut.append(icon);shortcut.onclick=()=>{returnFocus=shortcut;drawer.showModal();button.click();};rail.append(shortcut);
   });
   drawer.querySelector('#executorCancel').addEventListener('click',()=>{reset();sourceButton?.focus();});
   proceed.addEventListener('click',()=>{

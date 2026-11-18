@@ -18,7 +18,7 @@ for (const s of scripts) {
   ids.add(s.id);
   assert(['pc', 'mobile', 'both', 'unknown'].includes(s.device), s.id);
   assert(['source', 'loadstring'].includes(s.type), s.id);
-  assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch', 'web', 'java'].includes(s.platform), s.id);
+  assert(['roblox', 'universal', 'fivem', 'gameguardian', 'autotouch', 'web', 'java', 'python', 'kotlin', 'csharp', 'minecraft', 'unity', 'sql', 'linux', 'rcc-labs'].includes(s.platform), s.id);
   for (const key of ['tags', 'executors']) {
     assert(Array.isArray(s[key]), `${s.id}: ${key}`);
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);

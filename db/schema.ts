@@ -70,3 +70,10 @@ export const communityImports = pgTable('community_imports', {
   key: text().primaryKey(),
   importedAt: timestamp('imported_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Private preferences scoped to an HttpOnly browser cookie.
+export const workbenchPreferences = pgTable('workbench_preferences', {
+  id: uuid().primaryKey(),
+  settings: jsonb().notNull().default({}),
+  profiles: text().array().notNull().default(sql`'{}'::text[]`),
+});
