@@ -155,7 +155,7 @@ function fileAllowed(category, repo, file) {
   if (category.key === 'roblox' && /(^|\/)(executor|exploit|cheat|deobfuscator|decompiler)(\/|$)/i.test(file.path)) return false;
   return true;
 }
-function makeEntry(category, repo, file, checkedAt, options = {}) {
+function makeEntry(category, repo, file, checkedAt = new Date().toISOString(), options = {}) {
   const ext = extensionOf(file.path);
   const branch = repo.default_branch || 'main';
   const pathPart = file.path.split('/').map(encodeURIComponent).join('/');
