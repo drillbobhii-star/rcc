@@ -4,8 +4,8 @@ const { readCatalog, writeCatalog } = require('./catalog-store.cjs');
 
 const API = 'https://api.greasyfork.org/scripts.json';
 const WAIT = ms => new Promise(resolve => setTimeout(resolve, ms));
-const clean = (value, max = 260) => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, max);
-const DENIED = /\\b(keylogger|stealer|credential.?theft|cookie.?steal|token.?steal|password.?steal|phishing|ransomware|malware|ad.?fraud|paywall.?bypass)\\b/i;
+const clean = (value, max = 260) => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+const DENIED = /\b(keylogger|stealer|credential.?theft|cookie.?steal|token.?steal|password.?steal|phishing|ransomware|malware|ad.?fraud|paywall.?bypass)\b/i;
 const MAX_TARGET = 5000;
 
 function safeUrl(value, hosts) {
@@ -24,7 +24,7 @@ function licenseName(value) {
 }
 function normalizeScript(row, checkedAt = new Date().toISOString()) {
   const id = String(row?.id ?? '');
-  if (!/^\\d{1,12}$/.test(id)) return null;
+  if (!/^\d{1,12}$/.test(id)) return null;
   const title = clean(row.name || row.title, 140);
   const description = clean(row.description || '', 320);
   if (!title || DENIED.test(title + ' ' + description)) return null;
@@ -57,7 +57,6 @@ function normalizeScript(row, checkedAt = new Date().toISOString()) {
     game: 'JavaScript / navegador',
     game_id: 'greasyfork',
     catalog_section: 'web',
-    source_only: true,
     review: {
       provider: 'Greasy Fork',
       source,
