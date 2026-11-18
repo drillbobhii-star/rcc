@@ -267,7 +267,7 @@ async function fetchRepoFiles(category, repo) {
     const files = tree.filter(file => fileAllowed(category, repo, file))
       .slice(0, Number(process.env.RCC_GITHUB_FILES_PER_REPO || 25));
     const licenseFile = tree.find(file => file.type === 'blob' && file.size <= 60000
-      && /^(LICENSE|LICENSE\\.md|LICENSE\\.txt|COPYING|COPYING\\.md|UNLICENSE)$/i.test(file.path));
+      && /^(LICENSE|LICENSE\.md|LICENSE\.txt|COPYING|COPYING\.md|UNLICENSE)$/i.test(file.path));
     let licenseText = null;
     let spdx = null;
     if (licenseFile) {
