@@ -24,6 +24,20 @@ for (const s of scripts) {
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
   }
+  if(s.compatibility?.verification==='source-imported'){
+    const crypto=require('node:crypto');
+    const {sourceBody}=require('./import-source-archives.cjs');
+    assert.equal(s.source_only,false,s.id);
+    assert.equal(s.type,'source',s.id);
+    assert.match(s.source_commit,/^[a-f0-9]{40}$/,s.id);
+    assert(s.source_url.includes('/blob/'+s.source_commit+'/'),s.id);
+    assert(s.code.includes('SPDX-License-Identifier: '+s.license),s.id);
+    assert.equal(crypto.createHash('sha256').update(sourceBody(s.code).replace(/\r\n/g,'\n').trim()).digest('hex'),s.source_code_sha256,s.id);
+    assert(!newCode.has(s.source_code_sha256),'Duplicate imported source: '+s.id);newCode.add(s.source_code_sha256);
+    const platforms={java:'java',web:'web',roblox:'games',fivem:'fivem',universal:'all'};
+    assert.equal(s.catalog_section,platforms[s.platform],s.id);
+    continue;
+  }
   // Educational sources retain their declared verification level.
   if (s.catalog_section === 'java' && s.compatibility.verification === 'unverified') {
     assert.equal(s.platform, 'java', s.id);
@@ -99,6 +113,13 @@ for (const s of scripts) {
     assert.equal(c.executor_status, 'not-applicable');
   }
 }
+const archiveReport=JSON.parse(fs.readFileSync(path.join(root,'assets/source-import-report.json'),'utf8'));
+const imported=scripts.filter(s=>s.compatibility?.verification==='source-imported');
+assert(imported.length>12000,'Expected over 12,000 real imported source files');
+assert.equal(imported.length,archiveReport.added);
+assert.equal(archiveReport.sources.reduce((sum,s)=>sum+s.added,0),imported.length);
+assert(archiveReport.sources.length>=6,'Expected multiple independent repositories');
+for(const source of archiveReport.sources){assert.match(source.commit,/^[a-f0-9]{40}$/);assert.match(source.archiveSha256,/^[a-f0-9]{64}$/);}
 assert(counts.lua >= 435 && counts.server >= 326 && counts.client >= 45 && counts.browser >= 144 && counts.java >= 48, 'Expected expanded Lua, web and Java libraries');
 assert(scripts.filter(s=>s.catalog_section==='games' && s.type==='loadstring').length >= 2800, 'Expected expanded community library');
 for (const file of ['index.html', 'admin.html', 'soporte.html', 'soporte-enviado.html']) {
