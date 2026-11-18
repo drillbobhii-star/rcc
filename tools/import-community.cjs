@@ -113,7 +113,7 @@ async function main() {
       const createdAt = dateOnly(item.createdAt);
       const isKeyed = item.key === true;
       const universal = item.isUniversal === true;
-      const tags = ['Juegos', 'Comunidad', 'ScriptBlox', isKeyed ? 'Con clave' : 'Sin clave'];
+      const tags = ['RCC', 'Juegos', 'Comunidad', isKeyed ? 'Con clave' : 'Sin clave'];
       if (universal) tags.push('Universal');
       if (item.verified === true) tags.push('Fuente declara verificado');
 
