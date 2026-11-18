@@ -102,7 +102,7 @@ function classifyFile(platform,path) {
   return p.include.test(path)||path.split('/').length<=3;
 }
 function makeEntry(platform,repo,file,code,checkedAt) {
-  const p=PLATFORMS[platform],license=repo.license?.spdxId?.toLowerCase();
+  const p=PLATFORMS[platform],license=repo.license?.spdx_id?.toLowerCase();
   const source=repo.html_url+'/blob/'+encodeURIComponent(repo.default_branch)+'/'+file.path.split('/').map(encodeURIComponent).join('/');
   const raw=RAW+'/'+repo.full_name+'/'+encodeURIComponent(repo.default_branch)+'/'+file.path.split('/').map(encodeURIComponent).join('/');
   const ext=file.path.split('.').pop().toLowerCase();
