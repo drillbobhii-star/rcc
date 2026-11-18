@@ -3,7 +3,7 @@
   "version": "1.7.0",
   "description": "",
   "scripts": {
-    "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node tools/check-executor-downloads.mjs && node tools/check-vip-membership.mjs && node tools/check-community-feed.mjs && node tools/check-admin-dashboard.mjs && node tools/check-private-chat.mjs && node tools/check-chat-enhancements.mjs && node tools/check-java-library.cjs && node tools/check-java-catalog.mjs && node tools/check-fivem-import.mjs && node tools/check-robloxscripts-import.mjs && node tools/check-assistant-guide.mjs",
+    "test": "node tools/check-static-catalog.cjs && node tools/check-catalog.cjs && node tools/check-code-engine.mjs && node tools/check-cloud.cjs && node tools/check-executor-downloads.mjs && node tools/check-vip-membership.mjs && node tools/check-community-feed.mjs && node tools/check-admin-dashboard.mjs && node tools/check-private-chat.mjs && node tools/check-chat-enhancements.mjs && node tools/check-java-library.cjs && node tools/check-java-catalog.mjs && node tools/check-fivem-import.mjs && node tools/check-robloxscripts-import.mjs && node tools/check-assistant-guide.mjs && node tools/check-github-resource-import.mjs && node tools/check-rcc-tags.mjs",
     "test:static": "node tools/check-static-catalog.cjs",
     "test:vip": "node tools/check-vip-membership.mjs",
     "test:admin": "node tools/check-admin-dashboard.mjs",
@@ -12,7 +12,9 @@
     "test:java": "node tools/check-java-library.cjs && node tools/check-java-catalog.mjs",
     "test:fivem": "node tools/check-fivem-import.mjs",
     "test:assistant": "node tools/check-assistant-guide.mjs",
-    "test:roblox-sources": "node tools/check-fivem-import.mjs && node tools/check-robloxscripts-import.mjs"
+    "test:roblox-sources": "node tools/check-fivem-import.mjs && node tools/check-robloxscripts-import.mjs",
+    "test:github-sources": "node tools/check-github-resource-import.mjs",
+    "test:rcc-tags": "node tools/check-rcc-tags.mjs"
   },
   "keywords": [],
   "author": "",
