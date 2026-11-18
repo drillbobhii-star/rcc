@@ -197,7 +197,7 @@ function makeEntry(category, repo, file, checkedAt = new Date().toISOString(), o
     code, game: category.game, game_id: category.key, catalog_section: category.section,
     review: { provider: 'RCC Source Index', source: sourceUrl, checkedAt: checkedAt.slice(0, 10), status: 'unverified', riskAssessment: 'Sin auditoría de ejecución RCC' },
     compatibility: {
-      environment: category.key === 'fivem' ? 'server' : 'source',
+      environment: category.key === 'fivem' ? 'server' : category.key === 'java' ? 'java' : 'source',
       runtime: category.runtime,
       context: roblox ? 'Recurso para Roblox Studio y experiencias propias.' : 'Enlace a un archivo de código público; RCC no copia ni ejecuta el contenido.',
       requirements: 'Consulta la página original, su licencia, dependencias, versión y requisitos del entorno.',
