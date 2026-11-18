@@ -109,7 +109,7 @@ function makeEntry(platform,repo,file,code,checkedAt) {
   const base=file.path.split('/').pop().replace(/\.[^.]+$/,'');
   const name=clean(base.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),120);
   const id='gh_'+platform+'_'+repo.id+'_'+file.sha.slice(0,12);
-  const attribution='Original: '+repo.full_name+' · '+license.toUpperCase()+' · '+repo.owner.login;
+  const attribution='Licencia '+license.toUpperCase()+' · Titular indicado: '+repo.owner.login;
   const codeHeader=ext==='lua'||ext==='luau'?'-- ':'// ';
   const tagged=['RCC','Open Source',p.label,ext.toUpperCase(),license.toUpperCase()];
   if(repo.topics?.length)tagged.push(...repo.topics.slice(0,3).map(x=>clean(x,32)));
