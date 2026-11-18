@@ -26,7 +26,7 @@
     if(!append){quickPage=0;suggestedProfiles=[];}quickLoading=true;quickHasMore=false;renderQuickSuggestions();
     try{
       const sb=await window.rccSupabaseReady;
-      const {data,error}=await matchingQuery(sb).range(quickPage*8,quickPage*8+8).abortSignal(AbortSignal.any([quickController.signal,AbortSignal.timeout(10000)]));
+      const {data,error}=await matchingQuery(sb).range(quickPage*8,quickPage*8+7).abortSignal(AbortSignal.any([quickController.signal,AbortSignal.timeout(10000)]));
       if(rev!==quickRevision)return;if(error)throw error;
       quickHasMore=(data||[]).length>8;suggestedProfiles.push(...(data||[]).slice(0,8));quickPage++;quickLoading=false;renderQuickSuggestions();
     }catch{if(rev===quickRevision){quickLoading=false;quickBox.replaceChildren(make('div','No se pudieron cargar los nombres.','wb-profile-suggestion-empty'));const retry=make('button','Reintentar','social-retry');retry.type='button';retry.onclick=()=>loadQuickSuggestions();quickBox.append(retry);}}
