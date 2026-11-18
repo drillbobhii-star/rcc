@@ -1,4 +1,5 @@
 name: RCC Catalog Expansion
+# Manual refresh trigger: this workflow also runs on matching main-branch updates.
 
 on:
   workflow_dispatch:
