@@ -64,9 +64,11 @@ const APP_VERSION = '3.0';
   };
   [name,bio,avatar,color].forEach(input=>input.addEventListener('input',updateProfilePreview));
 
-  const showRoblox=field(profile.form,'Mostrar ID de Roblox','checkbox',{checked:false});
-  const showRobloxButton=el('button','Mostrar ID de Roblox','btn btn-ghost');showRobloxButton.type='button';showRobloxButton.setAttribute('aria-pressed','false');
-  showRobloxButton.onclick=()=>{showRoblox.checked=!showRoblox.checked;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';};
+  const showRoblox=field(profile.form,'Mostrar mi usuario de Roblox en mi perfil','checkbox',{checked:false});
+  const showRobloxButton=el('button','Mostrar mi usuario de Roblox en mi perfil','btn btn-ghost');showRobloxButton.type='button';showRobloxButton.setAttribute('aria-pressed','false');
+  showRoblox.parentElement.hidden=true;
+  showRobloxButton.setAttribute('aria-label','Mostrar u ocultar tu usuario de Roblox en los perfiles públicos');
+  showRobloxButton.onclick=()=>{showRoblox.checked=!showRoblox.checked;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar mi usuario de Roblox':'Mostrar mi usuario de Roblox en mi perfil';};
   showRoblox.parentElement.after(showRobloxButton);
   const creatorEffects=el('fieldset',null,'creator-effects');creatorEffects.hidden=true;creatorEffects.append(el('legend','Estudio del creador · efectos exclusivos'));
   const makeEffect=(label)=>{const wrap=el('label',label),select=el('select');for(const [value,title] of [['none','Sin efecto'],['shimmer','Destello'],['float','Flotación'],['aurora','Aurora']]){const option=el('option',title);option.value=value;select.append(option);}wrap.append(select);creatorEffects.append(wrap);return select;};
@@ -143,7 +145,7 @@ const APP_VERSION = '3.0';
       vipBannerSettings.hidden=!isProfileVip;bannerUpload.parentElement.hidden=!(isProfileVip||hasBannerPermission);
       bannerUpload.parentElement.firstChild.textContent=isProfileVip?'Banner de perfil · imagen o GIF animado (VIP)':'Banner de perfil · imagen o GIF animado (permiso especial)';
       robloxUsername.value = data?.roblox_username || '';currentRobloxId=String(data?.roblox_id||'');window.rccHasRobloxLink=!!data?.roblox_username;
-      bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar ID de Roblox':'Mostrar ID de Roblox';
+      bio.value=data?.bio||'';showRoblox.checked=!!data?.show_roblox;showRobloxButton.setAttribute('aria-pressed',String(showRoblox.checked));showRobloxButton.textContent=showRoblox.checked?'Ocultar mi usuario de Roblox':'Mostrar mi usuario de Roblox en mi perfil';
       const isCreator=data?.is_creator===true;creatorEffects.hidden=!isCreator;
       nameEffect.value=isCreator?(data?.name_effect||'none'):'none';bannerEffect.value=isCreator?(data?.banner_effect||'none'):'none';
       color.value = data?.text_color || '#dce6f5';
@@ -243,8 +245,8 @@ const APP_VERSION = '3.0';
     publicAvatar.src=profileData.avatar_url||new URL('/assets/default-avatar.svg',location.origin).href;
     publicBio.textContent=profileData.bio||'';publicBio.hidden=!publicBio.textContent;
     publicRoblox.removeAttribute('href');publicRoblox.removeAttribute('target');publicRoblox.removeAttribute('rel');
-    if(profileData.show_roblox && /^\\d+$/.test(String(profileData.roblox_id||''))){publicRoblox.textContent='@'+(profileData.roblox_username||'Roblox')+' · ID '+profileData.roblox_id+' ↗';publicRoblox.href='https://www.roblox.com/users/'+profileData.roblox_id+'/profile';publicRoblox.target='_blank';publicRoblox.rel='noopener noreferrer';}
-    else publicRoblox.textContent=profileData.roblox_username?'Cuenta de Roblox privada':'Cuenta de Roblox no vinculada';
+    if(profileData.show_roblox && profileData.roblox_username && /^\d+$/.test(String(profileData.roblox_id||''))){publicRoblox.textContent='@'+profileData.roblox_username+' ↗';publicRoblox.href='https://www.roblox.com/users/'+encodeURIComponent(profileData.roblox_id)+'/profile';publicRoblox.target='_blank';publicRoblox.rel='noopener noreferrer';publicRoblox.hidden=false;}
+    else {publicRoblox.hidden=!profileData.show_roblox;publicRoblox.textContent=profileData.show_roblox?'Usuario de Roblox no disponible':'Cuenta de Roblox oculta';}
     publicBanner.style.backgroundImage=profileData.banner_url?'url("'+String(profileData.banner_url).replace(/["\\\\]/g,'')+'")':'';
     publicBanner.style.height=(Number(profileData.banner_height)>=180&&Number(profileData.banner_height)<=300?Number(profileData.banner_height):180)+'px';
     publicBanner.style.backgroundPosition=['center','top','bottom'].includes(profileData.banner_position)?profileData.banner_position:'center';
