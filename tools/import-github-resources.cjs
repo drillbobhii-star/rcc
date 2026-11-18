@@ -7,6 +7,9 @@ const TOKEN = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '';
 const WAIT = ms => new Promise(resolve => setTimeout(resolve, ms));
 const PER_PAGE = 100;
 const CONCURRENCY = 4;
+const ALLOWED_LICENSES = new Set(['MIT','Apache-2.0','BSD-2-Clause','BSD-3-Clause','ISC','0BSD','Unlicense','Zlib','CC0-1.0']);
+const MAX_CODE_FETCHES = Math.max(0, Math.min(2500, Number(process.env.RCC_GITHUB_CODE_FETCH_LIMIT || 1800)));
+let codeFetches = 0;
 const DENIED = /\b(stealer|keylogger|ransomware|phishing|credential.?theft|cookie.?logger|token.?logger|backdoor|malware|rat)\b/i;
 const SKIP_PATH = /(^|\/)(node_modules|vendor|dist|build|coverage|\.git|\.next|\.venv|target|bin|obj)(\/|$)|(^|\/)\.github\//i;
 const BAD_FILE = /(^|[._-])(min|bundle|vendor|polyfill|lock|test|spec|mock|fixture|generated)([._-]|$)/i;
@@ -33,7 +36,7 @@ const CATEGORIES = [
     label: 'GameGuardian · plantillas y aprendizaje', runtime: 'GameGuardian · Lua',
     queries: ['topic:gameguardian language:Lua fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
-    allowRepo: /template|example|tutorial|documentation|reference|library|helper|api|sample/i,
+    allowRepo: /script|template|example|tutorial|documentation|reference|library|helper|api|sample/i,
     denyRepo: /\b(cheat|hack|bypass|anti.?ban|offset|mod.?menu|speed.?hack|aimbot|wallhack|stealer|backdoor)\b/i
   },
   {
@@ -81,6 +84,65 @@ function extensionOf(path) {
   if (lower.endsWith('.user.js')) return '.user.js';
   return lower.slice(lower.lastIndexOf('.'));
 }
+function detectLicense(spdxId, licenseText) {
+  const body = String(licenseText || '');
+  const known = String(spdxId || '').trim();
+  if (ALLOWED_LICENSES.has(known)) return known;
+  if (/permission is hereby granted, free of charge/i.test(body)) return 'MIT';
+  if (/apache license.*version 2\.0/is.test(body)) return 'Apache-2.0';
+  if (/redistribution and use in source and binary forms/i.test(body) && /neither the name/i.test(body)) return 'BSD-3-Clause';
+  if (/redistribution and use in source and binary forms/i.test(body)) return 'BSD-2-Clause';
+  if (/permission to use, copy, modify, and\/or distribute/i.test(body)) return '0BSD';
+  if (/do what the fuck you want to public license/i.test(body)) return 'WTFPL';
+  if (/this is free and unencumbered software released into the public domain/i.test(body)) return 'Unlicense';
+  if (/public domain/i.test(body) && /cc0/i.test(body)) return 'CC0-1.0';
+  if (/zlib license/i.test(body)) return 'Zlib';
+  if (/permission to use, copy, modify, and distribute this software for any purpose/i.test(body)) return 'ISC';
+  return null;
+}
+async function fetchBlobText(repo, sha, label) {
+  if (!sha) return null;
+  const payload = await requestJson(API + '/repos/' + repo.full_name + '/git/blobs/' + sha, label);
+  if (payload.encoding !== 'base64' || typeof payload.content !== 'string') return null;
+  const text = Buffer.from(payload.content.replace(/\s+/g, ''), 'base64').toString('utf8');
+  if (!text || text.includes('\0')) return null;
+  return text;
+}
+function commentPrefix(extension) {
+  return ['.lua','.luau'].includes(extension) ? '-- '
+    : ['.py','.sh','.ps1','.bat'].includes(extension) ? '# ' : '// ';
+}
+function attachAttribution(content, extension, licenseText, spdx, sourceUrl) {
+  const prefix = commentPrefix(extension);
+  const header = [
+    prefix + 'RCC source attribution',
+    prefix + 'Original file: ' + sourceUrl,
+    prefix + 'SPDX-License-Identifier: ' + spdx,
+    ...String(licenseText).trim().split(/\r?\n/).map(line => prefix + line),
+    ''
+  ].join('\n') + '\n';
+  const shebang = content.startsWith('#!') ? content.indexOf('\n') : -1;
+  if (shebang >= 0) return content.slice(0, shebang + 1) + header + content.slice(shebang + 1);
+  if (extension === '.user.js' && content.startsWith('// ==UserScript==')) {
+    const end = content.indexOf('// ==/UserScript==');
+    if (end >= 0) {
+      const insertAt = content.indexOf('\n', end);
+      if (insertAt >= 0) return content.slice(0, insertAt + 1) + header + content.slice(insertAt + 1);
+    }
+  }
+  return header + content;
+}
+function suspiciousCode(category, code) {
+  const text = String(code || '');
+  if (/\b(keylogger|ransomware|phishing|credential.?theft|cookie.?logger|token.?logger|password.?steal|grabber)\b/i.test(text)) return true;
+  if (/https?:\/\/(?:discord(?:app)?\.com\/api\/webhooks|pastebin\.com\/raw|hastebin\.com\/raw)\//i.test(text)) return true;
+  if (/\b(?:gh[pousr]_[A-Za-z0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|sk-[A-Za-z0-9]{30,})\b/.test(text)) return true;
+  if (category.key === 'roblox' && /loadstring\s*\(|game\s*:\s*HttpGet|syn\.request|getgenv\s*\(|hookmetamethod|getrawmetatable/i.test(text)) return true;
+  if (category.key === 'universal' && /rm\s+-rf\s+\/(?:\s|$)|dd\s+if=.*of=\/dev\/(?:sda|nvme)|format\s+c\s*:/i.test(text)) return true;
+  if (category.key === 'web' && /document\.cookie[\s\S]{0,500}(?:fetch\s*\(|XMLHttpRequest|sendBeacon)|(?:fetch\s*\(|XMLHttpRequest)[\s\S]{0,500}document\.cookie/i.test(text)) return true;
+  return false;
+}
+
 function fileAllowed(category, repo, file) {
   if (!file || file.type !== 'blob' || !Number.isSafeInteger(file.size) || file.size < 80 || file.size > 150000) return false;
   if (SKIP_PATH.test(file.path) || BAD_FILE.test(file.path.split('/').pop())) return false;
@@ -93,7 +155,7 @@ function fileAllowed(category, repo, file) {
   if (category.key === 'roblox' && /(^|\/)(executor|exploit|cheat|deobfuscator|decompiler)(\/|$)/i.test(file.path)) return false;
   return true;
 }
-function makeEntry(category, repo, file, checkedAt) {
+function makeEntry(category, repo, file, checkedAt, options = {}) {
   const ext = extensionOf(file.path);
   const branch = repo.default_branch || 'main';
   const pathPart = file.path.split('/').map(encodeURIComponent).join('/');
@@ -107,24 +169,29 @@ function makeEntry(category, repo, file, checkedAt) {
     : ext === '.ps1' ? 'PowerShell' : ext === '.sh' || ext === '.bat' ? 'Shell'
     : ext === '.cs' ? 'C#' : 'JavaScript';
   const roblox = category.key === 'roblox';
+  const license = options.spdx || null;
+  const sourceOnly = !options.content || !license || !options.licenseText;
   const tags = roblox
-    ? ['RCC', 'Roblox', 'Luau', 'Roblox Studio', 'Código fuente']
-    : ['RCC', category.label, language, 'Código fuente externo', 'Repositorio público'];
+    ? ['RCC', 'Roblox', 'Luau', 'Roblox Studio', ...(sourceOnly ? ['Código fuente externo'] : ['Código abierto', license])]
+    : ['RCC', category.label, language, ...(sourceOnly ? ['Código fuente externo'] : ['Código abierto', license])];
   for (const topic of (repo.topics || []).slice(0, 3)) {
     const tag = clean(topic, 28);
     if (tag && !tags.includes(tag) && !roblox) tags.push(tag);
   }
-  const comment = ['.lua', '.luau'].includes(ext) ? '-- ' : ['.py', '.sh', '.ps1', '.bat'].includes(ext) ? '# ' : '// ';
-  const license = repo.license?.spdx_id && repo.license.spdx_id !== 'NOASSERTION' ? repo.license.spdx_id : 'No indicada en los metadatos';
   const description = roblox
     ? 'Módulo Luau para Roblox Studio. Revisa sus dependencias, permisos y compatibilidad antes de integrarlo en tu propia experiencia.'
-    : 'Archivo ' + file.path + ' del proyecto ' + repo.full_name + '. Revisa licencia (' + license + '), dependencias y versión antes de instalarlo.';
-  const code = comment + 'RCC: ficha de referencia. Este registro apunta al archivo original; usa «Abrir código original» para consultarlo.';
+    : sourceOnly
+      ? 'Archivo público de referencia. No se encontró una licencia reutilizable o no se importó el contenido; abre la fuente original para consultar sus condiciones.'
+      : 'Código fuente con licencia ' + license + '. Revisa dependencias, versiones y requisitos del entorno; RCC no ha ejecutado este archivo.';
+  const code = sourceOnly
+    ? (['.lua','.luau'].includes(ext) ? '-- ' : ['.py','.sh','.ps1','.bat'].includes(ext) ? '# ' : '// ')
+      + 'RCC: ficha de referencia. Este registro apunta al archivo original; usa «Abrir código original» para consultarlo.'
+    : attachAttribution(options.content, ext, options.licenseText, license, sourceUrl);
 
   return {
     id, name: roblox ? basename : basename + ' · ' + repo.name,
-    description, level: 'external', device: 'unknown', platform: category.platform,
-    type: 'source', source_only: true, source_url: sourceUrl, file_extension: ext.slice(1),
+    description, level: sourceOnly ? 'external' : 'free', device: 'unknown', platform: category.platform,
+    type: 'source', source_only: sourceOnly, source_url: sourceUrl, file_extension: ext.slice(1),
     executors: [category.runtime], tags: [...new Set(tags)].slice(0, 12),
     version: 'Fuente externa', created_at: checkedAt.slice(0, 10),
     code, game: category.game, game_id: category.key, catalog_section: category.section,
@@ -196,10 +263,27 @@ async function fetchRepoFiles(category, repo) {
   const url = API + '/repos/' + repo.full_name + '/git/trees/' + encodeURIComponent(repo.default_branch) + '?recursive=1';
   try {
     const payload = await requestJson(url, category.key + ' tree ' + repo.full_name);
-    return (payload.tree || []).filter(file => fileAllowed(category, repo, file)).slice(0, Number(process.env.RCC_GITHUB_FILES_PER_REPO || 25));
+    const tree = payload.tree || [];
+    const files = tree.filter(file => fileAllowed(category, repo, file))
+      .slice(0, Number(process.env.RCC_GITHUB_FILES_PER_REPO || 25));
+    const licenseFile = tree.find(file => file.type === 'blob' && file.size <= 60000
+      && /^(LICENSE|LICENSE\\.md|LICENSE\\.txt|COPYING|COPYING\\.md|UNLICENSE)$/i.test(file.path));
+    let licenseText = null;
+    let spdx = null;
+    if (licenseFile) {
+      try {
+        licenseText = await fetchBlobText(repo, licenseFile.sha, category.key + ' license ' + repo.full_name);
+        spdx = detectLicense(repo.license?.spdx_id, licenseText);
+        if (!ALLOWED_LICENSES.has(spdx)) { licenseText = null; spdx = null; }
+      } catch {
+        licenseText = null;
+        spdx = null;
+      }
+    }
+    return { files, licenseText, spdx };
   } catch (error) {
     console.warn(category.key + ': no se pudo leer ' + repo.full_name + ': ' + error.message);
-    return [];
+    return { files: [], licenseText: null, spdx: null };
   }
 }
 async function importCategory(category, existingIds, existingSources, checkedAt) {
@@ -209,11 +293,26 @@ async function importCategory(category, existingIds, existingSources, checkedAt)
   async function worker() {
     while (cursor < repos.length && added < maxEntries) {
       const repo = repos[cursor++];
-      const files = await fetchRepoFiles(category, repo);
+      const discovered = await fetchRepoFiles(category, repo);
+      const files = discovered.files;
       reviewed++;
       for (const file of files) {
         if (added >= maxEntries) break;
-        const entry = makeEntry(category, repo, file, checkedAt);
+        let content = null;
+        if (discovered.licenseText && discovered.spdx && codeFetches < MAX_CODE_FETCHES) {
+          codeFetches++;
+          try {
+            const raw = await fetchBlobText(repo, file.sha, category.key + ' source ' + repo.full_name);
+            if (raw && Buffer.byteLength(raw, 'utf8') <= 150000 && !suspiciousCode(category, raw)) content = raw;
+          } catch {
+            content = null;
+          }
+        }
+        const entry = makeEntry(category, repo, file, checkedAt, {
+          content,
+          licenseText: discovered.licenseText,
+          spdx: discovered.spdx
+        });
         const source = entry.source_url;
         if (existingIds.has(entry.id) || existingSources.has(source)) continue;
         existingIds.add(entry.id);
@@ -226,7 +325,7 @@ async function importCategory(category, existingIds, existingSources, checkedAt)
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
   console.log(category.key + ': ' + added + ' archivos indexados desde ' + reviewed + ' repositorios.');
-  return { repos: repos.length, reviewed, added };
+  return { repos: repos.length, reviewed, added, licensedCodeRecords: catalog.filter(item => item.id.startsWith('gh_' + category.key + '_') && item.source_only === false).length };
 }
 
 let catalog;
@@ -241,7 +340,7 @@ async function main() {
   for (const category of CATEGORIES) results[category.key] = await importCategory(category, existingIds, existingSources, checkedAt);
   const added = Object.values(results).reduce((sum, item) => sum + item.added, 0);
   if (added) writeCatalog(catalog);
-  console.log(JSON.stringify({ checkedAt, added, total: catalog.length, results }, null, 2));
+  console.log(JSON.stringify({ checkedAt, added, total: catalog.length, codeFetches, codeFetchLimit: MAX_CODE_FETCHES, results }, null, 2));
 }
 if (require.main === module) main().catch(error => { console.error(error.stack || error.message); process.exitCode = 1; });
 module.exports = { CATEGORIES, fileAllowed, makeEntry };
