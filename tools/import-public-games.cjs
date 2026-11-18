@@ -147,7 +147,7 @@ async function main() {
         id,
         ...(image ? { reference_image: image } : {}),
         name: title,
-        description: clean(row.description || (gameName + '. Publicación gratuita revisada por RScripts.'), 300)
+        description: clean(row.description || (gameName + '. Publicación gratuita con metadatos externos.'), 300)
           + ' Fuente externa; RCC no ha descargado ni ejecutado este código.',
         level: 'free',
         device: 'unknown',
@@ -177,10 +177,10 @@ async function main() {
         compatibility: {
           environment: 'client',
           runtime: 'Roblox · ejecutor externo',
-          context: 'Publicación pública de RScripts; el catálogo conserva metadatos y enlace original.',
+          context: 'Publicación externa; el catálogo conserva metadatos y enlace original.',
           requirements: 'Requiere un ejecutor compatible con loadstring y game:HttpGet. La puntuación de riesgo pertenece a RScripts, no es una garantía de seguridad.',
           verification: 'unverified',
-          test_details: 'Metadatos de RScripts consultados el ' + checkedAt.slice(0, 10) + '. RCC no descargó ni ejecutó el código remoto.',
+          test_details: 'Metadatos públicos consultados el ' + checkedAt.slice(0, 10) + '. RCC no descargó ni ejecutó el código remoto.',
           mobile_status: row.isMobileReady === true ? 'La fuente indica compatibilidad móvil; RCC no lo probó.' : 'PC, Android e iOS sin comprobar.',
           executor_status: 'unverified',
           sources: [source, raw],
