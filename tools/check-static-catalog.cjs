@@ -6,6 +6,7 @@ const {readCatalog,writeCatalog,MAX_PART_BYTES}=require('./catalog-store.cjs');
 const root=path.resolve(__dirname,'..');
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'scripts.json'),'utf8'));
 const catalog=readCatalog();
+const expectedLoaded=catalog.map(row=>row?.platform==='roblox'&&row.compatibility?.verification==='source-imported'?{...row,catalog_section:'studio'}:row);
 assert.equal(manifest.format,'rcc-catalog-v1');
 assert.equal(manifest.total,catalog.length);
 assert(fs.statSync(path.join(root,'scripts.json')).size<64*1024,'Manifest must remain small');
@@ -35,7 +36,7 @@ const plain=value=>JSON.parse(JSON.stringify(value));
    return {ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))};
  });
  const loaded=await loader.load({onProgress:p=>progress.push(p)});
- assert.deepEqual(plain(loaded),catalog,'All original fields, ordering and code must survive loading');
+ assert.deepEqual(plain(loaded),expectedLoaded,'Only legacy Roblox archive section metadata may be normalized; all other fields, order and code must survive');
  assert(peak<=3&&peak>1,'Part requests must use bounded parallelism');
  let firstBatchRequests=0;let requests=0;let batchCount=0;
  const progressive=newLoader(async file=>{requests++;return {ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))};});
@@ -45,7 +46,7 @@ const plain=value=>JSON.parse(JSON.stringify(value));
    assert.equal(batch.total,catalog.length);
  }});
  assert.equal(firstBatchRequests,2,'First results must appear after only the manifest and first part');
- assert(batchCount>1);assert.deepEqual(plain(progressivelyLoaded),catalog);
+ assert(batchCount>1);assert.deepEqual(plain(progressivelyLoaded),expectedLoaded);
  // A real browser must finish loading without a click, search or custom event.
  const browserLoader=newLoader(async file=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}),{
    document:{createElement:()=>({addEventListener(){},remove(){}}),addEventListener(){},removeEventListener(){},getElementById:()=>null,querySelector:()=>null}

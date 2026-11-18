@@ -11,14 +11,18 @@ const [api, ui, styles, html, notifications, profileUi, privacyMigration] = awai
   readFile(new URL("../supabase/migrations/20261118150000_secure_public_profile_directory.sql", import.meta.url), "utf8")
 ]);
 
-for (const value of ["explore-api/v1/get-sort-content", "top-playing-now", "games.roblox.com/v1/games", "thumbnails.roblox.com/v1/games/icons", "b.playing - a.playing || b.visits - a.visits"]) assert.ok(api.includes(value), "Missing Roblox API behavior: " + value);
-for (const value of ["/api/roblox-trending", "Ver scripts de ", "RCC todavía no tiene scripts registrados", "studioTab"]) assert.ok(ui.includes(value), "Missing trends UI behavior: " + value);
+for (const value of ["https://apis.roblox.com/explore-api/v1", "/get-sorts?", "/get-sort-content", "top-playing-now", "games.roblox.com/v1/games", "thumbnails.roblox.com/v1/games/icons", "https://www.roblox.com/games/", "b.playing - a.playing || b.visits - a.visits"]) assert.ok(api.includes(value), "Missing Roblox API behavior: " + value);
+assert.ok(api.includes("Math.ceil(ids.length / 10)") && api.includes("ids.slice(index * 10, index * 10 + 10)"), "Roblox Games API requests must use batches of at most 10 IDs");
+for (const value of ["/api/roblox-trending", "game.url", "validUrl", "noopener noreferrer", "studioTab"]) assert.ok(ui.includes(value), "Missing trends UI behavior: " + value);
+assert.ok(!ui.includes("openGameScripts") && !ui.includes("Ver scripts de "), "Trend cards must link to Roblox experiences, not RCC script listings");
 assert.ok(!ui.includes("Math.random") && !ui.includes("copias estimadas") && !ui.includes("descargas estimadas"), "Trends must not fabricate metrics");
 assert.ok(styles.includes(".rcc-trend-game"), "Missing trends card styles");
 assert.ok(html.includes("assets/roblox-trends.js"), "Trends script is not loaded");
 assert.ok(html.includes('id="updatesTab" type="button" aria-pressed="false" hidden'), "The old Novedades tab should stay removed from navigation");
 assert.ok(html.includes('id="studioTab"'), "Roblox Studio category is missing");
 assert.ok(html.includes("studioOnly=options.studio===true"), "Roblox Studio filter is not wired");
+const loader = await readFile(new URL("../assets/catalog-loader.js", import.meta.url), "utf8");
+assert.ok(loader.includes("row.catalog_section='studio'") && loader.includes("verification==='source-imported'"), "Legacy imported Roblox Studio files must be separated from game scripts");
 assert.ok(html.includes("s.catalog_section==='games'?0:s.platform==='roblox'?1"), "Main feed ordering is not wired");
 assert.ok(!html.includes('id="rcc-maintenance"') && !html.includes("rm-hours") && !html.includes("rcc-maintenance-end-v2"), "Maintenance overlay/timer was not removed");
 assert.ok(notifications.includes("right:max(16px") && notifications.includes("top:max(16px"), "Notification bell must be top-right");

@@ -5,7 +5,7 @@
 .rcc-trends-heading p,.rcc-trends-status,.rcc-trends-source{color:var(--muted);font-size:.88rem;line-height:1.6}
 .rcc-trends-status{margin:12px 0}
 .rcc-trends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-.rcc-trend-game{display:flex;flex-direction:column;overflow:hidden;text-align:left;border:1px solid var(--border-glass);border-radius:18px;background:var(--card-glass);color:var(--text);font:inherit;cursor:pointer;min-width:0}
+.rcc-trend-game{display:flex;text-decoration:none;flex-direction:column;overflow:hidden;text-align:left;border:1px solid var(--border-glass);border-radius:18px;background:var(--card-glass);color:var(--text);font:inherit;cursor:pointer;min-width:0}
 .rcc-trend-game:hover{border-color:var(--border-hover);transform:translateY(-3px)}
 .rcc-trend-cover{position:relative;display:grid;place-items:center;aspect-ratio:16/9;background:#171c26;overflow:hidden}
 .rcc-trend-cover img{width:100%;height:100%;object-fit:cover}

@@ -32,6 +32,7 @@ assert.equal(fileAllowed(web, repo('demo/browser-userscripts', 'JavaScript users
 
 const entry = makeEntry(roblox, repo('demo/roblox-luau', 'Roblox Luau Studio modules', ['roblox','luau']), file('src/Inventory.luau'));
 assert.equal(entry.platform, 'roblox');
+assert.equal(entry.catalog_section, 'studio');
 assert.equal(entry.source_only, true);
 assert.equal(entry.tags.includes('RCC'), true);
 assert.equal(entry.tags.includes('GitHub'), false);
