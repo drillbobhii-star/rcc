@@ -106,7 +106,7 @@ jobs:
         run: node tools/import-github-scripts.cjs all "$TARGET"
 
       - name: Validate new importer syntax
-        run: node --check tools/import-github-scripts.cjs && node --check tools/tag-rcc-catalog.cjs
+        run: node --check tools/import-github-scripts.cjs && node --check tools/tag-rcc-catalog.cjs && node tools/check-github-import.mjs
 
       - name: Apply the RCC label and platform tags to the full catalog
         run: node tools/tag-rcc-catalog.cjs
