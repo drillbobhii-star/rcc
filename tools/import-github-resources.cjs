@@ -18,23 +18,23 @@ const CATEGORIES = [
   {
     key: 'roblox', platform: 'roblox', section: 'games', game: 'Roblox',
     label: 'Roblox / Luau', runtime: 'Luau · Roblox Studio',
-    queries: ['topic:roblox topic:luau fork:false archived:false', 'org:Roblox language:Luau fork:false archived:false', 'topic:roblox language:Lua fork:false archived:false'],
-    extensions: ['.lua', '.luau'], maxRepos: 100, maxEntries: 2500,
+    queries: ['topic:roblox topic:luau fork:false archived:false', 'topic:roblox-scripts fork:false archived:false', 'topic:roblox-studio fork:false archived:false', 'topic:roblox-game fork:false archived:false', 'topic:luau fork:false archived:false', 'org:Roblox language:Luau fork:false archived:false', 'topic:roblox language:Lua fork:false archived:false', 'Roblox Luau modules libraries examples fork:false archived:false'],
+    extensions: ['.lua', '.luau'], maxRepos: 160, maxEntries: 4000,
     allowRepo: /roblox|luau|studio|game.?dev|fusion|module|library/i,
     denyRepo: /\b(exploit|executor|deobfuscat|decompil|saveinstance|cheat|hack|bypass|stealer)\b/i
   },
   {
     key: 'fivem', platform: 'fivem', section: 'fivem', game: 'FiveM',
     label: 'FiveM', runtime: 'FiveM / FXServer',
-    queries: ['topic:fivem fork:false archived:false', 'topic:qbcore fork:false archived:false', 'topic:esx-framework fork:false archived:false', 'topic:qbox fork:false archived:false', 'language:Lua topic:fivem fork:false archived:false', 'language:JavaScript topic:fivem fork:false archived:false', 'language:C# topic:fivem fork:false archived:false'],
-    extensions: ['.lua', '.js', '.mjs', '.cs'], maxRepos: 120, maxEntries: 2500,
+    queries: ['topic:fivem fork:false archived:false', 'topic:qbcore fork:false archived:false', 'topic:esx-framework fork:false archived:false', 'topic:qbox fork:false archived:false', 'topic:oxlib fork:false archived:false', 'topic:redm fork:false archived:false', 'topic:fxserver fork:false archived:false', 'topic:gtav-mods fork:false archived:false', 'language:Lua topic:fivem fork:false archived:false', 'language:JavaScript topic:fivem fork:false archived:false', 'language:C# topic:fivem fork:false archived:false', 'FiveM ESX QBCore Qbox resource scripts fork:false archived:false'],
+    extensions: ['.lua', '.js', '.mjs', '.cs'], maxRepos: 180, maxEntries: 4000,
     allowRepo: /fivem|fxserver|qbcore|qbox|esx|redm|gta.?v|resource/i,
     denyRepo: /\b(stealer|backdoor|malware|rat|token.?logger|credential.?theft)\b/i
   },
   {
     key: 'gameguardian', platform: 'gameguardian', section: 'games', game: 'GameGuardian',
     label: 'GameGuardian · plantillas y aprendizaje', runtime: 'GameGuardian · Lua',
-    queries: ['topic:gameguardian language:Lua fork:false archived:false', 'GameGuardian Lua tutorial fork:false archived:false', 'GameGuardian Lua example fork:false archived:false', 'GameGuardian script template language:Lua fork:false archived:false'],
+    queries: ['topic:gameguardian language:Lua fork:false archived:false', 'GameGuardian Lua tutorial fork:false archived:false', 'GameGuardian Lua example fork:false archived:false', 'GameGuardian script template language:Lua fork:false archived:false', 'GameGuardian Lua API reference sample fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /script|template|example|tutorial|documentation|reference|library|helper|api|sample/i,
     denyRepo: /\b(cheat|hack|bypass|anti.?ban|offset|mod.?menu|speed.?hack|aimbot|wallhack|stealer|backdoor)\b/i
@@ -42,7 +42,7 @@ const CATEGORIES = [
   {
     key: 'autotouch', platform: 'autotouch', section: 'all', game: 'AutoTouch',
     label: 'AutoTouch · automatización iOS', runtime: 'AutoTouch · Lua · iOS',
-    queries: ['topic:autotouch language:Lua fork:false archived:false', 'autotouch automation language:Lua fork:false archived:false', 'AutoTouch iOS Lua examples fork:false archived:false'],
+    queries: ['topic:autotouch language:Lua fork:false archived:false', 'autotouch automation language:Lua fork:false archived:false', 'AutoTouch iOS Lua examples fork:false archived:false', 'topic:touchsprite language:Lua fork:false archived:false', 'iOS Lua automation scripts examples fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /autotouch|auto.?touch|ios|automation|script|example|template/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\b/i
@@ -50,24 +50,24 @@ const CATEGORIES = [
   {
     key: 'web', platform: 'web', section: 'web', game: 'JavaScript / Web',
     label: 'JavaScript / Web', runtime: 'JavaScript · navegador / Node.js',
-    queries: ['topic:userscript language:JavaScript fork:false archived:false', 'topic:userscripts language:JavaScript fork:false archived:false', 'topic:javascript-snippets language:JavaScript fork:false archived:false', 'topic:violentmonkey language:JavaScript fork:false archived:false', 'topic:tampermonkey language:JavaScript fork:false archived:false'],
-    extensions: ['.js', '.mjs', '.user.js', '.ts'], maxRepos: 120, maxEntries: 2500,
+    queries: ['topic:userscript language:JavaScript fork:false archived:false', 'topic:userscripts language:JavaScript fork:false archived:false', 'topic:javascript-snippets language:JavaScript fork:false archived:false', 'topic:violentmonkey language:JavaScript fork:false archived:false', 'topic:tampermonkey language:JavaScript fork:false archived:false', 'topic:scriptcat language:JavaScript fork:false archived:false', 'topic:openuserjs language:JavaScript fork:false archived:false', 'topic:greasemonkey language:JavaScript fork:false archived:false', 'browser userscripts collection javascript fork:false archived:false'],
+    extensions: ['.js', '.mjs', '.user.js', '.ts'], maxRepos: 180, maxEntries: 4000,
     allowRepo: /userscript|javascript|typescript|browser|web|extension|snippet|frontend|automation/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|paywall.?bypass)\b/i
   },
   {
     key: 'java', platform: 'java', section: 'java', game: 'Java · JDK 17+',
     label: 'Java · JDK 17+', runtime: 'Java · JDK 17 o posterior',
-    queries: ['language:Java topic:examples fork:false archived:false', 'topic:java-examples language:Java fork:false archived:false'],
-    extensions: ['.java'], maxRepos: 120, maxEntries: 2500,
+    queries: ['language:Java topic:examples fork:false archived:false', 'topic:java-examples language:Java fork:false archived:false', 'topic:java-snippets language:Java fork:false archived:false', 'topic:java-library language:Java fork:false archived:false', 'Java code recipes examples utilities fork:false archived:false', 'Java programming exercises samples fork:false archived:false'],
+    extensions: ['.java'], maxRepos: 180, maxEntries: 4000,
     allowRepo: /java|examples|samples|tutorial|cookbook|learning|guide/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\b/i
   },
   {
     key: 'universal', platform: 'universal', section: 'all', game: 'Universal',
     label: 'Universal', runtime: 'Lua / Python / Shell / PowerShell',
-    queries: ['language:Lua topic:lua fork:false archived:false', 'language:Python topic:python-scripts fork:false archived:false', 'language:Python topic:automation fork:false archived:false', 'language:Shell topic:shell-scripts fork:false archived:false', 'language:Shell topic:bash fork:false archived:false', 'language:PowerShell topic:powershell fork:false archived:false', 'language:PowerShell topic:automation fork:false archived:false'],
-    extensions: ['.lua', '.py', '.sh', '.ps1', '.bat'], maxRepos: 120, maxEntries: 2500,
+    queries: ['language:Lua topic:lua fork:false archived:false', 'language:Python topic:python-scripts fork:false archived:false', 'language:Python topic:automation fork:false archived:false', 'language:Python topic:python-tools fork:false archived:false', 'language:Shell topic:shell-scripts fork:false archived:false', 'language:Shell topic:bash fork:false archived:false', 'language:PowerShell topic:powershell fork:false archived:false', 'language:PowerShell topic:automation fork:false archived:false', 'topic:autohotkey language:AutoHotkey fork:false archived:false', 'topic:ahk language:AutoHotkey fork:false archived:false', 'Lua Python shell automation snippets utilities fork:false archived:false'],
+    extensions: ['.lua', '.py', '.sh', '.ps1', '.bat', '.ahk'], maxRepos: 180, maxEntries: 4000,
     allowRepo: /script|automation|utility|tool|example|sample|cli|library|lua|python|shell|powershell/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|ransomware)\b/i
   }
