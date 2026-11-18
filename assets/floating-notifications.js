@@ -3,10 +3,12 @@
   const email = document.getElementById('authEmail');
   if (!email) return;
   const control = document.createElement('aside');
-  control.className = 'floating-notifications';
+  control.className = 'sidebar-section notification-sidebar-section';
   control.hidden = true;
-  control.innerHTML = `<button type="button" class="notification-bell" aria-label="Abrir notificaciones" aria-expanded="false" aria-controls="floatingNotificationPanel" title="Notificaciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><section id="floatingNotificationPanel" class="floating-notification-panel" aria-labelledby="floatingNotificationTitle" hidden><div class="notification-panel-heading"><h2 id="floatingNotificationTitle">Notificaciones</h2><button type="button" class="notification-close" aria-label="Cerrar notificaciones">×</button></div><p class="notification-feed-status" role="status">Buscando notificaciones recientes…</p><div class="notification-feed-list"></div><label class="notification-sound-control"><input type="checkbox" id="notificationSound" checked> Sonido de notificaciones</label><label class="notification-sound-choice">Tono de notificación<select id="notificationSoundType"><option value="classic">Clásico</option><option value="soft">Suave</option><option value="pop">Pop</option><option value="digital">Digital</option><option value="bell">Campanita</option></select></label></section>`;
-  email.insertAdjacentElement("afterend", control);
+  control.innerHTML = `<button type="button" class="nav-item notification-bell" aria-label="Abrir notificaciones" aria-expanded="false" aria-controls="floatingNotificationPanel" title="Notificaciones"><span class="ico notification-nav-icon" aria-hidden="true">🔔</span><span class="notification-nav-label">Notificaciones</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><section id="floatingNotificationPanel" class="floating-notification-panel" aria-labelledby="floatingNotificationTitle" hidden><div class="notification-panel-heading"><h2 id="floatingNotificationTitle">Notificaciones</h2><button type="button" class="notification-close" aria-label="Cerrar notificaciones">×</button></div><p class="notification-feed-status" role="status">Buscando notificaciones recientes…</p><div class="notification-feed-list"></div><label class="notification-sound-control"><input type="checkbox" id="notificationSound" checked> Sonido de notificaciones</label><label class="notification-sound-choice">Tono de notificación<select id="notificationSoundType"><option value="classic">Clásico</option><option value="soft">Suave</option><option value="pop">Pop</option><option value="digital">Digital</option><option value="bell">Campanita</option></select></label></section>`;
+  const recentSection = document.getElementById('recentBtn')?.closest('.sidebar-section');
+  if (recentSection) recentSection.insertAdjacentElement('afterend', control);
+  else document.getElementById('sidebar')?.prepend(control);
   const bell = control.querySelector('.notification-bell');
   const panel = control.querySelector('section');
   const status = panel.querySelector('.notification-feed-status');
@@ -33,8 +35,8 @@
     if (panel.hidden) return;
     const box = bell.getBoundingClientRect();
     const width = Math.min(330, innerWidth - 24);
-    panel.style.left = Math.max(12, Math.min(box.right - width, innerWidth - width - 12)) + 'px';
-    panel.style.top = Math.max(12, Math.min(box.bottom + 10, innerHeight - panel.offsetHeight - 12)) + 'px';
+    panel.style.left = Math.max(12, Math.min(box.left, innerWidth - width - 12)) + 'px';
+    panel.style.top = Math.max(12, Math.min(box.bottom + 8, innerHeight - panel.offsetHeight - 12)) + 'px';
   }
   function close(focus = false) {
     panel.hidden = true;
