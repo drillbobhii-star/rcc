@@ -410,8 +410,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <script src="assets/personalization.js" defer></script>
 <script src="assets/executor-downloads.js" defer></script>
 <link rel="stylesheet" href="assets/executor-downloads.css">
-<script src="assets/script-art.js" defer></script>
-<script src="assets/game-reference.js" defer></script>
+<script src="assets/script-art.js?v=2" defer></script>
+<script src="assets/game-reference.js?v=2" defer></script>
 <link rel="stylesheet" href="assets/rcc-update.css">
 <link rel="stylesheet" href="assets/interactive-glass.css">
 <script src="assets/interactive-glass.js" defer></script>
@@ -432,7 +432,7 @@ window.rccSupabaseReady.catch(() => {});
 </script>
 <script src="assets/member-access.js?v=4.0"></script>
 <link rel="stylesheet" href="assets/community.css">
-<link rel="stylesheet" href="assets/social-refresh.css">
+<link rel="stylesheet" href="assets/social-refresh.css?v=2">
 <style>
 .auth-controls [hidden]{display:none!important}.auth-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.auth-email{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem;color:var(--muted)}
 #authModal{z-index:2100}#authModal .modal-box{width:min(100%,440px)}#authForm{display:grid;gap:14px}#authForm label{display:grid;gap:8px}#authForm input{width:100%;padding:13px;border:1px solid var(--border-glass);border-radius:14px;background:rgba(255,255,255,.06);color:var(--text);font:inherit}#authStatus{min-height:2.5em;color:var(--muted)}.favorite-button{margin-left:auto}.favorite-button[aria-pressed="true"]{color:#ffa9bd}button:disabled{opacity:.6;cursor:wait}
@@ -448,7 +448,7 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/trend-analysis.js"></script>
 <link rel="stylesheet" href="assets/studio.css">
 <link rel="stylesheet" href="assets/search-experience.css">
-<link rel="stylesheet" href="assets/script-media.css">
+<link rel="stylesheet" href="assets/script-media.css?v=2">
 <link rel="stylesheet" href="assets/sky-studio.css">
 <script src="assets/sky-studio.js" defer></script>
 <link rel="stylesheet" href="assets/graphite-studio.css">
@@ -456,7 +456,7 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/floating-notifications.js?v=2" defer></script>
 <script src="assets/notification-banners.js?v=2" defer></script>
 <link rel="stylesheet" href="assets/notification-banners.css?v=2">
-<link rel="stylesheet" href="assets/prism-logo.css">
+<link rel="stylesheet" href="assets/prism-logo.css?v=2">
 <link rel="stylesheet" href="assets/main-panel-personalization.css?v=1">
 <script src="assets/main-panel-personalization.js?v=3" defer></script>
 <link rel="stylesheet" href="assets/script-review.css">
@@ -464,10 +464,10 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/script-review.js"></script>
 <style>.rcc-apk-coming{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 12px;border:1px dashed var(--border-glass);border-radius:12px;color:var(--muted);font-size:.82rem}.rcc-apk-coming strong{font-size:.68rem;letter-spacing:.08em;color:var(--accent)}</style>
 <link rel="stylesheet" href="assets/workbench.css?v=2">
-<script src="assets/workbench.js?v=3" defer></script>
-<link rel="stylesheet" href="assets/script-social.css?v=1">
-<script src="assets/script-social.js?v=1" defer></script>
-<script src="assets/profile-discovery.js?v=1" defer></script>
+<script src="assets/workbench.js?v=4" defer></script>
+<link rel="stylesheet" href="assets/script-social.css?v=2">
+<script src="assets/script-social.js?v=2" defer></script>
+<script src="assets/profile-discovery.js?v=2" defer></script>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -489,7 +489,7 @@ window.rccSupabaseReady.catch(() => {});
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
-    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-prism" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path class="prism-shell" d="M9 7h24l8 8v26H15l-8-8V7Z"/><path class="prism-fold" d="M33 7v9h8M7 32h9v9"/><path class="prism-letter" d="m17 19-6 5 6 5m14-10 6 5-6 5m-5-13-5 16"/><circle class="prism-satellite" cx="38" cy="8" r="2.5"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
+    <h1><a href="index.html" id="logoHome" aria-label="RCC · Volver al panel principal"><span class="brand-symbol rcc-prism" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path class="rcc-orbit" d="M32 3a29 29 0 1 1-29 29"/><path class="rcc-frame" d="m32 9 20 12v22L32 55 12 43V21Z"/><path class="rcc-monogram" d="M22 42V23h9c10 0 10 11 0 11h-9m9 0 9 9m5-19a11 11 0 1 0 0 17"/><circle class="rcc-beacon" cx="32" cy="3" r="3"/></svg></span> RCC<span class="brand-dot">.</span></a></h1>
 
     <small>LUA SCRIPTS</small>
     <div class="language-picker notranslate" translate="no">
@@ -1216,6 +1216,7 @@ function verificationLabel(s){
     'lua-tested':'Verificado parcialmente · Lua 5.3 emulado; ejecutores externos sin probar',
     'syntax-only':'No verificado · solo se revisó la sintaxis; falta probar el entorno',
     'js-syntax':'No verificado · sintaxis JavaScript revisada; falta probar la ejecución',
+    'source-imported':'Código original importado · ejecución sin verificar',
     'unverified':'No verificado · todavía no hay pruebas registradas'
   })[state] || 'No verificado · compatibilidad pendiente de pruebas';
 }

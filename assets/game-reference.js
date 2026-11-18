@@ -9,14 +9,14 @@
   function fallback(container,script){container.classList.add('game-cover-fallback');container.replaceChildren(window.RCCScriptArt.create(script));}
   function fillImage(container,script) {
     if(!script)return;
-    const candidates=[...new Set([images[script.game_id],script.reference_image])].filter(src=>
+    const candidates=[...new Set([script.reference_image,images[script.game_id]])].filter(src=>
       typeof src==='string' && /^https:\/\/(?:(?:[\w-]+\.)?rbxcdn\.com\/|scriptblox\.com\/images\/|rscripts\.net\/assets\/(?:games|scripts)\/)/.test(src));
     let index=0;
     function next(){
       const src=candidates[index++];if(!src){fallback(container,script);return;}
       const image=document.createElement('img');image.src=src;image.alt='Imagen de referencia de '+(script.game||script.name);image.loading='lazy';image.decoding='async';
       image.onerror=()=>{if(container.firstChild===image)next();};
-      container.replaceChildren(image);container.classList.remove('game-cover-fallback');
+      const label=document.createElement('small');label.className='reference-image-label';label.textContent=src===script.reference_image?'IMAGEN DE LA PUBLICACIÓN ORIGINAL':'REFERENCIA DEL JUEGO · NO ES UNA CAPTURA DEL SCRIPT';container.replaceChildren(image,label);container.classList.remove('game-cover-fallback');
     }
     next();
   }
@@ -91,7 +91,7 @@
     const artwork=cover(script);artwork.classList.add('reference-thumb');panel.append(artwork);
     const text=document.createElement('div'),title=document.createElement('h4');title.textContent=script.game;text.append(title);
     const status=document.createElement('p');status.className='key-status';const tags=script.tags||[];
-    status.textContent=tags.includes('Con clave')?'Requiere llave; comprueba las instrucciones antes de ejecutar.':tags.includes('Sin clave')?'Sin llave declarada; puede cambiar con las actualizaciones.':script.type==='source'?'Receta RCC: no necesita llave. Se utiliza en tu propio proyecto de Studio.':'Estado de llave sin confirmar. Comprueba los requisitos antes de ejecutar.';text.append(status);
+    status.textContent=tags.includes('Con clave')?'Requiere llave; comprueba las instrucciones antes de ejecutar.':tags.includes('Sin clave')?'Sin llave declarada; puede cambiar con las actualizaciones.':script.type==='source'?'Código fuente: consulta el entorno, las dependencias y la licencia en la ficha.':'Estado de llave sin confirmar. Comprueba los requisitos antes de ejecutar.';text.append(status);
     const links=document.createElement('div');links.className='game-links';
     function link(label,value){const url=safeUrl(value);if(!url)return;const anchor=document.createElement('a');anchor.href=url;anchor.textContent=label;anchor.target='_blank';anchor.rel='noopener noreferrer';links.append(anchor);}
     if(/^[1-9]\d*$/.test(script.game_id))link('Jugar en Roblox ↗','https://www.roblox.com/games/'+script.game_id);

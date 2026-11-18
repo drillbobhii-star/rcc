@@ -21,7 +21,7 @@ const assert=require('node:assert/strict');
   await page.goto(process.argv[3]||'http://localhost:8889',{waitUntil:'domcontentloaded'});
   await page.locator('.social-code-preview').first().waitFor();await page.locator('.social-suggestion').first().waitFor();
   assert.equal(await page.locator('.social-suggestion').count(),2);
-  assert.equal(await page.locator('.social-code-preview').count(),27);
+  assert.equal(await page.locator('.social-code-preview').count(),await page.locator('#scripts>.card').count());
   assert.equal(await page.locator('.social-filters').getAttribute('open'),null);
   await page.locator('.social-open-code').first().click();assert(await page.locator('#modal.open').isVisible());await page.keyboard.press('Escape');
   await page.locator('[data-social-nav=people]').click();await page.locator('.social-person-card').first().waitFor();assert.equal(await page.locator('.social-person-card').count(),2);

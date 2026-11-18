@@ -1,0 +1,116 @@
+{
+  "checkedAt": "2026-11-18T13:59:06.410Z",
+  "before": 15023,
+  "sources": [
+    {
+      "repository": "TheAlgorithms/Python",
+      "category": "universal",
+      "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+      "license": "MIT",
+      "archive": "https://codeload.github.com/TheAlgorithms/Python/tar.gz/30507bbe41397065728167fb09aa820f9fce8dc7",
+      "archiveSha256": "034f7f7cbcef84bccb96b9169cfd812ba9c83bffac4b248e88bf60f04b738947",
+      "reviewed": 1364,
+      "added": 1363,
+      "duplicates": 1,
+      "rejected": 0
+    },
+    {
+      "repository": "TheAlgorithms/Java",
+      "category": "java",
+      "commit": "e79b0f106477774020d4c5c2738f0854ff3d2444",
+      "license": "MIT",
+      "archive": "https://codeload.github.com/TheAlgorithms/Java/tar.gz/e79b0f106477774020d4c5c2738f0854ff3d2444",
+      "archiveSha256": "a90736dda1d30c97af1849686e45c70d5ff39f6ce2f51684ee05cfd4eb059d72",
+      "reviewed": 852,
+      "added": 852,
+      "duplicates": 0,
+      "rejected": 0
+    },
+    {
+      "repository": "trekhleb/javascript-algorithms",
+      "category": "web",
+      "commit": "85293e3e2b88f4d2ce330d956b139cf628aa1e82",
+      "license": "MIT",
+      "archive": "https://codeload.github.com/trekhleb/javascript-algorithms/tar.gz/85293e3e2b88f4d2ce330d956b139cf628aa1e82",
+      "archiveSha256": "299abc4982e9c7a612c93f70a031a8818457c4b57c1245ba8596734592642594",
+      "reviewed": 172,
+      "added": 172,
+      "duplicates": 0,
+      "rejected": 0
+    },
+    {
+      "repository": "Roblox/roact",
+      "category": "roblox",
+      "commit": "1676d95c4886d51ee2b21bfcd55c6e50ece799e5",
+      "license": "Apache-2.0",
+      "archive": "https://codeload.github.com/Roblox/roact/tar.gz/1676d95c4886d51ee2b21bfcd55c6e50ece799e5",
+      "archiveSha256": "68d4aa03f0aeea2f1257a729a48ae036822694dca0d1f2a5df1336e188fadc2c",
+      "reviewed": 46,
+      "added": 46,
+      "duplicates": 0,
+      "rejected": 0
+    },
+    {
+      "repository": "Roblox/rodux",
+      "category": "roblox",
+      "commit": "120e94ec609c4992c9f2da7c7ae45542b168fd25",
+      "license": "Apache-2.0",
+      "archive": "https://codeload.github.com/Roblox/rodux/tar.gz/120e94ec609c4992c9f2da7c7ae45542b168fd25",
+      "archiveSha256": "58f01a68c86523891dc82faf303d211db7fbce9b146b61e285b38aa1e1c33ad0",
+      "reviewed": 16,
+      "added": 15,
+      "duplicates": 1,
+      "rejected": 0
+    },
+    {
+      "repository": "overextended/ox_lib",
+      "category": "fivem",
+      "commit": "06ecce2b8efcb2323c0af3c6d6f527bdb47ec860",
+      "license": "LGPL-3.0",
+      "archive": "https://codeload.github.com/overextended/ox_lib/tar.gz/06ecce2b8efcb2323c0af3c6d6f527bdb47ec860",
+      "archiveSha256": "d41823e5e753b4a61dd1199ffc04f39399819d12764ae1f715617cb47ed3a2eb",
+      "reviewed": 102,
+      "added": 102,
+      "duplicates": 0,
+      "rejected": 0
+    },
+    {
+      "repository": "qbcore-framework/qb-core",
+      "category": "fivem",
+      "commit": "9b3cddcce93e5e12cbcf6b47b866b687d32ac7bf",
+      "license": "GPL-3.0",
+      "archive": "https://codeload.github.com/qbcore-framework/qb-core/tar.gz/9b3cddcce93e5e12cbcf6b47b866b687d32ac7bf",
+      "archiveSha256": "062bed8e0ecd3652627d5543a106261d43d40773e41a1675335b991b25b1a497",
+      "reviewed": 62,
+      "added": 62,
+      "duplicates": 0,
+      "rejected": 0
+    },
+    {
+      "repository": "qbox-project/qbx_core",
+      "category": "fivem",
+      "commit": "5e43f63e9cf484549074ced8fee470520d4973d7",
+      "license": "GPL-3.0",
+      "archive": "https://codeload.github.com/qbox-project/qbx_core/tar.gz/5e43f63e9cf484549074ced8fee470520d4973d7",
+      "archiveSha256": "5257880de47d7f768ed63e8a9c53220ffc5813f2d5e2786bef3ec3136e409db1",
+      "reviewed": 51,
+      "added": 51,
+      "duplicates": 0,
+      "rejected": 0
+    },
+    {
+      "repository": "eugenp/tutorials",
+      "category": "java",
+      "commit": "c9887b8b25a68a372f723f0d3f45fbbb4cecdcb7",
+      "license": "MIT",
+      "archive": "https://codeload.github.com/eugenp/tutorials/tar.gz/c9887b8b25a68a372f723f0d3f45fbbb4cecdcb7",
+      "archiveSha256": "e42074a00e67150dbf2a6b436fb5bbd1d039164c54d8544c9cf3e9226448a612",
+      "reviewed": 14000,
+      "added": 13729,
+      "duplicates": 270,
+      "rejected": 1
+    }
+  ],
+  "added": 16392,
+  "total": 31415
+}
