@@ -101,6 +101,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RCC_GITHUB_FILES_PER_REPO: "25"
+          RCC_GITHUB_CODE_FETCH_LIMIT: "1800"
         run: node tools/import-github-resources.cjs
 
       - name: Apply RCC tag to every catalog entry
