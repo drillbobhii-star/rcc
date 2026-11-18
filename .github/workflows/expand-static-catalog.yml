@@ -94,7 +94,7 @@ jobs:
               throw new Error('Catalog part content/count mismatch: ' + part.file);
             }
             const hash = crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16);
-            const file = part.file.replace(/-[a-f0-9]{16}\\.json$/, '-' + hash + '.json');
+            const file = part.file.replace(/-[a-f0-9]{16}\.json$/, '-' + hash + '.json');
             const nextPath = path.join('.', file);
             if (nextPath !== oldPath) fs.renameSync(oldPath, nextPath);
             repaired.push({ file, count: rows.length, bytes: raw.length });
@@ -111,7 +111,7 @@ jobs:
           }
           if (total !== manifest.total) throw new Error('Catalog manifest total mismatch: ' + total + ' != ' + manifest.total);
           manifest.parts = repaired;
-          fs.writeFileSync('scripts.json', JSON.stringify(manifest, null, 2) + '\\n');
+          fs.writeFileSync('scripts.json', JSON.stringify(manifest, null, 2) + '\n');
           console.log('Catalog checksums normalized; validated ' + total + ' existing records.');
           NODE
 
