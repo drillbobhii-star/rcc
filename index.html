@@ -655,11 +655,11 @@ window.rccSupabaseReady.catch(() => {});
 <label>Etiqueta <select id="tagFilter"><option value="">Todas</option></select></label>
 <label>Entorno <select id="environmentFilter"><option value="all">Todos</option><option value="lua">Lua estándar</option><option value="client">Roblox cliente</option><option value="server">Roblox servidor</option><option value="browser">Navegador web</option><option value="fivem-client">FiveM cliente</option><option value="fivem-server">FiveM servidor</option><option value="gameguardian">GameGuardian Android</option><option value="autotouch">AutoTouch iOS</option><option value="legacy">Catálogo anterior</option></select></label>
 <label>Estado del script <select id="reviewFilter"><option value="all">Todos</option><option value="patched">Parcheados</option><option value="source-unpatched">Sin parcheo declarado</option><option value="unknown">Estado no declarado</option><option value="pending">Pendientes de revisión</option></select></label>
-<label>Prueba <select id="verificationFilter"><option value="all">Todas</option><option value="lua-tested">Lua ejecutado en emulador</option><option value="syntax-only">Solo sintaxis</option><option value="js-syntax">Sintaxis JavaScript revisada</option><option value="unverified">Sin verificar</option></select></label>
+<label>Verificación <select id="verificationFilter"><option value="all">Todos los estados</option><option value="verified">Verificados</option><option value="lua-tested">Verificación parcial · Lua emulado</option><option value="syntax-only">No verificado · solo sintaxis Lua</option><option value="js-syntax">No verificado · sintaxis JavaScript</option><option value="unverified">No verificados</option></select></label>
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC 2 · Un espacio para crear</strong><p>Nuevo menú de ocho categorías, 27 ejemplos originales, guía renovada, perfiles públicos con búsqueda y favoritos privados para este navegador. La biblioteca se carga a demanda. Próxima actualización: mods APK; explora su vista previa.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC 2 · Un espacio para crear</strong><p>Nuevo menú de ocho categorías, 27 ejemplos originales, guía renovada, perfiles públicos con búsqueda y favoritos privados para este navegador. La biblioteca se carga a demanda. Próxima actualización: mods APK; explora su vista previa. Próximamente: sistema de cheats y IA.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <section class="rcc-safety-notices" aria-label="Avisos importantes">
@@ -1215,7 +1215,14 @@ searchInput.addEventListener('input',()=>{clearTimeout(searchRenderTimer);search
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function verificationLabel(s){
-  return ({'lua-tested':'Ejecutado en Lua 5.3 emulado · ejecutores sin probar','syntax-only':'Sintaxis revisada · ejecución en el entorno sin probar','js-syntax':'Sintaxis JavaScript revisada · ejemplo web'})[s.compatibility?.verification] || 'Compatibilidad sin verificar';
+  const state=s.compatibility?.verification || 'unverified';
+  return ({
+    'verified':'Verificado · prueba registrada',
+    'lua-tested':'Verificado parcialmente · Lua 5.3 emulado; ejecutores externos sin probar',
+    'syntax-only':'No verificado · solo se revisó la sintaxis; falta probar el entorno',
+    'js-syntax':'No verificado · sintaxis JavaScript revisada; falta probar la ejecución',
+    'unverified':'No verificado · todavía no hay pruebas registradas'
+  })[state] || 'No verificado · compatibilidad pendiente de pruebas';
 }
 function renderCompatibility(s){
   const panel=document.getElementById('compatDetail');
