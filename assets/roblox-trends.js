@@ -32,38 +32,22 @@
   function render(items) {
     cards.replaceChildren();
     for (const [index, game] of items.entries()) {
-      const card = document.createElement("button");
-      card.type = "button"; card.className = "rcc-trend-game";
-      card.setAttribute("aria-label", "Ver scripts de " + game.name);
+      const validUrl = typeof game.url === "string" && /^https:\/\/www\.roblox\.com\/games\/\d+(?:\/|$)/.test(game.url);
+      const card = document.createElement(validUrl ? "a" : "article");
+      card.className = "rcc-trend-game";
+      if (validUrl) { card.href = game.url; card.target = "_blank"; card.rel = "noopener noreferrer"; card.setAttribute("aria-label", "Abrir " + game.name + " en Roblox"); }
+      else card.setAttribute("aria-label", game.name + " · enlace oficial no disponible");
       const cover = document.createElement("span"); cover.className = "rcc-trend-cover";
       if (game.image) { const image = document.createElement("img"); image.src = game.image; image.alt = ""; image.loading = "lazy"; image.decoding = "async"; cover.append(image); }
       else { cover.textContent = "ROBLOX"; cover.classList.add("is-fallback"); }
-      const rank = document.createElement("span"); rank.className = "rcc-trend-rank"; rank.textContent = "#" + (index + 1);
-      cover.append(rank);
+      const rank = document.createElement("span"); rank.className = "rcc-trend-rank"; rank.textContent = "#" + (index + 1); cover.append(rank);
       const info = document.createElement("span"); info.className = "rcc-trend-info";
       const name = document.createElement("strong"); name.textContent = game.name;
       const creator = document.createElement("small"); creator.textContent = game.creator ? "Por " + game.creator : "Experiencia de Roblox";
       const players = document.createElement("span"); players.className = "rcc-trend-metric"; players.textContent = format.format(game.playing) + " jugando ahora";
       const visits = document.createElement("small"); visits.textContent = format.format(game.visits) + " visitas totales";
-      info.append(name, creator, players, visits); card.append(cover, info);
-      card.addEventListener("click", () => openGameScripts(game.name));
-      cards.append(card);
+      info.append(name, creator, players, visits); card.append(cover, info); cards.append(card);
     }
-  }
-  function openGameScripts(name) {
-    const filter = document.getElementById("gameFilter");
-    if (!filter || typeof window.RCCNavigation?.section !== "function") return;
-    const normalized = value => String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es").replace(/[^a-z0-9]+/g, " ").trim();
-    const option = [...filter.options].find(item => item.value === name || item.textContent.trim() === name || normalized(item.value) === normalized(name) || normalized(item.textContent.replace(/\s*\(\d+\)\s*$/, "")) === normalized(name));
-    if (!option) {
-      status.textContent = "RCC todavía no tiene scripts registrados para " + name + ".";
-      return;
-    }
-    showTrends(false); tab.setAttribute("aria-pressed", "false");
-    window.RCCNavigation.section("games");
-    filter.value = option.value;
-    filter.dispatchEvent(new Event("change", { bubbles: true }));
-    document.getElementById("catalogHeading")?.scrollIntoView({ behavior: "instant", block: "start" });
   }
   async function load(force = false) {
     if (request) return request;
