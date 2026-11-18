@@ -23,6 +23,7 @@ assert.ok(html.includes("s.catalog_section==='games'?0:s.platform==='roblox'?1")
 assert.ok(!html.includes('id="rcc-maintenance"') && !html.includes("rm-hours") && !html.includes("rcc-maintenance-end-v2"), "Maintenance overlay/timer was not removed");
 assert.ok(notifications.includes("right:max(16px") && notifications.includes("top:max(16px"), "Notification bell must be top-right");
 assert.ok(profileUi.includes("from('rcc_public_profiles')"), "Profile directory must use privacy-safe view");
+assert.ok(profileUi.includes("range(suggestionPage*20,suggestionPage*20+19)"), "Profile suggestions must paginate beyond the first 20");
 assert.ok(privacyMigration.includes("case when show_roblox then roblox_username else null end"), "Privacy view must mask Roblox usernames when opted out");
 assert.ok(privacyMigration.includes("security_invoker = true"), "Privacy view must preserve RLS");
 console.log("RCC Roblox trends, catalog, maintenance and profile privacy checks passed.");
