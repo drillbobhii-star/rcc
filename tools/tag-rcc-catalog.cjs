@@ -4,11 +4,12 @@ const LABELS={roblox:'Roblox',fivem:'FiveM',gameguardian:'GameGuardian',autotouc
 const rows=readCatalog();let changed=0,tagged=0;
 for(const row of rows){
   const before=Array.isArray(row.tags)?row.tags:[];
-  const next=[...before];
-  if(!next.some(tag=>String(tag).toLowerCase()==='rcc')){next.push('RCC');tagged++;}
+  const next=['RCC',...before.filter(tag=>String(tag).toLowerCase()!=='rcc')];
+  if(!before.some(tag=>String(tag).toLowerCase()==='rcc'))tagged++;
   const platform=LABELS[String(row.platform||'').toLowerCase()];
   if(platform&&!next.some(tag=>String(tag).toLowerCase()===platform.toLowerCase()))next.push(platform);
-  if(next.length!==before.length){row.tags=next.slice(0,20);changed++;}
+  const final=next.slice(0,20);
+  if(JSON.stringify(final)!==JSON.stringify(before)){row.tags=final;changed++;}
 }
 if(changed)writeCatalog(rows);
 console.log(JSON.stringify({total:rows.length,changed,tagged,labels:LABELS}));
