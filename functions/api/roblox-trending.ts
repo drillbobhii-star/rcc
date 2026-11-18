@@ -1,5 +1,5 @@
 type RobloxGame = { universeId?: number; rootPlaceId?: number; placeId?: number; playerCount?: number; name?: string; creator?: { name?: string }; };
-const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { "Cache-Control": "public, max-age=180, stale-while-revalidate=300", "Access-Control-Allow-Origin": "*" } });
+const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120", "Access-Control-Allow-Origin": "*" } });
 const timeout = (ms = 9000) => AbortSignal.timeout(ms);
 async function getJson(url: string) {
   const response = await fetch(url, { headers: { Accept: "application/json", "User-Agent": "RCC-Roblox-Trends/1.0" }, signal: timeout() });
