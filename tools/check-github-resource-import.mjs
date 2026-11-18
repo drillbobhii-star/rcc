@@ -40,4 +40,17 @@ assert.match(entry.source_url, /^https:\/\/github\.com\//);
 assert.match(entry.code, /Abrir código original/);
 assert.equal(entry.compatibility.verification, 'source-linked');
 
+const licensed = makeEntry(
+  roblox,
+  repo('demo/roblox-luau', 'Roblox Luau Studio modules', ['roblox','luau']),
+  file('src/Inventory.luau'),
+  '2026-11-17T00:00:00.000Z',
+  { content: 'local Inventory = {}\\nreturn Inventory', licenseText: 'MIT License\\nPermission is hereby granted, free of charge, to any person obtaining a copy.', spdx: 'MIT' }
+);
+assert.equal(licensed.source_only, false);
+assert.equal(licensed.level, 'free');
+assert(licensed.code.includes('SPDX-License-Identifier: MIT'));
+assert(licensed.code.includes('Permission is hereby granted'));
+assert(licensed.code.includes('https://github.com/demo/roblox-luau/'));
+
 console.log('GitHub resource importer checks passed.');
