@@ -7,8 +7,8 @@ const TOKEN = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '';
 const WAIT = ms => new Promise(resolve => setTimeout(resolve, ms));
 const PER_PAGE = 100;
 const CONCURRENCY = 4;
-const DENIED = /\\b(stealer|keylogger|ransomware|phishing|credential.?theft|cookie.?logger|token.?logger|backdoor|malware|rat)\\b/i;
-const SKIP_PATH = /(^|\\/)(node_modules|vendor|dist|build|coverage|\\.git|\\.next|\\.venv|target|bin|obj)(\\/|$)|(^|\\/)\\.github\\//i;
+const DENIED = /\b(stealer|keylogger|ransomware|phishing|credential.?theft|cookie.?logger|token.?logger|backdoor|malware|rat)\b/i;
+const SKIP_PATH = /(^|\/)(node_modules|vendor|dist|build|coverage|\.git|\.next|\.venv|target|bin|obj)(\/|$)|(^|\/)\.github\//i;
 const BAD_FILE = /(^|[._-])(min|bundle|vendor|polyfill|lock|test|spec|mock|fixture|generated)([._-]|$)/i;
 
 const CATEGORIES = [
@@ -18,7 +18,7 @@ const CATEGORIES = [
     queries: ['topic:roblox topic:luau fork:false archived:false'],
     extensions: ['.lua', '.luau'], maxRepos: 100, maxEntries: 2500,
     allowRepo: /roblox|luau|studio|game.?dev|fusion|module|library/i,
-    denyRepo: /\\b(exploit|executor|deobfuscat|decompil|saveinstance|cheat|hack|bypass|stealer)\\b/i
+    denyRepo: /\b(exploit|executor|deobfuscat|decompil|saveinstance|cheat|hack|bypass|stealer)\b/i
   },
   {
     key: 'fivem', platform: 'fivem', section: 'fivem', game: 'FiveM',
@@ -26,7 +26,7 @@ const CATEGORIES = [
     queries: ['topic:fivem fork:false archived:false', 'topic:qbcore fork:false archived:false', 'topic:esx-framework fork:false archived:false'],
     extensions: ['.lua', '.js', '.mjs', '.cs'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /fivem|fxserver|qbcore|qbox|esx|redm|gta.?v|resource/i,
-    denyRepo: /\\b(stealer|backdoor|malware|rat|token.?logger|credential.?theft)\\b/i
+    denyRepo: /\b(stealer|backdoor|malware|rat|token.?logger|credential.?theft)\b/i
   },
   {
     key: 'gameguardian', platform: 'gameguardian', section: 'games', game: 'GameGuardian',
@@ -34,7 +34,7 @@ const CATEGORIES = [
     queries: ['topic:gameguardian language:Lua fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /template|example|tutorial|documentation|reference|library|helper|api|sample/i,
-    denyRepo: /\\b(cheat|hack|bypass|anti.?ban|offset|mod.?menu|speed.?hack|aimbot|wallhack|stealer|backdoor)\\b/i
+    denyRepo: /\b(cheat|hack|bypass|anti.?ban|offset|mod.?menu|speed.?hack|aimbot|wallhack|stealer|backdoor)\b/i
   },
   {
     key: 'autotouch', platform: 'autotouch', section: 'all', game: 'AutoTouch',
@@ -42,7 +42,7 @@ const CATEGORIES = [
     queries: ['topic:autotouch language:Lua fork:false archived:false', 'autotouch automation language:Lua fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /autotouch|auto.?touch|ios|automation|script|example|template/i,
-    denyRepo: /\\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\\b/i
+    denyRepo: /\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\b/i
   },
   {
     key: 'web', platform: 'web', section: 'web', game: 'JavaScript / Web',
@@ -50,7 +50,7 @@ const CATEGORIES = [
     queries: ['topic:userscript language:JavaScript fork:false archived:false', 'topic:userscripts language:JavaScript fork:false archived:false', 'topic:javascript-snippets language:JavaScript fork:false archived:false'],
     extensions: ['.js', '.mjs', '.user.js', '.ts'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /userscript|javascript|typescript|browser|web|extension|snippet|frontend|automation/i,
-    denyRepo: /\\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|paywall.?bypass)\\b/i
+    denyRepo: /\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|paywall.?bypass)\b/i
   },
   {
     key: 'java', platform: 'java', section: 'java', game: 'Java · JDK 17+',
@@ -58,7 +58,7 @@ const CATEGORIES = [
     queries: ['language:Java topic:examples fork:false archived:false', 'topic:java-examples language:Java fork:false archived:false'],
     extensions: ['.java'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /java|examples|samples|tutorial|cookbook|learning|guide/i,
-    denyRepo: /\\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\\b/i
+    denyRepo: /\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\b/i
   },
   {
     key: 'universal', platform: 'universal', section: 'all', game: 'Universal',
@@ -66,12 +66,12 @@ const CATEGORIES = [
     queries: ['language:Lua topic:lua fork:false archived:false', 'language:Python topic:python-scripts fork:false archived:false', 'language:Shell topic:shell-scripts fork:false archived:false', 'language:PowerShell topic:powershell fork:false archived:false'],
     extensions: ['.lua', '.py', '.sh', '.ps1', '.bat'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /script|automation|utility|tool|example|sample|cli|library|lua|python|shell|powershell/i,
-    denyRepo: /\\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|ransomware)\\b/i
+    denyRepo: /\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|ransomware)\b/i
   }
 ];
 
 function clean(value, max = 260) {
-  return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, max);
+  return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 }
 function categoryText(category, repo) {
   return [repo.full_name, repo.name, repo.description, ...(repo.topics || [])].join(' ');
@@ -90,7 +90,7 @@ function fileAllowed(category, repo, file) {
   if (DENIED.test(text) || category.denyRepo.test(text)) return false;
   if (category.allowRepo && !category.allowRepo.test(categoryText(category, repo))) return false;
   if (category.key === 'gameguardian' && !/(template|example|tutorial|documentation|reference|library|helper|api|sample)/i.test(text)) return false;
-  if (category.key === 'roblox' && /(^|\\/)(executor|exploit|cheat|deobfuscator|decompiler)(\\/|$)/i.test(file.path)) return false;
+  if (category.key === 'roblox' && /(^|\/)(executor|exploit|cheat|deobfuscator|decompiler)(\/|$)/i.test(file.path)) return false;
   return true;
 }
 function makeEntry(category, repo, file, checkedAt) {
