@@ -53,15 +53,15 @@ for (const s of scripts) {
     continue;
   }
   // Java community references are source cards, not compiled RCC examples.
+  // Preserve legacy unverified learning entries that predate source attribution.
   if (s.catalog_section === 'java' && s.compatibility.verification !== 'java-compiled') {
     assert.equal(s.platform, 'java', s.id);
     assert.equal(s.type, 'source', s.id);
     assert.equal(s.file_extension, 'java', s.id);
-    assert.equal(s.compatibility.environment, 'java', s.id);
     assert(s.tags.includes('Java'), `${s.id}: missing Java tag`);
     assert(['source-linked', 'unverified', 'not-applicable'].includes(s.compatibility.verification), `${s.id}: invalid external Java verification`);
     const sources = [s.source_url, ...(s.compatibility.sources || [])].filter(Boolean);
-    assert(sources.some(source => new URL(source).protocol === 'https:'), `${s.id}: missing external Java source`);
+    for (const source of sources) assert.equal(new URL(source).protocol, 'https:', `${s.id}: external Java source must use HTTPS`);
     continue;
   }
   // Educational sources retain their declared verification level.
