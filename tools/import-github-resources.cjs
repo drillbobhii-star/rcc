@@ -16,7 +16,7 @@ const BAD_FILE = /(^|[._-])(min|bundle|vendor|polyfill|lock|test|spec|mock|fixtu
 
 const CATEGORIES = [
   {
-    key: 'roblox', platform: 'roblox', section: 'games', game: 'Roblox',
+    key: 'roblox', platform: 'roblox', section: 'studio', game: 'Roblox Studio',
     label: 'Roblox / Luau', runtime: 'Luau · Roblox Studio',
     queries: ['topic:roblox topic:luau fork:false archived:false', 'topic:roblox-scripts fork:false archived:false', 'topic:roblox-studio fork:false archived:false', 'topic:roblox-game fork:false archived:false', 'topic:luau fork:false archived:false', 'org:Roblox language:Luau fork:false archived:false', 'topic:roblox language:Lua fork:false archived:false', 'Roblox Luau modules libraries examples fork:false archived:false'],
     extensions: ['.lua', '.luau'], maxRepos: 160, maxEntries: 4000,
