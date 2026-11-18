@@ -24,6 +24,8 @@ assert.ok(!html.includes('id="rcc-maintenance"') && !html.includes("rm-hours") &
 assert.ok(notifications.includes("right:max(16px") && notifications.includes("top:max(16px"), "Notification bell must be top-right");
 assert.ok(profileUi.includes("from('rcc_public_profiles')"), "Profile directory must use privacy-safe view");
 assert.ok(profileUi.includes("range(suggestionPage*20,suggestionPage*20+19)"), "Profile suggestions must paginate beyond the first 20");
+assert.ok(profileUi.includes("range(page*48,page*48+47)"), "Profile directory pagination must not overlap records");
+assert.ok(profileUi.includes("range(quickPage*8,quickPage*8+7)"), "Quick profile suggestions must not overlap records");
 assert.ok(privacyMigration.includes("case when show_roblox then roblox_username else null end"), "Privacy view must mask Roblox usernames when opted out");
 assert.ok(privacyMigration.includes("security_invoker = true"), "Privacy view must preserve RLS");
 console.log("RCC Roblox trends, catalog, maintenance and profile privacy checks passed.");
