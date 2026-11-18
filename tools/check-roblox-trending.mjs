@@ -15,6 +15,10 @@ for (const value of ["https://apis.roblox.com/explore-api/v1", "/get-sorts?", "/
 assert.ok(api.includes("Math.ceil(ids.length / 10)") && api.includes("ids.slice(index * 10, index * 10 + 10)"), "Roblox Games API requests must use batches of at most 10 IDs");
 for (const value of ["/api/roblox-trending", "game.url", "validUrl", "noopener noreferrer", "studioTab"]) assert.ok(ui.includes(value), "Missing trends UI behavior: " + value);
 assert.ok(!ui.includes("openGameScripts") && !ui.includes("Ver scripts de "), "Trend cards must link to Roblox experiences, not RCC script listings");
+assert.ok(ui.includes('section("all", { view: "trending" })'), "Opening Tendencias must activate RCC's real trending catalog view");
+assert.ok(ui.includes("window.loadTrends?.()"), "Opening Tendencias must load RCC's Lua/script activity ranking");
+assert.ok(ui.includes("Keep RCC's own catalog ranking visible"), "Roblox games and RCC Lua resources must remain visible together");
+assert.ok(!ui.includes('const hiddenTargets = ["catalogNews", "codeCompare", "activeFilters", "scripts"'), "Tendencias must not hide the RCC scripts catalog");
 assert.ok(!ui.includes("Math.random") && !ui.includes("copias estimadas") && !ui.includes("descargas estimadas"), "Trends must not fabricate metrics");
 assert.ok(styles.includes(".rcc-trend-game"), "Missing trends card styles");
 assert.ok(html.includes("assets/roblox-trends.js"), "Trends script is not loaded");
