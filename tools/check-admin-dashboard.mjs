@@ -16,7 +16,7 @@ assert.match(client, /window\.location\.replace\("\/index\.html"\)/);
 assert.match(client, /setInterval\(\(\) => \{ void loadDashboard\(true\); \}, 30000\)/);
 assert.match(client, /user\.email, user\.user_id, user\.discord_id/);
 assert.doesNotMatch(client, /approvePayment|forceRole|VIP|is_vip/);
-assert.match(client, /forceRole/);
+assert.doesNotMatch(client, /forceRole/);
 assert.match(client, /unlinkDiscord/);
 assert.doesNotMatch(html + client, /SUPABASE_SERVICE_ROLE_KEY|RCC_VIP_WEBHOOK_SECRET/);
 assert.match(api, /const ADMIN_EMAIL = "drillbobhii@gmail\.com"/);
