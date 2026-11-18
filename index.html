@@ -1110,7 +1110,8 @@ function openScript(s){
   const sourceCandidate = s.source_url || s.compatibility?.sources?.find(value => typeof value === 'string' && value.startsWith('https://')) || s.review?.source || '';
   let sourceHref = '';
   try { const candidate = new URL(sourceCandidate); if (candidate.protocol === 'https:' && !candidate.username && !candidate.password) sourceHref = candidate.href; } catch {}
-  const sourceOnly = s.source_only === true && Boolean(sourceHref);\n  const canOpenSource = sourceOnly && Boolean(currentUser);
+  const sourceOnly = s.source_only === true && Boolean(sourceHref);
+  const canOpenSource = sourceOnly && Boolean(currentUser);
   
   modalTitle.innerHTML = `${isLoadstring ? '🔗' : '📝'} ${escapeHTML(s.name)} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${escapeHTML(s.version)}</span>`;
   modalBody.innerHTML = `
