@@ -58,7 +58,8 @@
       status.textContent = "RCC todavía no tiene scripts registrados para " + name + ".";
       return;
     }
-    showTrends(false); tab.setAttribute("aria-pressed", "false");\n    window.RCCNavigation.section("games");
+    showTrends(false); tab.setAttribute("aria-pressed", "false");
+    window.RCCNavigation.section("games");
     filter.value = option.value;
     filter.dispatchEvent(new Event("change", { bubbles: true }));
     document.getElementById("catalogHeading")?.scrollIntoView({ behavior: "instant", block: "start" });
