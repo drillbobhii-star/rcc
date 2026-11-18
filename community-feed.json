@@ -18,6 +18,19 @@
   },
   "news": [
     {
+      "id": "rcc:seven-catalog-source-index:2026-11-17",
+      "kind": "news",
+      "source": "RCC · Catálogos",
+      "title": "Ampliación del descubrimiento para siete catálogos",
+      "game": "Roblox · FiveM · GameGuardian · AutoTouch · JavaScript/Web · Java · Universal",
+      "creator": "RCC",
+      "createdAt": "2026-11-17T23:50:00.000Z",
+      "description": "RCC prepara un índice ampliado para siete áreas de catálogo. Se añaden descubrimientos de archivos fuente públicos, código con licencia permisiva y texto de licencia conservado, además de metadatos JavaScript de la API pública de Greasy Fork. Las fichas externas abren el original; no se copia ni ejecuta código sin permiso. GameGuardian se limita a plantillas y documentación de aprendizaje.",
+      "url": "https://github.com/drillbobhii-star/rcc/pull/122",
+      "status": "En desarrollo",
+      "codeIncluded": false
+    },
+    {
       "id": "rcc:fivem-discovery-directories:2026-11-17",
       "kind": "news",
       "source": "RCC · FiveM",

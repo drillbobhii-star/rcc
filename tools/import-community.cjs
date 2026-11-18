@@ -113,7 +113,7 @@ async function main() {
       const createdAt = dateOnly(item.createdAt);
       const isKeyed = item.key === true;
       const universal = item.isUniversal === true;
-      const tags = ['Juegos', 'Comunidad', 'ScriptBlox', isKeyed ? 'Con clave' : 'Sin clave'];
+      const tags = ['RCC', 'Juegos', 'Comunidad', isKeyed ? 'Con clave' : 'Sin clave'];
       if (universal) tags.push('Universal');
       if (item.verified === true) tags.push('Fuente declara verificado');
 
@@ -149,7 +149,7 @@ async function main() {
         compatibility: {
           environment: 'client',
           runtime: 'Roblox · ejecutor externo',
-          context: 'Publicación pública de ScriptBlox; el catálogo conserva sus metadatos y el enlace original.',
+          context: 'Publicación pública externa; el catálogo conserva sus metadatos y el enlace original.',
           requirements: 'Requiere un ejecutor compatible con loadstring y game:HttpGet. Revisa la publicación y el contenido remoto antes de ejecutarlo.',
           verification: 'unverified',
           test_details: 'Metadatos consultados el ' + checkedAt.slice(0, 10) + '. RCC no descargó ni ejecutó el código remoto.',

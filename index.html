@@ -402,7 +402,7 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
-<script src="assets/assistant-guide.js?v=3" defer></script>
+<script src="assets/assistant-guide.js?v=5" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -1045,7 +1045,7 @@ function render(reset = true){
     card.innerHTML = `
       <div class="card-top">
         <div class="badges">
-          <span class="badge free">GRATIS</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
+          <span class="badge ${s.level==='external'?'release-badge':'free'}">${s.level==='external'?'FICHA EXTERNA':'GRATIS'}</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
           <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
           ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
         </div>
@@ -1064,7 +1064,7 @@ function render(reset = true){
         <span>${plat ? plat.name : 'Lua'} · ${(s.created_at||'').slice(0,7)}</span>
         <span class="ver">v${escapeHTML(s.version)}</span>
       </div>
-      <button class="card-action">${isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗'}</button>
+      <button class="card-action">${s.source_only ? 'Abrir recurso original ↗' : (isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗')}</button>
     `;
     if(releaseView==='trending'){
       const forecast=window.RCCTrendAnalysis.analyze(s);
@@ -1107,12 +1107,17 @@ function openScript(s){
   window.rccRequiresLogin = window.rccCodeLocked?.(s) || false;
   const plat = PLATFORMS.find(p=>p.id===s.platform);
   const isLoadstring = s.type === 'loadstring';
+  const sourceCandidate = s.source_url || s.compatibility?.sources?.find(value => typeof value === 'string' && value.startsWith('https://')) || s.review?.source || '';
+  let sourceHref = '';
+  try { const candidate = new URL(sourceCandidate); if (candidate.protocol === 'https:' && !candidate.username && !candidate.password) sourceHref = candidate.href; } catch {}
+  const sourceOnly = s.source_only === true && Boolean(sourceHref);
+  const canOpenSource = sourceOnly && Boolean(currentUser);
   
   modalTitle.innerHTML = `${isLoadstring ? '🔗' : '📝'} ${escapeHTML(s.name)} <span style="color:var(--muted);font-size:.85rem; font-weight: 500;">v${escapeHTML(s.version)}</span>`;
   modalBody.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="badge ${s.device}">${DEVICE_ICON[s.device]} ${DEVICE_LABEL[s.device]}</span>
-      <span class="badge free">GRATIS</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
+      <span class="badge ${s.level==='external'?'release-badge':'free'}">${s.level==='external'?'FICHA EXTERNA':'GRATIS'}</span>${s.release ? `<span class="badge release-badge">${s.release.kind==='new'?'NUEVO':'ACTUALIZADO'} · 1.7</span>` : ''}
       ${isLoadstring ? '<span class="badge loadstring">🔗 LOADSTRING</span>' : ''}
       ${plat?`<span class="badge" style="background:rgba(255,255,255,.1);color:#fff; border:1px solid rgba(255,255,255,.2)">${plat.icon} ${plat.name}</span>`:''}
     </div>
@@ -1123,20 +1128,19 @@ function openScript(s){
     </div>
     ${executorWarning(s)}
     <section class="compat-detail" id="compatDetail" aria-label="Requisitos de ejecución"></section>
-    <pre class="notranslate" translate="no"><code id="modalCode"></code></pre>
+    <pre class="notranslate" translate="no" ${sourceOnly ? 'hidden' : ''}><code id="modalCode"></code></pre>
     <div class="actions">
-      <button id="scriptCopyBtn" class="btn btn-primary" onclick="copyCode()">Copiar código</button>
-      <button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>
+      ${sourceOnly ? (canOpenSource ? `<a class="btn btn-primary" href="${escapeHTML(sourceHref)}" target="_blank" rel="noopener noreferrer">Abrir código original ↗</a>` : `<button class="btn btn-primary" type="button" onclick="openAuth()">Inicia sesión para abrir el original</button>`) : `<button id="scriptCopyBtn" class="btn btn-primary" onclick="copyCode()">Copiar código</button><button class="btn btn-ghost" onclick="downloadCurrent()">Descargar .${s.file_extension || 'lua'}</button>`}
       <button class="btn btn-ghost" onclick="shareCurrent()">Copiar enlace</button>
       <button class="btn btn-ghost" id="voteBtn" type="button">👍 Me gusta</button>
       <a class="btn btn-ghost" href="soporte.html?script=${encodeURIComponent(s.id)}#reportar">Notificar error</a>
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
     </div>
   `;
-  document.getElementById('modalCode').textContent = window.rccRequiresLogin && !currentUser ? '-- Inicia sesión o regístrate para ver este código.' : s.code;
+  document.getElementById('modalCode').textContent = sourceOnly ? '-- Este registro apunta al archivo original. Usa «Abrir código original» para consultarlo.' : (window.rccRequiresLogin && !currentUser ? '-- Inicia sesión o regístrate para ver este código.' : s.code);
   window.rccApplyCodeGate?.(s);
   window.enhanceGameDetail?.(s, modalBody);
-  const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => {if(window.rccRequiresLogin && !currentUser){openAuth();return;}window.openRccLab?.(s.code);}; modalBody.querySelector('.actions').prepend(explain);
+  if (!sourceOnly) { const explain = document.createElement('button'); explain.className = 'btn btn-ghost'; explain.textContent = '¿Qué hace este código?'; explain.onclick = () => {if(window.rccRequiresLogin && !currentUser){openAuth();return;}window.openRccLab?.(s.code);}; modalBody.querySelector('.actions').prepend(explain); }
   if(s.release){const note=document.createElement('section');note.className='release-note';const title=document.createElement('h4');title.textContent=s.release.changes.length?(s.release.kind==='new'?'Nuevo en':'Actualizado en')+' RCC 1.7 · '+s.release.date:s.release.date;note.append(title);for(const change of s.release.changes){const p=document.createElement('p');p.textContent=change;note.append(p);}modalBody.prepend(note);}
   window.RCCScriptReview?.detail(s, modalBody);
   window.rccMountComments?.(String(s.id));
@@ -1675,7 +1679,7 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 </div>
 
 <script src="assets/vip-membership.js?v=2"></script>
-<script src="assets/rcc-assistant.js?v=3" defer></script>
+<script src="assets/rcc-assistant.js?v=4" defer></script>
 <script src="assets/chat-widget.js?v=1"></script>
 <script src="assets/community-feed.js?v=2"></script>
 </body>
