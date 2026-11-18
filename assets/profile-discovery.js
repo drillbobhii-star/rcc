@@ -26,7 +26,7 @@
     if(!append){quickPage=0;suggestedProfiles=[];}quickLoading=true;quickHasMore=false;renderQuickSuggestions();
     try{
       const sb=await window.rccSupabaseReady;
-      const {data,error}=await matchingQuery(sb).range(quickPage*8,quickPage*8+8).abortSignal(AbortSignal.any([quickController.signal,AbortSignal.timeout(10000)]));
+      const {data,error}=await matchingQuery(sb).range(quickPage*8,quickPage*8+7).abortSignal(AbortSignal.any([quickController.signal,AbortSignal.timeout(10000)]));
       if(rev!==quickRevision)return;if(error)throw error;
       quickHasMore=(data||[]).length>8;suggestedProfiles.push(...(data||[]).slice(0,8));quickPage++;quickLoading=false;renderQuickSuggestions();
     }catch{if(rev===quickRevision){quickLoading=false;quickBox.replaceChildren(make('div','No se pudieron cargar los nombres.','wb-profile-suggestion-empty'));const retry=make('button','Reintentar','social-retry');retry.type='button';retry.onclick=()=>loadQuickSuggestions();quickBox.append(retry);}}
@@ -64,12 +64,12 @@
         if(!saved.size){box.replaceChildren();status.textContent='Todavía no guardaste perfiles.';return;}
         q=q.in('user_id',[...saved]);
       }
-      const {data,error}=await q.range(page*48,page*48+48).abortSignal(AbortSignal.any([signal,AbortSignal.timeout(12000)]));
+      const {data,error}=await q.range(page*48,page*48+47).abortSignal(AbortSignal.any([signal,AbortSignal.timeout(12000)]));
       if(rev!==revision)return;if(error)throw error;
       const profiles=(data||[]).slice(0,48);if(!append)box.replaceChildren();box.append(...profiles.map(p=>profileCard(p)));page++;
       more.hidden=(data||[]).length<=48;
       status.textContent=box.children.length?'Usuarios registrados · '+box.children.length+(more.hidden?'':' · Hay más perfiles disponibles'):'No encontramos personas con esos filtros.';
-    }catch{if(rev===revision){if(!append)box.replaceChildren();else{more.hidden=false;more.textContent='Reintentar cargar más perfiles';}status.textContent='No se pudieron cargar los perfiles. Pulsa Actualizar para reintentar.';}}
+    }catch(error){if(rev===revision){if(!append)box.replaceChildren();else{more.hidden=false;more.textContent='Reintentar cargar más perfiles';}const missingView=error?.code==='PGRST205'||/rcc_public_profiles|schema cache|does not exist/i.test(error?.message||'');status.textContent=missingView?'Falta aplicar en Supabase la migración 20261118150000_secure_public_profile_directory.sql. Después pulsa Actualizar.':'No se pudieron cargar los perfiles. Pulsa Actualizar para reintentar.';}}
     finally{if(rev===revision){box.setAttribute('aria-busy','false');more.disabled=false;}}
   }
   let suggestionPage=0;
@@ -101,7 +101,7 @@
         if(!append)target.replaceChildren();
         const retry=make('button',append?'Reintentar sugerencias':'Reintentar sugerencias','social-retry');
         retry.type='button';retry.onclick=()=>suggestions(append);target.append(retry);
-        message.textContent='Las sugerencias no están disponibles en este momento.';
+        const missingView=error?.code==='PGRST205'||/rcc_public_profiles|schema cache|does not exist/i.test(error?.message||'');message.textContent=missingView?'Falta aplicar la migración de directorio público en Supabase.':'Las sugerencias no están disponibles en este momento.';
       }
     }finally{if(rev===suggestionsRevision)target.setAttribute('aria-busy','false');}
   }
