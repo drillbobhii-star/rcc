@@ -15,19 +15,10 @@
   const refresh = panel.querySelector("[data-refresh]");
   const format = new Intl.NumberFormat("es");
   let request = null, lastItems = [], updatedAt = null;
-  const hiddenTargets = ["catalogNews", "codeCompare", "activeFilters", "scripts", "loadMore", "resultCount"];
-  const savedDisplay = new Map();
   function showTrends(on) {
+    // Keep RCC's own catalog ranking visible below Roblox's live popular games.
+    // release17.js uses this view to render trending Lua/scripts by real RCC activity.
     panel.hidden = !on;
-    for (const id of hiddenTargets) {
-      const node = document.getElementById(id);
-      if (!node) continue;
-      if (on) { if (!savedDisplay.has(id)) savedDisplay.set(id, node.hidden); node.hidden = true; }
-      else if (savedDisplay.has(id)) { node.hidden = savedDisplay.get(id); savedDisplay.delete(id); }
-    }
-    document.querySelector(".catalog-tools")?.toggleAttribute("hidden", on);
-    document.querySelector(".compat-note")?.toggleAttribute("hidden", on);
-    document.querySelector(".rcc-safety-notices")?.toggleAttribute("hidden", on);
   }
   function render(items) {
     cards.replaceChildren();
@@ -73,12 +64,11 @@
   }
   tab.textContent = "Tendencias";
   tab.onclick = () => {
-    window.RCCNavigation?.section("all");
+    window.RCCNavigation?.section("all", { view: "trending" });
+    window.loadTrends?.();
     showTrends(true);
-    tab.setAttribute("aria-pressed", "true");
-    for (const id of ["libraryTab","gamesTab","webTab","javaTab","fivemTab"]) document.getElementById(id)?.setAttribute("aria-pressed","false");
-    document.getElementById("heroTitle").textContent = "Tendencias de Roblox";
-    document.getElementById("heroSubtitle").textContent = "Los juegos más jugados ahora mismo, con datos públicos de Roblox.";
+    document.getElementById("heroTitle").textContent = "Juegos populares y recursos Lua";
+    document.getElementById("heroSubtitle").textContent = "Juegos populares de Roblox y scripts o recursos Lua destacados por actividad real en RCC.";
     load();
   };
   for (const id of ["libraryTab","gamesTab","studioTab","studioNav","webTab","javaTab","fivemTab","favoritesBtn","recentBtn","gamesNav","webNav","javaNav","fivemNav"]) {
