@@ -23,8 +23,14 @@ for (const item of library) {
     compatibility: { environment: 'java', runtime: 'Java 17+ / JDK', context: 'Guarda el contenido como Main.java. Compila con javac Main.java y ejecútalo con java Main.', requirements: 'JDK 17 o compatible. Solo bibliotecas estándar; sin claves, red ni dependencias externas.', verification: 'java-compiled', executor_status: 'not-applicable', test_details: 'Compilado y ejecutado automáticamente con JDK 17 en las comprobaciones de RCC. No es código Lua/Luau ni se ejecuta dentro de Roblox.', mobile_status: 'Requiere una JVM/JDK compatible; no se ha probado en dispositivos Android o iOS.', sources: ['https://dev.java/learn/', 'https://docs.oracle.com/en/java/javase/17/docs/api/'] }
   };
   const existingIndex = catalog.findIndex(current => current.id === item.id);
-  if (existingIndex >= 0) catalog[existingIndex] = { ...catalog[existingIndex], ...entry };
-  else catalog.push(entry);
+  if (existingIndex >= 0) {
+    const existing = catalog[existingIndex];
+    // Rebuilding Java source must never silently downgrade existing RCC Supporter access.
+    // Preserve all existing tags (including the Supporter entitlement) and the access level.
+    entry.level = existing.level || entry.level;
+    entry.tags = [...new Set([...(Array.isArray(existing.tags) ? existing.tags : []), ...entry.tags])];
+    catalog[existingIndex] = { ...existing, ...entry };
+  } else catalog.push(entry);
   ids.add(item.id);
 }
 writeCatalog(catalog);
