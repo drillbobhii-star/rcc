@@ -124,7 +124,7 @@ function makeEntry(platform,repo,file,code,checkedAt) {
     code:codeHeader+'RCC · '+p.label+' · '+attribution+'\n'+code,
     ...(p.section?{catalog_section:p.section}:{}),
     source_only:false,
-    review:{provider:'GitHub',source,checkedAt:checkedAt.slice(0,10),status:'license-checked',license:license.toUpperCase(),repository:repo.full_name,stars:repo.stargazers_count||0,riskAssessment:'Filtro estático básico; no equivale a auditoría de seguridad.'},
+    review:{provider:'GitHub',source,checkedAt:checkedAt.slice(0,10),sourceUpdatedAt:repo.pushed_at||repo.updated_at||checkedAt,importedAt:checkedAt,status:'license-checked',license:license.toUpperCase(),repository:repo.full_name,stars:repo.stargazers_count||0,riskAssessment:'Filtro estático básico; no equivale a auditoría de seguridad.'},
     compatibility:{
       environment:platform==='fivem'?'server':platform==='web'?'browser':platform==='java'?'jvm':platform==='roblox'?'studio':platform,
       runtime:p.runtime,context:'Archivo público seleccionado de un repositorio con licencia permisiva declarada.',
