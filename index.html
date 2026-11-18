@@ -1776,7 +1776,7 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
    const supabase = await window.rccSupabaseReady;
    const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.rccAuthRedirect || window.location.origin }
+    options: { redirectTo: window.rccAuthRedirect || window.location.origin, queryParams: { prompt: 'select_account' } }
    });
    if (error) throw error;
   } catch {
