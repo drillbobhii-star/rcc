@@ -1714,12 +1714,10 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
    <div class="rm-unit"><span class="rm-num" id="rm-seconds">00</span><span class="rm-label">SEGUNDOS</span></div>
   </div>
   <p>Estamos trabajando para ofrecerte una mejor experiencia.</p>
-  <form class="rm-login" id="rm-login">
-   <label for="rm-email">Acceso de administrador (visual)</label>
-   <input id="rm-email" type="email" autocomplete="username" placeholder="Correo electrónico" required>
-   <button type="submit">Iniciar sesión</button>
-   <div class="rm-status" id="rm-status" role="status">Acceso visual reservado al administrador.</div>
-  </form>
+  <div class="rm-login">
+   <button type="button" id="rm-google-login">Continuar con Google</button>
+   <div class="rm-status" id="rm-status" role="status">Inicia sesión con tu cuenta de Google para continuar.</div>
+  </div>
  </div>
 </section>
 <script>
@@ -1741,12 +1739,12 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
   if(left<=0){screen.hidden=true;clearInterval(clock);}
  }
  const clock=setInterval(tick,250);tick();
- $('rm-login').addEventListener('submit',event=>{
-  event.preventDefault();
-  const email=$('rm-email').value.trim().toLowerCase();
-  $('rm-status').textContent=email==='drillbobhii@gmail.com'
-   ?'Identidad visual reconocida. Este acceso no autentica ni protege datos.'
-   :'Acceso visual no disponible para esta cuenta.';
+ $('rm-google-login').addEventListener('click',()=>{
+  // Reuse RCC's existing Supabase Google OAuth flow; this is real account sign-in.
+  screen.hidden=true;
+  if(typeof window.openAuth==='function') window.openAuth();
+  else document.getElementById('loginBtn')?.click();
+  setTimeout(()=>document.getElementById('googleLoginBtn')?.click(),150);
  });
  // Solicita una comprobación de actualización del service worker y avisa a visitantes con versión anterior.
  if('serviceWorker' in navigator){
