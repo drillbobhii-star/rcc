@@ -48,8 +48,9 @@ for (const s of scripts) {
     assert(s.code.includes('SPDX-License-Identifier: '+s.license),s.id);
     assert.equal(crypto.createHash('sha256').update(sourceBody(s.code).replace(/\r\n/g,'\n').trim()).digest('hex'),s.source_code_sha256,s.id);
     assert(!newCode.has(s.source_code_sha256),'Duplicate imported source: '+s.id);newCode.add(s.source_code_sha256);
-    const platforms={java:'java',web:'web',roblox:'games',fivem:'fivem',universal:'all'};
-    assert.equal(s.catalog_section,platforms[s.platform],s.id);
+    const platforms={java:'java',web:'web',roblox:'studio',fivem:'fivem',universal:'all'};
+    const legacyRobloxStudio=s.platform==='roblox'&&s.catalog_section==='games';
+    assert(s.catalog_section===platforms[s.platform]||legacyRobloxStudio,`${s.id}: unexpected source section`);
     continue;
   }
   // Java community references are source cards, not compiled RCC examples.
