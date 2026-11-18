@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 const { readCatalog } = require('./catalog-store.cjs');
 const rows = readCatalog();
 assert(rows.length > 0);
