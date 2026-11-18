@@ -18,7 +18,7 @@ const CATEGORIES = [
   {
     key: 'roblox', platform: 'roblox', section: 'games', game: 'Roblox',
     label: 'Roblox / Luau', runtime: 'Luau · Roblox Studio',
-    queries: ['topic:roblox topic:luau fork:false archived:false'],
+    queries: ['topic:roblox topic:luau fork:false archived:false', 'org:Roblox language:Luau fork:false archived:false', 'topic:roblox language:Lua fork:false archived:false'],
     extensions: ['.lua', '.luau'], maxRepos: 100, maxEntries: 2500,
     allowRepo: /roblox|luau|studio|game.?dev|fusion|module|library/i,
     denyRepo: /\b(exploit|executor|deobfuscat|decompil|saveinstance|cheat|hack|bypass|stealer)\b/i
@@ -26,7 +26,7 @@ const CATEGORIES = [
   {
     key: 'fivem', platform: 'fivem', section: 'fivem', game: 'FiveM',
     label: 'FiveM', runtime: 'FiveM / FXServer',
-    queries: ['topic:fivem fork:false archived:false', 'topic:qbcore fork:false archived:false', 'topic:esx-framework fork:false archived:false'],
+    queries: ['topic:fivem fork:false archived:false', 'topic:qbcore fork:false archived:false', 'topic:esx-framework fork:false archived:false', 'topic:qbox fork:false archived:false', 'language:Lua topic:fivem fork:false archived:false', 'language:JavaScript topic:fivem fork:false archived:false', 'language:C# topic:fivem fork:false archived:false'],
     extensions: ['.lua', '.js', '.mjs', '.cs'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /fivem|fxserver|qbcore|qbox|esx|redm|gta.?v|resource/i,
     denyRepo: /\b(stealer|backdoor|malware|rat|token.?logger|credential.?theft)\b/i
@@ -34,7 +34,7 @@ const CATEGORIES = [
   {
     key: 'gameguardian', platform: 'gameguardian', section: 'games', game: 'GameGuardian',
     label: 'GameGuardian · plantillas y aprendizaje', runtime: 'GameGuardian · Lua',
-    queries: ['topic:gameguardian language:Lua fork:false archived:false', 'GameGuardian Lua tutorial fork:false archived:false', 'GameGuardian Lua example fork:false archived:false'],
+    queries: ['topic:gameguardian language:Lua fork:false archived:false', 'GameGuardian Lua tutorial fork:false archived:false', 'GameGuardian Lua example fork:false archived:false', 'GameGuardian script template language:Lua fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /script|template|example|tutorial|documentation|reference|library|helper|api|sample/i,
     denyRepo: /\b(cheat|hack|bypass|anti.?ban|offset|mod.?menu|speed.?hack|aimbot|wallhack|stealer|backdoor)\b/i
@@ -42,7 +42,7 @@ const CATEGORIES = [
   {
     key: 'autotouch', platform: 'autotouch', section: 'all', game: 'AutoTouch',
     label: 'AutoTouch · automatización iOS', runtime: 'AutoTouch · Lua · iOS',
-    queries: ['topic:autotouch language:Lua fork:false archived:false', 'autotouch automation language:Lua fork:false archived:false'],
+    queries: ['topic:autotouch language:Lua fork:false archived:false', 'autotouch automation language:Lua fork:false archived:false', 'AutoTouch iOS Lua examples fork:false archived:false'],
     extensions: ['.lua'], maxRepos: 35, maxEntries: 300,
     allowRepo: /autotouch|auto.?touch|ios|automation|script|example|template/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|token.?logger|backdoor|malware)\b/i
@@ -50,7 +50,7 @@ const CATEGORIES = [
   {
     key: 'web', platform: 'web', section: 'web', game: 'JavaScript / Web',
     label: 'JavaScript / Web', runtime: 'JavaScript · navegador / Node.js',
-    queries: ['topic:userscript language:JavaScript fork:false archived:false', 'topic:userscripts language:JavaScript fork:false archived:false', 'topic:javascript-snippets language:JavaScript fork:false archived:false'],
+    queries: ['topic:userscript language:JavaScript fork:false archived:false', 'topic:userscripts language:JavaScript fork:false archived:false', 'topic:javascript-snippets language:JavaScript fork:false archived:false', 'topic:violentmonkey language:JavaScript fork:false archived:false', 'topic:tampermonkey language:JavaScript fork:false archived:false'],
     extensions: ['.js', '.mjs', '.user.js', '.ts'], maxRepos: 120, maxEntries: 2500,
     allowRepo: /userscript|javascript|typescript|browser|web|extension|snippet|frontend|automation/i,
     denyRepo: /\b(stealer|keylogger|credential.?theft|cookie.?steal|token.?logger|phishing|backdoor|malware|paywall.?bypass)\b/i
