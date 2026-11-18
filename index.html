@@ -445,7 +445,6 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/catalog-filters.js"></script>
 <script src="assets/catalog-search.js"></script>
 <script src="assets/catalog-loader.js?v=20261118-1"></script>
-<script src="assets/trend-analysis.js"></script>
 <link rel="stylesheet" href="assets/studio.css">
 <link rel="stylesheet" href="assets/search-experience.css">
 <link rel="stylesheet" href="assets/script-media.css?v=2">
@@ -965,7 +964,6 @@ function render(reset = true){
   const reviewFilter=document.getElementById('reviewFilter').value;
   if(reviewFilter!=='all')list=list.filter(s=>(s.review?.status||'pending')===reviewFilter);
   if(releaseView==='updates') list=list.filter(s=>s.release?.version==='1.7'||s.review?.updateAvailable||s.review?.status==='patched'||s.tags?.includes('Nueva incorporación'));
-  if(releaseView==='trending') list=window.RCCTrendAnalysis.rank(list,trendCounts);
   if(catalogSection==='games'){
     list=list.filter(s=>s.catalog_section==='games');
     const gameName=document.getElementById('gameFilter').value || 'all';
@@ -1006,9 +1004,7 @@ function render(reset = true){
   if(order==='newest') list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
   if(order==='az' || order==='za') list.sort((a,b)=>a.name.localeCompare(b.name,'es')*(order==='za'?-1:1));
   if(showRecent) list.sort((a,b)=>recentIds.indexOf(a.id)-recentIds.indexOf(b.id));
-  if(releaseView==='trending'){const ranks=new Map(window.RCCTrendAnalysis.rank(scripts,trendCounts).map((s,i)=>[s.id,i]));list.sort((a,b)=>ranks.get(a.id)-ranks.get(b.id));}
   if(releaseView==='updates') list.sort((a,b)=>(b.review?.sourceUpdatedAt||b.release?.date||b.created_at||'').localeCompare(a.review?.sourceUpdatedAt||a.release?.date||a.created_at||''));
-  if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Novedades · noviembre de 2026'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Juegos y scripts destacados, con una selección que combina títulos del catálogo y códigos reutilizables según su utilidad, compatibilidad y código disponible. Las cifras altas son una simulación editorial de popularidad, no actividad registrada. Las acciones reales de los últimos 30 días se muestran por separado.':'Últimas incorporaciones, cambios de contenido registrados y scripts marcados como parcheados. Abre una ficha para ver sus notas breves.'; }
   document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`+(catalogLoading?` · Cargando el resto de ${catalogTotal.toLocaleString('es')}… Pulsa «Cargar catálogo completo» o escribe para ampliar la búsqueda.`:'');
   if(catalogLoadError){
     const retry=document.createElement('button');retry.type='button';retry.className='btn btn-ghost';retry.textContent='Carga incompleta · Reintentar';retry.onclick=loadScripts;
@@ -1079,23 +1075,6 @@ function render(reset = true){
       </div>
       <button class="card-action">${s.source_only ? 'Abrir recurso original ↗' : (isLoadstring ? 'Ver y copiar Loadstring' : 'Ver código y copiar ↗')}</button>
     `;
-    if(releaseView==='trending'){
-      const forecast=window.RCCTrendAnalysis.analyze(s);
-      const count=document.createElement('section');count.className='trend-forecast';
-      const label=document.createElement('strong');label.className='trend-label';label.textContent='Popularidad estimada · simulación';
-      const metrics=document.createElement('p');metrics.className='trend-count';
-      const format=new Intl.NumberFormat('es-ES');
-      metrics.textContent=`${format.format(forecast.copies)} copias estimadas · ${format.format(forecast.downloads)} descargas estimadas`;
-      const reason=document.createElement('p');reason.className='trend-reason';reason.textContent=forecast.reason;
-      const actual=document.createElement('p');actual.className='trend-real';
-      const recorded=trendCounts[s.id];
-      actual.textContent=recorded?`Registradas · 30 días: ${format.format(recorded.copies)} copias · ${format.format(recorded.downloads)} descargas`:trendStatus==='ready'?'Registradas · 30 días: 0 copias · 0 descargas':trendStatus==='loading'?'Consultando acciones reales…':'Acciones reales no disponibles';
-      if(s.catalog_section==='games'){
-        const gameLabel=document.createElement('span');gameLabel.className='badge release-badge';
-        gameLabel.textContent='Juego · '+(s.game||s.name);card.querySelector('.badges').append(gameLabel);
-      }
-      count.append(label,metrics,reason,actual);card.querySelector('.meta').before(count);
-    }
     window.rccGateCard?.(s, card);
     window.RCCScriptReview?.card(s, card);
     window.enhanceGameCard?.(s, card);
