@@ -12,6 +12,7 @@ const [api, ui, styles, html, notifications, profileUi, privacyMigration] = awai
 ]);
 
 for (const value of ["https://apis.roblox.com/explore-api/v1", "/get-sorts?", "/get-sort-content", "top-playing-now", "games.roblox.com/v1/games", "thumbnails.roblox.com/v1/games/icons", "b.playing - a.playing || b.visits - a.visits"]) assert.ok(api.includes(value), "Missing Roblox API behavior: " + value);
+assert.ok(api.includes("Math.ceil(ids.length / 10)") && api.includes("ids.slice(index * 10, index * 10 + 10)"), "Roblox Games API requests must use batches of at most 10 IDs");
 for (const value of ["/api/roblox-trending", "Ver scripts de ", "RCC todavía no tiene scripts registrados", "studioTab"]) assert.ok(ui.includes(value), "Missing trends UI behavior: " + value);
 assert.ok(!ui.includes("Math.random") && !ui.includes("copias estimadas") && !ui.includes("descargas estimadas"), "Trends must not fabricate metrics");
 assert.ok(styles.includes(".rcc-trend-game"), "Missing trends card styles");
