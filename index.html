@@ -993,6 +993,7 @@ function render(reset = true){
     document.getElementById('heroSubtitle').textContent='Recursos comunitarios de FiveM para ESX, QBCore, Qbox y servidores standalone. Revisa la fuente, licencia y compatibilidad antes de instalar.';
   }
   if(catalogSection==='all' && !showRecent && !showFavorites) {document.getElementById('heroTitle').textContent='Tu próxima idea empieza aquí.';document.getElementById('heroSubtitle').textContent=new Intl.NumberFormat('es').format(scripts.length)+' códigos: Lua, juegos, Java y JavaScript. Incluye ejemplos originales, variantes y publicaciones enlazadas.';}
+  if(studioOnly){document.getElementById('heroTitle').textContent='Roblox Studio';document.getElementById('heroSubtitle').textContent='Bibliotecas y herramientas para crear experiencias con Luau, Roact, Rodux y el ecosistema de Roblox Studio.';}
   if (showFavorites) list = list.filter(s => favoriteIds.has(s.id));
   if (showRecent) {
       list = list.filter(s => recentIds.includes(s.id));
