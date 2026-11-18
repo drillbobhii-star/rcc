@@ -64,7 +64,7 @@
         if(!saved.size){box.replaceChildren();status.textContent='Todavía no guardaste perfiles.';return;}
         q=q.in('user_id',[...saved]);
       }
-      const {data,error}=await q.range(page*48,page*48+48).abortSignal(AbortSignal.any([signal,AbortSignal.timeout(12000)]));
+      const {data,error}=await q.range(page*48,page*48+47).abortSignal(AbortSignal.any([signal,AbortSignal.timeout(12000)]));
       if(rev!==revision)return;if(error)throw error;
       const profiles=(data||[]).slice(0,48);if(!append)box.replaceChildren();box.append(...profiles.map(p=>profileCard(p)));page++;
       more.hidden=(data||[]).length<=48;
