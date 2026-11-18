@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -7,6 +7,9 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const catalog = require('./catalog-store.cjs').readCatalog();
 const examples = catalog.filter(item => item.id.startsWith('rcc_java_'));
+const expander = readFileSync(new URL('./expand-java.cjs', import.meta.url), 'utf8');
+assert(expander.includes('entry.tags = [...new Set([...(Array.isArray(existing.tags) ? existing.tags : []), ...entry.tags])]'), 'Java regeneration must preserve existing RCC Supporter tags');
+assert(expander.includes('entry.level = existing.level || entry.level'), 'Java regeneration must preserve existing access levels');
 assert.equal(examples.length, 48, 'Expected 48 Java examples');
 assert.equal(new Set(examples.map(item => item.code)).size, examples.length, 'Java examples must have unique source code');
 assert.equal(examples.filter(item => item.tags.includes('RCC Supporter')).length, 19, 'Exactly 19 Java examples must be reserved for RCC Supporter');
