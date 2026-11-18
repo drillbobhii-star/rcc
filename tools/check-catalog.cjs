@@ -24,6 +24,20 @@ for (const s of scripts) {
     assert(s[key].every(v => typeof v === 'string' && v.trim()), s.id);
     assert.equal(new Set(s[key]).size, s[key].length, `${s.id}: duplicate ${key}`);
   }
+  // Public external source cards are references, not locally generated examples.
+  // Validate their attribution and HTTPS source link separately from RCC-authored code.
+  if (s.source_url && s.compatibility?.verification === 'source-linked') {
+    assert.equal(s.type, 'source', `${s.id}: external source type`);
+    assert.equal(new URL(s.source_url).protocol, 'https:', `${s.id}: external source URL`);
+    assert(Array.isArray(s.compatibility.sources) && s.compatibility.sources.includes(s.source_url), `${s.id}: source attribution`);
+    if (s.catalog_section === 'java') {
+      assert.equal(s.platform, 'java', s.id);
+      assert.equal(s.file_extension, 'java', s.id);
+      assert.equal(s.compatibility.environment, 'java', s.id);
+      assert(s.tags.includes('Java'), `${s.id}: missing Java tag`);
+    }
+    continue;
+  }
   if(s.compatibility?.verification==='source-imported'){
     const crypto=require('node:crypto');
     const {sourceBody}=require('./import-source-archives.cjs');
@@ -36,6 +50,18 @@ for (const s of scripts) {
     assert(!newCode.has(s.source_code_sha256),'Duplicate imported source: '+s.id);newCode.add(s.source_code_sha256);
     const platforms={java:'java',web:'web',roblox:'games',fivem:'fivem',universal:'all'};
     assert.equal(s.catalog_section,platforms[s.platform],s.id);
+    continue;
+  }
+  // Java community references are source cards, not compiled RCC examples.
+  if (s.catalog_section === 'java' && s.compatibility.verification !== 'java-compiled') {
+    assert.equal(s.platform, 'java', s.id);
+    assert.equal(s.type, 'source', s.id);
+    assert.equal(s.file_extension, 'java', s.id);
+    assert.equal(s.compatibility.environment, 'java', s.id);
+    assert(s.tags.includes('Java'), `${s.id}: missing Java tag`);
+    assert(['source-linked', 'unverified', 'not-applicable'].includes(s.compatibility.verification), `${s.id}: invalid external Java verification`);
+    const sources = [s.source_url, ...(s.compatibility.sources || [])].filter(Boolean);
+    assert(sources.some(source => new URL(source).protocol === 'https:'), `${s.id}: missing external Java source`);
     continue;
   }
   // Educational sources retain their declared verification level.
