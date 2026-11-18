@@ -58,7 +58,7 @@
       status.textContent = "RCC todavía no tiene scripts registrados para " + name + ".";
       return;
     }
-    window.RCCNavigation.section("games");
+    showTrends(false); tab.setAttribute("aria-pressed", "false");\n    window.RCCNavigation.section("games");
     filter.value = option.value;
     filter.dispatchEvent(new Event("change", { bubbles: true }));
     document.getElementById("catalogHeading")?.scrollIntoView({ behavior: "instant", block: "start" });
@@ -95,7 +95,7 @@
     document.getElementById("heroSubtitle").textContent = "Los juegos más jugados ahora mismo, con datos públicos de Roblox.";
     load();
   };
-  for (const id of ["libraryTab","gamesTab","webTab","javaTab","fivemTab","favoritesBtn","recentBtn","gamesNav","webNav","javaNav","fivemNav"]) {
+  for (const id of ["libraryTab","gamesTab","studioTab","studioNav","webTab","javaTab","fivemTab","favoritesBtn","recentBtn","gamesNav","webNav","javaNav","fivemNav"]) {
     document.getElementById(id)?.addEventListener("click", () => { showTrends(false); tab.setAttribute("aria-pressed","false"); });
   }
   refresh.addEventListener("click", () => load(true));
