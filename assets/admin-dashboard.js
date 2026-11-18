@@ -8,7 +8,7 @@
   const statusEl = $("adminStatus");
   let supabaseClient = null;
   let session = null;
-  let dashboard = { users: [], payments: [], stats: {}, capabilities: {} };
+  let dashboard = { users: [], stats: {}, capabilities: {} };
   let activeTab = "users";
   let refreshing = false;
   let refreshTimer = null;
@@ -198,7 +198,6 @@
     switches.className = "switches";
     switches.style.marginTop = "10px";
     switches.append(
-      renderSwitch(user, "is_vip", "VIP"),
       renderSwitch(user, "is_creator", "Creator", !dashboard.capabilities.isCreator),
       renderSwitch(user, "has_banner", "Banner", !dashboard.capabilities.hasBanner)
     );
@@ -219,12 +218,6 @@
       unlink.type = "button"; unlink.className = "small-btn danger"; unlink.textContent = "Desvincular Discord";
       unlink.addEventListener("click", async () => { await unlinkDiscord(user, unlink); closeUserQuickMenu(); });
       discordActions.append(unlink);
-    }
-    if (user.is_vip && user.discord_id) {
-      const force = document.createElement("button");
-      force.type = "button"; force.className = "small-btn"; force.textContent = "Forzar rol VIP";
-      force.addEventListener("click", async () => { await forceRole(user, force); closeUserQuickMenu(); });
-      discordActions.append(force);
     }
     discord.append(discordTitle, discordInfo, discordActions);
     card.append(discord);
