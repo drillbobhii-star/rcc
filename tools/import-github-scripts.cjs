@@ -198,4 +198,5 @@ async function main() {
   require('node:fs').writeFileSync('assets/catalog-github-import-report.json',JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report,null,2));
 }
-main().catch(error=>{console.error(error.stack||error.message);process.exitCode=1;});
+if(require.main===module)main().catch(error=>{console.error(error.stack||error.message);process.exitCode=1;});
+module.exports={PLATFORMS,ALLOWED_LICENSES,safeCode,classifyFile,makeEntry};
