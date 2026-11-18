@@ -31,16 +31,22 @@ export async function onRequestGet() {
     for (const result of results) if (result.status === "fulfilled") collectIds(result.value, candidates);
     if (!candidates.size) return json({ items: [], source: "Roblox Discover API", updatedAt: new Date().toISOString(), unavailable: true }, 503);
     const ids = [...candidates.keys()].slice(0, 100);
-    const detailUrl = new URL("https://games.roblox.com/v1/games");
-    detailUrl.searchParams.set("universeIds", ids.join(","));
-    const details = await getJson(detailUrl.toString());
-    const games: any[] = Array.isArray(details.data) ? details.data : [];
-    const iconUrl = new URL("https://thumbnails.roblox.com/v1/games/icons");
-    iconUrl.searchParams.set("universeIds", games.map(game => game.id).filter(Boolean).join(","));
-    iconUrl.searchParams.set("size", "512x512"); iconUrl.searchParams.set("format", "Png"); iconUrl.searchParams.set("isCircular", "false");
-    const icons = await getJson(iconUrl.toString());
+    const groups = await Promise.all(Array.from({ length: Math.ceil(ids.length / 50) }, (_, index) => {
+      const detailUrl = new URL("https://games.roblox.com/v1/games");
+      detailUrl.searchParams.set("universeIds", ids.slice(index * 50, index * 50 + 50).join(","));
+      return getJson(detailUrl.toString());
+    }));
+    const games: any[] = groups.flatMap(group => Array.isArray(group.data) ? group.data : []);
+    const iconGroups = await Promise.all(Array.from({ length: Math.ceil(games.length / 100) }, (_, index) => {
+      const iconUrl = new URL("https://thumbnails.roblox.com/v1/games/icons");
+      iconUrl.searchParams.set("universeIds", games.slice(index * 100, index * 100 + 100).map(game => game.id).filter(Boolean).join(","));
+      iconUrl.searchParams.set("size", "512x512"); iconUrl.searchParams.set("format", "Png"); iconUrl.searchParams.set("isCircular", "false");
+      return getJson(iconUrl.toString());
+    }));
     const images = new Map<number, string>();
-    for (const item of Array.isArray(icons.data) ? icons.data : []) if (Number.isSafeInteger(item.targetId) && typeof item.imageUrl === "string" && item.imageUrl.startsWith("https://")) images.set(item.targetId, item.imageUrl);
+    for (const icons of iconGroups) for (const item of Array.isArray(icons.data) ? icons.data : []) {
+      if (Number.isSafeInteger(item.targetId) && typeof item.imageUrl === "string" && item.imageUrl.startsWith("https://")) images.set(item.targetId, item.imageUrl);
+    }
     const items = games.filter(game => Number.isSafeInteger(game.id) && game.id > 0).map(game => ({
       universeId: game.id,
       placeId: game.rootPlaceId,
