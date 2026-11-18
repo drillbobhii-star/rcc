@@ -69,7 +69,7 @@
       const profiles=(data||[]).slice(0,48);if(!append)box.replaceChildren();box.append(...profiles.map(p=>profileCard(p)));page++;
       more.hidden=(data||[]).length<=48;
       status.textContent=box.children.length?'Usuarios registrados · '+box.children.length+(more.hidden?'':' · Hay más perfiles disponibles'):'No encontramos personas con esos filtros.';
-    }catch{if(rev===revision){if(!append)box.replaceChildren();else{more.hidden=false;more.textContent='Reintentar cargar más perfiles';}status.textContent='No se pudieron cargar los perfiles. Pulsa Actualizar para reintentar.';}}
+    }catch(error){if(rev===revision){if(!append)box.replaceChildren();else{more.hidden=false;more.textContent='Reintentar cargar más perfiles';}const missingView=error?.code==='PGRST205'||/rcc_public_profiles|schema cache|does not exist/i.test(error?.message||'');status.textContent=missingView?'Falta aplicar en Supabase la migración 20261118150000_secure_public_profile_directory.sql. Después pulsa Actualizar.':'No se pudieron cargar los perfiles. Pulsa Actualizar para reintentar.';}}
     finally{if(rev===revision){box.setAttribute('aria-busy','false');more.disabled=false;}}
   }
   let suggestionPage=0;
@@ -101,7 +101,7 @@
         if(!append)target.replaceChildren();
         const retry=make('button',append?'Reintentar sugerencias':'Reintentar sugerencias','social-retry');
         retry.type='button';retry.onclick=()=>suggestions(append);target.append(retry);
-        message.textContent='Las sugerencias no están disponibles en este momento.';
+        const missingView=error?.code==='PGRST205'||/rcc_public_profiles|schema cache|does not exist/i.test(error?.message||'');message.textContent=missingView?'Falta aplicar la migración de directorio público en Supabase.':'Las sugerencias no están disponibles en este momento.';
       }
     }finally{if(rev===suggestionsRevision)target.setAttribute('aria-busy','false');}
   }
