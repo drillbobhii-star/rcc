@@ -254,6 +254,7 @@ const APP_VERSION = '3.0';
     publicProfile.d.querySelector('h2').textContent=isCreator?'Perfil del creador RCC':'Perfil de la comunidad';
     publicProfile.status.textContent='';if(!publicProfile.d.open)publicProfile.d.showModal();
   }
+  window.rccOpenPublicProfile=openPublicProfile;
   window.rccHasRobloxLink=false;
 
   
@@ -333,7 +334,7 @@ const APP_VERSION = '3.0';
           const image=el('img'); image.src=prof.avatar_url; image.alt=''; image.loading='lazy'; image.referrerPolicy='no-referrer'; image.onerror=()=>image.remove(); person.append(image);
         }
         
-        const authorName = prof.display_name || (row.user_email || 'Miembro').split('@')[0];
+        const authorName = prof.display_name || 'Miembro RCC';
         const authorColor = prof.text_color || '#dce6f5';
         
         const isCreator=prof.is_creator===true;

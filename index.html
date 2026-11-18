@@ -402,7 +402,8 @@ body.ios-glass :is(button,input,select,a):focus-visible{outline:2px solid #c0e6e
 <link rel="stylesheet" href="assets/personalization.css">
 <link rel="stylesheet" href="assets/liquid-glass.css">
 <link rel="stylesheet" href="assets/welcome.css">
-<script src="assets/assistant-guide.js?v=5" defer></script>
+
+<script src="assets/assistant-guide.js?v=6" defer></script>
 <script src="assets/studio.js" defer></script>
 <script src="assets/search-experience.js" defer></script>
 <script src="assets/welcome.js" defer></script>
@@ -463,6 +464,11 @@ window.rccSupabaseReady.catch(() => {});
 <script src="assets/review-signals.js"></script>
 <script src="assets/script-review.js"></script>
 <style>.rcc-apk-coming{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 12px;border:1px dashed var(--border-glass);border-radius:12px;color:var(--muted);font-size:.82rem}.rcc-apk-coming strong{font-size:.68rem;letter-spacing:.08em;color:var(--accent)}</style>
+<link rel="stylesheet" href="assets/workbench.css?v=2">
+<script src="assets/workbench.js?v=3" defer></script>
+<link rel="stylesheet" href="assets/script-social.css?v=1">
+<script src="assets/script-social.js?v=1" defer></script>
+<script src="assets/profile-discovery.js?v=1" defer></script>
 </head>
 <body data-ui="black">
 <a class="skip-link" href="#catalogHeading">Saltar al catálogo</a>
@@ -547,7 +553,7 @@ window.rccSupabaseReady.catch(() => {});
         </div>
 
         <a class="roblox-follow" href="https://www.roblox.com/share?code=86b2c3c1d4ef024fafa196db62dac9a6&amp;type=Profile&amp;source=ProfileShare&amp;stamp=1793551063604" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8 1 31 8 24 31 1 24Zm5 10-2 8 8 2 2-8Z"/></svg>Seguime en Roblox<span aria-hidden="true">↗</span></a>
-        <button class="quick-help" id="welcomeHelp" type="button">Cómo usar RCC</button>
+        <button class="quick-help" id="welcomeHelp" type="button">Tu guía RCC 2</button>
         <div class="auth-controls"><button type="button" id="authEmail" class="btn btn-ghost auth-email" aria-label="Editar tu perfil" hidden></button><button class="btn btn-ghost" id="loginBtn" type="button" aria-haspopup="dialog" aria-controls="authModal" aria-expanded="false">Iniciar sesión</button><span id="loginNotice" class="login-notice" role="status" aria-live="polite" hidden></span><button class="btn btn-ghost" id="logoutBtn" type="button" hidden>Cerrar Sesión</button></div>
         <button type="button" class="btn btn-supporter" id="rccSupportButton" hidden>RCC Supporter pausado temporalmente</button>
         <span class="catalog-free"><span aria-hidden="true"></span> Catálogo gratuito</span>
@@ -653,7 +659,7 @@ window.rccSupabaseReady.catch(() => {});
 <label>Ordenar <select id="sortOrder"><option value="original">Orden del catálogo</option><option value="newest" selected>Más recientes</option><option value="az">Nombre A–Z</option><option value="za">Nombre Z–A</option></select></label>
 <button id="resetFilters">Limpiar filtros</button>
 </div>
-<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC al día · Nuevas incorporaciones</strong><p>RCC amplía sus catálogos de Roblox, FiveM, Java y JavaScript y añade descubrimientos comunitarios de otros ecosistemas. Novedades reúne publicaciones recientes y propuestas en revisión para perfiles, banners, chat y administración. Próximamente: Buscador de mods APK. Las fuentes externas conservan sus enlaces originales.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
+<section class="catalog-news" id="catalogNews" aria-label="Novedades de RCC"><div><strong>RCC 2 · Un espacio para crear</strong><p>Nuevo menú de ocho categorías, 27 ejemplos originales, guía renovada, perfiles públicos con búsqueda y favoritos privados para este navegador. La biblioteca se carga a demanda. Próxima actualización: mods APK; explora su vista previa.</p><button class="btn btn-ghost" type="button" onclick="document.getElementById('updatesTab').click()">Explorar novedades</button></div><button class="btn btn-ghost" type="button" aria-label="Cerrar aviso de novedades" onclick="document.getElementById('catalogNews').remove()">Cerrar</button></section>
 <div class="active-filters" id="activeFilters"></div>
     <div class="compat-note">PC y móvil indican el dispositivo de destino, no una prueba en Android o iPhone. Los nombres de ejecutores son candidatos sin verificar; los scripts de servidor requieren tu propia experiencia. <a href="compatibilidad.html">Ver requisitos de compatibilidad</a>.</div>
     <section class="rcc-safety-notices" aria-label="Avisos importantes">
@@ -679,10 +685,10 @@ window.rccSupabaseReady.catch(() => {});
       <div class="tour-demo" id="tourDemo" data-scene="explore" aria-live="polite" aria-atomic="true"><div class="demo-scene" aria-hidden="true"><div class="demo-search">Buscar: inventario Lua<span>⌕</span></div><div class="demo-result"><i></i><div>Inventario para tu proyecto<small>Lua / Roblox Studio</small></div><b>↗</b></div></div><h3>Del buscador a tu proyecto.</h3><p>Busca por nombre o etiqueta. Usa filtros de plataforma, dispositivo y entorno; abre una ficha para leer los requisitos, copiar o descargar.</p></div>
     </section>
     <section id="tourLast" hidden>
-      <p class="welcome-lead">Tienes una biblioteca a tu alcance y un asistente de navegación para encontrar tu próximo ejemplo.</p>
-      <div class="tour-warning"><span>ANTES DE EMPEZAR</span><h3>RCC no es una IA<br>ni un generador de código.</h3><p>Los códigos ya están publicados. El asistente busca en el catálogo y te guía por las funciones; no inventa scripts ni responde como una IA.</p></div>
+      <p class="welcome-lead">Tu guía RCC 2: aprende a explorar, personalizar y compartir tu próximo proyecto.</p>
+      <div class="tour-warning"><span>ANTES DE EMPEZAR</span><h3>RCC no es una IA<br>ni un generador de código.</h3><p>Explora ejemplos publicados, consulta su entorno y guarda tus favoritos. La guía te acompaña con demostraciones de las funciones.</p></div>
       <p class="welcome-important">Lee los requisitos y prueba en una copia de tu proyecto. Los loaders descargan código remoto que el analizador no puede inspeccionar. «Jugar en Roblox» abre el juego, no ejecuta scripts.</p>
-      <p class="tour-memory">Este recorrido aparece en tu primera visita si no has iniciado sesión. Puedes volver a verlo desde «Cómo usar RCC». Los menús y el asistente se abren solo cuando los eliges.</p>
+      <p class="tour-memory">Este recorrido aparece en tu primera visita si no has iniciado sesión. Puedes volver a verlo desde «Cómo usar RCC». Los menús se abren cuando los eliges.</p>
     </section>
     <div class="tour-navigation"><button type="button" id="tourBack" hidden>← Anterior</button><button type="button" id="tourNext" class="welcome-confirm">Siguiente <span aria-hidden="true">→</span></button></div>
   </div>
@@ -744,6 +750,15 @@ try { const saved = JSON.parse(localStorage.getItem('rcc_recent')); if (Array.is
 let currentCopiedId = null;
 
 const PLATFORMS = [
+  {id:'python',name:'Python',icon:'Py'},
+  {id:'kotlin',name:'Android / Kotlin',icon:'Kt'},
+  {id:'csharp',name:'C# / .NET',icon:'C#'},
+  {id:'minecraft',name:'Minecraft',icon:'MC'},
+  {id:'unity',name:'Unity / GameDev',icon:'U'},
+  {id:'sql',name:'SQL / Bases de datos',icon:'DB'},
+  {id:'linux',name:'Linux / Terminal',icon:'>_'},
+  {id:'rcc-labs',name:'RCC Labs',icon:'R'},
+
   { id:'roblox',      name:'Roblox',       icon:'🎮' },
   { id:'fivem',       name:'FiveM',        icon:'🚗' },
   { id:'gameguardian',name:'GameGuardian', icon:'🕹️' },
@@ -774,11 +789,13 @@ async function loadScripts(){
   try {
     const data=await window.RCCCatalogLoader.load({onBatch:batch=>{
       catalogTotal=batch.total;
+      scripts=batch.scripts;
+      if(catalogStatus==='ready')render(false);
       if(catalogStatus!=='ready'){
         scripts=batch.scripts;catalogStatus='ready';buildSidebar();render();
       }
     },onProgress:({loaded,total})=>{
-      document.getElementById('resultCount').textContent=`Descargando: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos. Ya puedes explorar; la búsqueda completa estará disponible al terminar.`;
+      document.getElementById('resultCount').textContent=`Descargando: ${loaded.toLocaleString('es')} de ${total.toLocaleString('es')} códigos. Puedes explorar ahora. Pulsa «Cargar catálogo completo» o escribe en el buscador para cargar el resto.`;
     }});
     scripts=data;catalogLoading=false;catalogStatus='ready';
     const tagSelect = document.getElementById('tagFilter');
@@ -996,7 +1013,7 @@ function render(reset = true){
   if(releaseView==='trending'){const ranks=new Map(window.RCCTrendAnalysis.rank(scripts,trendCounts).map((s,i)=>[s.id,i]));list.sort((a,b)=>ranks.get(a.id)-ranks.get(b.id));}
   if(releaseView==='updates') list.sort((a,b)=>(b.review?.sourceUpdatedAt||b.release?.date||b.created_at||'').localeCompare(a.review?.sourceUpdatedAt||a.release?.date||a.created_at||''));
   if(releaseView) { document.getElementById('heroTitle').textContent=releaseView==='trending'?'Tendencia':'Novedades · noviembre de 2026'; document.getElementById('heroSubtitle').textContent=releaseView==='trending'?'Juegos y scripts destacados, con una selección que combina títulos del catálogo y códigos reutilizables según su utilidad, compatibilidad y código disponible. Las cifras altas son una simulación editorial de popularidad, no actividad registrada. Las acciones reales de los últimos 30 días se muestran por separado.':'Últimas incorporaciones, cambios de contenido registrados y scripts marcados como parcheados. Abre una ficha para ver sus notas breves.'; }
-  document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`+(catalogLoading?` · Cargando el resto de ${catalogTotal.toLocaleString('es')}… La búsqueda se amplía al terminar.`:'');
+  document.getElementById('resultCount').textContent = `${list.length} de ${scripts.length} scripts`+(catalogLoading?` · Cargando el resto de ${catalogTotal.toLocaleString('es')}… Pulsa «Cargar catálogo completo» o escribe para ampliar la búsqueda.`:'');
   if(catalogLoadError){
     const retry=document.createElement('button');retry.type='button';retry.className='btn btn-ghost';retry.textContent='Carga incompleta · Reintentar';retry.onclick=loadScripts;
     document.getElementById('resultCount').append(' ',retry);
@@ -1265,6 +1282,8 @@ modal.addEventListener('keydown',e=>{
   else if(!e.shiftKey && document.activeElement===last){e.preventDefault(); first.focus();}
 });
 function selectSection(section, options={}){
+  document.body.classList.remove('social-people');
+  document.dispatchEvent(new Event('rcc:catalog-demand'));
   clearCatalogFilters();
   catalogSection=['all','games','web','java','fivem','vip'].includes(section)?section:'all';
   releaseView=options.view || '';
@@ -1320,6 +1339,7 @@ window.RCCNavigation = {
   executors: () => getNavigationSearchIndex().executors,
   recommend: (query='') => getNavigationSearchIndex().recommend(query),
   assistantSubjects: () => [...new Set(scripts.map(script => script.name).filter(Boolean))],
+  script: id => scripts.find(script => script.id === id),
   section: selectSection
 };
 document.getElementById('libraryTab').onclick=()=>selectSection('all');
@@ -1679,7 +1699,7 @@ console.log('%c¡ALTO AHÍ! 🛑 Esta página está protegida por RCC. No intent
 </div>
 
 <script src="assets/vip-membership.js?v=2"></script>
-<script src="assets/rcc-assistant.js?v=4" defer></script>
+
 <script src="assets/chat-widget.js?v=1"></script>
 <script src="assets/community-feed.js?v=2"></script>
 </body>

@@ -26,9 +26,20 @@
       if(manifest.parts.reduce((n,p)=>n+p.count,0)!==manifest.total)throw Error('Total de catálogo inválido');
       const all=[],ids=new Set();
       let offset=0;
+      let unlock;
+      const demand=new Promise(resolve=>{unlock=resolve;});
+      const more=typeof document!=='undefined'?document.createElement('button'):{addEventListener(){},remove(){}};more.type='button';more.className='btn btn-ghost';more.textContent='Cargar catálogo completo';
+      const start=()=>{unlock();globalThis.document?.removeEventListener('rcc:catalog-demand',start);more.remove();globalThis.document?.getElementById('search')?.removeEventListener('input',start);};
+      more.addEventListener('click',start);
+      if(typeof location!=='undefined'&&new URLSearchParams(location.hash.slice(1)).has('script'))start();
+      globalThis.document?.addEventListener('rcc:catalog-demand',start,{once:true});
+      globalThis.document?.getElementById('search')?.addEventListener('input',start,{once:true});
+      globalThis.document?.querySelector('.catalog-tools')?.append(more);
+
       while(offset<manifest.parts.length){
         // The first part unlocks the interface; later requests have bounded parallelism.
-        const batch=manifest.parts.slice(offset,offset+(offset===0?1:3));
+        if(offset===1&&typeof document!=='undefined')await demand;
+        const batch=manifest.parts.slice(offset,offset+(offset===0?1:2));
         const results=await Promise.all(batch.map(async entry=>{
           try{
             const rows=await part(entry.file);

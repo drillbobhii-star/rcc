@@ -22,7 +22,7 @@ class Element {
   close(){this.open=false;this.events.close?.();}
   click(){this.events.click?.({target:this});}
 }
-const document={body:new Element('body'),createElement(tag){const el=new Element(tag);if(tag==='dialog')dialog=el;return el;},addEventListener(k,fn){if(k==='click')active=fn;}};
+const document={body:new Element('body'),querySelector(selector){if(!nodes.has(selector))nodes.set(selector,new Element(selector));return nodes.get(selector);},createElement(tag){const el=new Element(tag);if(tag==='dialog')dialog=el;return el;},addEventListener(k,fn){if(k==='click')active=fn;}};
 vm.runInNewContext(source,{document,URL,Date:{now:()=>now},setInterval(fn){const id=++intervalId;intervals.set(id,fn);return id;},clearInterval(id){intervals.delete(id);},window:{location:{assign(url){destinations.push(url);}}}});
 const get=selector=>nodes.get(selector),buttons=get('.executor-options').children;
 assert.equal(buttons.length,8);
