@@ -41,6 +41,7 @@ on:
       - "tools/check-greasyfork-import.mjs"
       - "tools/tag-rcc-catalog.cjs"
       - "tools/check-rcc-tags.mjs"
+      - "tools/check-catalog.cjs"
   schedule:
     - cron: "31 11 * * *"
 
