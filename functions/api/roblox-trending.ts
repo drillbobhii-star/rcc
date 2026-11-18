@@ -43,9 +43,9 @@ export async function onRequestGet() {
     for (const result of results) if (result.status === "fulfilled") collectIds(result.value, candidates);
     if (!candidates.size) return json({ items: [], source: "Roblox Discover API", updatedAt: new Date().toISOString(), unavailable: true, error: "Roblox no devolvió juegos para sus gráficos públicos." }, 503);
     const ids = [...candidates.keys()].slice(0, 100);
-    const groups = await Promise.all(Array.from({ length: Math.ceil(ids.length / 50) }, (_, index) => {
+    const groups = await Promise.all(Array.from({ length: Math.ceil(ids.length / 10) }, (_, index) => {
       const detailUrl = new URL("https://games.roblox.com/v1/games");
-      detailUrl.searchParams.set("universeIds", ids.slice(index * 50, index * 50 + 50).join(","));
+      detailUrl.searchParams.set("universeIds", ids.slice(index * 10, index * 10 + 10).join(","));
       return getJson(detailUrl.toString());
     }));
     const games: any[] = groups.flatMap(group => Array.isArray(group.data) ? group.data : []);
