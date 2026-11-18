@@ -42,7 +42,6 @@
     if (focus) bell.focus();
   }
   bell.addEventListener('click', event => {
-    if (event.detail !== 0 && suppressClick) { event.preventDefault(); suppressClick = false; return; }
     panel.hidden = !panel.hidden;
     bell.setAttribute('aria-expanded', String(!panel.hidden));
     if(!panel.hidden){bell.classList.remove('has-unread');bell.setAttribute('aria-label','Abrir notificaciones');window.dispatchEvent(new Event('rcc:notifications-refresh'));}
