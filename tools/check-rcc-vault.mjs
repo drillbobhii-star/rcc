@@ -37,7 +37,7 @@ test('script storage rejects unknown or non-allowlisted licenses', () => {
   const base = {
     name: 'Example', category: 'python', language: 'python', code: 'print(1)',
     licenseStatus: 'eligible', licenseSpdx: 'LicenseRef-Unknown',
-    attribution: 'Example author', sourceUrl: 'https://github.com/example/repo/file.py',
+    attribution: 'Example author', sourceCommit: 'abc1234', sourceUrl: 'https://github.com/example/repo/file.py',
     licenseUrl: 'https://github.com/example/repo/LICENSE'
   };
   assert.throws(() => validateScript(base), /not in RCC's current import allowlist/i);
@@ -124,4 +124,54 @@ test('manager writes pending sources as metadata only', async () => {
   assert.equal(storedRecord.license_status, 'pending_license');
   assert.equal(Object.hasOwn(storedRecord, 'code'), false);
   assert.equal(Object.hasOwn(storedRecord, 'content'), false);
+});
+
+
+test('same code from two sources is stored once but keeps both attribution records', async () => {
+  const files = new Map();
+  let puts = 0;
+  const fetchImpl = async (url, options) => {
+    if (url === 'https://api.github.com/repos/example/private-vault') {
+      return mockResponse(200, { private: true, visibility: 'private' });
+    }
+    const marker = '/contents/';
+    const path = url.includes(marker) ? decodeURIComponent(url.split(marker)[1].split('?')[0]) : '';
+    if (options.method === 'GET' && path) {
+      if (!files.has(path)) return mockResponse(404, { message: 'Not Found' });
+      return mockResponse(200, {
+        type: 'file', sha: 'blob-' + path,
+        content: Buffer.from(files.get(path), 'utf8').toString('base64')
+      });
+    }
+    if (options.method === 'PUT' && path) {
+      puts += 1;
+      files.set(path, Buffer.from(JSON.parse(options.body).content, 'base64').toString('utf8'));
+      return mockResponse(201, { content: { sha: 'blob-' + path } });
+    }
+    throw new Error('Unexpected request: ' + options.method + ' ' + url);
+  };
+  const manager = createVaultManager({ token: 'test-token', repository: 'example/private-vault', fetchImpl });
+  const base = {
+    name: 'Shared source code', category: 'python', language: 'python', code: 'print("same")\n',
+    licenseStatus: 'eligible', licenseSpdx: 'MIT', attribution: 'Example author',
+    sourceCommit: 'abc1234',
+    licenseUrl: 'https://github.com/example/project/blob/abc1234/LICENSE'
+  };
+  const first = await manager.saveScript({
+    ...base, sourceUrl: 'https://github.com/example/project/blob/abc1234/a.py'
+  });
+  const firstPutCount = puts;
+  const second = await manager.saveScript({
+    ...base, sourceUrl: 'https://github.com/another/project/blob/def5678/b.py',
+    sourceRepository: 'another/project', sourceCommit: 'def5678'
+  });
+  assert.equal(first.duplicate, false);
+  assert.equal(second.duplicate, true);
+  assert.equal(second.sourceRecordDuplicate, false);
+  assert.equal(puts, firstPutCount + 1, 'only the metadata index should be updated on second source');
+  const indexPath = second.indexPath;
+  const records = JSON.parse(files.get(indexPath));
+  assert.equal(records.length, 2);
+  assert.notEqual(records[0].id, records[1].id);
+  assert.equal(records[0].content_sha256, records[1].content_sha256);
 });
