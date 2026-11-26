@@ -95,3 +95,33 @@ test('manager saves licensed script content and a separate metadata index in a p
   assert.ok(calls.some(call => call.url.includes('/contents/python/')));
   assert.ok(calls.some(call => call.url.includes('/contents/index/python/')));
 });
+
+
+test('manager writes pending sources as metadata only', async () => {
+  const writes = [];
+  const fetchImpl = async (url, options) => {
+    if (url === 'https://api.github.com/repos/example/private-vault') {
+      return mockResponse(200, { private: true, visibility: 'private' });
+    }
+    if (options.method === 'GET' && url.includes('/contents/')) {
+      return mockResponse(404, { message: 'Not Found' });
+    }
+    if (options.method === 'PUT' && url.includes('/contents/')) {
+      writes.push(JSON.parse(options.body));
+      return mockResponse(201, { content: { sha: 'blob-sha' } });
+    }
+    throw new Error(`Unexpected request: ${options.method} ${url}`);
+  };
+  const manager = createVaultManager({ token: 'test-token', repository: 'example/private-vault', fetchImpl });
+  const result = await manager.savePendingSource({
+    name: 'Unlicensed candidate',
+    sourceUrl: 'https://github.com/example/project/blob/main/file.lua',
+    licenseDeclared: 'Unknown'
+  });
+  const storedJson = Buffer.from(writes[0].content, 'base64').toString('utf8');
+  const storedRecord = JSON.parse(storedJson)[0];
+  assert.equal(result.codeCopied, false);
+  assert.equal(storedRecord.license_status, 'pending_license');
+  assert.equal(Object.hasOwn(storedRecord, 'code'), false);
+  assert.equal(Object.hasOwn(storedRecord, 'content'), false);
+});
