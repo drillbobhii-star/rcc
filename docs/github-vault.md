@@ -12,7 +12,7 @@ The RCC website repository is public. Putting collected source files or a privat
 
 ## One-time GitHub setup
 
-1. Create a new **private** repository named `rcc-vault` under the RCC owner account. An empty repository is sufficient; do not add a README from the GitHub wizard if you prefer the manager to initialize it.
+1. Create a new **private** repository named `rcc-vault` under the RCC owner account. Initialize it with a README so GitHub creates the default branch (normally `main`); the manager needs that branch to exist before it can write.
 2. Create a fine-grained Personal Access Token restricted to that repository. Grant **Contents: Read and write** and **Metadata: Read-only**. Do not use a classic token with broad `repo` access unless fine-grained access is unavailable.
 3. Add these variables to the worker that will run the collector (Railway is the intended existing host):
    - `GITHUB_VAULT_REPOSITORY=drillbobhii-star/rcc-vault`
@@ -59,9 +59,9 @@ await vault.init();
 // Unknown/unverified license: saves the source reference only. No code is accepted.
 await vault.savePendingSource({
   name: 'Example source',
-  sourceUrl: 'https://github.com/owner/project/blob/COMMIT/path/file.lua',
+  sourceUrl: 'https://github.com/owner/project/blob/0123456789abcdef0123456789abcdef01234567/path/file.lua',
   sourceRepository: 'owner/project',
-  sourceCommit: 'COMMIT',
+  sourceCommit: '0123456789abcdef0123456789abcdef01234567',
   originalPath: 'path/file.lua',
   category: 'roblox-studio',
   licenseDeclared: 'Unknown',
@@ -76,11 +76,11 @@ await vault.saveScript({
   code: '-- source text',
   licenseStatus: 'eligible',
   licenseSpdx: 'MIT',
-  licenseUrl: 'https://github.com/owner/project/blob/COMMIT/LICENSE',
+  licenseUrl: 'https://github.com/owner/project/blob/0123456789abcdef0123456789abcdef01234567/LICENSE',
   attribution: 'owner/project',
-  sourceUrl: 'https://github.com/owner/project/blob/COMMIT/path/file.luau',
+  sourceUrl: 'https://github.com/owner/project/blob/0123456789abcdef0123456789abcdef01234567/path/file.luau',
   sourceRepository: 'owner/project',
-  sourceCommit: 'COMMIT',
+  sourceCommit: '0123456789abcdef0123456789abcdef01234567',
   originalPath: 'path/file.luau'
 });
 ```
