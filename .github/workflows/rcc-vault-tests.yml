@@ -1,0 +1,43 @@
+name: RCC Vault tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/rcc-vault.mjs'
+      - 'tools/check-rcc-vault.mjs'
+      - 'docs/github-vault.md'
+      - 'package.json'
+      - '.github/workflows/rcc-vault-tests.yml'
+  push:
+    branches:
+      - feat/github-vault-foundation-20261126
+    paths:
+      - 'tools/rcc-vault.mjs'
+      - 'tools/check-rcc-vault.mjs'
+      - 'docs/github-vault.md'
+      - 'package.json'
+      - '.github/workflows/rcc-vault-tests.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rcc-vault-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-vault:
+    name: Test private Vault manager
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run Vault tests
+        run: npm run test:vault
