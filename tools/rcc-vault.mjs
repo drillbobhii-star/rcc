@@ -121,6 +121,9 @@ export function validateScript(input = {}) {
   }
   const attribution = requiredString(input.attribution, 'attribution', 500);
   const sourceCommit = requiredString(input.sourceCommit ?? input.source_commit, 'sourceCommit', 100);
+  if (!/^[a-f0-9]{40}$/i.test(sourceCommit)) {
+    throw new VaultError('sourceCommit must be the full 40-character Git commit SHA.');
+  }
   const sourceUrl = safeHttpsUrl(input.sourceUrl ?? input.source_url);
   const licenseUrl = safeHttpsUrl(input.licenseUrl ?? input.license_url, 'licenseUrl');
   if (typeof input.code !== 'string' || !input.code.trim()) {
