@@ -38,7 +38,7 @@ Script files are content-addressed using SHA-256 and stored at:
 
 `<category>/<first-two-hash-characters>/<sha256>.<extension>`
 
-Metadata is sharded by category and the first two hash characters:
+Metadata is sharded by category and the first two hash characters. Separate source records are retained even when identical code hashes are deduplicated:
 
 `index/<category>/<first-two-hash-characters>.json`
 
@@ -89,7 +89,7 @@ The manager is a storage layer, not a crawler or a legal-review engine. The coll
 
 ## License and safety policy
 
-- `saveScript()` accepts only `licenseStatus: 'eligible'` and an SPDX identifier in the same allowlist currently used by `tools/import-github-resources.cjs`: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, Unlicense, Zlib, and CC0-1.0.
+- `saveScript()` requires a pinned `sourceCommit`, an attribution, a license URL, `licenseStatus: 'eligible'`, and an SPDX identifier in the same allowlist currently used by `tools/import-github-resources.cjs`: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, Unlicense, Zlib, and CC0-1.0.
 - A missing, unknown, incompatible, or unverified license must go through `savePendingSource()`. That function rejects `code`, `content`, and raw-code fields.
 - A manual RCC decision does not create redistribution rights. A pending source must be checked against its actual license or explicit permission before code is copied.
 - The manager stores text only, enforces a 1 MiB per-file limit, calculates SHA-256, and never executes code.
