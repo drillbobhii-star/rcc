@@ -37,7 +37,7 @@ test('script storage rejects unknown or non-allowlisted licenses', () => {
   const base = {
     name: 'Example', category: 'python', language: 'python', code: 'print(1)',
     licenseStatus: 'eligible', licenseSpdx: 'LicenseRef-Unknown',
-    attribution: 'Example author', sourceCommit: 'abc1234', sourceUrl: 'https://github.com/example/repo/file.py',
+    attribution: 'Example author', sourceCommit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', sourceUrl: 'https://github.com/example/repo/file.py',
     licenseUrl: 'https://github.com/example/repo/LICENSE'
   };
   assert.throws(() => validateScript(base), /not in RCC's current import allowlist/i);
@@ -48,8 +48,8 @@ test('script validation calculates a content hash and maps language extensions',
   const row = validateScript({
     name: 'Example', category: 'python', language: 'python', code: 'print(1)\n',
     licenseStatus: 'eligible', licenseSpdx: 'MIT', attribution: 'example/project',
-    sourceUrl: 'https://github.com/example/project/blob/abc/src/main.py',
-    licenseUrl: 'https://github.com/example/project/blob/abc/LICENSE', sourceCommit: 'abc'
+    sourceUrl: 'https://github.com/example/project/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/src/main.py',
+    licenseUrl: 'https://github.com/example/project/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/LICENSE', sourceCommit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
   });
   assert.equal(row.extension, '.py');
   assert.equal(row.contentHash, sha256('print(1)\n'));
@@ -85,8 +85,8 @@ test('manager saves licensed script content and a separate metadata index in a p
   const result = await manager.saveScript({
     name: 'Example', category: 'python', language: 'python', code: 'print(1)\n',
     licenseStatus: 'eligible', licenseSpdx: 'MIT', attribution: 'example/project',
-    sourceUrl: 'https://github.com/example/project/blob/abc/src/main.py',
-    licenseUrl: 'https://github.com/example/project/blob/abc/LICENSE', sourceCommit: 'abc'
+    sourceUrl: 'https://github.com/example/project/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/src/main.py',
+    licenseUrl: 'https://github.com/example/project/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/LICENSE', sourceCommit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
   });
 
   assert.equal(result.stored, true);
@@ -154,16 +154,16 @@ test('same code from two sources is stored once but keeps both attribution recor
   const base = {
     name: 'Shared source code', category: 'python', language: 'python', code: 'print("same")\n',
     licenseStatus: 'eligible', licenseSpdx: 'MIT', attribution: 'Example author',
-    sourceCommit: 'abc1234',
-    licenseUrl: 'https://github.com/example/project/blob/abc1234/LICENSE'
+    sourceCommit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    licenseUrl: 'https://github.com/example/project/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/LICENSE'
   };
   const first = await manager.saveScript({
-    ...base, sourceUrl: 'https://github.com/example/project/blob/abc1234/a.py'
+    ...base, sourceUrl: 'https://github.com/example/project/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/a.py'
   });
   const firstPutCount = puts;
   const second = await manager.saveScript({
-    ...base, sourceUrl: 'https://github.com/another/project/blob/def5678/b.py',
-    sourceRepository: 'another/project', sourceCommit: 'def5678'
+    ...base, sourceUrl: 'https://github.com/another/project/blob/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/b.py',
+    sourceRepository: 'another/project', sourceCommit: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
   });
   assert.equal(first.duplicate, false);
   assert.equal(second.duplicate, true);
@@ -174,4 +174,14 @@ test('same code from two sources is stored once but keeps both attribution recor
   assert.equal(records.length, 2);
   assert.notEqual(records[0].id, records[1].id);
   assert.equal(records[0].content_sha256, records[1].content_sha256);
+});
+
+test('script storage requires a full immutable Git commit SHA', () => {
+  const input = {
+    name: 'Example', category: 'python', language: 'python', code: 'print(1)',
+    licenseStatus: 'eligible', licenseSpdx: 'MIT', attribution: 'Example author',
+    sourceCommit: 'main', sourceUrl: 'https://github.com/example/repo/blob/main/file.py',
+    licenseUrl: 'https://github.com/example/repo/blob/main/LICENSE'
+  };
+  assert.throws(() => validateScript(input), /full 40-character Git commit SHA/i);
 });
