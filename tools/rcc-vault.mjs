@@ -175,6 +175,7 @@ export function createVaultManager({
       method,
       headers: {
         Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
         'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'RCC-Vault-Manager'
