@@ -120,6 +120,7 @@ export function validateScript(input = {}) {
     throw new VaultError(`License ${licenseSpdx} is not in RCC's current import allowlist.`);
   }
   const attribution = requiredString(input.attribution, 'attribution', 500);
+  const sourceCommit = requiredString(input.sourceCommit ?? input.source_commit, 'sourceCommit', 100);
   const sourceUrl = safeHttpsUrl(input.sourceUrl ?? input.source_url);
   const licenseUrl = safeHttpsUrl(input.licenseUrl ?? input.license_url, 'licenseUrl');
   if (typeof input.code !== 'string' || !input.code.trim()) {
@@ -139,7 +140,7 @@ export function validateScript(input = {}) {
     contentHash: sha256(input.code),
     sourceUrl,
     sourceRepository: optionalString(input.sourceRepository ?? input.source_repository, 300),
-    sourceCommit: optionalString(input.sourceCommit ?? input.source_commit, 100),
+    sourceCommit,
     originalPath: optionalString(input.originalPath ?? input.original_path, 1000),
     licenseSpdx,
     licenseUrl,
@@ -309,7 +310,7 @@ export function createVaultManager({
       await putFile(path, record.code, `vault: store ${record.name}`);
     }
     const metadata = {
-      id: hash,
+      id: sha256(`${hash}\0${record.sourceUrl}`),
       name: record.name,
       language: record.language,
       category: record.category,
@@ -328,7 +329,8 @@ export function createVaultManager({
     const indexed = await appendPartition(indexPath, metadata, 'id');
     return {
       stored: true,
-      duplicate: !indexed.inserted,
+      duplicate: Boolean(existingFile),
+      sourceRecordDuplicate: !indexed.inserted,
       codeBytes: record.codeBytes,
       contentHash: hash,
       githubPath: path,
