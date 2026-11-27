@@ -248,7 +248,7 @@ async function importAllowlistedPages(existing) {
     if (!url) { console.warn('URL externa ignorada: dominio o protocolo no permitido.'); continue; }
     try {
       const html = await fetchText(url);
-      const code = extractCodeFromHtml(html);
+      const code = extractCodeFromHtml(html) || (/<html\b/i.test(html) ? '' : html);
       const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || new URL(url).pathname.split('/').pop(), 160);
       const provider = new URL(url).hostname.replace(/^www\./, '');
       const entry = makeEntry({ id: url, title, description: 'Ficha recogida desde una URL pública permitida.', source: url, rawUrl: null, code, provider, game: 'Roblox' });
@@ -263,15 +263,11 @@ async function searchWebUrls() {
   const found = [];
   const query = 'Roblox Studio Luau open source scripts GitHub examples';
   if (process.env.SERPER_API_KEY) {
-    const payload = await fetchJson('https://google.serper.dev/search', {
-      'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json'
-    }).catch(async () => {
-      const response = await fetchResponse('https://google.serper.dev/search', {
-        method: 'POST', headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: query, num: 20 }), accept: 'application/json'
-      });
-      return response.json();
+    const response = await fetchResponse('https://google.serper.dev/search', {
+      method: 'POST', headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: query, num: 20 }), accept: 'application/json'
     });
+    const payload = await response.json();
     for (const row of payload.organic || []) if (row.link) found.push(row.link);
   } else if (process.env.TAVILY_API_KEY) {
     const response = await fetchResponse('https://api.tavily.com/search', {
