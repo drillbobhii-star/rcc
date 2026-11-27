@@ -122,7 +122,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         error: dispatch.status === 401 || dispatch.status === 403
           ? "GITHUB_PAT no tiene permisos para ejecutar el workflow."
           : "GitHub rechazó la solicitud de importación.",
-      }, dispatch.status === 401 || dispatch.status === 403 ? 502 : 502);
+      }, 502);
     }
     return json({ ok: true, dispatched: true, requested_at: new Date().toISOString() }, 202);
   } catch (error) {
