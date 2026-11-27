@@ -31,11 +31,11 @@ function json(body: unknown, status = 200) {
 }
 
 function baseUrl(env: Env) {
-  return (env.SUPABASE_URL || PROJECT_URL).replace(/\\/+$/, "");
+  return (env.SUPABASE_URL || PROJECT_URL).replace(/[/]+$/, "");
 }
 
 async function requireAdmin(request: Request, env: Env): Promise<AuthUser | Response> {
-  const token = request.headers.get("authorization")?.match(/^Bearer\\s+(.+)$/i)?.[1];
+  const authHeader = request.headers.get("authorization") || "";\n  const token = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7).trim() : "";
   if (!token) return json({ error: "Inicia sesión para continuar." }, 401);
   if (!env.SUPABASE_ANON_KEY) return json({ error: "Falta SUPABASE_ANON_KEY en Pages." }, 503);
   try {
