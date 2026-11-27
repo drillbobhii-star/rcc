@@ -50,6 +50,7 @@
 <button class="admin-tab" data-tab="discord">🎮 Discord</button>
 <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
 <button class="admin-tab" data-tab="messages">✉ Mensajes</button>
+<button class="admin-tab" data-tab="miner">⛏ Minero de Scripts</button>
 </nav>
 <section id="panel-users" class="admin-panel active"><div id="rccMainMessagePreview" class="glass-card" style="margin-bottom:16px"><div class="card-head"><div><h2>✉ Mensajes recientes</h2><div class="hint">Vista rápida de la última conversación.</div></div><button id="rccOpenFullMessages" class="small-btn" type="button">Abrir mensajería</button></div><div id="rccMainMessagePreviewBody" class="hint">Cargando conversaciones…</div></div><div class="glass-card"><div class="card-head"><div><h2>Usuarios registrados</h2><div class="hint">Correo desde Auth · Perfil desde profiles</div></div><span id="userCount" class="pill muted">0</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><select id="userSort" class="small-btn"><option value="newest">Más recientes registrados</option><option value="oldest">Más antiguos registrados</option><option value="discord">Discord vinculados primero</option><option value="email">Correo A–Z</option></select><select id="userFilter" class="small-btn"><option value="all">Todos</option><option value="discord">Discord vinculado</option><option value="no-discord">Sin Discord</option><option value="banned">Restringidos</option></select></div><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Identificadores</th><th>Accesos</th></tr></thead><tbody id="usersBody"><tr><td colspan="3" class="empty-state">Cargando…</td></tr></tbody></table></div></div></section>
 <section id="panel-discord" class="admin-panel"><div class="glass-card"><div class="card-head"><div><h2>Cuentas Discord vinculadas</h2><div class="hint">Reintentos del rol y desvinculación del perfil</div></div><span id="discordCount" class="pill muted">0</span></div><div class="table-wrap"><table><thead><tr><th>Usuario RCC</th><th>Discord ID</th><th>Acciones</th></tr></thead><tbody id="discordBody"></tbody></table></div></div></section>
@@ -82,6 +83,17 @@
     </div>
   </div>
 </section>
+<section id="panel-miner" class="admin-panel">
+  <div class="glass-card" style="max-width:820px;margin:0 auto;padding:clamp(20px,4vw,34px)">
+    <div class="card-head"><div><h2>⛏ Minero de Scripts</h2><div class="hint">Importa nuevas fichas públicas al catálogo de RCC mediante GitHub Actions.</div></div><span class="pill muted">GitHub Actions</span></div>
+    <p class="hint" style="line-height:1.7">La importación se ejecuta en GitHub. El catálogo se actualiza automáticamente cuando termina el proceso. No modifica RCC Vault.</p>
+    <button id="rccRunBulkImport" class="glass-btn primary" type="button" style="display:block;width:100%;min-height:58px;margin:22px 0;font-size:1rem">⛏ Ejecutar Importación Masiva</button>
+    <div id="rccMinerStatus" class="glass-card" role="status" aria-live="polite" style="background:rgba(9,13,25,.55);min-height:76px;display:flex;align-items:center;gap:12px">
+      <span class="pill muted">Listo</span><span class="hint">Pulsa el botón para iniciar una importación.</span>
+    </div>
+    <p class="hint" style="margin-top:12px">La ejecución puede tardar varios minutos. Puedes cambiar de pestaña; el estado se actualizará mientras permanezcas en Admin.</p>
+  </div>
+</section>
 <p id="adminStatus" role="status" aria-live="polite"></p>
 </main>
 <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNia3JweWZrdGVvbWN1a2Rpc2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MjY3NzEsImV4cCI6MjEwODUwMjc3MX0.8F9JQtwGoxXrZE-zpSaM3WCy74VDtmXtpb0JYKlDM8U">
@@ -96,7 +108,7 @@ window.rccAdminSupabaseReady = Promise.resolve().then(() => {
 });
 window.rccAdminSupabaseReady.catch(() => {});
 </script>
-<script src="assets/admin-dashboard.js?v=4"></script>
+<script src="assets/admin-dashboard.js?v=5"></script>
 <script src="assets/admin-chat.js?v=2"></script>
 </body>
 </html>

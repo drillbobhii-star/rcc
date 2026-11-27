@@ -435,6 +435,87 @@
     document.querySelectorAll(".admin-panel").forEach(panel => panel.classList.toggle("active", panel.id === "panel-" + tab));
   }
 
+
+  function renderMinerStatus(label, message, tone = "muted") {
+    const box = $("rccMinerStatus");
+    if (!box) return;
+    box.replaceChildren();
+    const badge = document.createElement("span");
+    badge.className = "pill " + tone;
+    badge.textContent = label;
+    const detail = document.createElement("span");
+    detail.className = "hint";
+    detail.textContent = message;
+    box.append(badge, detail);
+  }
+
+  async function triggerBulkImport() {
+    const button = $("rccRunBulkImport");
+    if (!button || button.disabled) return;
+    if (!session?.access_token) {
+      renderMinerStatus("Error", "La sesión de administrador expiró. Vuelve a iniciar sesión.", "warn");
+      return;
+    }
+    button.disabled = true;
+    button.textContent = "⛏ Minando…";
+    const requestedAt = new Date().toISOString();
+    renderMinerStatus("Minando…", "Enviando la orden a GitHub Actions.", "warn");
+    try {
+      const response = await fetch("/api/trigger-import", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + session.access_token },
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "No se pudo iniciar la importación.");
+      renderMinerStatus("Minando…", "GitHub recibió la orden. Esperando que arranque el workflow…", "warn");
+
+      let completed = false;
+      for (let attempt = 0; attempt < 90; attempt++) {
+        await new Promise(resolve => window.setTimeout(resolve, 7000));
+        const statusResponse = await fetch("/api/trigger-import?since=" + encodeURIComponent(requestedAt), {
+          headers: { Authorization: "Bearer " + session.access_token },
+          credentials: "same-origin",
+          cache: "no-store"
+        });
+        const status = await statusResponse.json().catch(() => ({}));
+        if (!statusResponse.ok) throw new Error(status.error || "No se pudo consultar el estado de GitHub Actions.");
+        if (!status.found) {
+          renderMinerStatus("Minando…", status.message || "GitHub está registrando la ejecución.", "warn");
+          continue;
+        }
+        if (status.status !== "completed") {
+          renderMinerStatus("Minando…", "Ejecución #" + (status.run_number || status.id) + " · " + status.status + ". " + (status.html_url ? "Abre GitHub Actions para ver los registros." : ""), "warn");
+          continue;
+        }
+        completed = true;
+        if (status.conclusion === "success") {
+          renderMinerStatus("Completado", "La importación terminó correctamente. Ejecución #" + (status.run_number || status.id) + ".", "ok");
+        } else {
+          renderMinerStatus("Falló", "GitHub terminó la ejecución con estado: " + (status.conclusion || "desconocido") + ".", "warn");
+        }
+        if (status.html_url) {
+          const link = document.createElement("a");
+          link.href = status.html_url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Ver ejecución en GitHub";
+          link.style.color = "var(--cyan)";
+          link.style.marginLeft = "auto";
+          $("rccMinerStatus").append(link);
+        }
+        break;
+      }
+      if (!completed) renderMinerStatus("En curso", "La importación sigue ejecutándose o tardó más de 10 minutos. Puedes volver a consultar GitHub Actions.", "warn");
+    } catch (error) {
+      renderMinerStatus("Error", error.message || "No se pudo ejecutar la importación.", "warn");
+    } finally {
+      button.disabled = false;
+      button.textContent = "⛏ Ejecutar Importación Masiva";
+    }
+  }
+
   async function start() {
     try {
       const ready = window.rccAdminSupabaseReady;
@@ -465,6 +546,7 @@
   }
 
   $("refreshAdmin").addEventListener("click", () => { void loadDashboard(false); });
+  $("rccRunBulkImport")?.addEventListener("click", () => { void triggerBulkImport(); });
   $("globalSearch").addEventListener("input", render);
   $("userSort")?.addEventListener("change",render); $("userFilter")?.addEventListener("change",render);
   $("adminLogout").addEventListener("click", async () => {

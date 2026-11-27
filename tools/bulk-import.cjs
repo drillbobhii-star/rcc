@@ -82,7 +82,7 @@ function makeEntry({ id, title, description, source, rawUrl, code, provider, gam
   source = safeUrl(source, [new URL(source).hostname]);
   if (!id || !source || !safeRobloxTitle(title, description)) return null;
   const raw = rawUrl ? safeUrl(rawUrl, [new URL(source).hostname]) : null;
-  const checkedAt = new Date().toISOString();
+  // Keep a precise timestamp so newly imported entries sort ahead of older catalog records.\n  const checkedAt = new Date().toISOString();
   const body = normalizedCode(code);
   const codeHash = body ? sha256(body) : null;
   const suspicious = body && (DENIED.test(body) || DANGEROUS_CODE.test(body) || body.length > 150000 || body.includes('\0'));
@@ -102,7 +102,7 @@ function makeEntry({ id, title, description, source, rawUrl, code, provider, gam
     executors: ['Roblox Studio / entorno externo sin verificar'],
     tags: safeTags,
     version: 'Fuente externa',
-    created_at: checkedAt.slice(0, 10),
+    created_at: checkedAt,
     code: acceptedCode || ('-- RCC: código no incluido automáticamente.\\n-- Fuente original: ' + source + (raw ? '\\n-- Código original: ' + raw : '') + '\\n-- Revisa el contenido y sus permisos antes de usarlo.'),
     game: clean(game || 'Roblox', 120),
     game_id: '0',
