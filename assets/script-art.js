@@ -25,10 +25,10 @@
     const diagram=document.createElement('div');diagram.className='script-art-diagram';diagram.setAttribute('aria-hidden','true');
     diagram.innerHTML='<i></i><i></i><i></i><span></span><b></b>';
     diagram.querySelector('span').textContent=({math:'Σ',inventory:'▦',interface:'▣',motion:'↗',health:'+',data:'[ ]',currency:'$',remote:'↓'})[info.kind]||'{ }';
-    const categoryImage=document.createElement('img');categoryImage.className='script-category-image';categoryImage.src='/assets/category-art/'+(['java','universal','web','roblox','fivem','gameguardian','autotouch'].includes(script.platform)?script.platform:'code')+'.svg';categoryImage.alt='Ilustración de la categoría '+(script.platform||'código');categoryImage.loading='lazy';categoryImage.decoding='async';categoryImage.width=340;categoryImage.height=200;
+    const categoryImage=document.createElement('img');categoryImage.className='script-category-image';const localThumbnail=typeof script.image==='string'&&/^\/assets\/script-thumbnails\/[a-f0-9]{64}\.(?:png|jpg|webp|gif)$/.test(script.image);categoryImage.src=localThumbnail?script.image:'/assets/category-art/'+(['java','universal','web','roblox','fivem','gameguardian','autotouch'].includes(script.platform)?script.platform:'code')+'.svg';categoryImage.alt=localThumbnail?'Imagen original de '+script.name:'Ilustración de la categoría '+(script.platform||'código');categoryImage.loading='lazy';categoryImage.decoding='async';categoryImage.width=340;categoryImage.height=200;
     const title=document.createElement('strong');title.className='script-art-title';title.textContent=script.name;
     const caption=document.createElement('span');caption.className='script-art-caption';caption.textContent=info.note;
-    const label=document.createElement('small');label.className='script-art-label';label.textContent='ILUSTRACIÓN · NO ES UNA CAPTURA';
+    const label=document.createElement('small');label.className='script-art-label';label.textContent=localThumbnail?'IMAGEN ORIGINAL · FUENTE EXTERNA':'ILUSTRACIÓN · NO ES UNA CAPTURA';
     art.append(heading,categoryImage,title,caption,label);return art;
   }
   window.RCCScriptArt={create,profile};
