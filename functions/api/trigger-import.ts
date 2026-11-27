@@ -35,7 +35,8 @@ function baseUrl(env: Env) {
 }
 
 async function requireAdmin(request: Request, env: Env): Promise<AuthUser | Response> {
-  const authHeader = request.headers.get("authorization") || "";\n  const token = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7).trim() : "";
+  const authHeader = request.headers.get("authorization") || "";
+  const token = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7).trim() : "";
   if (!token) return json({ error: "Inicia sesión para continuar." }, 401);
   if (!env.SUPABASE_ANON_KEY) return json({ error: "Falta SUPABASE_ANON_KEY en Pages." }, 503);
   try {
