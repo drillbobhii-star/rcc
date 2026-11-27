@@ -34,7 +34,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: \${{ github.ref_name }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -47,14 +47,14 @@ jobs:
 
       - name: Import public Roblox script listings
         env:
-          RCC_BULK_MAX_PAGES: \${{ inputs.max_pages || '25' }}
-          RCC_BULK_TARGET: \${{ inputs.target || '1500' }}
-          RCC_BULK_IMPORT_INCLUDE_CODE: \${{ (github.event_name == 'schedule' || inputs.include_code == true) && '1' || '0' }}
+          RCC_BULK_MAX_PAGES: ${{ inputs.max_pages || '25' }}
+          RCC_BULK_TARGET: ${{ inputs.target || '1500' }}
+          RCC_BULK_IMPORT_INCLUDE_CODE: ${{ (github.event_name == 'schedule' || inputs.include_code == true) && '1' || '0' }}
           RCC_BULK_DELAY_MS: "1000"
-          RSCRIPTS_API_KEY: \${{ secrets.RSCRIPTS_API_KEY }}
-          SERPER_API_KEY: \${{ secrets.SERPER_API_KEY }}
-          TAVILY_API_KEY: \${{ secrets.TAVILY_API_KEY }}
-          RCC_BULK_SOURCE_URLS: \${{ vars.RCC_BULK_SOURCE_URLS }}
+          RSCRIPTS_API_KEY: ${{ secrets.RSCRIPTS_API_KEY }}
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          RCC_BULK_SOURCE_URLS: ${{ vars.RCC_BULK_SOURCE_URLS }}
         run: node tools/bulk-import.cjs
 
       - name: Validate generated catalog and 2 MB parts
@@ -85,4 +85,4 @@ jobs:
             exit 0
           fi
           git commit -m "chore(catalog): bulk import public Roblox scripts"
-          git push origin "HEAD:\${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
