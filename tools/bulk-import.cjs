@@ -2,6 +2,8 @@
 // Imports public metadata from supported APIs and optional allowlisted HTML sources.
 // Third-party code is never executed. Raw-code ingestion is opt-in and risk-filtered.
 const crypto = require('node:crypto');
+const fs = require('node:fs');
+const path = require('node:path');
 const { readCatalog, writeCatalog, MAX_PART_BYTES } = require('./catalog-store.cjs');
 
 const USER_AGENT = 'RCC-Catalog-BulkImporter/1.0 (+https://github.com/drillbobhii-star/rcc)';
@@ -126,6 +128,71 @@ async function fetchText(url) {
   const response = await fetchResponse(url, { accept: 'text/plain,text/html;q=0.9,*/*;q=0.8' });
   return response.text();
 }
+function extractImageUrl(...values) {
+  const keys = ['imageUrl', 'image_url', 'thumbnailUrl', 'thumbnail_url', 'thumbnail', 'image', 'coverImage', 'cover', 'icon'];
+  const visit = (value, depth = 0) => {
+    if (depth > 4 || value == null) return '';
+    if (typeof value === 'string') return /^https:\/\//i.test(value) && /\.(?:png|jpe?g|webp|gif)(?:[?#]|$)/i.test(value) ? value : '';
+    if (Array.isArray(value)) { for (const item of value) { const found = visit(item, depth + 1); if (found) return found; } return ''; }
+    if (typeof value !== 'object') return '';
+    for (const key of keys) { const found = visit(value[key], depth + 1); if (found) return found; }
+    for (const key of ['game', 'media', 'assets', 'data', 'result']) { const found = visit(value[key], depth + 1); if (found) return found; }
+    return '';
+  };
+  for (const value of values) { const found = visit(value); if (found) return found; }
+  return '';
+}
+function allowedImageHost(host, provider) {
+  const domains = {
+    ScriptBlox: ['scriptblox.com', 'rbxcdn.com', 'roblox.com'],
+    'RobloxScripts.com': ['robloxscripts.com', 'rbxcdn.com', 'roblox.com'],
+    'Rscripts.net': ['rscripts.net', 'rbxcdn.com', 'roblox.com']
+  }[provider] || [];
+  return domains.some(domain => host === domain || host.endsWith('.' + domain));
+}
+async function downloadThumbnail(value, provider, id) {
+  let current;
+  try { current = new URL(value); } catch { return ''; }
+  for (let redirect = 0; redirect <= 3; redirect++) {
+    if (current.protocol !== 'https:' || current.username || current.password || !allowedImageHost(current.hostname.toLowerCase(), provider)) return '';
+    let response;
+    try {
+      response = await fetch(current, {
+        redirect: 'manual',
+        headers: { 'User-Agent': USER_AGENT, Accept: 'image/png,image/jpeg,image/webp,image/gif' },
+        signal: AbortSignal.timeout(15000)
+      });
+    } catch { return ''; }
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      if (!location || redirect === 3) return '';
+      try { current = new URL(location, current); } catch { return ''; }
+      continue;
+    }
+    if (!response.ok) return '';
+    const type = String(response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    const extensions = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
+    const extension = extensions[type];
+    const declaredSize = Number(response.headers.get('content-length') || 0);
+    if (!extension || (declaredSize && declaredSize > 2 * 1024 * 1024)) return '';
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (!bytes.length || bytes.length > 2 * 1024 * 1024) return '';
+    const signatures = {
+      png: bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
+      jpg: bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff,
+      webp: bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WEBP',
+      gif: bytes.subarray(0, 3).toString() === 'GIF'
+    };
+    if (!signatures[extension]) return '';
+    const digest = sha256(provider + ':' + id);
+    const directory = path.join(__dirname, '..', 'assets', 'script-thumbnails');
+    fs.mkdirSync(directory, { recursive: true });
+    const filename = digest + '.' + extension;
+    fs.writeFileSync(path.join(directory, filename), bytes);
+    return '/assets/script-thumbnails/' + filename;
+  }
+  return '';
+}
 function makeEntry({ id, title, description, source, rawUrl, code, provider, game, author, tags, risk }) {
   title = clean(title, 180);
   description = clean(description, 500);
@@ -215,6 +282,7 @@ async function importScriptBlox(existing) {
         author: detail.owner?.username || detail.creator?.username || row.owner?.username,
         tags: detail.tags || row.tags
       });
+      if (entry) entry.image = await downloadThumbnail(extractImageUrl(detail, row), 'ScriptBlox', slug);
       if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
     }
     console.log('ScriptBlox página ' + page + ': ' + added.length + ' nuevas fichas.');
@@ -244,6 +312,7 @@ async function importRobloxScripts(existing) {
         game: row.game?.name || (row.isUniversal ? 'Universal' : 'Roblox'),
         author: row.author?.username, tags: row.tags
       });
+      if (entry) entry.image = await downloadThumbnail(extractImageUrl(row), 'RobloxScripts.com', row.id);
       if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
     }
     if (!payload.data.length || payload.data.length < 50 || page >= Number(payload.pagination?.totalPages || 999)) break;
@@ -273,6 +342,7 @@ async function importRScripts(existing) {
         game: row.game?.title || 'Roblox', author: row.creator?.username,
         tags: row.tags, risk: row.risk || null
       });
+      if (entry) entry.image = await downloadThumbnail(extractImageUrl(row), 'Rscripts.net', row.id || row.slug);
       if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
     }
     if (!rows.length || rows.length < 48 || page >= Number(payload.meta?.totalPages || 999)) break;
