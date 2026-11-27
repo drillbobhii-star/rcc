@@ -40,7 +40,7 @@ function extractCode(value, depth = 0) {
   if (typeof value === 'string') {
     const text = normalizedCode(value);
     if (!text || /^<!doctype html|^<html\b/i.test(text)) return '';
-    if (/^[{[]/.test(text)) {
+    if (/^(?:\\{|\\[)/.test(text)) {
       try {
         const parsed = JSON.parse(text);
         if (parsed && typeof parsed === 'object') return extractCode(parsed, depth + 1);
@@ -76,6 +76,11 @@ function extractCode(value, depth = 0) {
 async function fetchRawCode(url) {
   if (!INCLUDE_CODE || !url) return '';
   try { return extractCode(await fetchText(url)); } catch { return ''; }
+}
+function looksLikeCode(value) {
+  const text = normalizedCode(value);
+  if (text.length < 8 || /^https?:\\/\\//i.test(text)) return false;
+  return /(?:\\b(local|function|return|if|then|elseif|else|end|for|while|repeat|until|do|game|workspace|script|Instance|Vector3|CFrame|task|print|warn|require|pairs|ipairs|tonumber|tostring)\\b|[=(){}])/i.test(text);
 }
 function safeUrl(value, hosts, pathPrefix) {
   try {
@@ -130,7 +135,7 @@ function makeEntry({ id, title, description, source, rawUrl, code, provider, gam
   const checkedAt = new Date().toISOString();
   const body = extractCode(code);
   // A listing/source URL is not a usable script. Reject it before creating any catalog row.
-  if (!INCLUDE_CODE || body.length < 8) return null;
+  if (!INCLUDE_CODE || !looksLikeCode(body)) return null;
   const codeHash = sha256(body);
   const suspicious = DENIED.test(body) || DANGEROUS_CODE.test(body) || body.length > 150000 || body.includes('\0');
   if (suspicious) return null;
@@ -140,7 +145,7 @@ function makeEntry({ id, title, description, source, rawUrl, code, provider, gam
     id: 'bulk_' + provider.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + sha256(String(id)).slice(0, 18),
     name: title,
     description: (description || 'Publicación externa de Roblox.') + ' Fuente: ' + provider + '. Código no ejecutado por RCC; verifica permisos, dependencias y compatibilidad.',
-    level: acceptedCode ? 'external' : 'external',
+    level: 'external',
     device: 'unknown',
     platform: 'roblox',
     type: 'source',
@@ -195,12 +200,11 @@ async function importScriptBlox(existing) {
       if (!slug) continue;
       const detailUrl = new URL('/api/script/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       let detail = row;
-      let rawUrl = null;
+      let rawUrl = new URL('/api/script/raw/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       let code = extractCode(row);
       try {
         const detailPayload = await fetchJson(detailUrl);
         detail = detailPayload?.script || detailPayload?.result || detailPayload?.data || detailPayload || row;
-        rawUrl = new URL('/api/script/raw/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
         if (!code) code = extractCode(detail);
       } catch {}
       if (!code && rawUrl) code = await fetchRawCode(rawUrl);
@@ -403,4 +407,4 @@ async function main() {
   }, null, 2));
 }
 if (require.main === module) main().catch(error => { console.error(error.stack || error.message); process.exitCode = 1; });
-module.exports = { makeEntry, safeUrl, extractCodeFromHtml, normalizedCode, buildIndex };
+module.exports = { makeEntry, safeUrl, extractCode, looksLikeCode, extractCodeFromHtml, normalizedCode, buildIndex };
