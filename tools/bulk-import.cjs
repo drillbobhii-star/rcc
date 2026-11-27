@@ -132,7 +132,7 @@ function extractImageUrl(...values) {
   const keys = ['imageUrl', 'image_url', 'thumbnailUrl', 'thumbnail_url', 'thumbnail', 'image', 'coverImage', 'cover', 'icon'];
   const visit = (value, depth = 0) => {
     if (depth > 4 || value == null) return '';
-    if (typeof value === 'string') return /^https:\/\//i.test(value) && /\.(?:png|jpe?g|webp|gif)(?:[?#]|$)/i.test(value) ? value : '';
+    if (typeof value === 'string') return /^https:\/\//i.test(value) ? value : '';
     if (Array.isArray(value)) { for (const item of value) { const found = visit(item, depth + 1); if (found) return found; } return ''; }
     if (typeof value !== 'object') return '';
     for (const key of keys) { const found = visit(value[key], depth + 1); if (found) return found; }
