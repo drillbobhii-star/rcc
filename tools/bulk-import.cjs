@@ -32,6 +32,56 @@ function sha256(value) {
 function normalizedCode(value) {
   return String(value ?? '').replace(/\r\n?/g, '\n').trim().replace(/[ \t]+$/gm, '');
 }
+
+// APIs may return code directly or wrap it in objects/JSON responses.
+// Never treat a page URL, an error message, or an HTML document as source code.
+function extractCode(value, depth = 0) {
+  if (depth > 5 || value == null) return '';
+  if (typeof value === 'string') {
+    const text = normalizedCode(value);
+    if (!text || /^<!doctype html|^<html\b/i.test(text)) return '';
+    if (/^(?:\{|\[)/.test(text)) {
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && typeof parsed === 'object') return extractCode(parsed, depth + 1);
+      } catch {}
+    }
+    if (/^(not found|unauthorized|forbidden|error\b|rate limit)/i.test(text)) return '';
+    return text;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = extractCode(item, depth + 1);
+      if (found) return found;
+    }
+    return '';
+  }
+  if (typeof value === 'object') {
+    const keys = ['script', 'code', 'rawScript', 'raw_script', 'scriptCode', 'script_code', 'scriptContent', 'script_content', 'content', 'source'];
+    for (const key of keys) {
+      if (value[key] != null) {
+        const found = extractCode(value[key], depth + 1);
+        if (found) return found;
+      }
+    }
+    for (const key of ['data', 'result', 'scriptData', 'script_data']) {
+      if (value[key] != null) {
+        const found = extractCode(value[key], depth + 1);
+        if (found) return found;
+      }
+    }
+  }
+  return '';
+}
+async function fetchRawCode(url) {
+  if (!INCLUDE_CODE || !url) return '';
+  try { return extractCode(await fetchText(url)); } catch { return ''; }
+}
+function looksLikeCode(value) {
+  const text = normalizedCode(value);
+  if (text.length < 8 || /^https?:\/\//i.test(text)) return false;
+  return /(?:\b(local|function|return|if|then|elseif|else|end|for|while|repeat|until|do|game|workspace|script|Instance|Vector3|CFrame|task|print|warn|require|pairs|ipairs|tonumber|tostring)\b|[=(){}])/i.test(text);
+}
 function safeUrl(value, hosts, pathPrefix) {
   try {
     const url = new URL(value);
@@ -83,27 +133,30 @@ function makeEntry({ id, title, description, source, rawUrl, code, provider, gam
   if (!id || !source || !safeRobloxTitle(title, description)) return null;
   const raw = rawUrl ? safeUrl(rawUrl, [new URL(source).hostname]) : null;
   const checkedAt = new Date().toISOString();
-  const body = normalizedCode(code);
-  const codeHash = body ? sha256(body) : null;
-  const suspicious = body && (DENIED.test(body) || DANGEROUS_CODE.test(body) || body.length > 150000 || body.includes('\0'));
-  const acceptedCode = INCLUDE_CODE && body && !suspicious ? body : null;
+  const body = extractCode(code);
+  // A listing/source URL is not a usable script. Reject it before creating any catalog row.
+  if (!INCLUDE_CODE || !looksLikeCode(body)) return null;
+  const codeHash = sha256(body);
+  const suspicious = DENIED.test(body) || DANGEROUS_CODE.test(body) || body.length > 150000 || body.includes('\0');
+  if (suspicious) return null;
+  const acceptedCode = body;
   const safeTags = [...new Set(['RCC', 'Roblox', 'Luau', provider, ...((tags || []).map(x => clean(x, 36)).filter(Boolean))])].slice(0, 14);
   return {
     id: 'bulk_' + provider.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + sha256(String(id)).slice(0, 18),
     name: title,
     description: (description || 'Publicación externa de Roblox.') + ' Fuente: ' + provider + '. Código no ejecutado por RCC; verifica permisos, dependencias y compatibilidad.',
-    level: acceptedCode ? 'external' : 'external',
+    level: 'external',
     device: 'unknown',
     platform: 'roblox',
     type: 'source',
-    source_only: !acceptedCode,
+    source_only: false,
     source_url: source,
-    code_hash: codeHash || sha256(source),
+    code_hash: codeHash,
     executors: ['Roblox Studio / entorno externo sin verificar'],
     tags: safeTags,
     version: 'Fuente externa',
-    created_at: checkedAt.slice(0, 10),
-    code: acceptedCode || ('-- RCC: código no incluido automáticamente.\\n-- Fuente original: ' + source + (raw ? '\\n-- Código original: ' + raw : '') + '\\n-- Revisa el contenido y sus permisos antes de usarlo.'),
+    created_at: checkedAt,
+    code: acceptedCode,
     game: clean(game || 'Roblox', 120),
     game_id: '0',
     catalog_section: 'games',
@@ -112,7 +165,7 @@ function makeEntry({ id, title, description, source, rawUrl, code, provider, gam
       source,
       checkedAt: checkedAt.slice(0, 10),
       status: 'unverified',
-      riskAssessment: suspicious ? 'Código rechazado por filtros automáticos; solo se conserva la ficha.' : 'No auditado por RCC.',
+      riskAssessment: 'Código importado sin ejecutar; requiere revisión de permisos y compatibilidad.',
       author: clean(author || 'No indicado', 80)
     },
     compatibility: {
@@ -147,16 +200,14 @@ async function importScriptBlox(existing) {
       if (!slug) continue;
       const detailUrl = new URL('/api/script/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       let detail = row;
-      let rawUrl = null;
-      let code = row.script || row.code || '';
+      let rawUrl = new URL('/api/script/raw/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
+      let code = extractCode(row);
       try {
         const detailPayload = await fetchJson(detailUrl);
         detail = detailPayload?.script || detailPayload?.result || detailPayload?.data || detailPayload || row;
-        rawUrl = new URL('/api/script/raw/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
-        if (INCLUDE_CODE && !code) {
-          try { code = await fetchText(rawUrl); } catch {}
-        }
+        if (!code) code = extractCode(detail);
       } catch {}
+      if (!code && rawUrl) code = await fetchRawCode(rawUrl);
       const source = new URL('/script/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       const entry = makeEntry({
         id: slug, title: detail.title || row.title, description: detail.features || detail.description || row.description,
@@ -185,10 +236,8 @@ async function importRobloxScripts(existing) {
       const source = safeUrl(row.scriptPageUrl, ['robloxscripts.com', 'www.robloxscripts.com']);
       const rawUrl = safeUrl(row.rawScriptUrl, ['robloxscripts.com', 'www.robloxscripts.com']);
       if (!source || !rawUrl) continue;
-      let code = row.script || '';
-      if (INCLUDE_CODE && !code) {
-        try { code = await fetchText(rawUrl); } catch {}
-      }
+      let code = extractCode(row);
+      if (!code) code = await fetchRawCode(rawUrl);
       const entry = makeEntry({
         id: row.id, title: row.title, description: row.description,
         source, rawUrl, code, provider: 'RobloxScripts.com',
@@ -220,7 +269,7 @@ async function importRScripts(existing) {
       if (row.risk?.isObfuscated === true) continue;
       const entry = makeEntry({
         id: row.id || row.slug, title: row.title, description: row.description,
-        source, rawUrl, code: row.script || '', provider: 'Rscripts.net',
+        source, rawUrl, code: extractCode(row) || await fetchRawCode(rawUrl), provider: 'Rscripts.net',
         game: row.game?.title || 'Roblox', author: row.creator?.username,
         tags: row.tags, risk: row.risk || null
       });
@@ -248,7 +297,7 @@ async function importAllowlistedPages(existing) {
     if (!url) { console.warn('URL externa ignorada: dominio o protocolo no permitido.'); continue; }
     try {
       const html = await fetchText(url);
-      const code = extractCodeFromHtml(html) || (/<html\b/i.test(html) ? '' : html);
+      const code = extractCode(extractCodeFromHtml(html) || (/<html\b/i.test(html) ? '' : html));
       const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || new URL(url).pathname.split('/').pop(), 160);
       const provider = new URL(url).hostname.replace(/^www\./, '');
       const entry = makeEntry({ id: url, title, description: 'Ficha recogida desde una URL pública permitida.', source: url, rawUrl: null, code, provider, game: 'Roblox' });
@@ -358,4 +407,4 @@ async function main() {
   }, null, 2));
 }
 if (require.main === module) main().catch(error => { console.error(error.stack || error.message); process.exitCode = 1; });
-module.exports = { makeEntry, safeUrl, extractCodeFromHtml, normalizedCode, buildIndex };
+module.exports = { makeEntry, safeUrl, extractCode, looksLikeCode, extractCodeFromHtml, normalizedCode, buildIndex };
