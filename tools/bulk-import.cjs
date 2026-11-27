@@ -40,7 +40,7 @@ function extractCode(value, depth = 0) {
   if (typeof value === 'string') {
     const text = normalizedCode(value);
     if (!text || /^<!doctype html|^<html\b/i.test(text)) return '';
-    if (/^(?:\\{|\\[)/.test(text)) {
+    if (/^(?:\{|\[)/.test(text)) {
       try {
         const parsed = JSON.parse(text);
         if (parsed && typeof parsed === 'object') return extractCode(parsed, depth + 1);
@@ -79,8 +79,8 @@ async function fetchRawCode(url) {
 }
 function looksLikeCode(value) {
   const text = normalizedCode(value);
-  if (text.length < 8 || /^https?:\\/\\//i.test(text)) return false;
-  return /(?:\\b(local|function|return|if|then|elseif|else|end|for|while|repeat|until|do|game|workspace|script|Instance|Vector3|CFrame|task|print|warn|require|pairs|ipairs|tonumber|tostring)\\b|[=(){}])/i.test(text);
+  if (text.length < 8 || /^https?:\/\//i.test(text)) return false;
+  return /(?:\b(local|function|return|if|then|elseif|else|end|for|while|repeat|until|do|game|workspace|script|Instance|Vector3|CFrame|task|print|warn|require|pairs|ipairs|tonumber|tostring)\b|[=(){}])/i.test(text);
 }
 function safeUrl(value, hosts, pathPrefix) {
   try {
