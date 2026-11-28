@@ -21,6 +21,14 @@ const SOURCES = {
   rscripts: 'https://api.rscripts.net'
 };
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const SOURCE_METRICS = Object.create(null);
+function metricsFor(provider) {
+  return SOURCE_METRICS[provider] ||= {
+    listings: 0, codeFound: 0, missingCode: 0, rejected: 0,
+    added: 0, duplicateCandidates: 0, imagesDownloaded: 0,
+    imagesUnavailable: 0, rawFetchErrors: 0, detailFetchErrors: 0
+  };
+}
 function clampInt(value, min, max, fallback) {
   const n = Number(value);
   return Number.isSafeInteger(n) && n >= min && n <= max ? n : fallback;
@@ -274,7 +282,7 @@ async function importScriptBlox(existing) {
         detail = detailPayload?.script || detailPayload?.result || detailPayload?.data || detailPayload || row;
         if (!code) code = extractCode(detail);
       } catch {}
-      if (!code && rawUrl) code = await fetchRawCode(rawUrl);
+      if (!code && rawUrl) code = await fetchRawCode(rawUrl, 'ScriptBlox');\n      if (looksLikeCode(code)) stats.codeFound++; else stats.missingCode++;
       const source = new URL('/script/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       const entry = makeEntry({
         id: slug, title: detail.title || row.title, description: detail.features || detail.description || row.description,
@@ -283,9 +291,9 @@ async function importScriptBlox(existing) {
         tags: detail.tags || row.tags
       });
       if (entry) entry.image = await downloadThumbnail(extractImageUrl(detail, row), 'ScriptBlox', slug);
-      if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
+      if (!entry) stats.rejected++;\n      if (entry && !isDuplicate(entry, existing, added)) { added.push(entry); stats.added++; }\n      else if (entry) stats.duplicateCandidates++;
     }
-    console.log('ScriptBlox página ' + page + ': ' + added.length + ' nuevas fichas.');
+    console.log('[ScriptBlox] Página ' + page + ': listados=' + rows.length + ', código válido acumulado=' + stats.codeFound + ', sin código=' + stats.missingCode + ', rechazados=' + stats.rejected + ', duplicados=' + stats.duplicateCandidates + ', añadidos=' + added.length + '.');
     if (rows.length < PAGE_SIZE) break;
     await sleep(WAIT_MS);
   }
@@ -297,7 +305,7 @@ async function importRobloxScripts(existing) {
     const url = new URL('/api/v1/scripts', SOURCES.robloxscripts);
     url.search = new URLSearchParams({ access: 'free', sort: 'newest', page: String(page), limit: '50' }).toString();
     const payload = await fetchJson(url);
-    if (!Array.isArray(payload?.data)) break;
+    if (!Array.isArray(payload?.data)) { console.warn('[RobloxScripts.com] Respuesta inesperada; claves raíz=' + Object.keys(payload || {}).join(', ')); break; }\n    stats.listings += payload.data.length;
     if (!String(payload.meta?.attribution || '').toLowerCase().includes('robloxscripts.com')) throw new Error('RobloxScripts: falta la atribución oficial.');
     for (const row of payload.data) {
       if (added.length >= TARGET) break;
@@ -305,7 +313,7 @@ async function importRobloxScripts(existing) {
       const rawUrl = safeUrl(row.rawScriptUrl, ['robloxscripts.com', 'www.robloxscripts.com']);
       if (!source || !rawUrl) continue;
       let code = extractCode(row);
-      if (!code) code = await fetchRawCode(rawUrl);
+      if (!code) code = await fetchRawCode(rawUrl, 'RobloxScripts.com');\n      if (looksLikeCode(code)) stats.codeFound++; else stats.missingCode++;
       const entry = makeEntry({
         id: row.id, title: row.title, description: row.description,
         source, rawUrl, code, provider: 'RobloxScripts.com',
@@ -338,7 +346,7 @@ async function importRScripts(existing) {
       if (row.risk?.isObfuscated === true) continue;
       const entry = makeEntry({
         id: row.id || row.slug, title: row.title, description: row.description,
-        source, rawUrl, code: extractCode(row) || await fetchRawCode(rawUrl), provider: 'Rscripts.net',
+        source, rawUrl, code: extractCode(row) || await fetchRawCode(rawUrl, 'Rscripts.net'), provider: 'Rscripts.net',
         game: row.game?.title || 'Roblox', author: row.creator?.username,
         tags: row.tags, risk: row.risk || null
       });
@@ -439,7 +447,7 @@ async function main() {
       for (const entry of entries) {
         if (!isDuplicate(entry, existing, collected)) collected.push(entry);
       }
-      reports.push({ source: name, added: entries.length, status: 'ok' });
+      reports.push({ source: name, added: entries.length, status: 'ok', metrics: metricsFor(name) });
     } catch (error) {
       reports.push({ source: name, added: 0, status: 'error', error: error.message });
       console.warn(name + ': ' + error.message);
