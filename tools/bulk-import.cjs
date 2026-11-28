@@ -83,9 +83,17 @@ function extractCode(value, depth = 0) {
   }
   return '';
 }
-async function fetchRawCode(url) {
+async function fetchRawCode(url, provider = 'unknown') {
   if (!INCLUDE_CODE || !url) return '';
-  try { return extractCode(await fetchText(url)); } catch { return ''; }
+  try {
+    const code = extractCode(await fetchText(url));
+    if (!code) console.warn('[' + provider + '] Respuesta raw sin código reconocible: ' + providerName(url));
+    return code;
+  } catch (error) {
+    metricsFor(provider).rawFetchErrors++;
+    console.warn('[' + provider + '] Error descargando raw (' + providerName(url) + '): ' + error.message);
+    return '';
+  }
 }
 function looksLikeCode(value) {
   const text = normalizedCode(value);
@@ -263,26 +271,37 @@ function scriptBloxRows(payload) {
 }
 async function importScriptBlox(existing) {
   const added = [];
+  const stats = metricsFor('ScriptBlox');
   for (let page = 1; page <= MAX_PAGES && added.length < TARGET; page++) {
     const url = new URL('/api/script/fetch', SOURCES.scriptblox);
     url.search = new URLSearchParams({ page: String(page), max: String(PAGE_SIZE), mode: 'free', patched: '0' }).toString();
     const payload = await fetchJson(url);
     const rows = scriptBloxRows(payload);
-    if (!rows.length) break;
+    stats.listings += rows.length;
+    if (!rows.length) {
+      console.log('[ScriptBlox] Página ' + page + ': 0 filas; claves raíz=' + Object.keys(payload || {}).join(', '));
+      break;
+    }
+    let pageCode = 0, pageMissing = 0, pageRejected = 0, pageAdded = 0;
     for (const row of rows) {
       if (added.length >= TARGET) break;
       const slug = String(row.slug || row._id || row.id || '');
-      if (!slug) continue;
+      if (!slug) { stats.rejected++; pageRejected++; continue; }
       const detailUrl = new URL('/api/script/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
+      const rawUrl = new URL('/api/script/raw/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       let detail = row;
-      let rawUrl = new URL('/api/script/raw/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       let code = extractCode(row);
       try {
         const detailPayload = await fetchJson(detailUrl);
         detail = detailPayload?.script || detailPayload?.result || detailPayload?.data || detailPayload || row;
         if (!code) code = extractCode(detail);
-      } catch {}
-      if (!code && rawUrl) code = await fetchRawCode(rawUrl, 'ScriptBlox');\n      if (looksLikeCode(code)) stats.codeFound++; else stats.missingCode++;
+      } catch (error) {
+        stats.detailFetchErrors++;
+        console.warn('[ScriptBlox] Error en detalle ' + slug + ': ' + error.message);
+      }
+      if (!code) code = await fetchRawCode(rawUrl, 'ScriptBlox');
+      if (looksLikeCode(code)) { stats.codeFound++; pageCode++; }
+      else { stats.missingCode++; pageMissing++; }
       const source = new URL('/script/' + encodeURIComponent(slug), SOURCES.scriptblox).href;
       const entry = makeEntry({
         id: slug, title: detail.title || row.title, description: detail.features || detail.description || row.description,
@@ -290,10 +309,13 @@ async function importScriptBlox(existing) {
         author: detail.owner?.username || detail.creator?.username || row.owner?.username,
         tags: detail.tags || row.tags
       });
-      if (entry) entry.image = await downloadThumbnail(extractImageUrl(detail, row), 'ScriptBlox', slug);
-      if (!entry) stats.rejected++;\n      if (entry && !isDuplicate(entry, existing, added)) { added.push(entry); stats.added++; }\n      else if (entry) stats.duplicateCandidates++;
+      if (!entry) { stats.rejected++; pageRejected++; continue; }
+      entry.image = await downloadThumbnail(extractImageUrl(detail, row), 'ScriptBlox', slug);
+      if (entry.image) stats.imagesDownloaded++; else stats.imagesUnavailable++;
+      if (!isDuplicate(entry, existing, added)) { added.push(entry); stats.added++; pageAdded++; }
+      else stats.duplicateCandidates++;
     }
-    console.log('[ScriptBlox] Página ' + page + ': listados=' + rows.length + ', código válido acumulado=' + stats.codeFound + ', sin código=' + stats.missingCode + ', rechazados=' + stats.rejected + ', duplicados=' + stats.duplicateCandidates + ', añadidos=' + added.length + '.');
+    console.log('[ScriptBlox] Página ' + page + ': filas=' + rows.length + ', con código=' + pageCode + ', sin código=' + pageMissing + ', rechazadas=' + pageRejected + ', nuevas=' + pageAdded + '.');
     if (rows.length < PAGE_SIZE) break;
     await sleep(WAIT_MS);
   }
@@ -301,28 +323,40 @@ async function importScriptBlox(existing) {
 }
 async function importRobloxScripts(existing) {
   const added = [];
+  const stats = metricsFor('RobloxScripts.com');
   for (let page = 1; page <= MAX_PAGES && added.length < TARGET; page++) {
     const url = new URL('/api/v1/scripts', SOURCES.robloxscripts);
     url.search = new URLSearchParams({ access: 'free', sort: 'newest', page: String(page), limit: '50' }).toString();
     const payload = await fetchJson(url);
-    if (!Array.isArray(payload?.data)) { console.warn('[RobloxScripts.com] Respuesta inesperada; claves raíz=' + Object.keys(payload || {}).join(', ')); break; }\n    stats.listings += payload.data.length;
+    if (!Array.isArray(payload?.data)) {
+      console.warn('[RobloxScripts.com] Respuesta inesperada; claves raíz=' + Object.keys(payload || {}).join(', '));
+      break;
+    }
+    stats.listings += payload.data.length;
     if (!String(payload.meta?.attribution || '').toLowerCase().includes('robloxscripts.com')) throw new Error('RobloxScripts: falta la atribución oficial.');
+    let pageCode = 0, pageMissing = 0, pageRejected = 0, pageAdded = 0;
     for (const row of payload.data) {
       if (added.length >= TARGET) break;
       const source = safeUrl(row.scriptPageUrl, ['robloxscripts.com', 'www.robloxscripts.com']);
       const rawUrl = safeUrl(row.rawScriptUrl, ['robloxscripts.com', 'www.robloxscripts.com']);
-      if (!source || !rawUrl) continue;
+      if (!source || !rawUrl) { stats.rejected++; pageRejected++; continue; }
       let code = extractCode(row);
-      if (!code) code = await fetchRawCode(rawUrl, 'RobloxScripts.com');\n      if (looksLikeCode(code)) stats.codeFound++; else stats.missingCode++;
+      if (!code) code = await fetchRawCode(rawUrl, 'RobloxScripts.com');
+      if (looksLikeCode(code)) { stats.codeFound++; pageCode++; }
+      else { stats.missingCode++; pageMissing++; }
       const entry = makeEntry({
         id: row.id, title: row.title, description: row.description,
         source, rawUrl, code, provider: 'RobloxScripts.com',
         game: row.game?.name || (row.isUniversal ? 'Universal' : 'Roblox'),
         author: row.author?.username, tags: row.tags
       });
-      if (entry) entry.image = await downloadThumbnail(extractImageUrl(row), 'RobloxScripts.com', row.id);
-      if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
+      if (!entry) { stats.rejected++; pageRejected++; continue; }
+      entry.image = await downloadThumbnail(extractImageUrl(row), 'RobloxScripts.com', row.id);
+      if (entry.image) stats.imagesDownloaded++; else stats.imagesUnavailable++;
+      if (!isDuplicate(entry, existing, added)) { added.push(entry); stats.added++; pageAdded++; }
+      else stats.duplicateCandidates++;
     }
+    console.log('[RobloxScripts.com] Página ' + page + ': filas=' + payload.data.length + ', con código=' + pageCode + ', sin código=' + pageMissing + ', rechazadas=' + pageRejected + ', nuevas=' + pageAdded + '.');
     if (!payload.data.length || payload.data.length < 50 || page >= Number(payload.pagination?.totalPages || 999)) break;
     await sleep(WAIT_MS);
   }
@@ -330,29 +364,38 @@ async function importRobloxScripts(existing) {
 }
 async function importRScripts(existing) {
   const key = process.env.RSCRIPTS_API_KEY || process.env.RSCRIPT_API_KEY;
-  if (!key) return [];
+  const stats = metricsFor('Rscripts.net');
+  if (!key) { console.warn('[Rscripts.net] Omitido: falta RSCRIPTS_API_KEY.'); return []; }
   const added = [];
   for (let page = 1; page <= Math.min(MAX_PAGES, 200) && added.length < TARGET; page++) {
     const url = new URL('/v1/scripts', SOURCES.rscripts);
     url.search = new URLSearchParams({ page: String(page), limit: '48', sort: 'newest', freeOnly: 'true', includeScript: String(INCLUDE_CODE) }).toString();
     const payload = await fetchJson(url, { Authorization: 'Bearer ' + key });
     const rows = Array.isArray(payload?.data) ? payload.data : [];
+    stats.listings += rows.length;
+    let pageCode = 0, pageMissing = 0, pageRejected = 0, pageAdded = 0;
     for (const row of rows) {
       if (added.length >= TARGET) break;
       const source = 'https://rscripts.net/script/' + encodeURIComponent(String(row.slug || ''));
       const rawUrl = safeUrl(row.rawScript, ['rscripts.net', 'www.rscripts.net']);
       const risk = row.risk?.score;
-      if (Number.isFinite(risk) && risk > 3) continue;
-      if (row.risk?.isObfuscated === true) continue;
+      if ((Number.isFinite(risk) && risk > 3) || row.risk?.isObfuscated === true) { stats.rejected++; pageRejected++; continue; }
+      const code = extractCode(row) || await fetchRawCode(rawUrl, 'Rscripts.net');
+      if (looksLikeCode(code)) { stats.codeFound++; pageCode++; }
+      else { stats.missingCode++; pageMissing++; }
       const entry = makeEntry({
         id: row.id || row.slug, title: row.title, description: row.description,
-        source, rawUrl, code: extractCode(row) || await fetchRawCode(rawUrl, 'Rscripts.net'), provider: 'Rscripts.net',
+        source, rawUrl, code, provider: 'Rscripts.net',
         game: row.game?.title || 'Roblox', author: row.creator?.username,
         tags: row.tags, risk: row.risk || null
       });
-      if (entry) entry.image = await downloadThumbnail(extractImageUrl(row), 'Rscripts.net', row.id || row.slug);
-      if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
+      if (!entry) { stats.rejected++; pageRejected++; continue; }
+      entry.image = await downloadThumbnail(extractImageUrl(row), 'Rscripts.net', row.id || row.slug);
+      if (entry.image) stats.imagesDownloaded++; else stats.imagesUnavailable++;
+      if (!isDuplicate(entry, existing, added)) { added.push(entry); stats.added++; pageAdded++; }
+      else stats.duplicateCandidates++;
     }
+    console.log('[Rscripts.net] Página ' + page + ': filas=' + rows.length + ', con código=' + pageCode + ', sin código=' + pageMissing + ', rechazadas=' + pageRejected + ', nuevas=' + pageAdded + '.');
     if (!rows.length || rows.length < 48 || page >= Number(payload.meta?.totalPages || 999)) break;
     await sleep(WAIT_MS);
   }
@@ -367,19 +410,25 @@ function extractCodeFromHtml(html) {
   return candidates.sort((a, b) => b.length - a.length)[0] || '';
 }
 async function importAllowlistedPages(existing) {
+  const stats = metricsFor('Web allowlist');
   const urls = String(process.env.RCC_BULK_SOURCE_URLS || '').split(/\s*,\s*/).filter(Boolean);
   const added = [];
+  stats.listings += urls.length;
+  if (!urls.length) console.log('[Web allowlist] Sin URLs configuradas en RCC_BULK_SOURCE_URLS.');
   for (const value of urls) {
     if (added.length >= TARGET) break;
     const url = safeUrl(value, ['wearedevs.net', 'www.wearedevs.net', 'rscripts.info', 'www.rscripts.info', 'pastebin.com', 'www.pastebin.com']);
-    if (!url) { console.warn('URL externa ignorada: dominio o protocolo no permitido.'); continue; }
+    if (!url) { console.warn('URL externa ignorada: dominio o protocolo no permitido.'); stats.rejected++; continue; }
     try {
       const html = await fetchText(url);
       const code = extractCode(extractCodeFromHtml(html) || (/<html\b/i.test(html) ? '' : html));
+      if (looksLikeCode(code)) stats.codeFound++; else stats.missingCode++;
       const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || new URL(url).pathname.split('/').pop(), 160);
       const provider = new URL(url).hostname.replace(/^www\./, '');
       const entry = makeEntry({ id: url, title, description: 'Ficha recogida desde una URL pública permitida.', source: url, rawUrl: null, code, provider, game: 'Roblox' });
-      if (entry && !isDuplicate(entry, existing, added)) added.push(entry);
+      if (!entry) stats.rejected++;
+      else if (!isDuplicate(entry, existing, added)) { added.push(entry); stats.added++; }
+      else stats.duplicateCandidates++;
     } catch (error) { console.warn(providerName(url) + ': ' + error.message); }
     await sleep(WAIT_MS);
   }
@@ -471,6 +520,7 @@ async function main() {
     const verified = readCatalog();
     if (verified.length !== next.length) throw new Error('Verificación posterior a la escritura fallida.');
   }
+  console.log('Diagnóstico por fuente: ' + JSON.stringify(SOURCE_METRICS, null, 2));
   console.log(JSON.stringify({
     dryRun: DRY_RUN,
     includeCode: INCLUDE_CODE,
